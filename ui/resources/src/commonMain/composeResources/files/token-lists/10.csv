@@ -1,0 +1,12 @@
+name,symbol,decimals,address,icon,type
+USD Coin,USDC,6,0b2c639c533813f4aa9d7837caf62653d097ff85,usdc,erc20
+Tether USD,USD₮,6,94b008aA00579c1307B0EF2c499aD98a8ce58e58,usdt,erc20
+Wrapped Ether,WETH,18,4200000000000000000000000000000000000006,eth,erc20
+Optimism,OP,18,4200000000000000000000000000000000000042,op,erc20
+Wrapped BTC,WBTC,8,68f180fcCe6836688e9084f035309E29Bf0A2095,wbtc,erc20
+Coinbase Wrapped Staked ETH,cbETH,18,addb6a0412de1ba0f936dcaeb8aaa24578dcf3b2,cbeth,erc20
+Dai Stablecoin,DAI,18,da10009cbd5d07dd0cecc66161fc93d7c9000da1,dai,erc20
+Rocket Pool ETH,rETH,18,9bcef72be871e61ed4fbbc7630889bee758eb81d,reth,erc20
+Wrapped liquid staked Ether 2.0,wstETH,18,1f32b1c2345538c0c6f582fcb022739c4a194ebb,wsteth,erc20
+Savings Dai,sDAI,18,2218a117083f5b482b0bb821d27056ba9c04b1d3,sdai,erc20
+Ankr Staked ETH,ankrETH,18,e05a08226c49b636acf99c40da8dc6af83ce5bb3,ankreth,erc20

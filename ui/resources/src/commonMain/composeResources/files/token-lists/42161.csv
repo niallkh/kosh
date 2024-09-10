@@ -1,0 +1,12 @@
+name,symbol,decimals,address,icon,type
+USD Coin,USDC,6,af88d065e77c8cc2239327c5edb3a432268e5831,usdc,erc20
+Gho Token,GHO,18,7dff72693f6a4149b17e7c6314655f6a9f7c8b33,gho,erc20
+Arbitrum,ARB,18,912ce59144191c1204e64559fe8253a0e49e6548,arb,erc20
+Rocket Pool ETH,rETH,18,ec70dcb4a1efa46b8f2d97c310c9c4790ba5ffa8,reth,erc20
+Coinbase Wrapped Staked ETH,cbETH,18,1debd73e752beaf79865fd6446b0c970eae7732f,cbeth,erc20
+Wrapped Ether,WETH,18,82af49447d8a07e3bd95bd0d56f35241523fbab1,eth,erc20
+Tether USD,USD₮,6,fd086bc7cd5c481dcc9c85ebe478a1c0b69fcbb9,usdt,erc20
+USD Coin (Arb1),USDC,6,ff970a61a04b1ca14834a43f5de4533ebddb5cc8,usdc,erc20
+Wrapped BTC,WBTC,8,2f2a2543B76A4166549F7aaB2e75Bef0aefC5B0f,wbtc,erc20
+Dai Stablecoin,DAI,18,da10009cbd5d07dd0cecc66161fc93d7c9000da1,dai,erc20
+Ankr Staked ETH,ankrETH,18,e05a08226c49b636acf99c40da8dc6af83ce5bb3,ankreth,erc20

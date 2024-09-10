@@ -1,0 +1,14 @@
+syntax = "proto2";
+
+option java_package = "kosh.libs.ipfs.car.proto";
+
+message PBLink {
+  optional bytes hash = 1;
+  optional string name = 2;
+  optional uint64 tsize = 3;
+}
+
+message PBNode {
+  repeated PBLink links = 2;
+  optional bytes data = 1;
+}

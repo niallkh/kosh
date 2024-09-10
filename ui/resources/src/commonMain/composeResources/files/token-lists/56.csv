@@ -1,0 +1,8 @@
+name,symbol,decimals,address,icon,type
+Wrapped BNB,WBNB,18,bb4cdb9cbd36b01bd1cbaebf2de08d9173bc095c,bnb,erc20
+Tether USD,USD₮,18,55d398326f99059ff775485246999027b3197955,usdt,erc20
+USD Coin,USDC,18,8ac76a51cc950d9822d68b83fe1ad97b32cd580d,usdc,erc20
+Binance Beacon ETH,BETH,18,250632378e573c6be1ac2f97fcdf00515d0aa91b,beth,erc20
+Ethereum Token,ETH,18,2170ed0880ac9a755fd29b2688956bd959f933f8,eth,erc20
+Dai Token,DAI,18,1af3f329e8be154074d8769d1ffa4ee058b1dbc3,dai,erc20
+BTCB Token,BTCB,18,7130d2a12b9bcbfae4f2634d864a1ee1ce3ead9c,btc,erc20

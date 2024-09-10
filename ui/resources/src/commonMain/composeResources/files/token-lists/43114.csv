@@ -1,0 +1,11 @@
+name,symbol,decimals,address,icon,type
+USD Coin,USDC,6,b97ef9ef8734c71904d8002f8b6bc66dd9c48a6e,usdc,erc20
+Euro Coin,EURC,6,c891eb4cbdeff6e073e859e987815ed1505c2acd,eurc,erc20
+Tether USD,USD₮,6,9702230a8ea53601f5cd2dc00fdbc13d4df4a8c7,usdt,erc20
+Tether USD,USDT.e,6,c7198437980c041c805a1edcba50c1ce5db95118,usdt,erc20
+USD Coin,USDC.e,6,a7d7079b0fead91f3e65f86e8915cb59c1a4c664,usdc,erc20
+Wrapped Ether,WETH.e,6,49d5c2bdffac6ce2bfdb6640f4f80f226bc10bab,eth,erc20
+Wrapped BTC,WBTC.e,8,50b7545627a5162f82a992c33b87adc75187b218,wbtc,erc20
+Dai Stablecoin,DAI.e,18,d586e7f844cea2f87f50152665bcbc2c279d8d70,dai,erc20
+Bitcoin,BTC.b,8,152b9d0fdc40c096757f570a51e494bd4b943e50,btc,erc20
+Wrapped AVAX,WAVAX,18,b31f66aa3c1e785363f0875a1b74e27b85fd66c7,avax,erc20

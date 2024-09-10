@@ -1,0 +1,116 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">Ethereal</string>
+
+    <!--  Wallets  -->
+    <string name="wallets_title">Wallets</string>
+    <string name="wallets_add_account_btn">Add Account</string>
+    <string name="wallets_new_wallet_btn">New Wallet</string>
+    <string name="account_failure_dialog_ok_btn">OK</string>
+    <string name="account_failure_dialog_cancel_btn">Cancel</string>
+
+    <!--  Wallets  -->
+    <string name="account_title">Account</string>
+
+    <!--  Dapps  -->
+    <string name="dapps_title">Dapps</string>
+    <string name="dapps_trezor_passkeys">Trezor Passkeys</string>
+    <string name="dapps_wc">WalletConnect</string>
+
+    <!--  Networks  -->
+    <string name="networks_title">Networks</string>
+    <string name="networks_add_btn">Add Network</string>
+    <string name="network_title_add">Add Network</string>
+    <string name="network_title_update">Update Network</string>
+    <string name="network_input_chain_id_label">Chain ID</string>
+    <string name="network_input_name_label">Network Name</string>
+    <string name="network_input_read_rpc_label">RPC Url</string>
+    <string name="network_input_write_rpc_label">Send RPC Url (optional)</string>
+    <string name="network_input_explorer_label">Explorer Url (optional)</string>
+    <string name="network_input_icon_label">Network Icon (optional)</string>
+    <string name="network_input_token_name_label">Token Name</string>
+    <string name="network_input_token_symbol_label">Token Symbol</string>
+    <string name="network_input_token_icon_label">Token Icon (optional)</string>
+    <string name="network_failure_dialog_ok_btn">OK</string>
+    <string name="network_failure_dialog_cancel_btn">Cancel</string>
+
+    <!--  Tokens  -->
+    <string name="tokens_title">Tokens</string>
+    <string name="tokens_add_btn">Add Token</string>
+    <string name="token_add_title">Add Token</string>
+    <string name="token_update_title">Update Token</string>
+    <string name="token_input_chain_id_label">Chain Id</string>
+    <string name="token_input_address_label">Address</string>
+    <string name="token_input_token_id_label">Token Id</string>
+    <string name="token_input_name_label">Token Name</string>
+    <string name="token_input_symbol_label">Token Symbol</string>
+    <string name="token_input_decimals_label">Decimals</string>
+    <string name="token_input_icon_label">Icon</string>
+    <string name="token_failure_dialog_ok_btn">OK</string>
+    <string name="token_failure_dialog_cancel_btn">Cancel</string>
+
+    <!--  Errors  -->
+    <string name="error_dialog_confirm">OK</string>
+    <string name="error_dialog_smth_went_wrong">Smth went wrong</string>
+
+    <!--  Trezor  -->
+    <string name="trezor_passphrase_dialog_title">Enter passphrase</string>
+    <string name="trezor_passphrase_textfield_label">Enter passphrase</string>
+    <string name="trezor_passphrase_dialog_confirm">Confirm</string>
+    <string name="trezor_passphrase_dialog_enter_on_device">Enter on Trezor</string>
+    <string name="trezor_passphrase_dialog_save">Save passphrase</string>
+    <string name="trezor_passphrase_biometric_title">Passphrase Biometric</string>
+    <string name="trezor_passphrase_biometric_subtitle">Confirm passphrase using your biometric</string>
+    <string name="trezor_pin_matrix_dialog_confirm">Confirm</string>
+    <string name="trezor_pin_matrix_textfield_label">Enter pin code</string>
+    <string name="trezor_failure_dialog_pin_code_cancelled">Pin Code cancelled</string>
+    <string name="trezor_failure_dialog_action_cancelled">Action cancelled</string>
+    <string name="trezor_failure_dialog_confirm">OK</string>
+    <string name="trezor_button_request_other">Confirm Action on Trezor</string>
+    <string name="trezor_button_request_pin_code">Enter Pin Code on Trezor</string>
+    <string name="trezor_not_connected">Trezor Not Connected!</string>
+    <string name="trezor_sign_title">Trezor Sign</string>
+
+    <!--  Trezor account  -->
+    <string name="trezor_new_account_title">Trezor New Account</string>
+    <string name="trezor_failure_dialog_ok_btn">OK</string>
+    <string name="trezor_failure_dialog_cancel_btn">Cancel</string>
+
+    <!--  Trezor passkeys  -->
+    <string name="trezor_passkeys_title">Trezor Passkeys</string>
+
+    <!--  WalletConnect  -->
+    <string name="wc_pair_title">Pair WalletConnect</string>
+    <string name="wc_pair_uri_label">Pairing Uri</string>
+    <string name="wc_proposal_title">WalletConnect Proposal</string>
+    <string name="wc_proposal_approve_btn">Approve</string>
+    <string name="wc_proposal_reject_btn">Reject</string>
+    <string name="wc_sessions_title">WalletConnect</string>
+    <string name="wc_session_title">WalletConnect Session</string>
+    <string name="wc_session_update_btn">Update</string>
+    <string name="wc_session_updated">Updated</string>
+    <string name="wc_session_disconnect_btn">Disconnect</string>
+    <string name="wc_request_title">WalletConnect Request</string>
+    <string name="wc_request_sign_btn">Sign</string>
+    <string name="wc_request_reject_btn">Reject</string>
+    <string name="wc_authentication_title">WalletConnect Authentication</string>
+    <string name="wc_authentication_authenticate_btn">Authenticate</string>
+    <string name="wc_authentication_reject_btn">Reject</string>
+
+    <string name="wc_psign_title">Sign Message</string>
+    <string name="wc_sign_typed_title">Sign Typed Message</string>
+
+    <string name="wc_sign_tx_title">Sign Transaction</string>
+    <string name="wc_sign_tx_send_btn">Send</string>
+
+    <!--  Failure  -->
+    <string name="failure_dialog_ok_btn">OK</string>
+    <string name="failure_dialog_cancel_btn">Cancel</string>
+
+    <!--  Balance  -->
+    <string name="portfolio_title">Assets</string>
+
+    <!--  Transaction  -->
+    <string name="transactions_title">Activity</string>
+
+</resources>

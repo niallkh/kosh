@@ -1,0 +1,8 @@
+name,symbol,decimals,address,icon,type
+USD Coin,USDC,6,833589fcd6edb6e08f4c7c32d4f71b54bda02913,usdc,erc20
+Wrapped Ether,WETH,18,4200000000000000000000000000000000000006,eth,erc20
+Coinbase Wrapped Staked ETH,cbETH,18,2ae3f1ec7f1f5012cfeab0185bfc7aa3cf0dec22,cbeth,erc20
+Dai Stablecoin,DAI,18,50c5725949a6f0c72e6c4a641f24049a917db0cb,dai,erc20
+Rocket Pool ETH,rETH,18,b6fe221fe9eef5aba221c348ba20a1bf5e73624c,reth,erc20
+Wrapped liquid staked Ether 2.0,wstETH,18,c1cba3fcea344f92d9239c08c0568f6f2f0ee452,wsteth,erc20
+Savings Dai,sDAI,18,99ac4484e8a1dbd6a185380b3a811913ac884d87,sdai,erc20

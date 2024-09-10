@@ -1,0 +1,20 @@
+CREATE TABLE kv (
+    key BLOB AS okio.ByteString NOT NULL PRIMARY KEY AUTOINCREMENT,
+    value BLOB AS okio.ByteString NOT NULL
+);
+
+
+insert:
+INSERT OR REPLACE INTO kv(key, value)
+VALUES (:key, :value);
+
+delete:
+DELETE FROM kv
+WHERE key = :key;
+
+get:
+SELECT value FROM kv
+WHERE key=:key
+LIMIT 1;
+
+

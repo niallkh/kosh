@@ -1,0 +1,9 @@
+name,symbol,decimals,address,icon,type
+Wrapped XDAI,WXDAI,18,e91d153e0b41518a2ce8dd3d7944fa863463a97d,dai,erc20
+Wrapped Ether on xDai,WETH,18,6a023ccd1ff6f2045c3309768ead9e68f978f6e1,eth,erc20
+Gnosis Token on xDai,GNO,18,9c58bacc331c9aa871afd802db6379a98e80cedb,gno,erc20
+Bridged USDC (Gnosis),USDC.e,6,2a22f9c3b484c3629090feed35f17ff8f88f76f0,usdc,erc20
+USD//C on xDai,USDC,6,ddafbb505ad214d7b80b1f830fccc89b60fb7a83,usdc,erc20
+Wrapped BTC on xDai,WBTC,8,8e5bbbb09ed1ebde8674cda39a0c169401db4252,wbtc,erc20
+Rocket Pool ETH from Mainnet,rETH,18,c791240d1f2def5938e2031364ff4ed887133c3d,reth,erc20
+Monerium EUR emoney,EURe,18,cb444e90d8198415266c6a2724b7900fb12fc56e,eure,erc20
