@@ -16,7 +16,7 @@ import kosh.presentation.wc.rememberSessions
 import kosh.ui.component.LoadingIndicator
 import kosh.ui.component.dapp.DappItem
 import kosh.ui.component.illustration.Illustration
-import kosh.ui.resources.illustrations.WcEmpty
+import kosh.ui.resources.illustrations.DappsEmpty
 
 @Composable
 fun WcSessionsScreen(
@@ -44,7 +44,7 @@ fun WcSessionsContent(
         if (sessions.isEmpty()) {
             item {
                 Illustration(
-                    WcEmpty(),
+                    DappsEmpty(),
                     "WcEmpty",
                     Modifier
                         .fillMaxWidth()

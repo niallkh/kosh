@@ -50,7 +50,7 @@ import kosh.ui.component.text.TextLine
 import kosh.ui.resources.Res
 import kosh.ui.resources.icons.LedgerIcon
 import kosh.ui.resources.icons.TrezorIcon
-import kosh.ui.resources.illustrations.AccountsEmpty
+import kosh.ui.resources.illustrations.WalletsEmpty
 import kosh.ui.resources.wallets_title
 import kotlinx.collections.immutable.PersistentList
 import org.jetbrains.compose.resources.stringResource
@@ -117,7 +117,7 @@ fun WalletsContent(
             if (wallets.isEmpty()) {
                 item {
                     Illustration(
-                        AccountsEmpty(),
+                        WalletsEmpty(),
                         "AccountsEmpty",
                         Modifier
                             .fillMaxWidth()
