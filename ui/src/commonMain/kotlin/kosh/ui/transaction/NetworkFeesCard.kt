@@ -14,6 +14,7 @@ import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
+import arrow.core.raise.nullable
 import kosh.domain.entities.TransactionEntity
 import kosh.domain.models.web3.Transaction
 import kosh.domain.models.web3.gasPrice
@@ -62,14 +63,15 @@ fun NetworkFeesCard(
             } ?: gasEstimation?.failure?.let {
                 AppFailureItem(it) { gasEstimation.retry() }
             } ?: run {
-
-            }
-
-            val maxFees = gasPrice?.gasPrice.orZero() *
-                    gasEstimation?.estimation?.gas?.toLong().orZero()
-
-            TokenAmountItem(token?.entity, maxFees) {
-                Text("Max Amount")
+                TokenAmountItem(
+                    token?.entity,
+                    nullable {
+                        ensureNotNull(gasPrice).gasPrice *
+                                ensureNotNull(gasEstimation?.estimation).gas.toLong()
+                    }
+                ) {
+                    Text("Max Amount")
+                }
             }
 
             AnimatedVisibility(expanded) {

@@ -178,7 +178,8 @@ fun WcSendTransactionContent(
                         )
 
                         val gasSpeed = rememberGasSpeed()
-                        val gasPrices = transaction?.chainId?.let { rememberGasPrices(it, signing) }
+                        val gasPrices =
+                            transaction?.chainId?.let { rememberGasPrices(it, !signing) }
                         val gasEstimation = transaction?.let { rememberEstimateGas(transaction) }
 
                         NetworkFeesCard(
