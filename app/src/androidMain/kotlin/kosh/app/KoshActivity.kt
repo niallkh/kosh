@@ -46,6 +46,7 @@ import kosh.ui.navigation.routes.RootRoute
 import kosh.ui.navigation.stack.DefaultStackRouter
 import kosh.ui.navigation.stack.StackRouter
 import kotlinx.serialization.serializer
+import java.math.BigDecimal
 import kotlin.LazyThreadSafetyMode.NONE
 
 class KoshActivity : FragmentActivity() {
@@ -100,6 +101,8 @@ class KoshActivity : FragmentActivity() {
         val applicationLifecycle = ApplicationLifecycle(routeContext.lifecycle)
         val fileRepo = windowScope.appRepositoriesComponent.fileRepo
         val pathResolver = PathResolver { fileRepo.read(it) }
+
+        BigDecimal.ZERO.toEngineeringString()
 
         setContent {
             CompositionLocalProvider(

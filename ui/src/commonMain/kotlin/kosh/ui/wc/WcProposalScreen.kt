@@ -128,11 +128,11 @@ fun WcSessionProposalContent(
             }
         },
         onUp = { onNavigateUp() }
-    ) { paddingValues ->
+    ) { innerPadding ->
         proposal.failure?.let {
-            AppFailureItem(it) { proposal.retry() }
+            AppFailureItem(it, Modifier.padding(innerPadding)) { proposal.retry() }
         } ?: LazyColumn(
-            contentPadding = paddingValues
+            contentPadding = innerPadding
         ) {
 
             item {
@@ -217,7 +217,7 @@ fun WcSessionProposalContent(
 
         LoadingIndicator(
             proposal.loading,
-            Modifier.padding(paddingValues),
+            Modifier.padding(innerPadding),
         )
     }
 }

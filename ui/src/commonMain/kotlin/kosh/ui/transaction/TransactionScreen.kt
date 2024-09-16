@@ -265,8 +265,8 @@ fun TransactionContent(
                     KeyValueRow(
                         key = { Text("Status") },
                         value = {
-                            val text =
-                                if (transaction.receipt?.success == true) "Success" else "Failure"
+                            val text = if (transaction.receipt?.success == true) "Success"
+                            else "Failure"
                             TextLine(text)
                         }
                     )
@@ -274,7 +274,7 @@ fun TransactionContent(
 
                 KeyValueRow(
                     key = { Text("Hash") },
-                    value = { TextBytes(transaction.hash.value) }
+                    value = { TextBytes(transaction.hash.value, clickable = true) }
                 )
 
                 if (transaction.receipt != null) {

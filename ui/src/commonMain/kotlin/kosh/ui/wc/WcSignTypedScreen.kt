@@ -101,14 +101,14 @@ fun WcSignTypedContent(
             }
             Spacer(Modifier.width(8.dp))
         }
-    ) { paddingValues ->
+    ) { innerPadding ->
         signTyped.failure?.let {
-            AppFailureItem(it) { signTyped.retry() }
+            AppFailureItem(it, Modifier.padding(innerPadding)) { signTyped.retry() }
         } ?: run {
             Column(
                 modifier = Modifier
                     .verticalScroll(rememberScrollState())
-                    .padding(paddingValues),
+                    .padding(innerPadding),
                 verticalArrangement = Arrangement.spacedBy(16.dp)
             ) {
 
@@ -166,7 +166,7 @@ fun WcSignTypedContent(
 
         LoadingIndicator(
             signTyped.loading,
-            Modifier.padding(paddingValues),
+            Modifier.padding(innerPadding),
         )
     }
 }

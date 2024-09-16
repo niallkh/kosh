@@ -146,7 +146,8 @@ fun AccountContent(
                     value = {
                         TextAddressShort(
                             account?.address.orZero(),
-                            Modifier.placeholder(account == null)
+                            Modifier.placeholder(account == null),
+                            clickable = true,
                         )
                     }
                 )
@@ -158,6 +159,7 @@ fun AccountContent(
                         TextDerivationPath(
                             account?.derivationPath ?: ethereumDerivationPath(),
                             Modifier.placeholder(account == null),
+                            clickable = true
                         )
                     }
                 )

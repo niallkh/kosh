@@ -276,7 +276,7 @@ private fun InfoSection(
         KeyValueRow(
             modifier = Modifier.fillMaxWidth(),
             key = { TextLine("Type") },
-            value = { TextLine(token.entity?.type?.name?.lowercase().orEmpty()) }
+            value = { TextLine(token.entity?.type?.name?.uppercase().orEmpty()) }
         )
 
         val network = token.entity?.networkId?.let { rememberNetwork(it) }
@@ -287,7 +287,7 @@ private fun InfoSection(
             value = {
                 TextLine(
                     network?.entity?.name.orEmpty(),
-                    Modifier.placeholder(network?.entity == null)
+                    Modifier.placeholder(network?.entity == null),
                 )
             }
         )
@@ -299,7 +299,8 @@ private fun InfoSection(
                 value = {
                     TextAddressShort(
                         token.entity?.address.orZero(),
-                        Modifier.placeholder(token.entity == null)
+                        Modifier.placeholder(token.entity == null),
+                        clickable = true,
                     )
                 }
             )
@@ -314,7 +315,8 @@ private fun InfoSection(
                         Text("#")
                         TextNumber(
                             token.entity?.tokenId.orZero(),
-                            Modifier.placeholder(token.entity == null)
+                            Modifier.placeholder(token.entity == null),
+                            clickable = true,
                         )
                     }
                 }
@@ -328,6 +330,7 @@ private fun InfoSection(
                         token.entity?.uri ?: Uri.EMPTY,
                         Modifier.placeholder(token.entity == null),
                         maxWidth = 240.dp,
+                        clickable = true,
                     )
                 }
             )
@@ -339,7 +342,8 @@ private fun InfoSection(
                     TextUri(
                         token.entity?.image ?: Uri.EMPTY,
                         Modifier.placeholder(token.entity == null),
-                        maxWidth = 240.dp
+                        maxWidth = 240.dp,
+                        clickable = true,
                     )
                 }
             )
@@ -351,7 +355,8 @@ private fun InfoSection(
                     TextUri(
                         token.entity?.external ?: Uri.EMPTY,
                         Modifier.placeholder(token.entity == null),
-                        maxWidth = 240.dp
+                        maxWidth = 240.dp,
+                        clickable = true,
                     )
                 }
             )

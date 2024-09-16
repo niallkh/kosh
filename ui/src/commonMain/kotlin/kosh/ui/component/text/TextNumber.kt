@@ -17,6 +17,7 @@ import com.ionspin.kotlin.bignum.integer.BigInteger
 fun TextNumber(
     number: BigInteger,
     modifier: Modifier = Modifier,
+    clickable: Boolean = false,
 ) {
     val text = remember(number) {
         if (number.bitLength() < 64) {
@@ -31,7 +32,7 @@ fun TextNumber(
     Text(
         modifier = modifier
             .clip(MaterialTheme.shapes.extraSmall)
-            .clickable { clipboardManager.setText(AnnotatedString(text)) },
+            .clickable(clickable) { clipboardManager.setText(AnnotatedString(text)) },
         text = text,
         maxLines = 1,
         overflow = TextOverflow.Ellipsis,
@@ -43,6 +44,7 @@ fun TextNumber(
 fun TextNumber(
     number: ULong,
     modifier: Modifier = Modifier,
+    clickable: Boolean = false,
 ) {
     val text = remember(number) {
         number.toString()
@@ -53,7 +55,7 @@ fun TextNumber(
     Text(
         modifier = modifier
             .clip(MaterialTheme.shapes.extraSmall)
-            .clickable { clipboardManager.setText(AnnotatedString(text)) },
+            .clickable(clickable) { clipboardManager.setText(AnnotatedString(text)) },
         text = text,
         maxLines = 1,
         overflow = TextOverflow.Ellipsis,

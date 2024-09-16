@@ -72,6 +72,7 @@ fun NewLedgerAccountScreen(
 
         } ?: AppFailureItem(
             LedgerFailure.NotConnected(),
+            Modifier.padding(paddingValues),
         )
     }
 }

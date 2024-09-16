@@ -35,7 +35,7 @@ fun <T : AppFailure> AppFailureMessage(
 
             val result = snackbarHostState.showSnackbar(
                 message = failure.message,
-                actionLabel = "retry".takeIf { retryAble },
+                actionLabel = "Retry".takeIf { retryAble },
                 duration = if (retryAble) SnackbarDuration.Indefinite else SnackbarDuration.Long,
                 withDismissAction = retryAble,
             )
@@ -66,7 +66,7 @@ fun <T : AppFailure> AppFailureMessage(
 
             val result = snackbarHostState.showSnackbar(
                 message = failure.message,
-                actionLabel = "retry".takeIf { retryAble },
+                actionLabel = "Retry".takeIf { retryAble },
                 duration = if (retryAble) SnackbarDuration.Long else SnackbarDuration.Short,
                 withDismissAction = retryAble,
             )
