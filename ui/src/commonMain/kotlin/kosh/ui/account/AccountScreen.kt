@@ -109,10 +109,7 @@ fun AccountContent(
 
                 AdaptiveMenuItem(
                     leadingIcon = {
-                        Icon(
-                            Icons.AutoMirrored.Filled.OpenInNew,
-                            "Open in explorer"
-                        )
+                        Icon(Icons.AutoMirrored.Filled.OpenInNew, "Open in explorer")
                     },
                     onClick = {
                         dismiss {

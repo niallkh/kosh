@@ -17,15 +17,19 @@ import kosh.domain.repositories.GasRepo
 import kosh.presentation.di.di
 import kosh.presentation.di.rememberLifecycleState
 import kosh.presentation.di.rememberSerializable
+import kotlinx.coroutines.delay
+import kotlin.time.Duration.Companion.seconds
 
 @Composable
 fun rememberGasPrices(
     chainId: ChainId,
-) = rememberGasPrices(NetworkEntity.Id(chainId))
+    active: Boolean = true,
+) = rememberGasPrices(NetworkEntity.Id(chainId), active)
 
 @Composable
 fun rememberGasPrices(
     networkId: NetworkEntity.Id,
+    active: Boolean = true,
     gasRepo: GasRepo = di { appRepositories.gasRepo },
 ): GasPricesState {
     var gasPrices by rememberSerializable { mutableStateOf<GasPrices?>(null) }
@@ -34,18 +38,24 @@ fun rememberGasPrices(
     var retry by remember { mutableIntStateOf(0) }
 
     if (rememberLifecycleState()) {
-        LaunchedEffect(retry, networkId) {
-            loading = true
+        LaunchedEffect(retry, networkId, active) {
+            if (!active) return@LaunchedEffect
 
-            recover({
-                gasPrices = gasRepo.gasPrices(networkId).bind()
+            while (true) {
+                loading = true
 
-                loading = false
-                failure = null
-            }) {
-                failure = it
-                loading = false
-                gasPrices = null
+                recover({
+                    gasPrices = gasRepo.gasPrices(networkId).bind()
+
+                    loading = false
+                    failure = null
+                }) {
+                    failure = it
+                    loading = false
+                    gasPrices = null
+                }
+
+                delay(30.seconds)
             }
         }
     }

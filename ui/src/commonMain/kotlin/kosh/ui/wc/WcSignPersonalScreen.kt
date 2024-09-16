@@ -145,6 +145,9 @@ fun WcSignPersonalContent(
             }
         }
 
-        LoadingIndicator(signPersonal.loading)
+        LoadingIndicator(
+            signPersonal.loading,
+            Modifier.padding(paddingValues),
+        )
     }
 }

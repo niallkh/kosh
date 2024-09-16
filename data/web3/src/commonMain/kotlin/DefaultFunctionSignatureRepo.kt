@@ -48,7 +48,7 @@ class DefaultFunctionSignatureRepo(
                     }
             }
 
-            response.results.maxByOrNull { it.createdAt }?.textSignature
+            response.results.minByOrNull { it.createdAt }?.textSignature
         }
     }
 

@@ -165,6 +165,9 @@ fun WcAddNetworkContent(
             )
         }
 
-        LoadingIndicator(addNetwork.loading)
+        LoadingIndicator(
+            addNetwork.loading,
+            Modifier.padding(paddingValues),
+        )
     }
 }

@@ -215,7 +215,10 @@ fun WcSessionProposalContent(
             }
         }
 
-        LoadingIndicator(proposal.loading)
+        LoadingIndicator(
+            proposal.loading,
+            Modifier.padding(paddingValues),
+        )
     }
 }
 

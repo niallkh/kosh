@@ -12,7 +12,8 @@ fun TextFunctionName(contractCall: ContractCall?) {
     if (contractCall?.selector != null) {
         val functionName = contractCall.selector?.let { rememberFunctionName(it) }
         TextLine(
-            functionName?.functionName?.value ?: "Contract Call",
+            functionName?.functionName?.value?.replaceFirstChar { it.uppercaseChar() }
+                ?: "Contract Call",
             Modifier.placeholder(functionName == null)
         )
     } else {

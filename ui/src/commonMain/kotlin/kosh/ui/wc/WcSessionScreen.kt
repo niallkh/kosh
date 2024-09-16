@@ -221,6 +221,9 @@ fun WcSessionContent(
             }
         }
 
-        LoadingIndicator(session.loading)
+        LoadingIndicator(
+            session.loading,
+            Modifier.padding(paddingValues),
+        )
     }
 }

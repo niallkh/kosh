@@ -113,7 +113,10 @@ fun SearchTokenScreen(
                     )
                 }
 
-                LoadingIndicator(searchToken.loading || createToken.loading)
+                LoadingIndicator(
+                    searchToken.loading || createToken.loading,
+                    Modifier.padding(innerPadding),
+                )
             }
         }
     }

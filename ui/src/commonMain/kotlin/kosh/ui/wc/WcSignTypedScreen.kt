@@ -164,6 +164,9 @@ fun WcSignTypedContent(
             }
         }
 
-        LoadingIndicator(signTyped.loading)
+        LoadingIndicator(
+            signTyped.loading,
+            Modifier.padding(paddingValues),
+        )
     }
 }

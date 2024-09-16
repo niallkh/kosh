@@ -66,7 +66,7 @@ fun WcSessionsContent(
             key = { it.id.sessionTopic.value }
         ) { session ->
             DappItem(
-                modifier = Modifier.animateItemPlacement(),
+                modifier = Modifier.animateItem(),
                 dapp = session.dapp,
                 onClick = { onSelect(session) },
             )
@@ -77,5 +77,8 @@ fun WcSessionsContent(
         }
     }
 
-    LoadingIndicator(loading)
+    LoadingIndicator(
+        loading,
+        Modifier.padding(paddingValues),
+    )
 }

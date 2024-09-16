@@ -13,6 +13,7 @@ import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.filled.OpenInNew
 import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material.icons.filled.Image
 import androidx.compose.material.icons.filled.OpenInBrowser
@@ -38,6 +39,7 @@ import kosh.domain.models.token.NftExtendedMetadata
 import kosh.domain.serializers.ImmutableList
 import kosh.domain.utils.orZero
 import kosh.presentation.network.rememberNetwork
+import kosh.presentation.network.rememberOpenExplorer
 import kosh.presentation.token.rememberNftMetadata
 import kosh.presentation.token.rememberRefreshToken
 import kosh.presentation.token.rememberToken
@@ -171,7 +173,10 @@ fun TokenScreen(
                 nftMetadata?.loading == true ||
                 tokenBalances.loading
 
-        LoadingIndicator(loading, Modifier.padding(paddingValues))
+        LoadingIndicator(
+            loading,
+            Modifier.padding(paddingValues)
+        )
     }
 }
 
@@ -238,6 +243,18 @@ private fun TokenMoreMenu(
                     }
                 )
             }
+        }
+
+        if (token != null && token.type != Type.Native) {
+            val openExplorer = rememberOpenExplorer(token.networkId)
+
+            DropdownMenuItem(
+                text = { Text("Open In Explorer") },
+                onClick = { dismiss { token.address?.let { openExplorer.openToken(it) } } },
+                leadingIcon = {
+                    Icon(Icons.AutoMirrored.Filled.OpenInNew, "Open in explorer")
+                }
+            )
         }
     }
 }

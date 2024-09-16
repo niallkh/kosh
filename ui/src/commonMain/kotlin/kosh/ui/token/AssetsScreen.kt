@@ -50,7 +50,10 @@ fun AssetsScreen(
         onSelect = { open(it.id, it.isNft) },
     )
 
-    LoadingIndicator(balances.loading)
+    LoadingIndicator(
+        balances.loading,
+        Modifier.padding(paddingValues),
+    )
 }
 
 
@@ -124,7 +127,7 @@ private fun LazyListScope.balances(
         key = { it.token.id.value.toString() }
     ) { tokenBalance ->
         TokenBalanceItem(
-            modifier = Modifier.animateItemPlacement(),
+            modifier = Modifier.animateItem(),
             tokenBalance = tokenBalance,
             onClick = { onSelect(tokenBalance.token) }
         )

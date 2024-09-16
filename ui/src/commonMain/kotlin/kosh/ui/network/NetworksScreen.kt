@@ -103,7 +103,7 @@ fun NetworksContent(
             ) { network ->
 
                 NetworkItem(
-                    modifier = Modifier.animateItemPlacement(),
+                    modifier = Modifier.animateItem(),
                     network = network,
                     onClick = { onSelect(network) },
                     trailingContent = {

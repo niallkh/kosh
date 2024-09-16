@@ -57,6 +57,9 @@ fun WcRequestContent(
             }
         }
 
-        LoadingIndicator(request.loading)
+        LoadingIndicator(
+            request.loading,
+            Modifier.padding(paddingValues),
+        )
     }
 }

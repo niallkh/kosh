@@ -149,7 +149,7 @@ private fun LazyListScope.requests(
         key = { it.id.value },
     ) { request ->
         WcRequestItem(
-            modifier = Modifier.animateItemPlacement(),
+            modifier = Modifier.animateItem(),
             request = request,
             onSelect = onSelect
         )
@@ -171,7 +171,7 @@ private fun LazyListScope.proposals(
         key = { it.requestId },
     ) { proposal ->
         WcProposalItem(
-            modifier = Modifier.animateItemPlacement(),
+            modifier = Modifier.animateItem(),
             proposal = proposal,
             onSelect = onSelect
         )
@@ -193,7 +193,7 @@ private fun LazyListScope.authentications(
         key = { it.id.value },
     ) { authentication ->
         WcAuthenticationItem(
-            modifier = Modifier.animateItemPlacement(),
+            modifier = Modifier.animateItem(),
             authentication = authentication,
             onSelect = onSelect
         )
@@ -223,19 +223,19 @@ private fun LazyListScope.transactions(
     ) { transaction ->
         when (transaction) {
             is TransactionEntity.Eip1559 -> TransactionItem(
-                modifier = Modifier.animateItemPlacement(),
+                modifier = Modifier.animateItem(),
                 transaction = transaction,
                 onClick = { onSelect(transaction) },
             )
 
             is TransactionEntity.Eip712 -> TypedMessageItem(
-                modifier = Modifier.animateItemPlacement(),
+                modifier = Modifier.animateItem(),
                 typedMessage = transaction,
                 onClick = { onSelect(transaction) },
             )
 
             is TransactionEntity.PersonalMessage -> PersonalMessageItem(
-                modifier = Modifier.animateItemPlacement(),
+                modifier = Modifier.animateItem(),
                 personalMessage = transaction,
                 onClick = { onSelect(transaction) },
             )

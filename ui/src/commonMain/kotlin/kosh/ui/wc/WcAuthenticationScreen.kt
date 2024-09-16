@@ -175,7 +175,10 @@ fun WcAuthenticationContent(
             }
         }
 
-        LoadingIndicator(authentication.loading)
+        LoadingIndicator(
+            authentication.loading,
+            Modifier.padding(paddingValues),
+        )
     }
 }
 

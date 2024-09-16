@@ -44,6 +44,7 @@ import kosh.ui.component.text.TextLine
 import kosh.ui.component.text.TextNumber
 import kosh.ui.component.wallet.AccountItem
 import kosh.ui.transaction.calls.ApproveCard
+import kosh.ui.transaction.calls.DeployCard
 import kosh.ui.transaction.calls.FallbackCard
 import kosh.ui.transaction.calls.NativeTransferCard
 import kosh.ui.transaction.calls.TransferCard
@@ -243,7 +244,7 @@ fun TransactionContent(
                     is ContractCall.Transfer -> TransferCard(call)
                     is ContractCall.Approve -> ApproveCard(call)
                     is ContractCall.NativeTransfer -> NativeTransferCard(call)
-                    is ContractCall.Deploy -> TODO()
+                    is ContractCall.Deploy -> DeployCard(call)
                     is ContractCall.Fallback -> FallbackCard(call)
                     null -> FallbackCard(call)
                 }
