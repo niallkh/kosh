@@ -3,7 +3,6 @@ package kosh.ui.account
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -90,7 +89,6 @@ fun WalletsContent(
     KoshScaffold(
         modifier = modifier,
         title = { Text(stringResource(Res.string.wallets_title)) },
-        largeTopBar = true,
         floatingActionButton = {
             var selectorVisible by remember { mutableStateOf(false) }
 
@@ -107,10 +105,11 @@ fun WalletsContent(
             }
         },
         onUp = { onNavigateUp() }
-    ) {
+    ) { paddingValues ->
 
         LazyColumn(
-            contentPadding = PaddingValues(horizontal = 16.dp, vertical = 8.dp),
+            modifier = Modifier.padding(horizontal = 16.dp),
+            contentPadding = paddingValues,
             verticalArrangement = Arrangement.spacedBy(16.dp)
         ) {
 

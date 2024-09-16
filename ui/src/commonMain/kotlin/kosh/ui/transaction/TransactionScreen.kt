@@ -75,7 +75,7 @@ fun TransactionContent(
     KoshScaffold(
         title = { DappTitle(transaction?.dapp) },
         onUp = onNavigateUp,
-        largeTopBar = true,
+
         actions = {
             DappIcon(transaction?.dapp)
 
@@ -106,21 +106,23 @@ fun TransactionContent(
 
             Spacer(Modifier.width(8.dp))
         }
-    ) {
-        when (transaction) {
-            is TransactionEntity.PersonalMessage -> PersonalMessageContent(
-                personalMessage = transaction,
-            )
+    ) { paddingValues ->
+        Box(Modifier.padding(paddingValues)) {
+            when (transaction) {
+                is TransactionEntity.PersonalMessage -> PersonalMessageContent(
+                    personalMessage = transaction,
+                )
 
-            is TransactionEntity.Eip712 -> TypedMessageContent(
-                typedMessage = transaction,
-            )
+                is TransactionEntity.Eip712 -> TypedMessageContent(
+                    typedMessage = transaction,
+                )
 
-            is TransactionEntity.Eip1559 -> TransactionContent(
-                transaction = transaction,
-            )
+                is TransactionEntity.Eip1559 -> TransactionContent(
+                    transaction = transaction,
+                )
 
-            null -> Unit
+                null -> Unit
+            }
         }
     }
 }

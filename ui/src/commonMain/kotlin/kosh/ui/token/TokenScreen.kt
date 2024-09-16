@@ -112,14 +112,14 @@ fun TokenScreen(
                 Spacer(Modifier.width(8.dp))
             }
         }
-    ) {
+    ) { paddingValues ->
         val tokenBalances = rememberTokenBalances(id)
 
         Column(
             modifier = Modifier
                 .verticalScroll(rememberScrollState())
-                .padding(bottom = 8.dp, top = 8.dp)
-                .animateContentSize(),
+                .padding(paddingValues)
+                .padding(vertical = 8.dp),
             verticalArrangement = Arrangement.spacedBy(16.dp)
         ) {
 
@@ -167,12 +167,11 @@ fun TokenScreen(
             InfoSection(id)
         }
 
-
         val loading = refreshToken.loading ||
                 nftMetadata?.loading == true ||
                 tokenBalances.loading
 
-        LoadingIndicator(loading)
+        LoadingIndicator(loading, Modifier.padding(paddingValues))
     }
 }
 

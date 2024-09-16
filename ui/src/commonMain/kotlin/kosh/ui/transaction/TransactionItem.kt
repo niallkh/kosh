@@ -3,7 +3,7 @@ package kosh.ui.transaction
 import androidx.compose.foundation.clickable
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.outlined.CheckCircle
-import androidx.compose.material.icons.outlined.Pending
+import androidx.compose.material.icons.outlined.Schedule
 import androidx.compose.material3.Icon
 import androidx.compose.material3.ListItem
 import androidx.compose.runtime.Composable
@@ -54,7 +54,7 @@ fun TransactionItem(
             if (transaction.receipt != null) {
                 Icon(Icons.Outlined.CheckCircle, "Confirmed")
             } else {
-                Icon(Icons.Outlined.Pending, "Pending")
+                Icon(Icons.Outlined.Schedule, "Pending")
             }
         }
     )

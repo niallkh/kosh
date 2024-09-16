@@ -33,6 +33,7 @@ import kosh.ui.wc.WcRequestItem
 
 @Composable
 fun ActivityScreen(
+    paddingValues: PaddingValues,
     onOpenTransaction: (TransactionEntity.Id) -> Unit,
     onOpenProposal: (WcProposal) -> Unit,
     onOpenAuth: (WcAuthentication) -> Unit,
@@ -48,6 +49,7 @@ fun ActivityScreen(
     val requests = rememberRequests()
 
     ActivityContent(
+        paddingValues = paddingValues,
         transactions = transactions.txs,
         proposals = proposals.proposals,
         authentications = authentications.authentications,
@@ -61,6 +63,7 @@ fun ActivityScreen(
 
 @Composable
 fun ActivityContent(
+    paddingValues: PaddingValues,
     transactions: ImmutableList<TransactionEntity>,
     proposals: ImmutableList<WcProposal>,
     authentications: ImmutableList<WcAuthentication>,
@@ -71,7 +74,7 @@ fun ActivityContent(
     onSelectRequest: (WcRequest) -> Unit,
 ) {
     LazyColumn(
-        contentPadding = PaddingValues(vertical = 8.dp),
+        contentPadding = paddingValues,
     ) {
 
         if (transactions.isEmpty() &&

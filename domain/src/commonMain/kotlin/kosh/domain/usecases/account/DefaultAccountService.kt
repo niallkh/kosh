@@ -12,6 +12,8 @@ import kosh.domain.entities.name
 import kosh.domain.failure.AccountFailure
 import kosh.domain.models.Address
 import kosh.domain.models.account.DerivationPath
+import kosh.domain.models.account.ethereumAddressIndex
+import kosh.domain.models.account.ledgerAddressIndex
 import kosh.domain.repositories.AppStateRepo
 import kosh.domain.repositories.modify
 import kosh.domain.repositories.optic
@@ -29,6 +31,7 @@ import kosh.domain.utils.phset
 import kosh.domain.utils.pmap
 import kotlinx.collections.immutable.toPersistentMap
 import kotlinx.coroutines.flow.Flow
+import kotlin.math.max
 
 class DefaultAccountService(
     private val appStateRepo: AppStateRepo,
@@ -61,10 +64,16 @@ class DefaultAccountService(
             location = location,
         )
 
+        val addressIndex = max(
+            derivationPath.ethereumAddressIndex,
+            derivationPath.ledgerAddressIndex,
+        )
+
         val account = AccountEntity(
             address = address,
             derivationPath = derivationPath,
             walletId = wallet.id,
+            name = "Account #$addressIndex"
         )
 
         appStateRepo.modify {
@@ -118,7 +127,7 @@ class DefaultAccountService(
             }
 
             AppState.transactions transform { map ->
-                map.filter { it.value.accountId == id }.toPersistentMap()
+                map.filter { it.value.accountId != id }.toPersistentMap()
             }
         }
     }

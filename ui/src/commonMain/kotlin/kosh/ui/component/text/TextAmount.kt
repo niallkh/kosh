@@ -17,7 +17,7 @@ fun TextAmount(
     decimals: UByte = 18u,
     modifier: Modifier = Modifier,
 ) {
-    val text = remember(amount, symbol, decimals) {
+    val text = remember(amount, symbol, decimals) { // TODO improve this
         if (amount == Value.BigNumber.UINT256_MAX) {
             "ALL $symbol"
         } else {

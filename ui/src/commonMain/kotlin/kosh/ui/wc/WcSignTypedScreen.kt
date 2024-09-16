@@ -94,20 +94,21 @@ fun WcSignTypedContent(
             }
         },
         onUp = onNavigateUp,
-        largeTopBar = true,
+
         actions = {
             if (signTyped.failure == null) {
                 DappIcon(signTyped.request?.dapp)
             }
             Spacer(Modifier.width(8.dp))
         }
-    ) {
+    ) { paddingValues ->
         signTyped.failure?.let {
             AppFailureItem(it) { signTyped.retry() }
         } ?: run {
             Column(
                 modifier = Modifier
-                    .verticalScroll(rememberScrollState()),
+                    .verticalScroll(rememberScrollState())
+                    .padding(paddingValues),
                 verticalArrangement = Arrangement.spacedBy(16.dp)
             ) {
 

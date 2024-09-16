@@ -2,6 +2,7 @@ package kosh.ui.token
 
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -34,6 +35,7 @@ import kosh.ui.resources.illustrations.AssetsEmpty
 
 @Composable
 fun AssetsScreen(
+    paddingValues: PaddingValues,
     open: (TokenEntity.Id, Boolean) -> Unit,
 ) {
     val balances = rememberBalances()
@@ -43,6 +45,7 @@ fun AssetsScreen(
     }
 
     AssetsContent(
+        paddingValues = paddingValues,
         balances = balances.balances,
         onSelect = { open(it.id, it.isNft) },
     )
@@ -53,6 +56,7 @@ fun AssetsScreen(
 
 @Composable
 fun AssetsContent(
+    paddingValues: PaddingValues,
     lazyListState: LazyListState = rememberLazyListState(),
     balances: ImmutableList<TokenBalance>,
     onSelect: (TokenEntity) -> Unit,
@@ -62,6 +66,7 @@ fun AssetsContent(
 
     LazyColumn(
         state = lazyListState,
+        contentPadding = paddingValues,
     ) {
 
         when {
@@ -169,5 +174,9 @@ private fun LazyListScope.balances(
                 }
             }
         }
+    }
+
+    item {
+        Spacer(Modifier.height(64.dp))
     }
 }

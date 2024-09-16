@@ -1,5 +1,6 @@
 package kosh.ui.ledger
 
+import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material3.Text
@@ -30,7 +31,7 @@ fun NewLedgerAccountScreen(
         modifier = modifier,
         title = { Text("Ledger New Account") },
         onUp = onNavigateUp,
-    ) {
+    ) { paddingValues ->
         val ledgerState = rememberLedger()
 
         ledgerState.ledger?.let { ledger ->
@@ -59,7 +60,8 @@ fun NewLedgerAccountScreen(
 
             NewLedgerAccountContent(
                 ledgerAccountsState = ledgerAccountsState,
-                onSelect = { createAccountState.create(it) }
+                paddingValues = paddingValues,
+                onSelect = { createAccountState.create(it) },
             )
 
             LoadingIndicator(
@@ -75,9 +77,12 @@ fun NewLedgerAccountScreen(
 @Composable
 fun NewLedgerAccountContent(
     ledgerAccountsState: LedgerAccountsState,
+    paddingValues: PaddingValues = PaddingValues(),
     onSelect: (Signer) -> Unit,
 ) {
-    LazyColumn {
+    LazyColumn(
+        contentPadding = paddingValues,
+    ) {
         ledgerAccountsState.failure?.let {
             item {
                 AppFailureItem(it) {

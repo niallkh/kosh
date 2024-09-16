@@ -4,7 +4,6 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
@@ -117,18 +116,18 @@ fun WcSendTransactionContent(
             }
         },
         onUp = onNavigateUp,
-        largeTopBar = true,
+
         actions = {
             if (sendTransaction.failure == null) {
                 DappIcon(sendTransaction.request?.dapp)
             }
             Spacer(Modifier.width(8.dp))
         }
-    ) {
+    ) { paddingValues ->
         Column(
             modifier = Modifier
-                .fillMaxSize()
-                .verticalScroll(rememberScrollState()),
+                .verticalScroll(rememberScrollState())
+                .padding(paddingValues),
         ) {
             sendTransaction.failure?.let {
                 AppFailureItem(it) { sendTransaction.retry() }

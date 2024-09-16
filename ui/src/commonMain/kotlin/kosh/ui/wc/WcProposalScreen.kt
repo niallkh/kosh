@@ -120,7 +120,7 @@ fun WcSessionProposalContent(
                 DappTitle(proposal.proposal?.proposal?.dapp)
             }
         },
-        largeTopBar = true,
+
         actions = {
             if (proposal.failure == null) {
                 DappIcon(proposal.proposal?.proposal?.dapp)
@@ -128,10 +128,12 @@ fun WcSessionProposalContent(
             }
         },
         onUp = { onNavigateUp() }
-    ) {
+    ) { paddingValues ->
         proposal.failure?.let {
             AppFailureItem(it) { proposal.retry() }
-        } ?: LazyColumn {
+        } ?: LazyColumn(
+            contentPadding = paddingValues
+        ) {
 
             item {
                 proposal.proposal?.proposal?.let {

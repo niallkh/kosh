@@ -118,7 +118,7 @@ fun HomeHost(
             }
         },
         onUp = null,
-    ) {
+    ) { paddingValues ->
 
         StackHost(
             stackRouter = stackRouter,
@@ -127,12 +127,14 @@ fun HomeHost(
 
             when (route) {
                 HomeRoute.Assets -> AssetsScreen(
+                    paddingValues = paddingValues,
                     open = { token, isNft ->
                         onOpen(RootRoute.Tokens(TokensRoute.Details(token), isNft))
                     },
                 )
 
                 HomeRoute.Activity -> ActivityScreen(
+                    paddingValues = paddingValues,
                     onOpenTransaction = {
                         onOpen(RootRoute.Transactions(TransactionsRoute.Details(it)))
                     },
@@ -148,6 +150,7 @@ fun HomeHost(
                 )
 
                 HomeRoute.WalletConnect -> WcSessionsScreen(
+                    paddingValues = paddingValues,
                     onOpen = { onOpen(RootRoute.WcSession(WcSessionRoute.Session(it.id))) },
                 )
             }

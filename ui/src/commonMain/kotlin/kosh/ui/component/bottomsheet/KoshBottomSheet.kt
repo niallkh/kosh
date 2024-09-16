@@ -2,7 +2,6 @@ package kosh.ui.component.bottomsheet
 
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.windowInsetsBottomHeight
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
@@ -13,6 +12,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.Shape
 import kotlinx.coroutines.launch
 
@@ -20,6 +20,7 @@ import kotlinx.coroutines.launch
 fun KoshModalBottomSheet(
     modifier: Modifier = Modifier,
     onDismissRequest: () -> Unit,
+    containerColor: Color = BottomSheetDefaults.ContainerColor,
     dragHandle: @Composable (() -> Unit)? = { BottomSheetDefaults.DragHandle() },
     shape: Shape = BottomSheetDefaults.ExpandedShape,
     content: @Composable (DismissCallback) -> Unit,
@@ -44,7 +45,7 @@ fun KoshModalBottomSheet(
         sheetState = bottomSheetState,
         dragHandle = dragHandle,
         shape = shape,
-        windowInsets = WindowInsets(0)
+        containerColor = containerColor,
     ) {
         Column(
             modifier = Modifier.verticalScroll(rememberScrollState())

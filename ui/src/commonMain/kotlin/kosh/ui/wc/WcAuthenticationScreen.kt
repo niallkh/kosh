@@ -121,16 +121,18 @@ fun WcAuthenticationContent(
             }
         },
         onUp = { onNavigateUp() },
-        largeTopBar = true,
+
         actions = {
             if (authentication.failure == null) {
                 DappIcon(authentication.auth?.dapp)
             }
             Spacer(Modifier.width(8.dp))
         }
-    ) {
+    ) { paddingValues ->
         Column(
-            modifier = Modifier.verticalScroll(rememberScrollState()),
+            modifier = Modifier
+                .verticalScroll(rememberScrollState())
+                .padding(paddingValues),
             verticalArrangement = Arrangement.spacedBy(16.dp)
         ) {
             authentication.failure?.let {
