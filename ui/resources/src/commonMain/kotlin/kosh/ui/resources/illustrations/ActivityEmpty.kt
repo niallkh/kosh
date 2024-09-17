@@ -44,7 +44,7 @@ public fun ActivityEmpty(
             close()
         }
         path(
-            fill = SolidColor(shoesDetails), stroke = null, strokeLineWidth = 0.0f,
+            fill = SolidColor(Color.White), stroke = null, strokeLineWidth = 0.0f,
             strokeLineCap = Butt, strokeLineJoin = Miter, strokeLineMiter = 4.0f,
             pathFillType = NonZero
         ) {
@@ -57,7 +57,7 @@ public fun ActivityEmpty(
             close()
         }
         path(
-            fill = SolidColor(shoesDetails), stroke = null, strokeLineWidth = 0.0f,
+            fill = SolidColor(Color.White), stroke = null, strokeLineWidth = 0.0f,
             strokeLineCap = Butt, strokeLineJoin = Miter, strokeLineMiter = 4.0f,
             pathFillType = NonZero
         ) {
@@ -70,7 +70,7 @@ public fun ActivityEmpty(
             close()
         }
         path(
-            fill = SolidColor(shoesDetails), stroke = null, strokeLineWidth = 0.0f,
+            fill = SolidColor(Color.White), stroke = null, strokeLineWidth = 0.0f,
             strokeLineCap = Butt, strokeLineJoin = Miter, strokeLineMiter = 4.0f,
             pathFillType = NonZero
         ) {
@@ -83,7 +83,7 @@ public fun ActivityEmpty(
             close()
         }
         path(
-            fill = SolidColor(shoesDetails), stroke = null, strokeLineWidth = 0.0f,
+            fill = SolidColor(Color.White), stroke = null, strokeLineWidth = 0.0f,
             strokeLineCap = Butt, strokeLineJoin = Miter, strokeLineMiter = 4.0f,
             pathFillType = NonZero
         ) {
@@ -96,7 +96,7 @@ public fun ActivityEmpty(
             close()
         }
         path(
-            fill = SolidColor(shoesDetails), stroke = null, strokeLineWidth = 0.0f,
+            fill = SolidColor(Color.White), stroke = null, strokeLineWidth = 0.0f,
             strokeLineCap = Butt, strokeLineJoin = Miter, strokeLineMiter = 4.0f,
             pathFillType = NonZero
         ) {
@@ -109,7 +109,7 @@ public fun ActivityEmpty(
             close()
         }
         path(
-            fill = SolidColor(shoesDetails), stroke = null, strokeLineWidth = 0.0f,
+            fill = SolidColor(Color.White), stroke = null, strokeLineWidth = 0.0f,
             strokeLineCap = Butt, strokeLineJoin = Miter, strokeLineMiter = 4.0f,
             pathFillType = NonZero
         ) {
@@ -122,7 +122,7 @@ public fun ActivityEmpty(
             close()
         }
         path(
-            fill = SolidColor(shoesDetails), stroke = null, strokeLineWidth = 0.0f,
+            fill = SolidColor(Color.White), stroke = null, strokeLineWidth = 0.0f,
             strokeLineCap = Butt, strokeLineJoin = Miter, strokeLineMiter = 4.0f,
             pathFillType = NonZero
         ) {
@@ -135,7 +135,7 @@ public fun ActivityEmpty(
             close()
         }
         path(
-            fill = SolidColor(shoesDetails), stroke = null, strokeLineWidth = 0.0f,
+            fill = SolidColor(Color.White), stroke = null, strokeLineWidth = 0.0f,
             strokeLineCap = Butt, strokeLineJoin = Miter, strokeLineMiter = 4.0f,
             pathFillType = NonZero
         ) {
@@ -149,7 +149,7 @@ public fun ActivityEmpty(
             close()
         }
         path(
-            fill = SolidColor(shoesDetails), stroke = null, strokeLineWidth = 0.0f,
+            fill = SolidColor(Color.White), stroke = null, strokeLineWidth = 0.0f,
             strokeLineCap = Butt, strokeLineJoin = Miter, strokeLineMiter = 4.0f,
             pathFillType = NonZero
         ) {
@@ -163,7 +163,7 @@ public fun ActivityEmpty(
             close()
         }
         path(
-            fill = SolidColor(shoesDetails), stroke = null, strokeLineWidth = 0.0f,
+            fill = SolidColor(Color.White), stroke = null, strokeLineWidth = 0.0f,
             strokeLineCap = Butt, strokeLineJoin = Miter, strokeLineMiter = 4.0f,
             pathFillType = NonZero
         ) {
@@ -177,7 +177,7 @@ public fun ActivityEmpty(
             close()
         }
         path(
-            fill = SolidColor(shoesDetails), stroke = null, strokeLineWidth = 0.0f,
+            fill = SolidColor(Color.White), stroke = null, strokeLineWidth = 0.0f,
             strokeLineCap = Butt, strokeLineJoin = Miter, strokeLineMiter = 4.0f,
             pathFillType = NonZero
         ) {
@@ -190,7 +190,7 @@ public fun ActivityEmpty(
             close()
         }
         path(
-            fill = SolidColor(shoesDetails), stroke = null, strokeLineWidth = 0.0f,
+            fill = SolidColor(Color.White), stroke = null, strokeLineWidth = 0.0f,
             strokeLineCap = Butt, strokeLineJoin = Miter, strokeLineMiter = 4.0f,
             pathFillType = NonZero
         ) {
@@ -204,7 +204,7 @@ public fun ActivityEmpty(
             close()
         }
         path(
-            fill = SolidColor(shoesDetails), stroke = null, strokeLineWidth = 0.0f,
+            fill = SolidColor(Color.White), stroke = null, strokeLineWidth = 0.0f,
             strokeLineCap = Butt, strokeLineJoin = Miter, strokeLineMiter = 4.0f,
             pathFillType = NonZero
         ) {
@@ -218,7 +218,7 @@ public fun ActivityEmpty(
             close()
         }
         path(
-            fill = SolidColor(shoesDetails), stroke = null, strokeLineWidth = 0.0f,
+            fill = SolidColor(Color.White), stroke = null, strokeLineWidth = 0.0f,
             strokeLineCap = Butt, strokeLineJoin = Miter, strokeLineMiter = 4.0f,
             pathFillType = NonZero
         ) {
@@ -244,7 +244,7 @@ public fun ActivityEmpty(
             close()
         }
         path(
-            fill = SolidColor(shoesDetails), stroke = null, strokeLineWidth = 0.0f,
+            fill = SolidColor(Color.White), stroke = null, strokeLineWidth = 0.0f,
             strokeLineCap = Butt, strokeLineJoin = Miter, strokeLineMiter = 4.0f,
             pathFillType = NonZero
         ) {
@@ -257,7 +257,7 @@ public fun ActivityEmpty(
             close()
         }
         path(
-            fill = SolidColor(shoesDetails), stroke = null, strokeLineWidth = 0.0f,
+            fill = SolidColor(Color.White), stroke = null, strokeLineWidth = 0.0f,
             strokeLineCap = Butt, strokeLineJoin = Miter, strokeLineMiter = 4.0f,
             pathFillType = NonZero
         ) {
@@ -271,7 +271,7 @@ public fun ActivityEmpty(
             close()
         }
         path(
-            fill = SolidColor(shoesDetails), stroke = null, strokeLineWidth = 0.0f,
+            fill = SolidColor(Color.White), stroke = null, strokeLineWidth = 0.0f,
             strokeLineCap = Butt, strokeLineJoin = Miter, strokeLineMiter = 4.0f,
             pathFillType = NonZero
         ) {
@@ -284,7 +284,7 @@ public fun ActivityEmpty(
             close()
         }
         path(
-            fill = SolidColor(shoesDetails), stroke = null, strokeLineWidth = 0.0f,
+            fill = SolidColor(Color.White), stroke = null, strokeLineWidth = 0.0f,
             strokeLineCap = Butt, strokeLineJoin = Miter, strokeLineMiter = 4.0f,
             pathFillType = NonZero
         ) {
@@ -297,7 +297,7 @@ public fun ActivityEmpty(
             close()
         }
         path(
-            fill = SolidColor(shoesDetails), stroke = null, strokeLineWidth = 0.0f,
+            fill = SolidColor(Color.White), stroke = null, strokeLineWidth = 0.0f,
             strokeLineCap = Butt, strokeLineJoin = Miter, strokeLineMiter = 4.0f,
             pathFillType = NonZero
         ) {
@@ -310,7 +310,7 @@ public fun ActivityEmpty(
             close()
         }
         path(
-            fill = SolidColor(shoesDetails), stroke = null, strokeLineWidth = 0.0f,
+            fill = SolidColor(Color.White), stroke = null, strokeLineWidth = 0.0f,
             strokeLineCap = Butt, strokeLineJoin = Miter, strokeLineMiter = 4.0f,
             pathFillType = NonZero
         ) {
@@ -324,7 +324,7 @@ public fun ActivityEmpty(
             close()
         }
         path(
-            fill = SolidColor(shoesDetails), stroke = null, strokeLineWidth = 0.0f,
+            fill = SolidColor(Color.White), stroke = null, strokeLineWidth = 0.0f,
             strokeLineCap = Butt, strokeLineJoin = Miter, strokeLineMiter = 4.0f,
             pathFillType = NonZero
         ) {
@@ -337,7 +337,7 @@ public fun ActivityEmpty(
             close()
         }
         path(
-            fill = SolidColor(shoesDetails), stroke = null, strokeLineWidth = 0.0f,
+            fill = SolidColor(Color.White), stroke = null, strokeLineWidth = 0.0f,
             strokeLineCap = Butt, strokeLineJoin = Miter, strokeLineMiter = 4.0f,
             pathFillType = NonZero
         ) {
@@ -350,7 +350,7 @@ public fun ActivityEmpty(
             close()
         }
         path(
-            fill = SolidColor(shoesDetails), stroke = null, strokeLineWidth = 0.0f,
+            fill = SolidColor(Color.White), stroke = null, strokeLineWidth = 0.0f,
             strokeLineCap = Butt, strokeLineJoin = Miter, strokeLineMiter = 4.0f,
             pathFillType = NonZero
         ) {
@@ -363,7 +363,7 @@ public fun ActivityEmpty(
             close()
         }
         path(
-            fill = SolidColor(shoesDetails), stroke = null, strokeLineWidth = 0.0f,
+            fill = SolidColor(Color.White), stroke = null, strokeLineWidth = 0.0f,
             strokeLineCap = Butt, strokeLineJoin = Miter, strokeLineMiter = 4.0f,
             pathFillType = NonZero
         ) {
@@ -376,7 +376,7 @@ public fun ActivityEmpty(
             close()
         }
         path(
-            fill = SolidColor(shoesDetails), stroke = null, strokeLineWidth = 0.0f,
+            fill = SolidColor(Color.White), stroke = null, strokeLineWidth = 0.0f,
             strokeLineCap = Butt, strokeLineJoin = Miter, strokeLineMiter = 4.0f,
             pathFillType = NonZero
         ) {
@@ -390,7 +390,7 @@ public fun ActivityEmpty(
             close()
         }
         path(
-            fill = SolidColor(shoesDetails), stroke = null, strokeLineWidth = 0.0f,
+            fill = SolidColor(Color.White), stroke = null, strokeLineWidth = 0.0f,
             strokeLineCap = Butt, strokeLineJoin = Miter, strokeLineMiter = 4.0f,
             pathFillType = NonZero
         ) {
@@ -403,7 +403,7 @@ public fun ActivityEmpty(
             close()
         }
         path(
-            fill = SolidColor(shoesDetails), stroke = null, strokeLineWidth = 0.0f,
+            fill = SolidColor(Color.White), stroke = null, strokeLineWidth = 0.0f,
             strokeLineCap = Butt, strokeLineJoin = Miter, strokeLineMiter = 4.0f,
             pathFillType = NonZero
         ) {
@@ -417,7 +417,7 @@ public fun ActivityEmpty(
             close()
         }
         path(
-            fill = SolidColor(shoesDetails), stroke = null, strokeLineWidth = 0.0f,
+            fill = SolidColor(Color.White), stroke = null, strokeLineWidth = 0.0f,
             strokeLineCap = Butt, strokeLineJoin = Miter, strokeLineMiter = 4.0f,
             pathFillType = NonZero
         ) {
@@ -442,7 +442,7 @@ public fun ActivityEmpty(
             close()
         }
         path(
-            fill = SolidColor(shoesDetails), stroke = null, strokeLineWidth = 0.0f,
+            fill = SolidColor(Color.White), stroke = null, strokeLineWidth = 0.0f,
             strokeLineCap = Butt, strokeLineJoin = Miter, strokeLineMiter = 4.0f,
             pathFillType = NonZero
         ) {
@@ -455,7 +455,7 @@ public fun ActivityEmpty(
             close()
         }
         path(
-            fill = SolidColor(shoesDetails), stroke = null, strokeLineWidth = 0.0f,
+            fill = SolidColor(Color.White), stroke = null, strokeLineWidth = 0.0f,
             strokeLineCap = Butt, strokeLineJoin = Miter, strokeLineMiter = 4.0f,
             pathFillType = NonZero
         ) {
@@ -468,7 +468,7 @@ public fun ActivityEmpty(
             close()
         }
         path(
-            fill = SolidColor(shoesDetails), stroke = null, strokeLineWidth = 0.0f,
+            fill = SolidColor(Color.White), stroke = null, strokeLineWidth = 0.0f,
             strokeLineCap = Butt, strokeLineJoin = Miter, strokeLineMiter = 4.0f,
             pathFillType = NonZero
         ) {
@@ -481,7 +481,7 @@ public fun ActivityEmpty(
             close()
         }
         path(
-            fill = SolidColor(shoesDetails), stroke = null, strokeLineWidth = 0.0f,
+            fill = SolidColor(Color.White), stroke = null, strokeLineWidth = 0.0f,
             strokeLineCap = Butt, strokeLineJoin = Miter, strokeLineMiter = 4.0f,
             pathFillType = NonZero
         ) {
@@ -494,7 +494,7 @@ public fun ActivityEmpty(
             close()
         }
         path(
-            fill = SolidColor(shoesDetails), stroke = null, strokeLineWidth = 0.0f,
+            fill = SolidColor(Color.White), stroke = null, strokeLineWidth = 0.0f,
             strokeLineCap = Butt, strokeLineJoin = Miter, strokeLineMiter = 4.0f,
             pathFillType = NonZero
         ) {
@@ -507,7 +507,7 @@ public fun ActivityEmpty(
             close()
         }
         path(
-            fill = SolidColor(shoesDetails), stroke = null, strokeLineWidth = 0.0f,
+            fill = SolidColor(Color.White), stroke = null, strokeLineWidth = 0.0f,
             strokeLineCap = Butt, strokeLineJoin = Miter, strokeLineMiter = 4.0f,
             pathFillType = NonZero
         ) {
@@ -520,7 +520,7 @@ public fun ActivityEmpty(
             close()
         }
         path(
-            fill = SolidColor(shoesDetails), stroke = null, strokeLineWidth = 0.0f,
+            fill = SolidColor(Color.White), stroke = null, strokeLineWidth = 0.0f,
             strokeLineCap = Butt, strokeLineJoin = Miter, strokeLineMiter = 4.0f,
             pathFillType = NonZero
         ) {
@@ -533,7 +533,7 @@ public fun ActivityEmpty(
             close()
         }
         path(
-            fill = SolidColor(shoesDetails), stroke = null, strokeLineWidth = 0.0f,
+            fill = SolidColor(Color.White), stroke = null, strokeLineWidth = 0.0f,
             strokeLineCap = Butt, strokeLineJoin = Miter, strokeLineMiter = 4.0f,
             pathFillType = NonZero
         ) {
@@ -546,7 +546,7 @@ public fun ActivityEmpty(
             close()
         }
         path(
-            fill = SolidColor(shoesDetails), stroke = null, strokeLineWidth = 0.0f,
+            fill = SolidColor(Color.White), stroke = null, strokeLineWidth = 0.0f,
             strokeLineCap = Butt, strokeLineJoin = Miter, strokeLineMiter = 4.0f,
             pathFillType = NonZero
         ) {
@@ -559,7 +559,7 @@ public fun ActivityEmpty(
             close()
         }
         path(
-            fill = SolidColor(shoesDetails), stroke = null, strokeLineWidth = 0.0f,
+            fill = SolidColor(Color.White), stroke = null, strokeLineWidth = 0.0f,
             strokeLineCap = Butt, strokeLineJoin = Miter, strokeLineMiter = 4.0f,
             pathFillType = NonZero
         ) {
@@ -572,7 +572,7 @@ public fun ActivityEmpty(
             close()
         }
         path(
-            fill = SolidColor(shoesDetails), stroke = null, strokeLineWidth = 0.0f,
+            fill = SolidColor(Color.White), stroke = null, strokeLineWidth = 0.0f,
             strokeLineCap = Butt, strokeLineJoin = Miter, strokeLineMiter = 4.0f,
             pathFillType = NonZero
         ) {
@@ -585,7 +585,7 @@ public fun ActivityEmpty(
             close()
         }
         path(
-            fill = SolidColor(shoesDetails), stroke = null, strokeLineWidth = 0.0f,
+            fill = SolidColor(Color.White), stroke = null, strokeLineWidth = 0.0f,
             strokeLineCap = Butt, strokeLineJoin = Miter, strokeLineMiter = 4.0f,
             pathFillType = NonZero
         ) {
@@ -598,7 +598,7 @@ public fun ActivityEmpty(
             close()
         }
         path(
-            fill = SolidColor(shoesDetails), stroke = null, strokeLineWidth = 0.0f,
+            fill = SolidColor(Color.White), stroke = null, strokeLineWidth = 0.0f,
             strokeLineCap = Butt, strokeLineJoin = Miter, strokeLineMiter = 4.0f,
             pathFillType = NonZero
         ) {
@@ -611,7 +611,7 @@ public fun ActivityEmpty(
             close()
         }
         path(
-            fill = SolidColor(shoesDetails), stroke = null, strokeLineWidth = 0.0f,
+            fill = SolidColor(Color.White), stroke = null, strokeLineWidth = 0.0f,
             strokeLineCap = Butt, strokeLineJoin = Miter, strokeLineMiter = 4.0f,
             pathFillType = NonZero
         ) {
@@ -636,7 +636,7 @@ public fun ActivityEmpty(
             close()
         }
         path(
-            fill = SolidColor(shoesDetails), stroke = null, strokeLineWidth = 0.0f,
+            fill = SolidColor(Color.White), stroke = null, strokeLineWidth = 0.0f,
             strokeLineCap = Butt, strokeLineJoin = Miter, strokeLineMiter = 4.0f,
             pathFillType = NonZero
         ) {
@@ -650,7 +650,7 @@ public fun ActivityEmpty(
             close()
         }
         path(
-            fill = SolidColor(shoesDetails), stroke = null, strokeLineWidth = 0.0f,
+            fill = SolidColor(Color.White), stroke = null, strokeLineWidth = 0.0f,
             strokeLineCap = Butt, strokeLineJoin = Miter, strokeLineMiter = 4.0f,
             pathFillType = NonZero
         ) {
@@ -663,7 +663,7 @@ public fun ActivityEmpty(
             close()
         }
         path(
-            fill = SolidColor(shoesDetails), stroke = null, strokeLineWidth = 0.0f,
+            fill = SolidColor(Color.White), stroke = null, strokeLineWidth = 0.0f,
             strokeLineCap = Butt, strokeLineJoin = Miter, strokeLineMiter = 4.0f,
             pathFillType = NonZero
         ) {
@@ -676,7 +676,7 @@ public fun ActivityEmpty(
             close()
         }
         path(
-            fill = SolidColor(shoesDetails), stroke = null, strokeLineWidth = 0.0f,
+            fill = SolidColor(Color.White), stroke = null, strokeLineWidth = 0.0f,
             strokeLineCap = Butt, strokeLineJoin = Miter, strokeLineMiter = 4.0f,
             pathFillType = NonZero
         ) {
@@ -690,7 +690,7 @@ public fun ActivityEmpty(
             close()
         }
         path(
-            fill = SolidColor(shoesDetails), stroke = null, strokeLineWidth = 0.0f,
+            fill = SolidColor(Color.White), stroke = null, strokeLineWidth = 0.0f,
             strokeLineCap = Butt, strokeLineJoin = Miter, strokeLineMiter = 4.0f,
             pathFillType = NonZero
         ) {
@@ -703,7 +703,7 @@ public fun ActivityEmpty(
             close()
         }
         path(
-            fill = SolidColor(shoesDetails), stroke = null, strokeLineWidth = 0.0f,
+            fill = SolidColor(Color.White), stroke = null, strokeLineWidth = 0.0f,
             strokeLineCap = Butt, strokeLineJoin = Miter, strokeLineMiter = 4.0f,
             pathFillType = NonZero
         ) {
@@ -717,7 +717,7 @@ public fun ActivityEmpty(
             close()
         }
         path(
-            fill = SolidColor(shoesDetails), stroke = null, strokeLineWidth = 0.0f,
+            fill = SolidColor(Color.White), stroke = null, strokeLineWidth = 0.0f,
             strokeLineCap = Butt, strokeLineJoin = Miter, strokeLineMiter = 4.0f,
             pathFillType = NonZero
         ) {
@@ -730,7 +730,7 @@ public fun ActivityEmpty(
             close()
         }
         path(
-            fill = SolidColor(shoesDetails), stroke = null, strokeLineWidth = 0.0f,
+            fill = SolidColor(Color.White), stroke = null, strokeLineWidth = 0.0f,
             strokeLineCap = Butt, strokeLineJoin = Miter, strokeLineMiter = 4.0f,
             pathFillType = NonZero
         ) {
@@ -744,7 +744,7 @@ public fun ActivityEmpty(
             close()
         }
         path(
-            fill = SolidColor(shoesDetails), stroke = null, strokeLineWidth = 0.0f,
+            fill = SolidColor(Color.White), stroke = null, strokeLineWidth = 0.0f,
             strokeLineCap = Butt, strokeLineJoin = Miter, strokeLineMiter = 4.0f,
             pathFillType = NonZero
         ) {
@@ -758,7 +758,7 @@ public fun ActivityEmpty(
             close()
         }
         path(
-            fill = SolidColor(shoesDetails), stroke = null, strokeLineWidth = 0.0f,
+            fill = SolidColor(Color.White), stroke = null, strokeLineWidth = 0.0f,
             strokeLineCap = Butt, strokeLineJoin = Miter, strokeLineMiter = 4.0f,
             pathFillType = NonZero
         ) {
@@ -772,7 +772,7 @@ public fun ActivityEmpty(
             close()
         }
         path(
-            fill = SolidColor(shoesDetails), stroke = null, strokeLineWidth = 0.0f,
+            fill = SolidColor(Color.White), stroke = null, strokeLineWidth = 0.0f,
             strokeLineCap = Butt, strokeLineJoin = Miter, strokeLineMiter = 4.0f,
             pathFillType = NonZero
         ) {
@@ -786,7 +786,7 @@ public fun ActivityEmpty(
             close()
         }
         path(
-            fill = SolidColor(shoesDetails), stroke = null, strokeLineWidth = 0.0f,
+            fill = SolidColor(Color.White), stroke = null, strokeLineWidth = 0.0f,
             strokeLineCap = Butt, strokeLineJoin = Miter, strokeLineMiter = 4.0f,
             pathFillType = NonZero
         ) {
@@ -800,7 +800,7 @@ public fun ActivityEmpty(
             close()
         }
         path(
-            fill = SolidColor(shoesDetails), stroke = null, strokeLineWidth = 0.0f,
+            fill = SolidColor(Color.White), stroke = null, strokeLineWidth = 0.0f,
             strokeLineCap = Butt, strokeLineJoin = Miter, strokeLineMiter = 4.0f,
             pathFillType = NonZero
         ) {
@@ -814,7 +814,7 @@ public fun ActivityEmpty(
             close()
         }
         path(
-            fill = SolidColor(shoesDetails), stroke = null, strokeLineWidth = 0.0f,
+            fill = SolidColor(Color.White), stroke = null, strokeLineWidth = 0.0f,
             strokeLineCap = Butt, strokeLineJoin = Miter, strokeLineMiter = 4.0f,
             pathFillType = NonZero
         ) {
@@ -840,7 +840,7 @@ public fun ActivityEmpty(
             close()
         }
         path(
-            fill = SolidColor(shoesDetails), stroke = null, strokeLineWidth = 0.0f,
+            fill = SolidColor(Color.White), stroke = null, strokeLineWidth = 0.0f,
             strokeLineCap = Butt, strokeLineJoin = Miter, strokeLineMiter = 4.0f,
             pathFillType = NonZero
         ) {
@@ -853,7 +853,7 @@ public fun ActivityEmpty(
             close()
         }
         path(
-            fill = SolidColor(shoesDetails), stroke = null, strokeLineWidth = 0.0f,
+            fill = SolidColor(Color.White), stroke = null, strokeLineWidth = 0.0f,
             strokeLineCap = Butt, strokeLineJoin = Miter, strokeLineMiter = 4.0f,
             pathFillType = NonZero
         ) {
@@ -866,7 +866,7 @@ public fun ActivityEmpty(
             close()
         }
         path(
-            fill = SolidColor(shoesDetails), stroke = null, strokeLineWidth = 0.0f,
+            fill = SolidColor(Color.White), stroke = null, strokeLineWidth = 0.0f,
             strokeLineCap = Butt, strokeLineJoin = Miter, strokeLineMiter = 4.0f,
             pathFillType = NonZero
         ) {
@@ -879,7 +879,7 @@ public fun ActivityEmpty(
             close()
         }
         path(
-            fill = SolidColor(shoesDetails), stroke = null, strokeLineWidth = 0.0f,
+            fill = SolidColor(Color.White), stroke = null, strokeLineWidth = 0.0f,
             strokeLineCap = Butt, strokeLineJoin = Miter, strokeLineMiter = 4.0f,
             pathFillType = NonZero
         ) {
@@ -892,7 +892,7 @@ public fun ActivityEmpty(
             close()
         }
         path(
-            fill = SolidColor(shoesDetails), stroke = null, strokeLineWidth = 0.0f,
+            fill = SolidColor(Color.White), stroke = null, strokeLineWidth = 0.0f,
             strokeLineCap = Butt, strokeLineJoin = Miter, strokeLineMiter = 4.0f,
             pathFillType = NonZero
         ) {
@@ -905,7 +905,7 @@ public fun ActivityEmpty(
             close()
         }
         path(
-            fill = SolidColor(shoesDetails), stroke = null, strokeLineWidth = 0.0f,
+            fill = SolidColor(Color.White), stroke = null, strokeLineWidth = 0.0f,
             strokeLineCap = Butt, strokeLineJoin = Miter, strokeLineMiter = 4.0f,
             pathFillType = NonZero
         ) {
@@ -918,7 +918,7 @@ public fun ActivityEmpty(
             close()
         }
         path(
-            fill = SolidColor(shoesDetails), stroke = null, strokeLineWidth = 0.0f,
+            fill = SolidColor(Color.White), stroke = null, strokeLineWidth = 0.0f,
             strokeLineCap = Butt, strokeLineJoin = Miter, strokeLineMiter = 4.0f,
             pathFillType = NonZero
         ) {
@@ -931,7 +931,7 @@ public fun ActivityEmpty(
             close()
         }
         path(
-            fill = SolidColor(shoesDetails), stroke = null, strokeLineWidth = 0.0f,
+            fill = SolidColor(Color.White), stroke = null, strokeLineWidth = 0.0f,
             strokeLineCap = Butt, strokeLineJoin = Miter, strokeLineMiter = 4.0f,
             pathFillType = NonZero
         ) {
@@ -944,7 +944,7 @@ public fun ActivityEmpty(
             close()
         }
         path(
-            fill = SolidColor(shoesDetails), stroke = null, strokeLineWidth = 0.0f,
+            fill = SolidColor(Color.White), stroke = null, strokeLineWidth = 0.0f,
             strokeLineCap = Butt, strokeLineJoin = Miter, strokeLineMiter = 4.0f,
             pathFillType = NonZero
         ) {
@@ -957,7 +957,7 @@ public fun ActivityEmpty(
             close()
         }
         path(
-            fill = SolidColor(shoesDetails), stroke = null, strokeLineWidth = 0.0f,
+            fill = SolidColor(Color.White), stroke = null, strokeLineWidth = 0.0f,
             strokeLineCap = Butt, strokeLineJoin = Miter, strokeLineMiter = 4.0f,
             pathFillType = NonZero
         ) {
@@ -970,7 +970,7 @@ public fun ActivityEmpty(
             close()
         }
         path(
-            fill = SolidColor(shoesDetails), stroke = null, strokeLineWidth = 0.0f,
+            fill = SolidColor(Color.White), stroke = null, strokeLineWidth = 0.0f,
             strokeLineCap = Butt, strokeLineJoin = Miter, strokeLineMiter = 4.0f,
             pathFillType = NonZero
         ) {
@@ -983,7 +983,7 @@ public fun ActivityEmpty(
             close()
         }
         path(
-            fill = SolidColor(shoesDetails), stroke = null, strokeLineWidth = 0.0f,
+            fill = SolidColor(Color.White), stroke = null, strokeLineWidth = 0.0f,
             strokeLineCap = Butt, strokeLineJoin = Miter, strokeLineMiter = 4.0f,
             pathFillType = NonZero
         ) {
@@ -996,7 +996,7 @@ public fun ActivityEmpty(
             close()
         }
         path(
-            fill = SolidColor(shoesDetails), stroke = null, strokeLineWidth = 0.0f,
+            fill = SolidColor(Color.White), stroke = null, strokeLineWidth = 0.0f,
             strokeLineCap = Butt, strokeLineJoin = Miter, strokeLineMiter = 4.0f,
             pathFillType = NonZero
         ) {
@@ -1010,7 +1010,7 @@ public fun ActivityEmpty(
             close()
         }
         path(
-            fill = SolidColor(shoesDetails), stroke = null, strokeLineWidth = 0.0f,
+            fill = SolidColor(Color.White), stroke = null, strokeLineWidth = 0.0f,
             strokeLineCap = Butt, strokeLineJoin = Miter, strokeLineMiter = 4.0f,
             pathFillType = NonZero
         ) {
@@ -1035,7 +1035,7 @@ public fun ActivityEmpty(
             close()
         }
         path(
-            fill = SolidColor(shoesDetails), stroke = null, strokeLineWidth = 0.0f,
+            fill = SolidColor(Color.White), stroke = null, strokeLineWidth = 0.0f,
             strokeLineCap = Butt, strokeLineJoin = Miter, strokeLineMiter = 4.0f,
             pathFillType = NonZero
         ) {
@@ -1048,7 +1048,7 @@ public fun ActivityEmpty(
             close()
         }
         path(
-            fill = SolidColor(shoesDetails), stroke = null, strokeLineWidth = 0.0f,
+            fill = SolidColor(Color.White), stroke = null, strokeLineWidth = 0.0f,
             strokeLineCap = Butt, strokeLineJoin = Miter, strokeLineMiter = 4.0f,
             pathFillType = NonZero
         ) {
@@ -1061,7 +1061,7 @@ public fun ActivityEmpty(
             close()
         }
         path(
-            fill = SolidColor(shoesDetails), stroke = null, strokeLineWidth = 0.0f,
+            fill = SolidColor(Color.White), stroke = null, strokeLineWidth = 0.0f,
             strokeLineCap = Butt, strokeLineJoin = Miter, strokeLineMiter = 4.0f,
             pathFillType = NonZero
         ) {
@@ -1074,7 +1074,7 @@ public fun ActivityEmpty(
             close()
         }
         path(
-            fill = SolidColor(shoesDetails), stroke = null, strokeLineWidth = 0.0f,
+            fill = SolidColor(Color.White), stroke = null, strokeLineWidth = 0.0f,
             strokeLineCap = Butt, strokeLineJoin = Miter, strokeLineMiter = 4.0f,
             pathFillType = NonZero
         ) {
@@ -1087,7 +1087,7 @@ public fun ActivityEmpty(
             close()
         }
         path(
-            fill = SolidColor(shoesDetails), stroke = null, strokeLineWidth = 0.0f,
+            fill = SolidColor(Color.White), stroke = null, strokeLineWidth = 0.0f,
             strokeLineCap = Butt, strokeLineJoin = Miter, strokeLineMiter = 4.0f,
             pathFillType = NonZero
         ) {
@@ -1100,7 +1100,7 @@ public fun ActivityEmpty(
             close()
         }
         path(
-            fill = SolidColor(shoesDetails), stroke = null, strokeLineWidth = 0.0f,
+            fill = SolidColor(Color.White), stroke = null, strokeLineWidth = 0.0f,
             strokeLineCap = Butt, strokeLineJoin = Miter, strokeLineMiter = 4.0f,
             pathFillType = NonZero
         ) {
@@ -1113,7 +1113,7 @@ public fun ActivityEmpty(
             close()
         }
         path(
-            fill = SolidColor(shoesDetails), stroke = null, strokeLineWidth = 0.0f,
+            fill = SolidColor(Color.White), stroke = null, strokeLineWidth = 0.0f,
             strokeLineCap = Butt, strokeLineJoin = Miter, strokeLineMiter = 4.0f,
             pathFillType = NonZero
         ) {
@@ -1126,7 +1126,7 @@ public fun ActivityEmpty(
             close()
         }
         path(
-            fill = SolidColor(shoesDetails), stroke = null, strokeLineWidth = 0.0f,
+            fill = SolidColor(Color.White), stroke = null, strokeLineWidth = 0.0f,
             strokeLineCap = Butt, strokeLineJoin = Miter, strokeLineMiter = 4.0f,
             pathFillType = NonZero
         ) {
@@ -1139,7 +1139,7 @@ public fun ActivityEmpty(
             close()
         }
         path(
-            fill = SolidColor(shoesDetails), stroke = null, strokeLineWidth = 0.0f,
+            fill = SolidColor(Color.White), stroke = null, strokeLineWidth = 0.0f,
             strokeLineCap = Butt, strokeLineJoin = Miter, strokeLineMiter = 4.0f,
             pathFillType = NonZero
         ) {
@@ -1152,7 +1152,7 @@ public fun ActivityEmpty(
             close()
         }
         path(
-            fill = SolidColor(shoesDetails), stroke = null, strokeLineWidth = 0.0f,
+            fill = SolidColor(Color.White), stroke = null, strokeLineWidth = 0.0f,
             strokeLineCap = Butt, strokeLineJoin = Miter, strokeLineMiter = 4.0f,
             pathFillType = NonZero
         ) {
@@ -1165,7 +1165,7 @@ public fun ActivityEmpty(
             close()
         }
         path(
-            fill = SolidColor(shoesDetails), stroke = null, strokeLineWidth = 0.0f,
+            fill = SolidColor(Color.White), stroke = null, strokeLineWidth = 0.0f,
             strokeLineCap = Butt, strokeLineJoin = Miter, strokeLineMiter = 4.0f,
             pathFillType = NonZero
         ) {
@@ -1178,7 +1178,7 @@ public fun ActivityEmpty(
             close()
         }
         path(
-            fill = SolidColor(shoesDetails), stroke = null, strokeLineWidth = 0.0f,
+            fill = SolidColor(Color.White), stroke = null, strokeLineWidth = 0.0f,
             strokeLineCap = Butt, strokeLineJoin = Miter, strokeLineMiter = 4.0f,
             pathFillType = NonZero
         ) {
@@ -1191,7 +1191,7 @@ public fun ActivityEmpty(
             close()
         }
         path(
-            fill = SolidColor(shoesDetails), stroke = null, strokeLineWidth = 0.0f,
+            fill = SolidColor(Color.White), stroke = null, strokeLineWidth = 0.0f,
             strokeLineCap = Butt, strokeLineJoin = Miter, strokeLineMiter = 4.0f,
             pathFillType = NonZero
         ) {
@@ -1204,7 +1204,7 @@ public fun ActivityEmpty(
             close()
         }
         path(
-            fill = SolidColor(shoesDetails), stroke = null, strokeLineWidth = 0.0f,
+            fill = SolidColor(Color.White), stroke = null, strokeLineWidth = 0.0f,
             strokeLineCap = Butt, strokeLineJoin = Miter, strokeLineMiter = 4.0f,
             pathFillType = NonZero
         ) {
@@ -1229,7 +1229,7 @@ public fun ActivityEmpty(
             close()
         }
         path(
-            fill = SolidColor(shoesDetails), stroke = null, strokeLineWidth = 0.0f,
+            fill = SolidColor(Color.White), stroke = null, strokeLineWidth = 0.0f,
             strokeLineCap = Butt, strokeLineJoin = Miter, strokeLineMiter = 4.0f,
             pathFillType = NonZero
         ) {
@@ -1242,7 +1242,7 @@ public fun ActivityEmpty(
             close()
         }
         path(
-            fill = SolidColor(shoesDetails), stroke = null, strokeLineWidth = 0.0f,
+            fill = SolidColor(Color.White), stroke = null, strokeLineWidth = 0.0f,
             strokeLineCap = Butt, strokeLineJoin = Miter, strokeLineMiter = 4.0f,
             pathFillType = NonZero
         ) {
@@ -1255,7 +1255,7 @@ public fun ActivityEmpty(
             close()
         }
         path(
-            fill = SolidColor(shoesDetails), stroke = null, strokeLineWidth = 0.0f,
+            fill = SolidColor(Color.White), stroke = null, strokeLineWidth = 0.0f,
             strokeLineCap = Butt, strokeLineJoin = Miter, strokeLineMiter = 4.0f,
             pathFillType = NonZero
         ) {
@@ -1268,7 +1268,7 @@ public fun ActivityEmpty(
             close()
         }
         path(
-            fill = SolidColor(shoesDetails), stroke = null, strokeLineWidth = 0.0f,
+            fill = SolidColor(Color.White), stroke = null, strokeLineWidth = 0.0f,
             strokeLineCap = Butt, strokeLineJoin = Miter, strokeLineMiter = 4.0f,
             pathFillType = NonZero
         ) {
@@ -1281,7 +1281,7 @@ public fun ActivityEmpty(
             close()
         }
         path(
-            fill = SolidColor(shoesDetails), stroke = null, strokeLineWidth = 0.0f,
+            fill = SolidColor(Color.White), stroke = null, strokeLineWidth = 0.0f,
             strokeLineCap = Butt, strokeLineJoin = Miter, strokeLineMiter = 4.0f,
             pathFillType = NonZero
         ) {
@@ -1294,7 +1294,7 @@ public fun ActivityEmpty(
             close()
         }
         path(
-            fill = SolidColor(shoesDetails), stroke = null, strokeLineWidth = 0.0f,
+            fill = SolidColor(Color.White), stroke = null, strokeLineWidth = 0.0f,
             strokeLineCap = Butt, strokeLineJoin = Miter, strokeLineMiter = 4.0f,
             pathFillType = NonZero
         ) {
@@ -1308,7 +1308,7 @@ public fun ActivityEmpty(
             close()
         }
         path(
-            fill = SolidColor(shoesDetails), stroke = null, strokeLineWidth = 0.0f,
+            fill = SolidColor(Color.White), stroke = null, strokeLineWidth = 0.0f,
             strokeLineCap = Butt, strokeLineJoin = Miter, strokeLineMiter = 4.0f,
             pathFillType = NonZero
         ) {
@@ -1322,7 +1322,7 @@ public fun ActivityEmpty(
             close()
         }
         path(
-            fill = SolidColor(shoesDetails), stroke = null, strokeLineWidth = 0.0f,
+            fill = SolidColor(Color.White), stroke = null, strokeLineWidth = 0.0f,
             strokeLineCap = Butt, strokeLineJoin = Miter, strokeLineMiter = 4.0f,
             pathFillType = NonZero
         ) {
@@ -1336,7 +1336,7 @@ public fun ActivityEmpty(
             close()
         }
         path(
-            fill = SolidColor(shoesDetails), stroke = null, strokeLineWidth = 0.0f,
+            fill = SolidColor(Color.White), stroke = null, strokeLineWidth = 0.0f,
             strokeLineCap = Butt, strokeLineJoin = Miter, strokeLineMiter = 4.0f,
             pathFillType = NonZero
         ) {
@@ -1350,7 +1350,7 @@ public fun ActivityEmpty(
             close()
         }
         path(
-            fill = SolidColor(shoesDetails), stroke = null, strokeLineWidth = 0.0f,
+            fill = SolidColor(Color.White), stroke = null, strokeLineWidth = 0.0f,
             strokeLineCap = Butt, strokeLineJoin = Miter, strokeLineMiter = 4.0f,
             pathFillType = NonZero
         ) {
@@ -1364,7 +1364,7 @@ public fun ActivityEmpty(
             close()
         }
         path(
-            fill = SolidColor(shoesDetails), stroke = null, strokeLineWidth = 0.0f,
+            fill = SolidColor(Color.White), stroke = null, strokeLineWidth = 0.0f,
             strokeLineCap = Butt, strokeLineJoin = Miter, strokeLineMiter = 4.0f,
             pathFillType = NonZero
         ) {
@@ -1378,7 +1378,7 @@ public fun ActivityEmpty(
             close()
         }
         path(
-            fill = SolidColor(shoesDetails), stroke = null, strokeLineWidth = 0.0f,
+            fill = SolidColor(Color.White), stroke = null, strokeLineWidth = 0.0f,
             strokeLineCap = Butt, strokeLineJoin = Miter, strokeLineMiter = 4.0f,
             pathFillType = NonZero
         ) {
@@ -1392,7 +1392,7 @@ public fun ActivityEmpty(
             close()
         }
         path(
-            fill = SolidColor(shoesDetails), stroke = null, strokeLineWidth = 0.0f,
+            fill = SolidColor(Color.White), stroke = null, strokeLineWidth = 0.0f,
             strokeLineCap = Butt, strokeLineJoin = Miter, strokeLineMiter = 4.0f,
             pathFillType = NonZero
         ) {
@@ -1406,7 +1406,7 @@ public fun ActivityEmpty(
             close()
         }
         path(
-            fill = SolidColor(shoesDetails), stroke = null, strokeLineWidth = 0.0f,
+            fill = SolidColor(Color.White), stroke = null, strokeLineWidth = 0.0f,
             strokeLineCap = Butt, strokeLineJoin = Miter, strokeLineMiter = 4.0f,
             pathFillType = NonZero
         ) {

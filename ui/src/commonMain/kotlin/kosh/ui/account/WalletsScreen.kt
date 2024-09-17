@@ -123,7 +123,7 @@ fun WalletsContent(
                             .padding(64.dp),
                     ) {
                         Text(
-                            "Get started by adding new wallet",
+                            "Get started by adding your first wallet",
                             textAlign = TextAlign.Center
                         )
                     }

@@ -89,7 +89,7 @@ fun AssetsContent(
                 ) {
                     Column(horizontalAlignment = Alignment.CenterHorizontally) {
                         Text(
-                            "Get started by adding your Wallet",
+                            "Get started by adding your first wallet",
                             textAlign = TextAlign.Center
                         )
 
@@ -112,7 +112,7 @@ fun AssetsContent(
                 ) {
                     Column(horizontalAlignment = Alignment.CenterHorizontally) {
                         Text(
-                            "Get started by adding Ethereum Network",
+                            "Get started by adding your first network",
                             textAlign = TextAlign.Center
                         )
 

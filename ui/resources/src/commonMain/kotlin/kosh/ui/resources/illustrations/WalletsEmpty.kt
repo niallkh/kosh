@@ -866,7 +866,7 @@ public fun WalletsEmpty(
                 close()
             }
             path(
-                fill = SolidColor(Color(0xFFFFFFFE)), stroke = null, strokeLineWidth = 0.0f,
+                fill = SolidColor(shoesDetails), stroke = null, strokeLineWidth = 0.0f,
                 strokeLineCap = Butt, strokeLineJoin = Miter, strokeLineMiter = 4.0f,
                 pathFillType = NonZero
             ) {
@@ -879,7 +879,7 @@ public fun WalletsEmpty(
                 close()
             }
             path(
-                fill = SolidColor(Color(0xFFFFFFFE)), stroke = null, strokeLineWidth = 0.0f,
+                fill = SolidColor(shoesDetails), stroke = null, strokeLineWidth = 0.0f,
                 strokeLineCap = Butt, strokeLineJoin = Miter, strokeLineMiter = 4.0f,
                 pathFillType = NonZero
             ) {
@@ -892,7 +892,7 @@ public fun WalletsEmpty(
                 close()
             }
             path(
-                fill = SolidColor(Color(0xFFFFFFFE)), stroke = null, strokeLineWidth = 0.0f,
+                fill = SolidColor(shoesDetails), stroke = null, strokeLineWidth = 0.0f,
                 strokeLineCap = Butt, strokeLineJoin = Miter, strokeLineMiter = 4.0f,
                 pathFillType = NonZero
             ) {
@@ -903,20 +903,6 @@ public fun WalletsEmpty(
                 horizontalLineToRelative(22.07f)
                 curveToRelative(0.049f, 0.0f, 0.087f, 0.037f, 0.087f, 0.085f)
                 curveToRelative(0.0f, 0.048f, -0.04f, 0.086f, -0.086f, 0.086f)
-                close()
-            }
-            path(
-                fill = SolidColor(Color(0xFFFFFFFE)), stroke = null, strokeLineWidth = 0.0f,
-                strokeLineCap = Butt, strokeLineJoin = Miter, strokeLineMiter = 4.0f,
-                pathFillType = NonZero
-            ) {
-                moveTo(27.291f, 98.484f)
-                horizontalLineTo(8.141f)
-                arcToRelative(0.085f, 0.085f, 0.0f, false, true, -0.086f, -0.086f)
-                curveToRelative(0.0f, -0.048f, 0.038f, -0.085f, 0.086f, -0.085f)
-                horizontalLineToRelative(19.15f)
-                curveToRelative(0.048f, 0.0f, 0.086f, 0.037f, 0.086f, 0.085f)
-                curveToRelative(0.0f, 0.047f, -0.04f, 0.086f, -0.086f, 0.086f)
                 close()
             }
             path(

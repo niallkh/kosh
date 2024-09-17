@@ -13,7 +13,6 @@ import io.ktor.http.contentType
 import io.ktor.http.takeFrom
 import io.ktor.utils.io.ByteReadChannel
 import io.ktor.utils.io.readAvailable
-import io.ktor.utils.io.writeFully
 import io.ktor.utils.io.writer
 import kosh.libs.ipfs.car.CarSource
 import kosh.libs.ipfs.cid.Cid
@@ -102,7 +101,7 @@ public fun String.toIpfsUri(): Uri? = try {
             if (cid != null) {
                 Uri.Builder().run {
                     scheme("ipfs")
-                    appendPath(cid.encode())
+                    authority(cid.encode())
                     uri.pathSegments.drop(2).forEach {
                         appendPath(it)
                     }

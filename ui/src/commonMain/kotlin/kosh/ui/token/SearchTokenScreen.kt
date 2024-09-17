@@ -114,7 +114,6 @@ fun SearchTokenScreen(
 
                 LoadingIndicator(
                     searchToken.loading || createToken.loading,
-                    Modifier.padding(innerPadding),
                 )
             }
         }
@@ -178,7 +177,6 @@ fun SearchTokenItem(
     modifier: Modifier = Modifier,
     onClick: () -> Unit,
 ) {
-
     ListItem(
         modifier = modifier.clickable(onClick = onClick),
         leadingContent = {

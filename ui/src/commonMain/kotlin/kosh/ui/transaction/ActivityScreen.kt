@@ -91,7 +91,7 @@ fun ActivityContent(
                         .padding(64.dp),
                 ) {
                     Text(
-                        "Get started by creating new transaction",
+                        "Get started by sending your first transaction",
                         textAlign = TextAlign.Center
                     )
                 }

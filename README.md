@@ -1,34 +1,52 @@
-This is a Kotlin Multiplatform project targeting Android, iOS, Web, Desktop, Server.
+<img src="images/logo.png" alt="logo" width="64" height="64">
 
-* `/composeApp` is for code that will be shared across your Compose Multiplatform applications.
-  It contains several subfolders:
-    - `commonMain` is for code that’s common for all targets.
-    - Other folders are for Kotlin code that will be compiled for only the platform indicated in the
-      folder name.
-      For example, if you want to use Apple’s CoreCrypto for the iOS part of your Kotlin app,
-      `iosMain` would be the right folder for such calls.
+# Kosh
 
-* `/iosApp` contains iOS applications. Even if you’re sharing your UI with Compose Multiplatform,
-  you need this entry point for your iOS app. This is also where you should add SwiftUI code for
-  your project.
+Mobile WalletConnect interface for hardware wallets. Access and manage your dapps on the go.
 
-* `/server` is for the Ktor server application.
+## Features
 
-* `/shared` is for the code that will be shared between all targets in the project.
-  The most important subfolder is `commonMain`. If preferred, you can add code to the
-  platform-specific folders here too.
+Some things you can do with Kosh:
 
-Learn more
-about [Kotlin Multiplatform](https://www.jetbrains.com/help/kotlin-multiplatform-dev/get-started.html),
-[Compose Multiplatform](https://github.com/JetBrains/compose-multiplatform/#compose-multiplatform),
-[Kotlin/Wasm](https://kotl.in/wasm/)…
+* WalletConnect Sign, Auth
+* EIP-191, EIP-712, EIP-1559
+* Trezor Safe 3, Safe 5, T, One
+* Link Trezor Passphrase to Biometrics
+* Ledger Nano X, Nano S Plus, Stax (USB)
+* NFTs
+* IPFS trustless client
+* Material You design
 
-**Note:** Compose/Web is Experimental and may be changed at any time. Use it only for evaluation
-purposes.
-We would appreciate your feedback on Compose/Web and Kotlin/Wasm in the public Slack
-channel [#compose-web](https://slack-chats.kotlinlang.org/c/compose-web).
-If you face any issues, please report them
-on [GitHub](https://github.com/JetBrains/compose-multiplatform/issues).
+## Roadmap
 
-You can open the web application by running the `:composeApp:wasmJsBrowserDevelopmentRun` Gradle
-task.
+Some things you can expect in future:
+
+* Export/Import passkeys
+* Ledger Bluetooth
+* ENS
+* iOS
+
+## Built With
+
+* [Kotlin Multiplatform](https://github.com/JetBrains/kotlin)
+* [Kotlin Compose](https://github.com/JetBrains/compose-multiplatform)
+* [Secp256k1](https://github.com/ACINQ/secp256k1-kmp)
+* [Decompose](https://github.com/arkivanov/Decompose) for Navigation
+* [Compose ImageLoader](https://github.com/qdsfdhvh/compose-imageloader)
+
+## Screenshots
+
+<div>
+    <p>
+        <img src="images/assets.png" width="128"  alt="Assets">
+        <img src="images/activity.png" width="128"  alt="Activity">
+        <img src="images/networks.png" width="128"  alt="Networks">
+        <img src="images/nft.png" width="128"  alt="NFT">
+    </p>
+    <p>
+        <img src="images/send_tx.png" width="128"  alt="Send Transaction">
+        <img src="images/add_wallet.png" width="128"  alt="Add Hardware Wallet">
+        <img src="images/illustration_light.png" width="128"  alt="Illustration Light">
+        <img src="images/illustration_dark.png" width="128"  alt="Illustration Dark">
+    </p>
+</div>

@@ -90,7 +90,7 @@ fun NetworksContent(
                             .padding(64.dp),
                     ) {
                         Text(
-                            "Get started by adding new Ethereum Network",
+                            "Get started by adding your first network",
                             textAlign = TextAlign.Center
                         )
                     }

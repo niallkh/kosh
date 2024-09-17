@@ -19,7 +19,7 @@ fun TextAmount(
 ) {
     val text = remember(amount, symbol, decimals) { // TODO improve this
         if (amount == Value.BigNumber.UINT256_MAX) {
-            "ALL $symbol"
+            "UNLIMITED $symbol"
         } else {
             var resultScale: Scale = Scale.Default
             var text = amount.toString()

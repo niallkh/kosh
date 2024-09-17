@@ -54,7 +54,7 @@ fun WcSessionsContent(
                         .padding(64.dp),
                 ) {
                     Text(
-                        "Get started by connecting new dapp",
+                        "Get started by connecting your first DApp",
                         textAlign = TextAlign.Center
                     )
                 }
