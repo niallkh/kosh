@@ -22,7 +22,7 @@ class KoshApplication : Application() {
 //            StrictMode.enableDefaults()
             Logger.setMinSeverity(Severity.Verbose)
         } else {
-            Logger.setMinSeverity(Severity.Debug)
+            Logger.setMinSeverity(Severity.Info)
             Thread.setDefaultUncaughtExceptionHandler { t, e ->
                 Logger.e(e) { "Error happened" }
             }

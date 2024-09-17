@@ -43,13 +43,13 @@ fun ledgerDerivationPath(index: UInt = 0u): DerivationPath {
 }
 
 val DerivationPath.ethereumAddressIndex: UInt
-    inline get() = path[4]
+    get() = path[4]
 
 val DerivationPath.ledgerAddressIndex: UInt
-    inline get() = path[2]
+    get() = path[2].unhardened
 
 val DerivationPath.slip44: UInt
-    inline get() = path[1]
+    get() = path[1]
 
 internal fun derivationPathOf(path: String): DerivationPath {
     val segments = path.split("/")

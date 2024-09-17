@@ -2,7 +2,8 @@
 
 # Kosh
 
-Mobile WalletConnect interface for hardware wallets. Access and manage your dapps on the go.
+Bridge the gap between your hardware wallet and dapps. Manage your crypto and interact with dapp
+from your mobile device.
 
 ## Features
 
@@ -38,15 +39,15 @@ Some things you can expect in future:
 
 <div>
     <p>
-        <img src="images/assets.png" width="128"  alt="Assets">
-        <img src="images/activity.png" width="128"  alt="Activity">
-        <img src="images/networks.png" width="128"  alt="Networks">
-        <img src="images/nft.png" width="128"  alt="NFT">
+        <img src="images/assets.png" width="160"  alt="Assets">
+        <img src="images/activity.png" width="160"  alt="Activity">
+        <img src="images/networks.png" width="160"  alt="Networks">
+        <img src="images/nft.png" width="160"  alt="NFT">
     </p>
     <p>
-        <img src="images/send_tx.png" width="128"  alt="Send Transaction">
-        <img src="images/add_wallet.png" width="128"  alt="Add Hardware Wallet">
-        <img src="images/illustration_light.png" width="128"  alt="Illustration Light">
-        <img src="images/illustration_dark.png" width="128"  alt="Illustration Dark">
+        <img src="images/send_tx.png" width="160"  alt="Send Transaction">
+        <img src="images/add_wallet.png" width="160"  alt="Add Hardware Wallet">
+        <img src="images/illustration_light.png" width="160"  alt="Illustration Light">
+        <img src="images/illustration_dark.png" width="160"  alt="Illustration Dark">
     </p>
 </div>
