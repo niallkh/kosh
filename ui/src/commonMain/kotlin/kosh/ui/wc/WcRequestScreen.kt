@@ -2,6 +2,7 @@ package kosh.ui.wc
 
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.Text
@@ -44,9 +45,10 @@ fun WcRequestContent(
     KoshScaffold(
         title = { Text(stringResource(Res.string.wc_request_title)) },
         onUp = { onNavigateUp() }
-    ) {
+    ) { paddingValues ->
         Column(
             modifier = Modifier.verticalScroll(rememberScrollState())
+                .padding(paddingValues)
         ) {
             request.failure?.let {
                 AppFailureItem(it) { request.retry() }
@@ -55,6 +57,9 @@ fun WcRequestContent(
             }
         }
 
-        LoadingIndicator(request.loading)
+        LoadingIndicator(
+            request.loading,
+            Modifier.padding(paddingValues),
+        )
     }
 }

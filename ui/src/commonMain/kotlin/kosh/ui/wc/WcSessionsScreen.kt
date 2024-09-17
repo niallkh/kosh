@@ -1,5 +1,6 @@
 package kosh.ui.wc
 
+import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
@@ -20,32 +21,34 @@ import kosh.ui.resources.illustrations.DappsEmpty
 
 @Composable
 fun WcSessionsScreen(
-    modifier: Modifier = Modifier,
+    paddingValues: PaddingValues,
     onOpen: (WcSession) -> Unit,
 ) {
     val sessions = rememberSessions()
 
     WcSessionsContent(
+        paddingValues = paddingValues,
         sessions = sessions.sessions,
         loading = sessions.loading,
         onSelect = onOpen,
-        modifier = modifier,
     )
 }
 
 @Composable
 fun WcSessionsContent(
+    paddingValues: PaddingValues,
     sessions: List<WcSession>,
     loading: Boolean,
     onSelect: (WcSession) -> Unit,
-    modifier: Modifier = Modifier,
 ) {
-    LazyColumn(modifier) {
+    LazyColumn(
+        contentPadding = paddingValues,
+    ) {
         if (sessions.isEmpty()) {
             item {
                 Illustration(
                     DappsEmpty(),
-                    "WcEmpty",
+                    "DappsEmpty",
                     Modifier
                         .fillMaxWidth()
                         .padding(64.dp),
@@ -63,7 +66,7 @@ fun WcSessionsContent(
             key = { it.id.sessionTopic.value }
         ) { session ->
             DappItem(
-                modifier = Modifier.animateItemPlacement(),
+                modifier = Modifier.animateItem(),
                 dapp = session.dapp,
                 onClick = { onSelect(session) },
             )
@@ -74,5 +77,8 @@ fun WcSessionsContent(
         }
     }
 
-    LoadingIndicator(loading)
+    LoadingIndicator(
+        loading,
+        Modifier.padding(paddingValues),
+    )
 }

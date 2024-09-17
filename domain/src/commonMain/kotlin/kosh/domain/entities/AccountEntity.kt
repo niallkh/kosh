@@ -5,7 +5,6 @@ import arrow.core.memoize
 import arrow.optics.optics
 import kosh.domain.models.Address
 import kosh.domain.models.account.DerivationPath
-import kosh.domain.models.account.ethereumAddressIndex
 import kosh.domain.models.eip55
 import kosh.domain.serializers.Uuid
 import kosh.domain.serializers.UuidSerializer
@@ -55,14 +54,15 @@ data class AccountEntity(
             address: Address,
             walletId: WalletEntity.Id,
             derivationPath: DerivationPath,
+            name: String,
         ): AccountEntity = AccountEntity(
             id = Id(address),
             walletId = walletId,
             address = address,
             derivationPath = derivationPath,
+            name = name,
             createdAt = Clock.System.now(),
-            modifiedAt = Clock.System.now(),
-            name = "Account #${derivationPath.ethereumAddressIndex}"
+            modifiedAt = Clock.System.now()
         )
     }
 }

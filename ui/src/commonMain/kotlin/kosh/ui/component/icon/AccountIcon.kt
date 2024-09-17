@@ -34,7 +34,7 @@ fun AccountIcon(
         Icon(
             modifier = Modifier
                 .padding(4.dp)
-                .fillMaxSize(),
+                .fillMaxSize(), // TODO check
             imageVector = walletVector(address.bytes()),
             contentDescription = "WalletIcon",
         )

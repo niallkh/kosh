@@ -1,5 +1,7 @@
 package kosh.ui.trezor
 
+import androidx.compose.foundation.layout.PaddingValues
+import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material3.Text
@@ -32,7 +34,7 @@ fun NewTrezorAccountScreen(
         modifier = modifier,
         title = { Text("Trezor New Account") },
         onUp = onNavigateUp
-    ) {
+    ) { paddingValues ->
         val trezor = rememberTrezor()
 
         trezor.trezor?.let { ledger ->
@@ -65,14 +67,17 @@ fun NewTrezorAccountScreen(
 
             NewTrezorAccountContent(
                 trezorAccounts = trezorAccounts,
-                onSelect = { createAccountState.create(it) }
+                paddingValues = paddingValues,
+                onSelect = { createAccountState.create(it) },
             )
 
             LoadingIndicator(
-                createAccountState.loading || trezorAccounts.loading
+                createAccountState.loading || trezorAccounts.loading,
+                Modifier.padding(paddingValues),
             )
         } ?: AppFailureItem(
             TrezorFailure.NotConnected(),
+            Modifier.padding(paddingValues),
         )
     }
 }
@@ -80,9 +85,12 @@ fun NewTrezorAccountScreen(
 @Composable
 fun NewTrezorAccountContent(
     trezorAccounts: TrezorAccountsState,
+    paddingValues: PaddingValues = PaddingValues(),
     onSelect: (Signer) -> Unit,
 ) {
-    LazyColumn {
+    LazyColumn(
+        contentPadding = paddingValues
+    ) {
         trezorAccounts.failure?.let {
             item {
                 AppFailureItem(it) {

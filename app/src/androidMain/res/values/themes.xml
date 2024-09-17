@@ -1,9 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
 
-    <style name="Theme.Kosh" parent="Theme.AppCompat.DayNight">
-        <item name="android:windowBackground">?android:colorBackground</item>
-    </style>
+    <style name="Theme.Kosh" parent="android:Theme.Material.Light.NoActionBar" />
 
     <style name="Theme.Kosh.Starting" parent="Theme.SplashScreen">
         <item name="postSplashScreenTheme">@style/Theme.Kosh</item>

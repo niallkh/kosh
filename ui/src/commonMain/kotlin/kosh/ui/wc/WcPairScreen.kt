@@ -96,11 +96,12 @@ fun WcPairContent(
         modifier = modifier.nestedScroll(topAppBarScrollBehavior.nestedScrollConnection),
         title = { Text(stringResource(Res.string.wc_pair_title)) },
         onUp = { onNavigateUp() }
-    ) {
+    ) { paddingValues ->
         Column(
             modifier = Modifier
                 .verticalScroll(rememberScrollState())
-                .padding(16.dp)
+                .padding(paddingValues)
+                .padding(16.dp),
         ) {
 
             PairingUriTextField(

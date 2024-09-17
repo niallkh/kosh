@@ -12,6 +12,8 @@ import kosh.domain.entities.name
 import kosh.domain.failure.AccountFailure
 import kosh.domain.models.Address
 import kosh.domain.models.account.DerivationPath
+import kosh.domain.models.account.ethereumAddressIndex
+import kosh.domain.models.account.ledgerAddressIndex
 import kosh.domain.repositories.AppStateRepo
 import kosh.domain.repositories.modify
 import kosh.domain.repositories.optic
@@ -53,7 +55,7 @@ class DefaultAccountService(
         location: WalletEntity.Location,
         derivationPath: DerivationPath,
         address: Address,
-    ): WalletEntity.Id = raise.run {
+    ) = raise.run {
         val walletsAmount = appStateRepo.state().wallets.size
 
         val wallet = WalletEntity(
@@ -61,10 +63,16 @@ class DefaultAccountService(
             location = location,
         )
 
+        val addressIndex = when (location) {
+            is WalletEntity.Location.Ledger -> derivationPath.ledgerAddressIndex
+            is WalletEntity.Location.Trezor -> derivationPath.ethereumAddressIndex
+        }
+
         val account = AccountEntity(
             address = address,
             derivationPath = derivationPath,
             walletId = wallet.id,
+            name = "Account #$addressIndex"
         )
 
         appStateRepo.modify {
@@ -79,8 +87,6 @@ class DefaultAccountService(
             AppState.accounts.at(At.pmap(), account.id) set account
             AppState.enabledAccountIds.at(At.phset(), account.id) set true
         }
-
-        wallet.id
     }
 
     override fun update(id: AccountEntity.Id, name: String) = either {
@@ -118,7 +124,7 @@ class DefaultAccountService(
             }
 
             AppState.transactions transform { map ->
-                map.filter { it.value.accountId == id }.toPersistentMap()
+                map.filter { it.value.accountId != id }.toPersistentMap()
             }
         }
     }

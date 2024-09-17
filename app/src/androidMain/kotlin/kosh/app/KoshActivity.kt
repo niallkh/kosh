@@ -1,14 +1,17 @@
 package kosh.app
 
+import android.Manifest
 import android.content.Intent
 import android.net.Uri
+import android.os.Build
 import android.os.Bundle
+import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
+import androidx.activity.result.contract.ActivityResultContracts.RequestPermission
 import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
-import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.ui.graphics.toArgb
 import androidx.core.app.TaskStackBuilder
@@ -43,6 +46,7 @@ import kosh.ui.navigation.routes.RootRoute
 import kosh.ui.navigation.stack.DefaultStackRouter
 import kosh.ui.navigation.stack.StackRouter
 import kotlinx.serialization.serializer
+import java.math.BigDecimal
 import kotlin.LazyThreadSafetyMode.NONE
 
 class KoshActivity : FragmentActivity() {
@@ -98,6 +102,8 @@ class KoshActivity : FragmentActivity() {
         val fileRepo = windowScope.appRepositoriesComponent.fileRepo
         val pathResolver = PathResolver { fileRepo.read(it) }
 
+        BigDecimal.ZERO.toEngineeringString()
+
         setContent {
             CompositionLocalProvider(
                 LocalRouteContext provides routeContext,
@@ -108,14 +114,25 @@ class KoshActivity : FragmentActivity() {
                 LocalRootNavigator provides rootNavigator,
             ) {
                 App(
-                    onBackgroundColorChanged = { window.decorView.setBackgroundColor(it.toArgb()) },
                     stackRouter = rootRouter,
+                    onBackgroundColorChanged = { window.decorView.setBackgroundColor(it.toArgb()) }
                 )
 
+                NotificationPermission()
                 HideSplashScreen(splashScreen)
+                EdgeToEdge()
             }
+        }
+    }
 
-            EdgeToEdge()
+    @Composable
+    private fun NotificationPermission() {
+        val launcher = rememberLauncherForActivityResult(RequestPermission()) {}
+
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+            LaunchedEffect(Unit) {
+                launcher.launch(Manifest.permission.POST_NOTIFICATIONS)
+            }
         }
     }
 
@@ -147,9 +164,8 @@ class KoshActivity : FragmentActivity() {
     private fun EdgeToEdge() {
         val darkTheme = isSystemInDarkTheme()
 
-        DisposableEffect(darkTheme) {
+        LaunchedEffect(darkTheme) {
             enableEdgeToEdge()
-            onDispose { }
         }
     }
 

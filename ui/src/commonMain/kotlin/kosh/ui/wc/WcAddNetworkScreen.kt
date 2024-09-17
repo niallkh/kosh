@@ -66,13 +66,14 @@ fun WcAddNetworkContent(
     KoshScaffold(
         title = { TextLine("Add Network") },
         onUp = { onNavigateUp() },
-    ) {
+    ) { innerPadding ->
         addNetwork.failure?.let {
-            AppFailureItem(it) { addNetwork.retry() }
+            AppFailureItem(it, Modifier.padding(innerPadding)) { addNetwork.retry() }
         } ?: Column(
             modifier = Modifier.verticalScroll(rememberScrollState())
                 .imePadding()
-                .padding(horizontal = 16.dp, vertical = 8.dp),
+                .padding(horizontal = 16.dp, vertical = 8.dp)
+                .padding(innerPadding),
             verticalArrangement = Arrangement.spacedBy(8.dp)
         ) {
 
@@ -164,6 +165,9 @@ fun WcAddNetworkContent(
             )
         }
 
-        LoadingIndicator(addNetwork.loading)
+        LoadingIndicator(
+            addNetwork.loading,
+            Modifier.padding(innerPadding),
+        )
     }
 }

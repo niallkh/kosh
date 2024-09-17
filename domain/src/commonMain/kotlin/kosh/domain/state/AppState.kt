@@ -34,8 +34,8 @@ import kotlinx.collections.immutable.PersistentList
 import kotlinx.collections.immutable.persistentHashMapOf
 import kotlinx.collections.immutable.persistentHashSetOf
 import kotlinx.collections.immutable.persistentMapOf
-import kotlinx.collections.immutable.toPersistentHashSet
 import kotlinx.collections.immutable.toPersistentList
+import kotlinx.collections.immutable.toPersistentSet
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.UseSerializers
 import okio.Buffer
@@ -70,7 +70,7 @@ fun AppState.Companion.activeNetworks() = Getter<AppState, PersistentList<Networ
 }
 
 fun AppState.Companion.activeNetworksIds() =
-    activeNetworks() compose Getter { list -> list.map { it.id }.toPersistentHashSet() }
+    activeNetworks() compose Getter { list -> list.map { it.id }.toPersistentSet() }
 
 fun AppState.Companion.networks() = Getter<AppState, PersistentList<NetworkEntity>> { state ->
     state.networks.values
@@ -86,8 +86,7 @@ fun AppState.Companion.activeAccounts() = Getter<AppState, PersistentList<Accoun
 }
 
 fun AppState.Companion.activeAccountIds() =
-    activeAccounts() compose Getter { list -> list.map { it.id }.toPersistentHashSet() }
-
+    activeAccounts() compose Getter { list -> list.map { it.id }.toPersistentSet() }
 
 fun AppState.Companion.activeTokens() = Getter<AppState, PersistentList<TokenEntity>> { state ->
     state.tokens.values

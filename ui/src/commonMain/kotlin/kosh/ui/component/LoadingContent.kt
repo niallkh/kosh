@@ -13,9 +13,10 @@ import androidx.compose.ui.Modifier
 @Composable
 fun LoadingIndicator(
     loading: Boolean,
+    modifier: Modifier = Modifier,
 ) {
     AnimatedVisibility(
-        modifier = Modifier.fillMaxWidth(),
+        modifier = modifier.fillMaxWidth(),
         visible = loading,
         enter = expandVertically() + fadeIn(),
         exit = shrinkVertically() + fadeOut(),

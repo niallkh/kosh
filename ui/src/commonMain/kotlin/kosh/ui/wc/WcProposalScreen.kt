@@ -120,7 +120,7 @@ fun WcSessionProposalContent(
                 DappTitle(proposal.proposal?.proposal?.dapp)
             }
         },
-        largeTopBar = true,
+
         actions = {
             if (proposal.failure == null) {
                 DappIcon(proposal.proposal?.proposal?.dapp)
@@ -128,10 +128,12 @@ fun WcSessionProposalContent(
             }
         },
         onUp = { onNavigateUp() }
-    ) {
+    ) { innerPadding ->
         proposal.failure?.let {
-            AppFailureItem(it) { proposal.retry() }
-        } ?: LazyColumn {
+            AppFailureItem(it, Modifier.padding(innerPadding)) { proposal.retry() }
+        } ?: LazyColumn(
+            contentPadding = innerPadding
+        ) {
 
             item {
                 proposal.proposal?.proposal?.let {
@@ -213,7 +215,10 @@ fun WcSessionProposalContent(
             }
         }
 
-        LoadingIndicator(proposal.loading)
+        LoadingIndicator(
+            proposal.loading,
+            Modifier.padding(innerPadding),
+        )
     }
 }
 

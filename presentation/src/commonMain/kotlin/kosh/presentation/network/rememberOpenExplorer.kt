@@ -24,6 +24,11 @@ fun rememberOpenExplorer(
             network.entity?.explorers?.firstOrNull()?.let {
                 uriHandler.openUri("$it/address/$address")
             }
+        },
+        openToken = { address ->
+            network.entity?.explorers?.firstOrNull()?.let {
+                uriHandler.openUri("$it/token/$address")
+            }
         }
     )
 }
@@ -31,4 +36,5 @@ fun rememberOpenExplorer(
 data class OpenExplorerState(
     val openTransaction: (Hash) -> Unit,
     val openAddress: (Address) -> Unit,
+    val openToken: (Address) -> Unit,
 )

@@ -108,7 +108,7 @@ fun TrezorPasskeys(
             val selected by derivedStateOf { passkey.index in selectedPasskeys }
 
             TrezorPasskey(
-                modifier = Modifier.animateItemPlacement(),
+                modifier = Modifier.animateItem(),
                 passkey = passkey,
                 selected = selected,
                 onSelect = onSelect
@@ -116,7 +116,10 @@ fun TrezorPasskeys(
         }
     }
 
-    LoadingIndicator(loading)
+    LoadingIndicator(
+        loading,
+        Modifier,
+    )
 }
 
 @Composable

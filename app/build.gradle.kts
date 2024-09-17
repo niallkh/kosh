@@ -42,7 +42,6 @@ kotlin {
             implementation(libs.androidx.splash)
             implementation(libs.decompose.android)
             implementation(libs.ktor.client.okhttp)
-//            implementation(libs.wc2.android.web3wallet)
             implementation(libs.wc2.android)
             implementation(libs.secp256k1.android)
         }
@@ -90,8 +89,8 @@ android {
         applicationId = "eth.kosh.app"
         minSdk = libs.versions.android.minSdk.get().toInt()
         targetSdk = libs.versions.android.compileSdk.get().toInt()
-        versionCode = 1
-        versionName = "1.0.0"
+        versionCode = 3
+        versionName = "0.0.1"
     }
 
     buildTypes {

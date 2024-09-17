@@ -8,16 +8,18 @@ import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Shape
+import androidx.compose.ui.graphics.vector.rememberVectorPainter
 import androidx.compose.ui.layout.ContentScale
 import com.seiko.imageloader.model.ImageRequest
 import com.seiko.imageloader.rememberImagePainter
 import kosh.domain.serializers.Uri
+import kosh.ui.resources.illustrations.NftEmpty
 
 @Composable
 fun NftImage(
-    modifier: Modifier = Modifier,
     image: Uri,
-    maxSize: Int,
+    modifier: Modifier = Modifier,
+    maxSize: Int = 1024,
     shape: Shape = MaterialTheme.shapes.medium,
 ) {
     val request = remember(image) {
@@ -31,7 +33,11 @@ fun NftImage(
         modifier = modifier
             .aspectRatio(1f)
             .clip(shape),
-        painter = rememberImagePainter(request),
+        painter = rememberImagePainter(
+            request,
+            errorPainter = { rememberVectorPainter(NftEmpty()) },
+            placeholderPainter = { rememberVectorPainter(NftEmpty()) },
+        ),
         contentDescription = "NFT Image",
         contentScale = ContentScale.Crop,
     )

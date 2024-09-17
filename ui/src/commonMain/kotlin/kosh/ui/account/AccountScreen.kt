@@ -109,10 +109,7 @@ fun AccountContent(
 
                 AdaptiveMenuItem(
                     leadingIcon = {
-                        Icon(
-                            Icons.AutoMirrored.Filled.OpenInNew,
-                            "Open in explorer"
-                        )
+                        Icon(Icons.AutoMirrored.Filled.OpenInNew, "Open in explorer")
                     },
                     onClick = {
                         dismiss {
@@ -130,10 +127,11 @@ fun AccountContent(
                 )
             }
         }
-    ) {
+    ) { paddingValues ->
         Column(
             modifier = Modifier
                 .padding(vertical = 8.dp)
+                .padding(paddingValues)
                 .verticalScroll(rememberScrollState()),
             verticalArrangement = Arrangement.spacedBy(16.dp),
         ) {
@@ -148,7 +146,8 @@ fun AccountContent(
                     value = {
                         TextAddressShort(
                             account?.address.orZero(),
-                            Modifier.placeholder(account == null)
+                            Modifier.placeholder(account == null),
+                            clickable = true,
                         )
                     }
                 )
@@ -160,6 +159,7 @@ fun AccountContent(
                         TextDerivationPath(
                             account?.derivationPath ?: ethereumDerivationPath(),
                             Modifier.placeholder(account == null),
+                            clickable = true
                         )
                     }
                 )

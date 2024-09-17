@@ -94,20 +94,21 @@ fun WcSignTypedContent(
             }
         },
         onUp = onNavigateUp,
-        largeTopBar = true,
+
         actions = {
             if (signTyped.failure == null) {
                 DappIcon(signTyped.request?.dapp)
             }
             Spacer(Modifier.width(8.dp))
         }
-    ) {
+    ) { innerPadding ->
         signTyped.failure?.let {
-            AppFailureItem(it) { signTyped.retry() }
+            AppFailureItem(it, Modifier.padding(innerPadding)) { signTyped.retry() }
         } ?: run {
             Column(
                 modifier = Modifier
-                    .verticalScroll(rememberScrollState()),
+                    .verticalScroll(rememberScrollState())
+                    .padding(innerPadding),
                 verticalArrangement = Arrangement.spacedBy(16.dp)
             ) {
 
@@ -163,6 +164,9 @@ fun WcSignTypedContent(
             }
         }
 
-        LoadingIndicator(signTyped.loading)
+        LoadingIndicator(
+            signTyped.loading,
+            Modifier.padding(innerPadding),
+        )
     }
 }

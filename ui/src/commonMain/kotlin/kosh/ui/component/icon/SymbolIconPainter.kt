@@ -36,7 +36,7 @@ class SymbolIconPainter(
 
         val standard = size.toDpSize().width > 16.dp
 
-        val scale = if (standard) 0.9f else 0.5f
+        val scale = if (standard) 0.9f else 0.5f // TODO improve this
         val text = if (standard) symbol.take(5) else symbol.take(3)
 
         scale(scale) {

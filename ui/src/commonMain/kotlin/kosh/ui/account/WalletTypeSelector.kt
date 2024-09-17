@@ -21,7 +21,6 @@ fun WalletTypeSelector(
         KoshModalBottomSheet(
             onDismissRequest = onDismiss,
         ) { dismiss ->
-
             ListItem(
                 modifier = Modifier.clickable { dismiss { onSelected(WalletEntity.Type.Trezor) } },
                 leadingContent = { Icon(TrezorIcon, "Trezor") },

@@ -91,17 +91,18 @@ fun WcSignPersonalContent(
             }
         },
         onUp = onNavigateUp,
-        largeTopBar = true,
+
         actions = {
             if (signPersonal.failure == null) {
                 DappIcon(signPersonal.request?.dapp)
             }
             Spacer(Modifier.width(8.dp))
         }
-    ) {
+    ) { paddingValues ->
         Column(
             modifier = Modifier
-                .verticalScroll(rememberScrollState()),
+                .verticalScroll(rememberScrollState())
+                .padding(paddingValues),
             verticalArrangement = Arrangement.spacedBy(16.dp)
         ) {
             signPersonal.failure?.let {
@@ -144,6 +145,9 @@ fun WcSignPersonalContent(
             }
         }
 
-        LoadingIndicator(signPersonal.loading)
+        LoadingIndicator(
+            signPersonal.loading,
+            Modifier.padding(paddingValues),
+        )
     }
 }

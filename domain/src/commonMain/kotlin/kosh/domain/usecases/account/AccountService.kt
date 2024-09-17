@@ -3,7 +3,6 @@ package kosh.domain.usecases.account
 import arrow.core.Either
 import arrow.core.raise.Raise
 import kosh.domain.entities.AccountEntity
-import kosh.domain.entities.WalletEntity
 import kosh.domain.entities.WalletEntity.Location
 import kosh.domain.failure.AccountFailure
 import kosh.domain.models.Address
@@ -25,7 +24,7 @@ interface AccountService {
         location: Location,
         derivationPath: DerivationPath,
         address: Address,
-    ): WalletEntity.Id
+    )
 
     fun toggle(id: AccountEntity.Id, enabled: Boolean)
 

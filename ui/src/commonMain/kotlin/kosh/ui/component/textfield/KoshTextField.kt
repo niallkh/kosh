@@ -1,9 +1,6 @@
-@file:OptIn(ExperimentalAnimationApi::class)
-
 package kosh.ui.component.textfield
 
 import androidx.compose.animation.AnimatedVisibility
-import androidx.compose.animation.ExperimentalAnimationApi
 import androidx.compose.animation.core.updateTransition
 import androidx.compose.animation.expandVertically
 import androidx.compose.animation.shrinkVertically
@@ -29,6 +26,7 @@ import androidx.compose.ui.platform.LocalHapticFeedback
 import androidx.compose.ui.text.TextRange
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.input.TextFieldValue
+import androidx.compose.ui.text.input.VisualTransformation
 import kosh.ui.component.modifier.optionalClickable
 import kosh.ui.navigation.animation.fadeIn
 import kosh.ui.navigation.animation.fadeOut
@@ -44,6 +42,7 @@ fun KoshTextField(
     readOnly: Boolean = false,
     keyboardActions: KeyboardActions = KeyboardActions.Default,
     keyboardOptions: KeyboardOptions = KeyboardOptions.Default,
+    visualTransformation: VisualTransformation = VisualTransformation.None,
     label: @Composable (() -> Unit)? = null,
     leadingIcon: @Composable (() -> Unit)? = null,
     trailingIcon: @Composable (() -> Unit)? = null,
@@ -74,6 +73,7 @@ fun KoshTextField(
                 Text(transition.targetState ?: transition.currentState ?: "")
             }
         },
+        visualTransformation = visualTransformation
     )
 
     LaunchedEffect(requestFocus) {

@@ -44,6 +44,7 @@ import kosh.ui.component.text.TextLine
 import kosh.ui.component.text.TextNumber
 import kosh.ui.component.wallet.AccountItem
 import kosh.ui.transaction.calls.ApproveCard
+import kosh.ui.transaction.calls.DeployCard
 import kosh.ui.transaction.calls.FallbackCard
 import kosh.ui.transaction.calls.NativeTransferCard
 import kosh.ui.transaction.calls.TransferCard
@@ -75,7 +76,7 @@ fun TransactionContent(
     KoshScaffold(
         title = { DappTitle(transaction?.dapp) },
         onUp = onNavigateUp,
-        largeTopBar = true,
+
         actions = {
             DappIcon(transaction?.dapp)
 
@@ -106,21 +107,23 @@ fun TransactionContent(
 
             Spacer(Modifier.width(8.dp))
         }
-    ) {
-        when (transaction) {
-            is TransactionEntity.PersonalMessage -> PersonalMessageContent(
-                personalMessage = transaction,
-            )
+    ) { paddingValues ->
+        Box(Modifier.padding(paddingValues)) {
+            when (transaction) {
+                is TransactionEntity.PersonalMessage -> PersonalMessageContent(
+                    personalMessage = transaction,
+                )
 
-            is TransactionEntity.Eip712 -> TypedMessageContent(
-                typedMessage = transaction,
-            )
+                is TransactionEntity.Eip712 -> TypedMessageContent(
+                    typedMessage = transaction,
+                )
 
-            is TransactionEntity.Eip1559 -> TransactionContent(
-                transaction = transaction,
-            )
+                is TransactionEntity.Eip1559 -> TransactionContent(
+                    transaction = transaction,
+                )
 
-            null -> Unit
+                null -> Unit
+            }
         }
     }
 }
@@ -241,7 +244,7 @@ fun TransactionContent(
                     is ContractCall.Transfer -> TransferCard(call)
                     is ContractCall.Approve -> ApproveCard(call)
                     is ContractCall.NativeTransfer -> NativeTransferCard(call)
-                    is ContractCall.Deploy -> TODO()
+                    is ContractCall.Deploy -> DeployCard(call)
                     is ContractCall.Fallback -> FallbackCard(call)
                     null -> FallbackCard(call)
                 }
@@ -262,8 +265,8 @@ fun TransactionContent(
                     KeyValueRow(
                         key = { Text("Status") },
                         value = {
-                            val text =
-                                if (transaction.receipt?.success == true) "Success" else "Failure"
+                            val text = if (transaction.receipt?.success == true) "Success"
+                            else "Failure"
                             TextLine(text)
                         }
                     )
@@ -271,7 +274,7 @@ fun TransactionContent(
 
                 KeyValueRow(
                     key = { Text("Hash") },
-                    value = { TextBytes(transaction.hash.value) }
+                    value = { TextBytes(transaction.hash.value, clickable = true) }
                 )
 
                 if (transaction.receipt != null) {

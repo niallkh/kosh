@@ -13,6 +13,7 @@ import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.filled.OpenInNew
 import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material.icons.filled.Image
 import androidx.compose.material.icons.filled.OpenInBrowser
@@ -38,6 +39,7 @@ import kosh.domain.models.token.NftExtendedMetadata
 import kosh.domain.serializers.ImmutableList
 import kosh.domain.utils.orZero
 import kosh.presentation.network.rememberNetwork
+import kosh.presentation.network.rememberOpenExplorer
 import kosh.presentation.token.rememberNftMetadata
 import kosh.presentation.token.rememberRefreshToken
 import kosh.presentation.token.rememberToken
@@ -112,14 +114,14 @@ fun TokenScreen(
                 Spacer(Modifier.width(8.dp))
             }
         }
-    ) {
+    ) { paddingValues ->
         val tokenBalances = rememberTokenBalances(id)
 
         Column(
             modifier = Modifier
                 .verticalScroll(rememberScrollState())
-                .padding(bottom = 8.dp, top = 8.dp)
-                .animateContentSize(),
+                .padding(paddingValues)
+                .padding(vertical = 8.dp),
             verticalArrangement = Arrangement.spacedBy(16.dp)
         ) {
 
@@ -167,12 +169,14 @@ fun TokenScreen(
             InfoSection(id)
         }
 
-
         val loading = refreshToken.loading ||
                 nftMetadata?.loading == true ||
                 tokenBalances.loading
 
-        LoadingIndicator(loading)
+        LoadingIndicator(
+            loading,
+            Modifier.padding(paddingValues)
+        )
     }
 }
 
@@ -240,6 +244,18 @@ private fun TokenMoreMenu(
                 )
             }
         }
+
+        if (token != null && token.type != Type.Native) {
+            val openExplorer = rememberOpenExplorer(token.networkId)
+
+            DropdownMenuItem(
+                text = { Text("Open In Explorer") },
+                onClick = { dismiss { token.address?.let { openExplorer.openToken(it) } } },
+                leadingIcon = {
+                    Icon(Icons.AutoMirrored.Filled.OpenInNew, "Open in explorer")
+                }
+            )
+        }
     }
 }
 
@@ -260,7 +276,7 @@ private fun InfoSection(
         KeyValueRow(
             modifier = Modifier.fillMaxWidth(),
             key = { TextLine("Type") },
-            value = { TextLine(token.entity?.type?.name?.lowercase().orEmpty()) }
+            value = { TextLine(token.entity?.type?.name?.uppercase().orEmpty()) }
         )
 
         val network = token.entity?.networkId?.let { rememberNetwork(it) }
@@ -271,7 +287,7 @@ private fun InfoSection(
             value = {
                 TextLine(
                     network?.entity?.name.orEmpty(),
-                    Modifier.placeholder(network?.entity == null)
+                    Modifier.placeholder(network?.entity == null),
                 )
             }
         )
@@ -283,7 +299,8 @@ private fun InfoSection(
                 value = {
                     TextAddressShort(
                         token.entity?.address.orZero(),
-                        Modifier.placeholder(token.entity == null)
+                        Modifier.placeholder(token.entity == null),
+                        clickable = true,
                     )
                 }
             )
@@ -298,7 +315,8 @@ private fun InfoSection(
                         Text("#")
                         TextNumber(
                             token.entity?.tokenId.orZero(),
-                            Modifier.placeholder(token.entity == null)
+                            Modifier.placeholder(token.entity == null),
+                            clickable = true,
                         )
                     }
                 }
@@ -312,6 +330,7 @@ private fun InfoSection(
                         token.entity?.uri ?: Uri.EMPTY,
                         Modifier.placeholder(token.entity == null),
                         maxWidth = 240.dp,
+                        clickable = true,
                     )
                 }
             )
@@ -323,7 +342,8 @@ private fun InfoSection(
                     TextUri(
                         token.entity?.image ?: Uri.EMPTY,
                         Modifier.placeholder(token.entity == null),
-                        maxWidth = 240.dp
+                        maxWidth = 240.dp,
+                        clickable = true,
                     )
                 }
             )
@@ -335,7 +355,8 @@ private fun InfoSection(
                     TextUri(
                         token.entity?.external ?: Uri.EMPTY,
                         Modifier.placeholder(token.entity == null),
-                        maxWidth = 240.dp
+                        maxWidth = 240.dp,
+                        clickable = true,
                     )
                 }
             )

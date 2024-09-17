@@ -66,7 +66,7 @@ fun NetworksContent(
     KoshScaffold(
         modifier = modifier,
         title = { Text(stringResource(Res.string.networks_title)) },
-        largeTopBar = true,
+
         floatingActionButton = {
             FloatingActionButton(
                 onClick = onAdd.single(),
@@ -75,8 +75,10 @@ fun NetworksContent(
             }
         },
         onUp = { onNavigateUp() }
-    ) {
-        LazyColumn {
+    ) { paddingValues ->
+        LazyColumn(
+            contentPadding = paddingValues,
+        ) {
 
             if (networks.isEmpty()) {
                 item {
@@ -101,7 +103,7 @@ fun NetworksContent(
             ) { network ->
 
                 NetworkItem(
-                    modifier = Modifier.animateItemPlacement(),
+                    modifier = Modifier.animateItem(),
                     network = network,
                     onClick = { onSelect(network) },
                     trailingContent = {

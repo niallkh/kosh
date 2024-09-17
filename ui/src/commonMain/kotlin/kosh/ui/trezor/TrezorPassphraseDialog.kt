@@ -1,5 +1,6 @@
 package kosh.ui.trezor
 
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -8,7 +9,7 @@ import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Checkbox
 import androidx.compose.material3.ListItem
-import androidx.compose.material3.ListItemDefaults
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
@@ -19,6 +20,7 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.input.KeyboardCapitalization
 import androidx.compose.ui.text.input.KeyboardType
+import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.DialogProperties
@@ -55,6 +57,7 @@ fun TrezorPassphraseDialog(
                     Text(stringResource(Res.string.trezor_passphrase_dialog_enter_on_device))
                 }
             },
+            containerColor = MaterialTheme.colorScheme.background,
             text = {
                 Column(
                     modifier = Modifier.fillMaxWidth(),
@@ -67,8 +70,8 @@ fun TrezorPassphraseDialog(
                     )
 
                     if (canSave) {
-                        ListItemDefaults.colors()
                         ListItem(
+                            modifier = Modifier.clickable { savePassphrase = !savePassphrase },
                             headlineContent = { Text(stringResource(Res.string.trezor_passphrase_dialog_save)) },
                             trailingContent = {
                                 Checkbox(
@@ -99,11 +102,12 @@ fun PassphraseTextField(
         keyboardActions = remember(onConfirm) { KeyboardActions { onConfirm() } },
         keyboardOptions = remember {
             KeyboardOptions(
-                autoCorrect = false,
+                autoCorrectEnabled = false,
                 capitalization = KeyboardCapitalization.None,
                 keyboardType = KeyboardType.Password,
             )
         },
         requestFocus = true,
+        visualTransformation = PasswordVisualTransformation()
     )
 }

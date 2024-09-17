@@ -11,48 +11,33 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import kosh.domain.models.web3.ContractCall
-import kosh.domain.utils.orEmpty
-import kosh.presentation.transaction.rememberFunctionName
-import kosh.ui.component.placeholder.placeholder
 import kosh.ui.component.text.KeyValueColumn
 import kosh.ui.component.text.TextBytes
 import kosh.ui.component.text.TextHeader
 
 @Composable
-fun FallbackCard(
-    call: ContractCall.Fallback?,
+fun DeployCard(
+    call: ContractCall.Deploy,
     modifier: Modifier = Modifier,
 ) {
     Column(
         modifier = modifier,
         verticalArrangement = Arrangement.spacedBy(8.dp)
     ) {
-        val functionName = call?.selector?.let { rememberFunctionName(it) }
-
-        TextHeader(
-            functionName?.functionName?.value?.replaceFirstChar { it.uppercaseChar() }
-                ?: "Contract Call"
-        )
+        TextHeader("Deploy")
 
         OutlinedCard {
             TokenAmountItem(
-                call?.token,
-                call?.value,
+                call.token,
+                call.value,
             ) {
                 Text("Value")
-            }
-
-            AccountItem(call?.contract) {
-                Text("Contract Address")
             }
 
             KeyValueColumn(
                 key = { Text("Data") },
                 value = {
-                    TextBytes(
-                        call?.input.orEmpty(),
-                        Modifier.placeholder(call == null)
-                    )
+                    TextBytes(call.input)
                 },
                 Modifier.padding(horizontal = 16.dp),
             )

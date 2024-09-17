@@ -3,6 +3,7 @@ package kosh.ui.token
 import androidx.compose.animation.AnimatedContent
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.CheckCircle
@@ -48,8 +49,13 @@ fun DeleteTokenScreen(
     KoshScaffold(
         title = { Text("Delete Token") },
         onUp = null,
-    ) {
-        Box(Modifier.fillMaxWidth(), contentAlignment = Alignment.Center) {
+    ) { paddingValues ->
+        Box(
+            Modifier
+                .fillMaxWidth()
+                .padding(paddingValues),
+            contentAlignment = Alignment.Center
+        ) {
             AnimatedContent(
                 targetState = deleteToken.deleted,
             ) { deleted ->

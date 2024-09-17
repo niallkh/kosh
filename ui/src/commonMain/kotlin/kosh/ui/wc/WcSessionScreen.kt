@@ -2,6 +2,7 @@ package kosh.ui.wc
 
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
@@ -117,7 +118,7 @@ fun WcSessionContent(
                 DappTitle(session.session?.session?.dapp)
             }
         },
-        largeTopBar = true,
+
         onUp = { onNavigateUp() },
         actions = {
             if (session.failure == null) {
@@ -125,9 +126,11 @@ fun WcSessionContent(
                 Spacer(Modifier.width(8.dp))
             }
         }
-    ) {
+    ) { paddingValues ->
 
-        LazyColumn {
+        LazyColumn(
+            contentPadding = paddingValues,
+        ) {
 
             stickyHeader {
                 session.session?.session?.dapp?.description?.let {
@@ -212,8 +215,15 @@ fun WcSessionContent(
                     }
                 )
             }
+
+            item {
+                Spacer(Modifier.height(64.dp))
+            }
         }
 
-        LoadingIndicator(session.loading)
+        LoadingIndicator(
+            session.loading,
+            Modifier.padding(paddingValues),
+        )
     }
 }

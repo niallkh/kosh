@@ -4,7 +4,6 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
@@ -58,6 +57,7 @@ import kosh.ui.resources.wc_sign_tx_send_btn
 import kosh.ui.transaction.NetworkFeesCard
 import kosh.ui.transaction.SignContent
 import kosh.ui.transaction.calls.ApproveCard
+import kosh.ui.transaction.calls.DeployCard
 import kosh.ui.transaction.calls.FallbackCard
 import kosh.ui.transaction.calls.NativeTransferCard
 import kosh.ui.transaction.calls.TransferCard
@@ -117,18 +117,18 @@ fun WcSendTransactionContent(
             }
         },
         onUp = onNavigateUp,
-        largeTopBar = true,
+
         actions = {
             if (sendTransaction.failure == null) {
                 DappIcon(sendTransaction.request?.dapp)
             }
             Spacer(Modifier.width(8.dp))
         }
-    ) {
+    ) { paddingValues ->
         Column(
             modifier = Modifier
-                .fillMaxSize()
-                .verticalScroll(rememberScrollState()),
+                .verticalScroll(rememberScrollState())
+                .padding(paddingValues),
         ) {
             sendTransaction.failure?.let {
                 AppFailureItem(it) { sendTransaction.retry() }
@@ -178,7 +178,8 @@ fun WcSendTransactionContent(
                         )
 
                         val gasSpeed = rememberGasSpeed()
-                        val gasPrices = transaction?.chainId?.let { rememberGasPrices(it) }
+                        val gasPrices =
+                            transaction?.chainId?.let { rememberGasPrices(it, !signing) }
                         val gasEstimation = transaction?.let { rememberEstimateGas(transaction) }
 
                         NetworkFeesCard(
@@ -225,9 +226,12 @@ fun WcSendTransactionContent(
                 Spacer(Modifier.height(64.dp))
             }
         }
-    }
 
-    LoadingIndicator(sendTransaction.loading)
+        LoadingIndicator(
+            sendTransaction.loading,
+            Modifier.padding(paddingValues),
+        )
+    }
 }
 
 @Composable
@@ -246,7 +250,7 @@ fun TransactionCall(
         when (val call = contractCall?.contractCall) {
             is ContractCall.Transfer -> TransferCard(call, modifier)
             is ContractCall.Approve -> ApproveCard(call, modifier)
-            is ContractCall.Deploy -> TODO()
+            is ContractCall.Deploy -> DeployCard(call)
             is ContractCall.NativeTransfer -> NativeTransferCard(call, modifier)
             is ContractCall.Fallback -> FallbackCard(call, modifier)
             null -> FallbackCard(call, modifier)

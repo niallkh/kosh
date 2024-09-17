@@ -1,70 +1,54 @@
 package kosh.ui.component.scaffold
 
-import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.RowScope
-import androidx.compose.foundation.layout.consumeWindowInsets
-import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.imePadding
 import androidx.compose.material3.Scaffold
+import androidx.compose.material3.SnackbarHost
+import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.CompositionLocalProvider
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.input.nestedscroll.nestedScroll
-import androidx.compose.ui.unit.dp
 import kosh.ui.component.topbar.KoshLargeTopBar
-import kosh.ui.component.topbar.KoshMediumTopBar
 
 @Composable
 fun KoshScaffold(
     modifier: Modifier = Modifier,
     onUp: (() -> Unit)?,
-    largeTopBar: Boolean = true,
     title: @Composable () -> Unit = {},
     actions: @Composable RowScope.() -> Unit = {},
     bottomBar: @Composable () -> Unit = {},
     floatingActionButton: (@Composable () -> Unit)? = null,
-    content: @Composable () -> Unit,
+    content: @Composable (PaddingValues) -> Unit,
 ) {
     val scrollBehavior = TopAppBarDefaults.exitUntilCollapsedScrollBehavior()
+    val snackbarHostState = remember { SnackbarHostState() }
 
     Scaffold(
-        modifier = modifier.then(
-            scrollBehavior.nestedScrollConnection
-                .let { Modifier.nestedScroll(it) }
-        ),
+        modifier = modifier.nestedScroll(scrollBehavior.nestedScrollConnection),
         floatingActionButton = floatingActionButton ?: {},
         topBar = {
-            if (largeTopBar) {
-                KoshLargeTopBar(
-                    onUp = onUp,
-                    scrollBehavior = scrollBehavior,
-                    actions = actions
-                ) {
-                    title()
-                }
-            } else {
-                KoshMediumTopBar(
-                    onUp = onUp,
-                    scrollBehavior = scrollBehavior,
-                    actions = actions,
-                ) {
-                    title()
-                }
+            KoshLargeTopBar(
+                onUp = onUp,
+                scrollBehavior = scrollBehavior,
+                actions = actions
+            ) {
+                title()
             }
         },
-        bottomBar = bottomBar
+        bottomBar = bottomBar,
+        snackbarHost = {
+            SnackbarHost(
+                modifier = Modifier.imePadding(),
+                hostState = snackbarHostState
+            )
+        },
     ) { paddingValues ->
-        Box(
-            Modifier
-                .padding(paddingValues)
-                .consumeWindowInsets(paddingValues)
-                .fillMaxSize()
-        ) {
-            content()
+        CompositionLocalProvider(LocalSnackbarHostState provides snackbarHostState) {
+            content(paddingValues)
         }
-    }
-
-    if (floatingActionButton != null) {
-        ProvideSnackbarOffset(80.dp)
     }
 }

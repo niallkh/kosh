@@ -22,18 +22,10 @@ fun SignerItem(
 
     ListItem(
         modifier = modifier.clickable(onClick = onClick.single()),
-        leadingContent = {
-            AccountIcon(
-                modifier = Modifier,
-                address = signer.address,
-            )
-        },
+        leadingContent = { AccountIcon(signer.address) },
         headlineContent = {
-            account.entity?.let { TextLine(it.name) }
-                ?: TextAddressShort(signer.address)
+            account.entity?.let { TextLine(it.name) } ?: TextAddressShort(signer.address)
         },
-        trailingContent = {
-            TextDerivationPath(signer.derivationPath)
-        }
+        supportingContent = { TextDerivationPath(signer.derivationPath) }
     )
 }
