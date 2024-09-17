@@ -61,7 +61,6 @@ fun SearchTokenScreen(
     onNavigateUp: () -> Unit,
 ) {
     CompositionLocalProvider(LocalAbsoluteTonalElevation provides 3.dp) {
-
         Scaffold(
             topBar = {
                 SearchView(
@@ -179,7 +178,6 @@ fun SearchTokenItem(
     modifier: Modifier = Modifier,
     onClick: () -> Unit,
 ) {
-    val (network) = rememberNetwork(token.chainId)
 
     ListItem(
         modifier = modifier.clickable(onClick = onClick),
@@ -192,6 +190,8 @@ fun SearchTokenItem(
                     symbol = token.symbol,
                     icon = token.icon,
                 )
+
+                val (network) = rememberNetwork(token.chainId)
 
                 if (network?.chainId != null) {
                     ChainBadge(

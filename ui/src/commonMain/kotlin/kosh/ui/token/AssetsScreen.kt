@@ -2,6 +2,7 @@ package kosh.ui.token
 
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
@@ -14,7 +15,9 @@ import androidx.compose.foundation.lazy.LazyListState
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
@@ -31,6 +34,8 @@ import kosh.ui.component.text.Header
 import kosh.ui.component.token.NftBalanceItem
 import kosh.ui.component.token.TokenBalanceItem
 import kosh.ui.failure.AppFailureMessage
+import kosh.ui.navigation.LocalRootNavigator
+import kosh.ui.navigation.routes.RootRoute
 import kosh.ui.resources.illustrations.AssetsEmpty
 
 @Composable
@@ -56,7 +61,6 @@ fun AssetsScreen(
     )
 }
 
-
 @Composable
 fun AssetsContent(
     paddingValues: PaddingValues,
@@ -66,6 +70,8 @@ fun AssetsContent(
 ) {
     val wallets = rememberWallets()
     val networks = rememberNetworks()
+
+    val rootNavigator = LocalRootNavigator.current
 
     LazyColumn(
         state = lazyListState,
@@ -81,10 +87,18 @@ fun AssetsContent(
                         .fillMaxWidth()
                         .padding(64.dp),
                 ) {
-                    Text(
-                        "Get started by adding your Wallet",
-                        textAlign = TextAlign.Center
-                    )
+                    Column(horizontalAlignment = Alignment.CenterHorizontally) {
+                        Text(
+                            "Get started by adding your Wallet",
+                            textAlign = TextAlign.Center
+                        )
+
+                        TextButton(onClick = {
+                            rootNavigator.open(RootRoute.Wallets())
+                        }) {
+                            Text("Add Wallet")
+                        }
+                    }
                 }
             }
 
@@ -96,10 +110,18 @@ fun AssetsContent(
                         .fillMaxWidth()
                         .padding(64.dp),
                 ) {
-                    Text(
-                        "Get started by adding Ethereum Network",
-                        textAlign = TextAlign.Center
-                    )
+                    Column(horizontalAlignment = Alignment.CenterHorizontally) {
+                        Text(
+                            "Get started by adding Ethereum Network",
+                            textAlign = TextAlign.Center
+                        )
+
+                        TextButton(onClick = {
+                            rootNavigator.open(RootRoute.Networks())
+                        }) {
+                            Text("Add Network")
+                        }
+                    }
                 }
             }
 

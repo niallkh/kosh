@@ -31,7 +31,6 @@ import kosh.domain.utils.phset
 import kosh.domain.utils.pmap
 import kotlinx.collections.immutable.toPersistentMap
 import kotlinx.coroutines.flow.Flow
-import kotlin.math.max
 
 class DefaultAccountService(
     private val appStateRepo: AppStateRepo,
@@ -56,7 +55,7 @@ class DefaultAccountService(
         location: WalletEntity.Location,
         derivationPath: DerivationPath,
         address: Address,
-    ): WalletEntity.Id = raise.run {
+    ) = raise.run {
         val walletsAmount = appStateRepo.state().wallets.size
 
         val wallet = WalletEntity(
@@ -64,10 +63,10 @@ class DefaultAccountService(
             location = location,
         )
 
-        val addressIndex = max(
-            derivationPath.ethereumAddressIndex,
-            derivationPath.ledgerAddressIndex,
-        )
+        val addressIndex = when (location) {
+            is WalletEntity.Location.Ledger -> derivationPath.ledgerAddressIndex
+            is WalletEntity.Location.Trezor -> derivationPath.ethereumAddressIndex
+        }
 
         val account = AccountEntity(
             address = address,
@@ -88,8 +87,6 @@ class DefaultAccountService(
             AppState.accounts.at(At.pmap(), account.id) set account
             AppState.enabledAccountIds.at(At.phset(), account.id) set true
         }
-
-        wallet.id
     }
 
     override fun update(id: AccountEntity.Id, name: String) = either {
