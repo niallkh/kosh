@@ -48,7 +48,7 @@ fun DeleteTransactionScreen(
 
     KoshScaffold(
         title = { Text("Delete Transaction") },
-        onUp = null,
+        onNavigateUp = null,
     ) { paddingValues ->
         Box(
             Modifier.fillMaxWidth()

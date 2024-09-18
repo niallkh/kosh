@@ -44,7 +44,7 @@ fun WcRequestContent(
 ) {
     KoshScaffold(
         title = { Text(stringResource(Res.string.wc_request_title)) },
-        onUp = { onNavigateUp() }
+        onNavigateUp = { onNavigateUp() }
     ) { paddingValues ->
         Column(
             modifier = Modifier.verticalScroll(rememberScrollState())

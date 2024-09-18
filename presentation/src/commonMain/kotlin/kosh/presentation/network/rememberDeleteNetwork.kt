@@ -3,9 +3,8 @@ package kosh.presentation.network
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.Immutable
 import kosh.domain.entities.NetworkEntity
-import kosh.domain.failure.AppFailure
 import kosh.domain.usecases.network.NetworkService
-import kosh.presentation.PerformAction
+import kosh.presentation.Perform
 import kosh.presentation.di.di
 
 @Composable
@@ -14,7 +13,7 @@ fun rememberDeleteNetwork(
     networkService: NetworkService = di { domain.networkService },
 ): DeleteNetworkState {
 
-    val delete = PerformAction<Unit, AppFailure>(id) {
+    val delete = Perform(id) {
         networkService.delete(id)
     }
 

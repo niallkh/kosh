@@ -5,7 +5,7 @@ import androidx.compose.runtime.Immutable
 import kosh.domain.entities.AccountEntity
 import kosh.domain.failure.AccountFailure
 import kosh.domain.usecases.account.AccountService
-import kosh.presentation.PerformAction
+import kosh.presentation.Perform
 import kosh.presentation.di.di
 
 @Composable
@@ -14,7 +14,7 @@ fun rememberUpdateAccount(
     accountService: AccountService = di { domain.accountService },
 ): UpdateAccountState {
 
-    val update = PerformAction<String, _> { name ->
+    val update = Perform { name: String ->
         accountService.update(id, name).bind()
     }
 

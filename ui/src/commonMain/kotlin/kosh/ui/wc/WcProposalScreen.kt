@@ -127,7 +127,7 @@ fun WcSessionProposalContent(
                 Spacer(Modifier.width(8.dp))
             }
         },
-        onUp = { onNavigateUp() }
+        onNavigateUp = { onNavigateUp() }
     ) { innerPadding ->
         proposal.failure?.let {
             AppFailureItem(it, Modifier.padding(innerPadding)) { proposal.retry() }

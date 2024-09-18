@@ -7,5 +7,6 @@ fun interface RootNavigator {
     fun open(rootRoute: RootRoute)
 }
 
-val LocalRootNavigator =
-    compositionLocalOf<RootNavigator> { error("LocalRootNavigator not provided") }
+val LocalRootNavigator = compositionLocalOf<RootNavigator> {
+    error("LocalRootNavigator not provided")
+}

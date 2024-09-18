@@ -1,6 +1,6 @@
 package kosh.domain.usecases.account
 
-import arrow.core.raise.Raise
+import arrow.core.Either
 import arrow.core.raise.either
 import arrow.core.raise.ensure
 import arrow.optics.dsl.at
@@ -51,11 +51,10 @@ class DefaultAccountService(
     ): Flow<AccountEntity?> = appStateRepo.optic(AppState.account(id))
 
     override fun create(
-        raise: Raise<AccountFailure>,
         location: WalletEntity.Location,
         derivationPath: DerivationPath,
         address: Address,
-    ) = raise.run {
+    ): Either<AccountFailure, AccountEntity.Id> = either {
         val walletsAmount = appStateRepo.state().wallets.size
 
         val wallet = WalletEntity(
@@ -87,6 +86,8 @@ class DefaultAccountService(
             AppState.accounts.at(At.pmap(), account.id) set account
             AppState.enabledAccountIds.at(At.phset(), account.id) set true
         }
+
+        account.id
     }
 
     override fun update(id: AccountEntity.Id, name: String) = either {

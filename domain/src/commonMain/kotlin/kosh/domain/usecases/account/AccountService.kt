@@ -1,7 +1,6 @@
 package kosh.domain.usecases.account
 
 import arrow.core.Either
-import arrow.core.raise.Raise
 import kosh.domain.entities.AccountEntity
 import kosh.domain.entities.WalletEntity.Location
 import kosh.domain.failure.AccountFailure
@@ -20,15 +19,14 @@ interface AccountService {
     suspend fun isActive(address: Address): Boolean
 
     fun create(
-        raise: Raise<AccountFailure>,
         location: Location,
         derivationPath: DerivationPath,
         address: Address,
-    )
+    ): Either<AccountFailure, AccountEntity.Id>
 
     fun toggle(id: AccountEntity.Id, enabled: Boolean)
 
     fun update(id: AccountEntity.Id, name: String): Either<AccountFailure, Unit>
 
-    fun delete(id: AccountEntity.Id): Unit
+    fun delete(id: AccountEntity.Id)
 }

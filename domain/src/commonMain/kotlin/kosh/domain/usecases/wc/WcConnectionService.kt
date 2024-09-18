@@ -12,8 +12,6 @@ class WcConnectionService(
     val connected: Flow<Boolean>
         get() = wcRepo.connected
 
-    suspend fun initialize() = wcRepo.initialize()
-
     suspend fun connect() {
         wcRepo.connect()
     }

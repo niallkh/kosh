@@ -25,5 +25,7 @@ sealed interface Web3Failure : AppFailure {
 
     class HttpException(override val message: String) : Web3Failure
 
-    class Other(override val message: String) : Web3Failure
+    class Other(override val message: String) : Web3Failure {
+        constructor(appFailure: AppFailure) : this(appFailure.message)
+    }
 }

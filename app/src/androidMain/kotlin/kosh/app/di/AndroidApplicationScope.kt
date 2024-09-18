@@ -23,7 +23,7 @@ class AndroidApplicationScope(
     override val androidPushNotifier: AndroidPushNotifier by provider {
         AndroidPushNotifier(
             context = context,
-            notificationRepo = appRepositoriesComponent.notificationRepo,
+            notificationService = domainComponent.notificationService,
             applicationScope = coroutinesComponent.applicationScope,
         )
     }

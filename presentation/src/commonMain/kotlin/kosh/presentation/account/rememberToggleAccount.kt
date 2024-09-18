@@ -3,16 +3,15 @@ package kosh.presentation.account
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.Immutable
 import kosh.domain.entities.AccountEntity
-import kosh.domain.failure.AppFailure
 import kosh.domain.usecases.account.AccountService
-import kosh.presentation.PerformAction
+import kosh.presentation.Perform
 import kosh.presentation.di.di
 
 @Composable
 fun rememberToggleAccount(
     accountService: AccountService = di { domain.accountService },
 ): ToggleAccountState {
-    val toggle = PerformAction<Pair<AccountEntity.Id, Boolean>, AppFailure> { (id, enabled) ->
+    val toggle = Perform<_, _, Any> { (id, enabled): Pair<AccountEntity.Id, Boolean> ->
         accountService.toggle(id, enabled)
     }
 

@@ -19,6 +19,13 @@ fun <T : AppFailure> AppFailureMessage(
 
 @Composable
 fun <T : AppFailure> AppFailureMessage(
+    failures: Nel<T>?,
+) {
+    AppFailureMessage(failures, { false }, {})
+}
+
+@Composable
+fun <T : AppFailure> AppFailureMessage(
     failure: T?,
     isRetryAble: (T) -> Boolean = { true },
     retry: () -> Unit,

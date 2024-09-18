@@ -8,6 +8,7 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.ui.Modifier
+import kosh.domain.entities.AccountEntity
 import kosh.domain.failure.LedgerFailure
 import kosh.domain.models.account.ledgerAddressIndex
 import kosh.domain.models.web3.Signer
@@ -25,13 +26,11 @@ import kosh.ui.failure.AppFailureMessage
 @Composable
 fun NewLedgerAccountScreen(
     onNavigateUp: () -> Unit,
-    onResult: () -> Unit,
-    modifier: Modifier = Modifier,
+    onFinish: (AccountEntity.Id) -> Unit,
 ) {
     KoshScaffold(
-        modifier = modifier,
         title = { Text("Ledger New Account") },
-        onUp = onNavigateUp,
+        onNavigateUp = onNavigateUp,
     ) { paddingValues ->
         val ledgerState = rememberLedger()
 
@@ -48,10 +47,8 @@ fun NewLedgerAccountScreen(
 
             AppFailureMessage(createAccountState.failure)
 
-            LaunchedEffect(createAccountState.created) {
-                if (createAccountState.created) {
-                    onResult()
-                }
+            LaunchedEffect(createAccountState.createdAccount) {
+                createAccountState.createdAccount?.let(onFinish)
             }
 
             val ledgerAccountsState = rememberLedgerAccounts(

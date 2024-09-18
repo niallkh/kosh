@@ -116,7 +116,7 @@ fun WcSendTransactionContent(
                 DappTitle(sendTransaction.request?.dapp)
             }
         },
-        onUp = onNavigateUp,
+        onNavigateUp = onNavigateUp,
 
         actions = {
             if (sendTransaction.failure == null) {

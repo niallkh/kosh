@@ -17,7 +17,7 @@ class DefaultRouteContext(
     MutableMap<KType, Any> by mutableMapOf()
 
 val LocalRouteContext: ProvidableCompositionLocal<RouteContext> = compositionLocalOf {
-    error("VMContext not provided")
+    error("RouteContext not provided")
 }
 
 @Composable

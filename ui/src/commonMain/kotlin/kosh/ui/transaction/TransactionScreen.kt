@@ -75,7 +75,7 @@ fun TransactionContent(
 ) {
     KoshScaffold(
         title = { DappTitle(transaction?.dapp) },
-        onUp = onNavigateUp,
+        onNavigateUp = onNavigateUp,
 
         actions = {
             DappIcon(transaction?.dapp)

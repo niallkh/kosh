@@ -24,7 +24,7 @@ import kosh.domain.utils.optic
 import kosh.presentation.component.selector.selector
 import kosh.presentation.di.di
 import kosh.presentation.di.rememberLifecycleState
-import kosh.presentation.ticker.rememberTicker
+import kosh.presentation.ticker.rememberTimer
 import kotlin.time.Duration.Companion.minutes
 
 @Composable
@@ -36,12 +36,12 @@ fun rememberBalances(
     var loading by remember { mutableStateOf(false) }
     var failures by remember { mutableStateOf<Nel<Web3Failure>?>(null) }
     var retry by remember { mutableIntStateOf(0) }
-    val ticker = rememberTicker(5.minutes)
+    val timer = rememberTimer(5.minutes)
 
     if (rememberLifecycleState()) {
         LaunchedEffect(retry) {
             while (true) {
-                ticker.waitNext()
+                timer.waitNext()
 
                 loading = true
 
@@ -63,7 +63,7 @@ fun rememberBalances(
     }
 
     appStateProvider.collectAsState().optic(AppState.balancesKey()).selector {
-        ticker.reset()
+        timer.reset()
     }
 
     return BalancesState(
@@ -72,7 +72,7 @@ fun rememberBalances(
         failures = failures,
         retry = {
             retry++
-            ticker.reset()
+            timer.reset()
         }
     )
 }

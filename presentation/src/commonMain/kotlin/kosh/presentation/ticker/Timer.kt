@@ -16,7 +16,7 @@ import kotlin.time.Duration
 import kotlin.time.Duration.Companion.seconds
 
 @Stable
-class Ticker(
+class Timer(
     private val period: Duration,
     initial: Instant = Instant.DISTANT_PAST,
 ) {
@@ -47,7 +47,7 @@ class Ticker(
     }
 
     companion object {
-        val Saver = Saver<Ticker, Array<Long>>(
+        val Saver = Saver<Timer, Array<Long>>(
             save = {
                 arrayOf(
                     it.last.epochSeconds,
@@ -56,9 +56,9 @@ class Ticker(
             },
             restore = {
                 val (initial, period) = it
-                Ticker(
-                    period.seconds,
-                    Instant.fromEpochSeconds(initial),
+                Timer(
+                    initial = Instant.fromEpochSeconds(initial),
+                    period = period.seconds,
                 )
             }
         )
@@ -66,8 +66,8 @@ class Ticker(
 }
 
 @Composable
-fun rememberTicker(period: Duration): Ticker = rememberSaveable(period, saver = Ticker.Saver) {
-    Ticker(period)
+fun rememberTimer(period: Duration): Timer = rememberSaveable(period, saver = Timer.Saver) {
+    Timer(period)
 }
 
 

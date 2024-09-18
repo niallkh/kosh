@@ -119,7 +119,7 @@ fun WcSessionContent(
             }
         },
 
-        onUp = { onNavigateUp() },
+        onNavigateUp = { onNavigateUp() },
         actions = {
             if (session.failure == null) {
                 DappIcon(session.session?.session?.dapp)

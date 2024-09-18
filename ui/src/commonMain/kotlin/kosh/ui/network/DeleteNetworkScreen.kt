@@ -48,7 +48,7 @@ fun DeleteNetworkScreen(
 
     KoshScaffold(
         title = { Text("Delete Network") },
-        onUp = null,
+        onNavigateUp = null,
     ) { paddingValues ->
         Box(
             Modifier

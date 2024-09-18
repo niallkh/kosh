@@ -20,9 +20,7 @@ interface RouteScope {
 @Composable
 fun rememberRouteScope(): RouteScope {
     val routeScopeFactory = LocalRouteScopeFactory.current
-    return rememberOnRoute {
-        routeScopeFactory()
-    }
+    return rememberOnRoute { routeScopeFactory() }
 }
 
 @Composable

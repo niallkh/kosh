@@ -95,7 +95,7 @@ fun WcPairContent(
     KoshScaffold(
         modifier = modifier.nestedScroll(topAppBarScrollBehavior.nestedScrollConnection),
         title = { Text(stringResource(Res.string.wc_pair_title)) },
-        onUp = { onNavigateUp() }
+        onNavigateUp = { onNavigateUp() }
     ) { paddingValues ->
         Column(
             modifier = Modifier

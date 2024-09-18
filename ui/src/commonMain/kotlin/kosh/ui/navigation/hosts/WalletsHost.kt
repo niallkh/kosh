@@ -6,6 +6,7 @@ import com.arkivanov.decompose.router.stack.replaceCurrent
 import kosh.domain.entities.WalletEntity
 import kosh.ui.account.AccountScreen
 import kosh.ui.account.DeleteAccountScreen
+import kosh.ui.account.DiscoveryAccountTokensScreen
 import kosh.ui.account.WalletsScreen
 import kosh.ui.analytics.LogScreen
 import kosh.ui.ledger.NewLedgerAccountScreen
@@ -32,8 +33,8 @@ fun WalletsHost(
                 onOpen = { push(WalletsRoute.Account(it)) },
                 onAdd = { type ->
                     when (type) {
-                        WalletEntity.Type.Trezor -> push(WalletsRoute.NewTrezorAccount())
-                        WalletEntity.Type.Ledger -> push(WalletsRoute.NewLedgerAccount())
+                        WalletEntity.Type.Trezor -> push(WalletsRoute.NewTrezorAccount)
+                        WalletEntity.Type.Ledger -> push(WalletsRoute.NewLedgerAccount)
                     }
                 }
             )
@@ -51,13 +52,18 @@ fun WalletsHost(
             )
 
             is WalletsRoute.NewTrezorAccount -> NewTrezorAccountScreen(
-                onFinish = { pop() },
+                onFinish = { replaceCurrent(WalletsRoute.TokensDiscovery(it)) },
                 onNavigateUp = { navigateUp() },
             )
 
             is WalletsRoute.NewLedgerAccount -> NewLedgerAccountScreen(
-                onResult = { pop() },
+                onFinish = { replaceCurrent(WalletsRoute.TokensDiscovery(it)) },
                 onNavigateUp = { navigateUp() }
+            )
+
+            is WalletsRoute.TokensDiscovery -> DiscoveryAccountTokensScreen(
+                id = route.id,
+                onFinish = { finish() }
             )
         }
 

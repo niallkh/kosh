@@ -3,10 +3,10 @@ package kosh.presentation.account
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.Immutable
 import kosh.domain.entities.AccountEntity
-import kosh.domain.failure.AppFailure
 import kosh.domain.usecases.account.AccountService
-import kosh.presentation.PerformAction
+import kosh.presentation.Perform
 import kosh.presentation.di.di
+import kosh.presentation.invoke
 
 @Composable
 fun rememberDeleteAccount(
@@ -14,14 +14,14 @@ fun rememberDeleteAccount(
     accountService: AccountService = di { domain.accountService },
 ): DeleteAccountState {
 
-    val delete = PerformAction<Unit, AppFailure> {
+    val delete = Perform {
         accountService.delete(id)
     }
 
     return DeleteAccountState(
         deleted = delete.performed,
         loading = delete.inProgress,
-        delete = { delete(Unit) },
+        delete = { delete() },
     )
 }
 

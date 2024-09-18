@@ -90,7 +90,7 @@ fun WcSignPersonalContent(
                 DappTitle(signPersonal.request?.dapp)
             }
         },
-        onUp = onNavigateUp,
+        onNavigateUp = onNavigateUp,
 
         actions = {
             if (signPersonal.failure == null) {

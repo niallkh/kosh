@@ -9,6 +9,7 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import arrow.core.raise.recover
+import kosh.domain.entities.NetworkEntity
 import kosh.domain.failure.Web3Failure
 import kosh.domain.models.Address
 import kosh.domain.models.ChainAddress
@@ -36,7 +37,7 @@ fun rememberSearchNft(
 
         recover({
             token = token ?: tokenDiscoveryService.getTokenMetadata(
-                chainAddress.chainId, chainAddress.address
+                NetworkEntity.Id(chainAddress.chainId), chainAddress.address
             ).bind()
 
             nft = tokenDiscoveryService.searchNft(token ?: raise(null), query).bind()

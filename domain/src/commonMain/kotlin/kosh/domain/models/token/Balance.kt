@@ -15,8 +15,6 @@ data class Balance(
     companion object {
         private val Empty = Balance(BigInteger.ZERO, Instant.DISTANT_PAST)
 
-        operator fun invoke(): Balance {
-            return Empty
-        }
+        operator fun invoke(): Balance = Empty
     }
 }

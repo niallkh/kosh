@@ -7,7 +7,9 @@ import kosh.domain.core.provider
 import kosh.domain.state.AppStateProvider
 import kosh.domain.state.DefaultAppStateProvider
 import kosh.domain.usecases.account.AccountService
+import kosh.domain.usecases.account.AccountTokensDiscoveryService
 import kosh.domain.usecases.account.DefaultAccountService
+import kosh.domain.usecases.account.DefaultAccountTokensDiscoveryService
 import kosh.domain.usecases.ledger.DefaultLedgerAccountService
 import kosh.domain.usecases.ledger.DefaultLedgerService
 import kosh.domain.usecases.ledger.LedgerAccountService
@@ -222,6 +224,15 @@ class DefaultDomainComponent(
             wcRepo = wcRepo,
             applicationScope = applicationScope,
             notificationService = notificationService,
+            appStateProvider = appStateProvider,
+        )
+    }
+
+    override val accountTokensDiscoveryService: AccountTokensDiscoveryService by provider {
+        DefaultAccountTokensDiscoveryService(
+            tokensDiscoveryService = tokenDiscoveryService,
+            tokenBalanceService = tokenBalanceService,
+            tokenService = tokenService,
             appStateProvider = appStateProvider,
         )
     }

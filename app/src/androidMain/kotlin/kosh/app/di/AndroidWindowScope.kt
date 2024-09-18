@@ -7,7 +7,7 @@ import kosh.domain.WindowRepositoriesComponent
 import kosh.domain.core.provider
 import kosh.presentation.di.RouteScopeFactory
 
-class DefaultWindowScope(
+class AndroidWindowScope(
     applicationScope: ApplicationScope,
     activityResultRegistry: ActivityResultRegistry,
     contentResolver: ContentResolver,
@@ -21,7 +21,7 @@ class DefaultWindowScope(
     }
 
     override val routeScopeFactory: RouteScopeFactory by provider {
-        DefaultRouteScopeFactory(
+        AndroidRouteScopeFactory(
             applicationScope = applicationScope,
             windowScope = this
         )

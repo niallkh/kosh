@@ -22,6 +22,7 @@ import kosh.domain.models.Address
 import kosh.domain.models.ChainId
 import kosh.domain.models.account.ethereumAddressIndex
 import kosh.domain.models.account.ledgerAddressIndex
+import kosh.domain.models.token.AccountBalance
 import kosh.domain.models.token.Balance
 import kosh.domain.models.token.TokenBalance
 import kosh.domain.serializers.BigInteger
@@ -165,21 +166,37 @@ fun AppState.Companion.optionalNetwork(id: NetworkEntity.Id) =
 
 fun AppState.Companion.balances() = Getter<AppState, PersistentList<TokenBalance>> { state ->
     val activeAccounts = AppState.activeAccountIds().get(state)
+    val activeTokens = AppState.activeTokens().get(state)
 
-    AppState.activeTokens().get(state)
-        .map { token ->
+    activeTokens.map { token ->
+        val tokenBalance = state.tokenBalances
+            .filter { (accountId) -> accountId in activeAccounts }
+            .map { (_, balances) -> balances[token.id] ?: Balance() }
+            .fold(Balance()) { total, balance -> total.copy(value = total.value + balance.value) }
 
-            val tokenBalance = state.tokenBalances
-                .filter { (accountId) -> accountId in activeAccounts }
-                .map { (_, balances) -> balances[token.id] ?: Balance() }
-                .fold(Balance()) { total, balance -> total.copy(value = total.value + balance.value) }
+        TokenBalance(
+            token = token,
+            value = tokenBalance,
+        )
+    }.toPersistentList()
+}
 
-            TokenBalance(
-                token = token,
-                value = tokenBalance,
-            )
-        }
-        .toPersistentList()
+fun AppState.Companion.tokenBalances(
+    id: TokenEntity.Id,
+) = Getter<AppState, PersistentList<AccountBalance>> { state ->
+    val activeAccounts = AppState.activeAccounts().get(state)
+    val balances = AppState.tokenBalances.get(state)
+
+    activeAccounts.mapNotNull { account ->
+        val balance = balances[account.id]?.get(id)
+
+        if (balance == null || balance.value.isZero()) return@mapNotNull null
+
+        AccountBalance(
+            account = account,
+            value = balance,
+        )
+    }.toPersistentList()
 }
 
 fun AppState.Companion.balancesKey() = Getter<AppState, String> { state ->

@@ -8,6 +8,7 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.ui.Modifier
+import kosh.domain.entities.AccountEntity
 import kosh.domain.failure.TrezorFailure
 import kosh.domain.models.account.ethereumAddressIndex
 import kosh.domain.models.web3.Signer
@@ -26,14 +27,14 @@ import kosh.ui.keystore.KeyStoreListenerContent
 
 @Composable
 fun NewTrezorAccountScreen(
-    onFinish: () -> Unit,
     onNavigateUp: () -> Unit,
+    onFinish: (AccountEntity.Id) -> Unit,
     modifier: Modifier = Modifier,
 ) {
     KoshScaffold(
         modifier = modifier,
         title = { Text("Trezor New Account") },
-        onUp = onNavigateUp
+        onNavigateUp = onNavigateUp
     ) { paddingValues ->
         val trezor = rememberTrezor()
 
@@ -54,10 +55,8 @@ fun NewTrezorAccountScreen(
 
             AppFailureMessage(createAccountState.failure)
 
-            LaunchedEffect(createAccountState.created) {
-                if (createAccountState.created) {
-                    onFinish()
-                }
+            LaunchedEffect(createAccountState.createdAccount) {
+                createAccountState.createdAccount?.let(onFinish)
             }
 
             val trezorAccounts = rememberTrezorAccounts(

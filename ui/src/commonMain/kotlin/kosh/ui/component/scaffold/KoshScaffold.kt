@@ -17,7 +17,7 @@ import kosh.ui.component.topbar.KoshLargeTopBar
 @Composable
 fun KoshScaffold(
     modifier: Modifier = Modifier,
-    onUp: (() -> Unit)?,
+    onNavigateUp: (() -> Unit)?,
     title: @Composable () -> Unit = {},
     actions: @Composable RowScope.() -> Unit = {},
     bottomBar: @Composable () -> Unit = {},
@@ -32,7 +32,7 @@ fun KoshScaffold(
         floatingActionButton = floatingActionButton ?: {},
         topBar = {
             KoshLargeTopBar(
-                onUp = onUp,
+                onUp = onNavigateUp,
                 scrollBehavior = scrollBehavior,
                 actions = actions
             ) {

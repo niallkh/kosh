@@ -1,11 +1,11 @@
 package kosh.presentation.wc
 
 import androidx.compose.runtime.Composable
-import kosh.domain.failure.WcFailure
 import kosh.domain.models.wc.WcRequest
 import kosh.domain.usecases.wc.WcRequestService
-import kosh.presentation.PerformAction
+import kosh.presentation.Perform
 import kosh.presentation.di.di
+import kosh.presentation.invoke
 
 @Composable
 fun rememberRejectRequest(
@@ -13,14 +13,14 @@ fun rememberRejectRequest(
     wcRequestService: WcRequestService = di { domain.wcRequestService },
 ): RejectRequestState {
 
-    val reject = PerformAction<Unit, WcFailure>(id) {
+    val reject = Perform(id) {
         wcRequestService.reject(id).join()
     }
 
     return RejectRequestState(
         loading = reject.inProgress,
         rejected = reject.performed,
-        reject = { reject.invoke(Unit) },
+        reject = { reject() },
         retry = { reject.retry() }
     )
 }

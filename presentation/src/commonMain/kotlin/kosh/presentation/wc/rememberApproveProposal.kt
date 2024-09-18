@@ -6,7 +6,7 @@ import kosh.domain.models.Address
 import kosh.domain.models.ChainId
 import kosh.domain.models.wc.WcProposal
 import kosh.domain.usecases.wc.WcProposalService
-import kosh.presentation.PerformAction
+import kosh.presentation.Perform
 import kosh.presentation.di.di
 
 @Composable
@@ -15,8 +15,8 @@ fun rememberApproveProposal(
     proposalService: WcProposalService = di { domain.wcProposalService },
 ): ApproveProposalState {
 
-    val approve = PerformAction<Pair<List<Address>, List<ChainId>>, _>(id) {
-        proposalService.approve(id, it.first, it.second).bind()
+    val approve = Perform(id) { (accounts, chains): Pair<List<Address>, List<ChainId>> ->
+        proposalService.approve(id, accounts, chains).bind()
     }
 
     return ApproveProposalState(

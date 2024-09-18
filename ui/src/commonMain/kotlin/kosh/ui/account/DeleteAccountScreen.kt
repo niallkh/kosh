@@ -30,31 +30,31 @@ fun DeleteAccountScreen(
     id: AccountEntity.Id,
     onFinish: () -> Unit,
 ) {
-    val onFinishUpdated by rememberUpdatedState(onFinish)
-
-    val deleteAccount = rememberDeleteAccount(id)
-
-    LaunchedEffect(Unit) {
-        delay(300.milliseconds)
-        deleteAccount.delete()
-    }
-
-    LaunchedEffect(deleteAccount.deleted) {
-        if (deleteAccount.deleted) {
-            delay(1.seconds)
-            onFinishUpdated()
-        }
-    }
-
     KoshScaffold(
         title = { Text("Delete Account") },
-        onUp = null,
+        onNavigateUp = null,
     ) { paddingValues ->
         Box(
             Modifier.fillMaxWidth()
                 .padding(paddingValues),
             contentAlignment = Alignment.Center
         ) {
+            val onFinishUpdated by rememberUpdatedState(onFinish)
+
+            val deleteAccount = rememberDeleteAccount(id)
+
+            LaunchedEffect(Unit) {
+                delay(300.milliseconds)
+                deleteAccount.delete()
+            }
+
+            LaunchedEffect(deleteAccount.deleted) {
+                if (deleteAccount.deleted) {
+                    delay(1.seconds)
+                    onFinishUpdated()
+                }
+            }
+
             AnimatedContent(
                 targetState = deleteAccount.deleted,
             ) { deleted ->

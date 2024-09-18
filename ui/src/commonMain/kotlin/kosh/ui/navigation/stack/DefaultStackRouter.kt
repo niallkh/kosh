@@ -44,9 +44,7 @@ class DefaultStackRouter<R : Route>(
     )
 
     override fun pop(result: RouteResult<R>) {
-        pop {
-            if (it.not()) onResult(result)
-        }
+        pop { if (it.not()) onResult(result) }
     }
 
     override fun pop() {

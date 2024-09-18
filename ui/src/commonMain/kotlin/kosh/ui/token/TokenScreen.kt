@@ -1,6 +1,7 @@
 package kosh.ui.token
 
 import androidx.compose.animation.animateContentSize
+import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -15,7 +16,6 @@ import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.OpenInNew
 import androidx.compose.material.icons.filled.Delete
-import androidx.compose.material.icons.filled.Image
 import androidx.compose.material.icons.filled.OpenInBrowser
 import androidx.compose.material.icons.filled.Refresh
 import androidx.compose.material3.DropdownMenuItem
@@ -28,11 +28,11 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.platform.LocalUriHandler
 import androidx.compose.ui.unit.dp
+import arrow.core.raise.nullable
 import com.eygraber.uri.Uri
 import kosh.domain.entities.TokenEntity
 import kosh.domain.entities.TokenEntity.Type
 import kosh.domain.entities.isNft
-import kosh.domain.models.eip55
 import kosh.domain.models.orZero
 import kosh.domain.models.token.AccountBalance
 import kosh.domain.models.token.NftExtendedMetadata
@@ -41,6 +41,7 @@ import kosh.domain.utils.orZero
 import kosh.presentation.network.rememberNetwork
 import kosh.presentation.network.rememberOpenExplorer
 import kosh.presentation.token.rememberNftMetadata
+import kosh.presentation.token.rememberOpenSea
 import kosh.presentation.token.rememberRefreshToken
 import kosh.presentation.token.rememberToken
 import kosh.presentation.token.rememberTokenBalances
@@ -59,6 +60,7 @@ import kosh.ui.component.text.TextUri
 import kosh.ui.component.token.NftItem
 import kosh.ui.component.wallet.AccountItem
 import kosh.ui.failure.AppFailureMessage
+import kosh.ui.resources.icons.OpenSea
 import kotlinx.collections.immutable.persistentListOf
 
 @Composable
@@ -76,12 +78,6 @@ fun TokenScreen(
 
     val refreshToken = rememberRefreshToken(id)
 
-    AppFailureMessage(refreshToken.web3Failure) {
-        refreshToken.refresh()
-    }
-
-    AppFailureMessage(refreshToken.tokenFailure)
-
     KoshScaffold(
         modifier = modifier,
         title = {
@@ -90,7 +86,7 @@ fun TokenScreen(
                 Modifier.placeholder(token.entity == null),
             )
         },
-        onUp = onNavigateUp,
+        onNavigateUp = onNavigateUp,
         actions = {
             TokenIcon(
                 symbol = token.entity?.symbol ?: "",
@@ -116,6 +112,12 @@ fun TokenScreen(
         }
     ) { paddingValues ->
         val tokenBalances = rememberTokenBalances(id)
+
+        AppFailureMessage(refreshToken.web3Failure) {
+            refreshToken.refresh()
+        }
+
+        AppFailureMessage(refreshToken.tokenFailure)
 
         Column(
             modifier = Modifier
@@ -169,12 +171,8 @@ fun TokenScreen(
             InfoSection(id)
         }
 
-        val loading = refreshToken.loading ||
-                nftMetadata?.loading == true ||
-                tokenBalances.loading
-
         LoadingIndicator(
-            loading,
+            refreshToken.loading || nftMetadata?.loading == true,
             Modifier.padding(paddingValues)
         )
     }
@@ -203,15 +201,41 @@ private fun TokenMoreMenu(
             )
         }
 
+        if (token != null && token.type != Type.Native) {
+            val openExplorer = rememberOpenExplorer(token.networkId)
+
+            DropdownMenuItem(
+                text = { Text("Open In Explorer") },
+                onClick = { dismiss { token.address?.let { openExplorer.openToken(it) } } },
+                leadingIcon = {
+                    Icon(Icons.AutoMirrored.Filled.OpenInNew, "Open in explorer")
+                }
+            )
+        }
+
         token?.let { token ->
             if (token.isNft) {
+                val openSea = rememberOpenSea()
+                val network = rememberNetwork(token.networkId)
+
                 DropdownMenuItem(
-                    text = { Text("Opensea") },
-                    onClick = { dismiss { uriHandler.openUri("https://opensea.io/assets/ethereum/${token.address!!.eip55()}/${token.tokenId!!}") } },
+                    text = { Text("Open in OpenSea") },
+                    onClick = {
+                        dismiss {
+                            nullable {
+                                openSea.openNft(
+                                    ensureNotNull(network.entity?.chainId),
+                                    ensureNotNull(token.address),
+                                    ensureNotNull(token.tokenId)
+                                )
+                            }
+                        }
+                    },
                     leadingIcon = {
-                        Icon(
-                            Icons.Default.Image,
-                            contentDescription = "Opensea"
+                        Image(
+                            OpenSea,
+                            "Open In OpenSea",
+                            Modifier.size(24.dp),
                         )
                     }
                 )
@@ -243,18 +267,6 @@ private fun TokenMoreMenu(
                     }
                 )
             }
-        }
-
-        if (token != null && token.type != Type.Native) {
-            val openExplorer = rememberOpenExplorer(token.networkId)
-
-            DropdownMenuItem(
-                text = { Text("Open In Explorer") },
-                onClick = { dismiss { token.address?.let { openExplorer.openToken(it) } } },
-                leadingIcon = {
-                    Icon(Icons.AutoMirrored.Filled.OpenInNew, "Open in explorer")
-                }
-            )
         }
     }
 }

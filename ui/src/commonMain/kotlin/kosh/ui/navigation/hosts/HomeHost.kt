@@ -117,7 +117,7 @@ fun HomeHost(
                 } ?: Spacer(Modifier.size(56.dp))
             }
         },
-        onUp = null,
+        onNavigateUp = null,
     ) { paddingValues ->
 
         StackHost(

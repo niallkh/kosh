@@ -11,8 +11,8 @@ class DefaultNotificationService(
     override val notifications: Flow<Notification>
         get() = notificationRepo.notifications
 
-    override val canceled: Flow<Set<Long>>
-        get() = notificationRepo.canceled
+    override val cancelled: Flow<Set<Long>>
+        get() = notificationRepo.cancelled
 
     override fun send(notification: Notification) {
         notificationRepo.send(notification)

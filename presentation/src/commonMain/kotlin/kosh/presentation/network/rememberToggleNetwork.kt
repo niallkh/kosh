@@ -3,16 +3,15 @@ package kosh.presentation.network
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.Immutable
 import kosh.domain.entities.NetworkEntity
-import kosh.domain.failure.AppFailure
 import kosh.domain.usecases.network.NetworkService
-import kosh.presentation.PerformAction
+import kosh.presentation.Perform
 import kosh.presentation.di.di
 
 @Composable
 fun rememberToggleNetwork(
     networkService: NetworkService = di { domain.networkService },
 ): ToggleNetworkState {
-    val toggle = PerformAction<Pair<NetworkEntity.Id, Boolean>, AppFailure> { (id, enabled) ->
+    val toggle = Perform<_, _, Any> { (id, enabled): Pair<NetworkEntity.Id, Boolean> ->
         networkService.toggle(id, enabled)
     }
 

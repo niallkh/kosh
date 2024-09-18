@@ -23,18 +23,17 @@ import androidx.fragment.app.FragmentActivity
 import co.touchlab.kermit.Logger
 import com.arkivanov.decompose.defaultComponentContext
 import com.arkivanov.decompose.router.stack.push
+import com.arkivanov.essenty.lifecycle.asEssentyLifecycle
 import com.arkivanov.essenty.lifecycle.doOnStop
 import com.eygraber.uri.toAndroidUri
 import com.eygraber.uri.toUri
 import com.seiko.imageloader.LocalImageLoader
-import kosh.app.di.DefaultWindowScope
+import kosh.app.di.AndroidWindowScope
 import kosh.presentation.app.rememberInitApp
 import kosh.presentation.core.defaultAppContext
 import kosh.presentation.di.DefaultRouteContext
 import kosh.presentation.di.LocalRouteContext
 import kosh.presentation.di.LocalRouteScopeFactory
-import kosh.ui.app.ApplicationLifecycle
-import kosh.ui.app.LocalApplicationLifecycle
 import kosh.ui.component.path.LocalPathResolver
 import kosh.ui.component.path.PathResolver
 import kosh.ui.navigation.LocalRootNavigator
@@ -46,28 +45,10 @@ import kosh.ui.navigation.routes.RootRoute
 import kosh.ui.navigation.stack.DefaultStackRouter
 import kosh.ui.navigation.stack.StackRouter
 import kotlinx.serialization.serializer
-import java.math.BigDecimal
-import kotlin.LazyThreadSafetyMode.NONE
 
 class KoshActivity : FragmentActivity() {
 
     private val logger = Logger.withTag("[K]KoshActivity")
-
-    private val applicationScope by lazy(NONE) {
-        KoshApplication.applicationScope
-    }
-
-    private val windowScope by lazy(NONE) {
-        DefaultWindowScope(
-            applicationScope = applicationScope,
-            activityResultRegistry = activityResultRegistry,
-            contentResolver = contentResolver,
-        )
-    }
-
-    private val routeContext by lazy(NONE) {
-        DefaultRouteContext(defaultAppContext(defaultComponentContext()))
-    }
 
     private lateinit var rootRouter: StackRouter<RootRoute>
 
@@ -80,6 +61,14 @@ class KoshActivity : FragmentActivity() {
         val deeplink = handleDeepLink(intent) { it?.toUri()?.let(::parseDeeplink) }
         logger.v { "deeplink=${intent.data}" }
 
+        val routeContext = DefaultRouteContext(defaultAppContext(defaultComponentContext()))
+
+        val windowScope = AndroidWindowScope(
+            applicationScope = KoshApplication.applicationScope,
+            activityResultRegistry = activityResultRegistry,
+            contentResolver = contentResolver,
+        )
+
         rootRouter = DefaultStackRouter(
             routeContext = routeContext,
             serializer = serializer(),
@@ -89,27 +78,19 @@ class KoshActivity : FragmentActivity() {
                 when (it) {
                     is RouteResult.Canceled -> onCancel()
                     is RouteResult.Finished -> onFinish()
-                    is RouteResult.Up -> navigateUp(it.route)
+                    is RouteResult.Up -> onNavigateUp(it.route)
                 }
             },
         )
 
-        val rootNavigator = RootNavigator {
-            rootRouter.push(it)
-        }
-
-        val applicationLifecycle = ApplicationLifecycle(routeContext.lifecycle)
-        val fileRepo = windowScope.appRepositoriesComponent.fileRepo
-        val pathResolver = PathResolver { fileRepo.read(it) }
-
-        BigDecimal.ZERO.toEngineeringString()
+        val rootNavigator = RootNavigator { rootRouter.push(it) }
+        val pathResolver = PathResolver { windowScope.appRepositoriesComponent.fileRepo.read(it) }
 
         setContent {
             CompositionLocalProvider(
                 LocalRouteContext provides routeContext,
                 LocalRouteScopeFactory provides windowScope.routeScopeFactory,
                 LocalImageLoader provides windowScope.imageComponent.imageLoader,
-                LocalApplicationLifecycle provides applicationLifecycle,
                 LocalPathResolver provides pathResolver,
                 LocalRootNavigator provides rootNavigator,
             ) {
@@ -139,7 +120,8 @@ class KoshActivity : FragmentActivity() {
     override fun onStart() {
         super.onStart()
 
-        ContextCompat.startForegroundService(this, Intent(this, KoshService::class.java))
+        val intent = Intent(this, KoshService::class.java)
+        ContextCompat.startForegroundService(this, intent)
     }
 
     override fun onNewIntent(intent: Intent) {
@@ -172,7 +154,7 @@ class KoshActivity : FragmentActivity() {
     private fun onFinish() {
         logger.i { "onFinish()" }
         if (moveTaskToBack(false)) {
-            routeContext.lifecycle.doOnStop(isOneTime = true) {
+            lifecycle.asEssentyLifecycle().doOnStop(isOneTime = true) {
                 rootRouter.reset()
             }
         } else {
@@ -183,7 +165,7 @@ class KoshActivity : FragmentActivity() {
     private fun onCancel() {
         logger.i { "onCancel()" }
         if (moveTaskToBack(false)) {
-            routeContext.lifecycle.doOnStop(isOneTime = true) {
+            lifecycle.asEssentyLifecycle().doOnStop(isOneTime = true) {
                 rootRouter.reset()
             }
         } else {
@@ -191,7 +173,7 @@ class KoshActivity : FragmentActivity() {
         }
     }
 
-    private fun navigateUp(rootRoute: RootRoute?) {
+    private fun onNavigateUp(rootRoute: RootRoute?) {
         val intent = Intent(
             this,
             KoshActivity::class.java

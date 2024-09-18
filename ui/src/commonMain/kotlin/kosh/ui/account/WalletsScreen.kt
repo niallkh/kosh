@@ -104,7 +104,7 @@ fun WalletsContent(
                 Icon(Icons.Default.Add, contentDescription = "Add Wallet")
             }
         },
-        onUp = { onNavigateUp() }
+        onNavigateUp = { onNavigateUp() }
     ) { paddingValues ->
 
         LazyColumn(

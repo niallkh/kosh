@@ -2,6 +2,7 @@ package kosh.domain
 
 import kosh.domain.state.AppStateProvider
 import kosh.domain.usecases.account.AccountService
+import kosh.domain.usecases.account.AccountTokensDiscoveryService
 import kosh.domain.usecases.ledger.LedgerAccountService
 import kosh.domain.usecases.ledger.LedgerService
 import kosh.domain.usecases.network.NetworkService
@@ -38,6 +39,7 @@ interface DomainComponent {
     val transactionService: TransactionService
     val notificationService: NotificationService
     val callDataParserService: ContractCallService
+    val accountTokensDiscoveryService: AccountTokensDiscoveryService
 
     val trezorPasskeysService: TrezorPasskeysService
     val trezorPassphraseService: TrezorPassphraseService

@@ -7,7 +7,9 @@ import kosh.domain.entities.NetworkEntity
 import kosh.domain.entities.TokenEntity
 import kosh.domain.failure.Web3Failure
 import kosh.domain.models.Address
+import kosh.domain.models.ChainId
 import kosh.domain.models.token.Balance
+import kosh.domain.models.token.TokenMetadata
 import kosh.domain.repositories.TokenBalanceRepo
 import kosh.domain.serializers.Either
 import kosh.domain.usecases.network.NetworkService
@@ -20,6 +22,8 @@ import kosh.eth.proposals.erc721.Erc721Abi
 import kosh.eth.proposals.multicall.MulticallAbi
 import kosh.eth.proposals.multicall.multicall
 import kosh.eth.rpc.Web3ProviderFactory
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.withContext
 import kotlinx.datetime.Clock
 
 class DefaultTokenBalanceRepo(
@@ -33,24 +37,47 @@ class DefaultTokenBalanceRepo(
         networkId: NetworkEntity.Id,
         account: Address,
         tokens: List<TokenEntity>,
-    ): Either<Web3Failure, List<Balance>> = either {
-        val now = Clock.System.now()
+    ): Either<Web3Failure, List<Balance>> = withContext(Dispatchers.Default) {
+        either {
+            val now = Clock.System.now()
 
-        val calls = tokens.map { token -> mapToCall(account, token) }
+            val calls = tokens.map { token -> mapToCall(account, token) }
 
-        val web3 = web3ProviderFactory(networkService.getRpc(networkId))
+            val web3 = web3ProviderFactory(networkService.getRpc(networkId))
 
-        web3.catch(logger) {
-            web3.multicall(*calls.toTypedArray())
-        }.bind()
+            web3.catch(logger) {
+                web3.multicall(*calls.toTypedArray())
+            }.bind()
 
-        calls.map { call ->
-            val balance = call.result.getOrNull() ?: BigInteger.ZERO
+            calls.map { call ->
+                val balance = call.result.getOrNull() ?: BigInteger.ZERO
 
-            Balance(
-                value = balance,
-                updatedAt = now,
-            )
+                Balance(balance, now)
+            }
+        }
+    }
+
+    override suspend fun getBalances(
+        chainId: ChainId,
+        account: Address,
+        tokens: List<TokenMetadata>,
+    ): Either<Web3Failure, List<Balance>> = withContext(Dispatchers.Default) {
+        either {
+            val now = Clock.System.now()
+
+            val calls = tokens.mapNotNull { token -> mapToCall(account, token) }
+
+            val web3 = web3ProviderFactory(networkService.getRpc(NetworkEntity.Id(chainId)))
+
+            web3.catch(logger) {
+                web3.multicall(*calls.toTypedArray())
+            }.bind()
+
+            calls.map { call ->
+                val balance = call.result.getOrNull() ?: BigInteger.ZERO
+
+                Balance(balance, now)
+            }
         }
     }
 
@@ -73,5 +100,17 @@ class DefaultTokenBalanceRepo(
         TokenEntity.Type.Erc1155 -> Erc1155Abi
             .balanceOf(account.bytes().abiAddress, token.tokenId!!)
             .at(token.address!!.bytes().abiAddress)
+    }
+
+    private fun mapToCall(
+        account: Address,
+        token: TokenMetadata,
+    ): ContractCall<BigInteger>? = when (token.type) {
+        TokenMetadata.Type.ERC20 -> Erc20Abi
+            .balanceOf(account.bytes().abiAddress)
+            .at(token.address.bytes().abiAddress)
+
+        TokenMetadata.Type.ERC721 -> null
+        TokenMetadata.Type.ERC1155 -> null
     }
 }

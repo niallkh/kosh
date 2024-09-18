@@ -7,14 +7,8 @@ import kotlinx.serialization.Serializable
 sealed class TransactionsRoute : Route {
 
     @Serializable
-    data class Details(
-        val id: TransactionEntity.Id,
-        override val link: Nothing? = null,
-    ) : TransactionsRoute()
+    data class Details(val id: TransactionEntity.Id) : TransactionsRoute()
 
     @Serializable
-    data class Delete(
-        val id: TransactionEntity.Id,
-        override val link: Nothing? = null,
-    ) : TransactionsRoute()
+    data class Delete(val id: TransactionEntity.Id) : TransactionsRoute()
 }

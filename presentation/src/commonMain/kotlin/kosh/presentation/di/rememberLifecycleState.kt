@@ -45,9 +45,7 @@ fun rememberLifecycleState(atLeast: Lifecycle.State = Lifecycle.State.RESUMED): 
 
         lifecycle.subscribe(callbacks)
 
-        onDispose {
-            lifecycle.unsubscribe(callbacks)
-        }
+        onDispose { lifecycle.unsubscribe(callbacks) }
     }
 
     return meet

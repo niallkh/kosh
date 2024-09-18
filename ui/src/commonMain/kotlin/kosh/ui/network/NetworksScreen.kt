@@ -74,7 +74,7 @@ fun NetworksContent(
                 Icon(Icons.Default.Add, contentDescription = "Add")
             }
         },
-        onUp = { onNavigateUp() }
+        onNavigateUp = { onNavigateUp() }
     ) { paddingValues ->
         LazyColumn(
             contentPadding = paddingValues,

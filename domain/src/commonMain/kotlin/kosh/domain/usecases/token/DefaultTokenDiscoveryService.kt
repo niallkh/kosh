@@ -30,6 +30,7 @@ import kosh.domain.state.network
 import kosh.domain.utils.optic
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.FlowPreview
+import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.asFlow
 import kotlinx.coroutines.flow.filterNotNull
 import kotlinx.coroutines.flow.first
@@ -60,6 +61,11 @@ class DefaultTokenDiscoveryService(
                 },
             )
         }
+    }
+
+    override suspend fun getVerifiedTokens(): Flow<TokenMetadata> {
+        return appStateProvider.optic(AppState.activeNetworks()).value.asFlow()
+            .flatMapConcat { network -> tokenListsRepo.tokens(network.chainId) }
     }
 
     override suspend fun searchNft(
@@ -93,14 +99,7 @@ class DefaultTokenDiscoveryService(
         val network = appStateProvider.optic(AppState.network(networkId)).value
             ?: return@either null
 
-        getTokenMetadata(network.chainId, address).bind()
-    }
-
-    override suspend fun getTokenMetadata(
-        chainId: ChainId,
-        address: Address,
-    ): Either<Web3Failure, TokenMetadata?> = either {
-        tokenRepo.getTokenMetadata(chainId, address).bind()
+        tokenRepo.getTokenMetadata(network.chainId, address).bind()
     }
 
     override suspend fun getNftMetadata(
@@ -125,8 +124,7 @@ class DefaultTokenDiscoveryService(
 
     private suspend fun queryTokenLists(
         q: String,
-    ): List<TokenMetadata> = appStateProvider.optic(AppState.activeNetworks()).value.asFlow()
-        .flatMapConcat { network -> tokenListsRepo.tokens(network.chainId) }
+    ): List<TokenMetadata> = getVerifiedTokens()
         .mapNotNull { token ->
             when {
                 token.symbol.startsWith(q, ignoreCase = true) -> 0 to token
@@ -143,8 +141,7 @@ class DefaultTokenDiscoveryService(
 
     private suspend fun queryTokenLists(
         address: Address,
-    ): TokenMetadata? = appStateProvider.optic(AppState.activeNetworks()).value.asFlow()
-        .flatMapConcat { network -> tokenListsRepo.tokens(network.chainId) }
+    ): TokenMetadata? = getVerifiedTokens()
         .firstOrNull { it.address == address }
 
     private suspend fun queryToken(

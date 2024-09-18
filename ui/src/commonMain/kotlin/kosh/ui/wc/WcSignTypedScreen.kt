@@ -93,7 +93,7 @@ fun WcSignTypedContent(
                 DappTitle(signTyped.request?.dapp)
             }
         },
-        onUp = onNavigateUp,
+        onNavigateUp = onNavigateUp,
 
         actions = {
             if (signTyped.failure == null) {

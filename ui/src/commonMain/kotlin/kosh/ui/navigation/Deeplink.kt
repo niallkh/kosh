@@ -26,11 +26,8 @@ fun parseDeeplink(uri: Uri): RootRoute? {
         }
 
         "wc" -> when {
-            arrayOf("@2", "relay-protocol=irn", "symKey").all { it in uriStr } ->
-                wcPairRoute(uriStr)
-
+            arrayOf("@2", "symKey").all { it in uriStr } -> wcPairRoute(uriStr)
             arrayOf("@2").all { it in uriStr } -> wcRequestRoute(uriStr)
-
             else -> null
         }
 

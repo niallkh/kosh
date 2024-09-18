@@ -120,7 +120,7 @@ fun WcAuthenticationContent(
                 DappTitle(authentication.auth?.dapp)
             }
         },
-        onUp = { onNavigateUp() },
+        onNavigateUp = { onNavigateUp() },
 
         actions = {
             if (authentication.failure == null) {

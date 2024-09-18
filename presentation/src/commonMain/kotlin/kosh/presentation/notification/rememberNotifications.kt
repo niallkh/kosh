@@ -28,7 +28,7 @@ fun rememberNotifications(
                 }
             }
             launch {
-                notificationService.canceled.collect { canceled ->
+                notificationService.cancelled.collect { canceled ->
                     notifications = notifications.removeAll { it.id in canceled }
                 }
             }

@@ -1,6 +1,7 @@
 package kosh.app
 
 import android.Manifest.permission.POST_NOTIFICATIONS
+import android.app.Notification
 import android.app.NotificationChannel
 import android.app.NotificationManager
 import android.app.PendingIntent
@@ -12,21 +13,23 @@ import androidx.core.app.NotificationCompat
 import androidx.core.app.NotificationManagerCompat
 import co.touchlab.kermit.Logger
 import com.eygraber.uri.toAndroidUri
-import kosh.domain.repositories.Notification
 import kosh.domain.repositories.NotificationRepo
+import kosh.domain.usecases.notification.NotificationService
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.flow.collectLatest
+import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.filter
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.launch
 import kotlin.time.Duration.Companion.minutes
+import kosh.domain.repositories.Notification as AppNotification
 
 private const val WC_CH_ID = "WC_CH_ID"
 private const val OTHER_CH_ID = "OTHER_CH_ID"
 
 class AndroidPushNotifier(
     private val context: Context,
-    private val notificationRepo: NotificationRepo,
+    private val notificationService: NotificationService,
     private val applicationScope: CoroutineScope,
 ) {
     private val logger = Logger.withTag("[K]AndroidPushNotifier")
@@ -36,14 +39,15 @@ class AndroidPushNotifier(
         applicationScope.launch {
             ActivityCallbacks.background
                 .map { notificationManager.areNotificationsEnabled() }
+                .distinctUntilChanged()
                 .filter { it }
                 .collectLatest { collectNotifications() }
         }
 
         applicationScope.launch {
-            notificationRepo.canceled.collectLatest { canceled ->
-                val active = notificationManager.activeNotifications.map { it.id }
-                canceled.map { it.toInt() }.intersect(active.toSet()).forEach {
+            notificationService.cancelled.collectLatest { canceled ->
+                val active = notificationManager.activeNotifications.map { it.id }.toSet()
+                canceled.map { it.toInt() }.intersect(active).forEach {
                     notificationManager.cancel(it)
                 }
             }
@@ -51,7 +55,7 @@ class AndroidPushNotifier(
     }
 
     private suspend fun collectNotifications() {
-        notificationRepo.notifications.collect { notification ->
+        notificationService.notifications.collect { appNotification ->
             logger.d { "notification()" }
 
             if (
@@ -61,24 +65,26 @@ class AndroidPushNotifier(
                 error("No permission")
             }
 
-            val chId = when (notification.type) {
+            val chId = when (appNotification.type) {
                 NotificationRepo.Type.Wc2 -> createWc2NotificationChannel()
             }
 
+            val notification = createNotification(chId, appNotification)
+
             notificationManager.notify(
-                /* id = */ notification.id.toInt(),
-                /* notification = */ createNotification(chId, notification),
+                /* id = */ appNotification.id.toInt(),
+                /* notification = */ notification,
             )
         }
     }
 
     private fun createNotification(
         channel: String,
-        notification: Notification,
-    ): android.app.Notification {
+        appNotification: AppNotification,
+    ): Notification {
         val intent = Intent(
             /* action = */ Intent.ACTION_VIEW,
-            /* uri = */ notification.uri.toAndroidUri(),
+            /* uri = */ appNotification.uri.toAndroidUri(),
             /* packageContext = */ context,
             /* cls = */ KoshActivity::class.java
         )
@@ -86,11 +92,11 @@ class AndroidPushNotifier(
         val pendingIntent: PendingIntent = PendingIntent
             .getActivity(context, 0, intent, PendingIntent.FLAG_IMMUTABLE)
 
-        val not = NotificationCompat.Builder(context, channel).run {
+        return NotificationCompat.Builder(context, channel).run {
             setSmallIcon(R.drawable.ic_launcher_notification)
-            setContentTitle(notification.title)
-            if (notification.body != null) {
-                setContentText(notification.body)
+            setContentTitle(appNotification.title)
+            if (appNotification.body != null) {
+                setContentText(appNotification.body)
             }
             setPriority(NotificationCompat.PRIORITY_HIGH)
             setContentIntent(pendingIntent)
@@ -98,18 +104,11 @@ class AndroidPushNotifier(
             setAutoCancel(true)
             build()
         }
-
-        return not
     }
 
     private fun createWc2NotificationChannel(): String {
-        createNotificationChannel(WC_CH_ID, "Wallet Connect Request")
+        createNotificationChannel(WC_CH_ID, "WalletConnect Requests")
         return WC_CH_ID
-    }
-
-    private fun createOtherNotificationChannel(): String {
-        createNotificationChannel(OTHER_CH_ID, "Other Notification Channel")
-        return OTHER_CH_ID
     }
 
     private fun createNotificationChannel(

@@ -65,7 +65,7 @@ fun WcAddNetworkContent(
 ) {
     KoshScaffold(
         title = { TextLine("Add Network") },
-        onUp = { onNavigateUp() },
+        onNavigateUp = { onNavigateUp() },
     ) { innerPadding ->
         addNetwork.failure?.let {
             AppFailureItem(it, Modifier.padding(innerPadding)) { addNetwork.retry() }

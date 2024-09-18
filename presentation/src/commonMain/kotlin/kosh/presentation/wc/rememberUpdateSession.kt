@@ -6,7 +6,7 @@ import kosh.domain.models.Address
 import kosh.domain.models.ChainId
 import kosh.domain.models.wc.WcSession
 import kosh.domain.usecases.wc.WcSessionService
-import kosh.presentation.PerformAction
+import kosh.presentation.Perform
 import kosh.presentation.di.di
 
 @Composable
@@ -14,8 +14,8 @@ fun rememberUpdateSession(
     id: WcSession.Id,
     sessionService: WcSessionService = di { domain.wcSessionService },
 ): UpdateSessionState {
-    val approve = PerformAction<Pair<List<Address>, List<ChainId>>, _>(id) {
-        sessionService.update(id, it.first, it.second).bind()
+    val approve = Perform(id) { (accounts, chains): Pair<List<Address>, List<ChainId>> ->
+        sessionService.update(id, accounts, chains).bind()
     }
 
     return UpdateSessionState(

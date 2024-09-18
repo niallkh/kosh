@@ -3,9 +3,8 @@ package kosh.presentation.token
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.Immutable
 import kosh.domain.entities.TokenEntity
-import kosh.domain.failure.AppFailure
 import kosh.domain.usecases.token.TokenService
-import kosh.presentation.PerformAction
+import kosh.presentation.Perform
 import kosh.presentation.di.di
 
 @Composable
@@ -13,7 +12,7 @@ fun rememberDeleteToken(
     id: TokenEntity.Id,
     tokenService: TokenService = di { domain.tokenService },
 ): DeleteTokenState {
-    val delete = PerformAction<Unit, AppFailure>(id) {
+    val delete = Perform(id) {
         tokenService.delete(id)
     }
 

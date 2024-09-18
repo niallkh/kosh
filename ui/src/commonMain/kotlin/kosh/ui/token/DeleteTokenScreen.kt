@@ -48,7 +48,7 @@ fun DeleteTokenScreen(
 
     KoshScaffold(
         title = { Text("Delete Token") },
-        onUp = null,
+        onNavigateUp = null,
     ) { paddingValues ->
         Box(
             Modifier

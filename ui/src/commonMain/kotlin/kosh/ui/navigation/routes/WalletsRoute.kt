@@ -1,7 +1,6 @@
 package kosh.ui.navigation.routes
 
 import kosh.domain.entities.AccountEntity
-import kosh.ui.navigation.Deeplink
 import kotlinx.serialization.Serializable
 
 @Serializable
@@ -17,12 +16,11 @@ sealed class WalletsRoute : Route {
     data class DeleteAccount(val id: AccountEntity.Id) : WalletsRoute()
 
     @Serializable
-    data class NewTrezorAccount(
-        override val link: Deeplink? = null,
-    ) : WalletsRoute()
+    data object NewTrezorAccount : WalletsRoute()
 
     @Serializable
-    data class NewLedgerAccount(
-        override val link: Deeplink? = null,
-    ) : WalletsRoute()
+    data object NewLedgerAccount : WalletsRoute()
+
+    @Serializable
+    data class TokensDiscovery(val id: AccountEntity.Id) : WalletsRoute()
 }

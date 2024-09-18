@@ -93,7 +93,7 @@ fun AccountContent(
                 Modifier.placeholder(account == null)
             )
         },
-        onUp = { onNavigateUp() },
+        onNavigateUp = { onNavigateUp() },
         actions = {
             AccountIcon(
                 account?.address.orZero(),

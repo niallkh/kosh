@@ -2,24 +2,24 @@ package kosh.presentation.transaction
 
 import androidx.compose.runtime.Composable
 import kosh.domain.entities.TransactionEntity
-import kosh.domain.failure.AppFailure
 import kosh.domain.usecases.transaction.TransactionService
-import kosh.presentation.PerformAction
+import kosh.presentation.Perform
 import kosh.presentation.di.di
+import kosh.presentation.invoke
 
 @Composable
 fun rememberDeleteTransaction(
     id: TransactionEntity.Id,
     transactionService: TransactionService = di { domain.transactionService },
 ): DeleteTransactionState {
-    val delete = PerformAction<Unit, AppFailure>(id) {
+    val delete = Perform(id) {
         transactionService.delete(id)
     }
 
     return DeleteTransactionState(
         deleted = delete.performed,
         loading = delete.inProgress,
-        delete = { delete(Unit) }
+        delete = { delete.invoke() }
     )
 }
 

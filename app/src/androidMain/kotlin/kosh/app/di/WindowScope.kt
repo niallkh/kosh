@@ -11,4 +11,3 @@ interface WindowScope {
 
     val windowRepositoriesComponent: WindowRepositoriesComponent
 }
-

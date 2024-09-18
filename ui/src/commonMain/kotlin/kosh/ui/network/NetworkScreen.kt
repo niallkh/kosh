@@ -103,7 +103,7 @@ fun NetworkContent(
 ) {
     KoshScaffold(
         title = { TextLine(network?.entity?.name ?: "New Network") },
-        onUp = { onNavigateUp() },
+        onNavigateUp = { onNavigateUp() },
         actions = {
             network?.entity?.let { network ->
                 ChainIcon(

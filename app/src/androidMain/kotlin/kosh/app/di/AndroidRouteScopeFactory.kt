@@ -3,7 +3,7 @@ package kosh.app.di
 import kosh.presentation.di.RouteScope
 import kosh.presentation.di.RouteScopeFactory
 
-class DefaultRouteScopeFactory(
+class AndroidRouteScopeFactory(
     private val applicationScope: ApplicationScope,
     private val windowScope: WindowScope,
 ) : RouteScopeFactory {

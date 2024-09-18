@@ -43,7 +43,6 @@ include(":data:trezor")
 include(":data:ledger")
 include(":data:web3")
 include(":datastore")
-include(":database")
 
 include(":eth:rpc")
 include(":eth:wallet")

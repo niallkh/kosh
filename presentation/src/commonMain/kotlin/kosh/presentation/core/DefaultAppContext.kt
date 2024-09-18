@@ -53,5 +53,5 @@ fun defaultAppContext(
 ): AppContext = DefaultAppContext(
     componentContext = componentContext,
     coroutineScope = CoroutineScope(coroutineContext + Dispatchers.Main.immediate + SupervisorJob()),
-    logger = Logger.withTag("[K]VM")
+    logger = Logger.withTag("[K]AppContext")
 )
