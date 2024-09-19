@@ -7,7 +7,7 @@ from your mobile device.
 
 ## Features
 
-Some things you can do with Kosh:
+Some things you can do now:
 
 * WalletConnect Sign, Auth
 * EIP-191, EIP-712, EIP-1559
@@ -15,16 +15,18 @@ Some things you can do with Kosh:
 * Link Trezor Passphrase to Biometrics
 * Ledger Nano X, Nano S Plus, Stax (USB)
 * NFTs
-* IPFS trustless client
 * Material You design
+* IPFS trustless client
 
 ## Roadmap
 
-Some things you can expect in future:
+Some things you can expect in the future:
 
 * Export/Import passkeys
-* Ledger Bluetooth
+* WalletConnect Inbox
 * ENS
+* Keystone (USB)
+* Ledger (Bluetooth)
 * iOS
 
 ## Built With
@@ -32,7 +34,7 @@ Some things you can expect in future:
 * [Kotlin Multiplatform](https://github.com/JetBrains/kotlin)
 * [Kotlin Compose](https://github.com/JetBrains/compose-multiplatform)
 * [Secp256k1](https://github.com/ACINQ/secp256k1-kmp)
-* [Decompose](https://github.com/arkivanov/Decompose) for Navigation
+* [Decompose](https://github.com/arkivanov/Decompose) for navigation
 * [Compose ImageLoader](https://github.com/qdsfdhvh/compose-imageloader)
 
 ## Screenshots
