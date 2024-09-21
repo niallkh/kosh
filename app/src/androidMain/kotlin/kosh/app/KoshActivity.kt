@@ -85,7 +85,6 @@ class KoshActivity : FragmentActivity() {
 
         val rootNavigator = RootNavigator { rootRouter.push(it) }
         val pathResolver = PathResolver { windowScope.appRepositoriesComponent.fileRepo.read(it) }
-
         setContent {
             CompositionLocalProvider(
                 LocalRouteContext provides routeContext,

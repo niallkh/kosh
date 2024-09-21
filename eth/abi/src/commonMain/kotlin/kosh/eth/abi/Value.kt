@@ -2,8 +2,7 @@ package kosh.eth.abi
 
 import com.ionspin.kotlin.bignum.integer.BigInteger
 import com.ionspin.kotlin.bignum.integer.toBigInteger
-import okio.ByteString
-import okio.ByteString.Companion.toByteString
+import kotlinx.io.bytestring.ByteString
 import kotlin.jvm.JvmInline
 
 public sealed interface Value {
@@ -16,6 +15,8 @@ public sealed interface Value {
 
             public operator fun invoke(bigInteger: BigInteger): BigNumber =
                 if (bigInteger.isZero()) ZERO else BigNumber(bigInteger)
+
+            public operator fun invoke(): BigNumber = ZERO
 
             public val UINT256_MAX: BigInteger by lazy {
                 BigInteger.parseString(
@@ -37,12 +38,12 @@ public sealed interface Value {
     }
 
     @JvmInline
-    public value class Bytes private constructor(public val value: ByteString) : Value {
+    public value class Bytes(public val value: ByteString) : Value {
         public companion object {
-            private val EMPTY: Bytes = Bytes(ByteString.EMPTY)
+            private val EMPTY: Bytes = Bytes(ByteString())
 
-            public operator fun invoke(byteString: ByteString? = null): Bytes {
-                return if (byteString == null || byteString.size == 0) EMPTY else Bytes(byteString)
+            public operator fun invoke(byteString: ByteString = ByteString()): Bytes {
+                return if (byteString.size == 0) EMPTY else Bytes(byteString)
             }
         }
     }
@@ -58,7 +59,7 @@ public sealed interface Value {
         }
 
         public companion object {
-            private val ZERO: Address = Address(ByteArray(20).toByteString())
+            private val ZERO: Address = Address(ByteString(ByteArray(20)))
 
             public operator fun invoke(byteString: ByteString? = null): Address {
                 require(byteString == null || byteString.size == 20)
@@ -70,15 +71,16 @@ public sealed interface Value {
     public data class Function(val address: Address, val selector: ByteString) : Value
 
     @JvmInline
-    public value class Array<T : Value>(private val values: List<T>) : Value, List<T> by values
+    public value class Array<T : Value>(private val list: List<T>) : Value, List<T> by list
 
     @JvmInline
-    public value class Tuple(private val values: List<Value>) : Value, List<Value> by values
+    public value class Tuple(private val map: Map<kotlin.String, Value>) : Value,
+        Map<kotlin.String, Value> by map
 
     public companion object {
         public fun <T : Value> array(vararg values: T): Array<T> = Array(values.toList())
-        public fun tuple(vararg values: Value): Tuple = Tuple(values.toList())
-        public fun tuple(values: List<Value>): Tuple = Tuple(values)
+        public fun <T : Value> array(values: List<T>): Array<T> = Array(values.toList())
+        public fun tuple(vararg values: Pair<kotlin.String, Value>): Tuple = Tuple(values.toMap())
     }
 }
 
@@ -97,23 +99,40 @@ public val String.abi: Value.String
 public val Boolean.abi: Value.Bool
     inline get() = Value.Bool(this)
 
-public val ByteString.abiAddress: Value.Address
-    inline get() = Value.Address(this)
+public val Value.Bytes.address: Value.Address
+    inline get() = Value.Address(value)
 
 public val ByteString.abi: Value.Bytes
     inline get() = Value.Bytes(this)
 
-public val Value.asBigNumber: Value.BigNumber
+public val Value.abiBigNumber: Value.BigNumber
     inline get() = this as Value.BigNumber
 
-public val Value.asBool: Value.Bool
+public val Value.abiBool: Value.Bool
     inline get() = this as Value.Bool
 
-public val Value.asAddress: Value.Address
+public val Value.abiAddress: Value.Address
     inline get() = this as Value.Address
 
-public val Value.asBytes: Value.Bytes
+public val Value.abiBytes: Value.Bytes
     inline get() = this as Value.Bytes
 
-public val Value.asString: Value.String
+public val Value.abiString: Value.String
     inline get() = this as Value.String
+
+public fun Value.at(vararg path: String): Value = at(path.toList())
+
+public fun Value.at(path: List<String>): Value = when (this) {
+    is Value.Array<*> -> {
+        val index = path.first().toInt()
+        get(index).at(path.drop(1))
+    }
+
+    is Value.Tuple -> {
+        val name = path.first()
+        getValue(name).at(path.drop(1))
+
+    }
+
+    else -> this.also { check(path.isEmpty()) }
+}

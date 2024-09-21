@@ -1,11 +1,11 @@
 package kosh.eth.abi
 
+import kosh.eth.abi.coder.AbiType
 import kosh.eth.abi.coder.encodeSignature
 import kosh.eth.abi.json.JsonAbi
 import kosh.eth.abi.json.toAbi
+import kotlinx.io.bytestring.ByteString
 import kotlinx.serialization.json.JsonElement
-import okio.ByteString
-import okio.ByteString.Companion.encodeUtf8
 
 public data class Abi(
     val items: List<Item>,
@@ -14,7 +14,7 @@ public data class Abi(
     public sealed class Item {
 
         public data class Constructor(
-            val inputs: Type.Tuple,
+            val inputs: AbiType.Tuple,
             val stateMutability: StateMutability = StateMutability.NonPayable,
         ) : Item()
 
@@ -28,33 +28,21 @@ public data class Abi(
 
         public data class Function(
             val name: String,
-            val inputs: Type.Tuple,
-            val outputs: Type.Tuple,
+            val inputs: AbiType.Tuple,
+            val outputs: AbiType.Tuple,
             val stateMutability: StateMutability,
-        ) : Item() {
-            public val selector: ByteString by lazy {
-                encodeSignature().encodeUtf8().keccak256().selector()!!
-            }
-        }
+        ) : Item()
 
         public data class Error(
             val name: String,
-            val inputs: Type.Tuple,
-        ) : Item() {
-            public val selector: ByteString by lazy {
-                encodeSignature().encodeUtf8().keccak256().selector()!!
-            }
-        }
+            val inputs: AbiType.Tuple,
+        ) : Item()
 
         public data class Event(
             val anonymous: Boolean,
             val name: String,
-            val inputs: Type.Tuple,
-        ) : Item() {
-            public val selector: ByteString by lazy {
-                encodeSignature().encodeUtf8().keccak256().selector()!!
-            }
-        }
+            val inputs: AbiType.Tuple,
+        ) : Item()
 
         public enum class StateMutability {
             Pure,
@@ -70,7 +58,7 @@ public data class Abi(
     }
 }
 
-public fun ByteString.selector(): ByteString? {
+public fun ByteString.functionSelector(): ByteString? {
     if (size < 4) return null
     return substring(0, 4)
 }
@@ -87,12 +75,10 @@ public val Abi.Item.name: String?
 
 public val Abi.Item.selector: ByteString?
     get() = when (this) {
-        is Abi.Item.Function -> selector
-        is Abi.Item.Event -> selector
-        is Abi.Item.Error -> selector
+        is Abi.Item.Function -> encodeSignature().keccak256().functionSelector()
+        is Abi.Item.Event -> encodeSignature().keccak256()
+        is Abi.Item.Error -> encodeSignature().keccak256().functionSelector()
         is Abi.Item.Constructor -> null
         is Abi.Item.Fallback -> null
         is Abi.Item.Receive -> null
     }
-
-

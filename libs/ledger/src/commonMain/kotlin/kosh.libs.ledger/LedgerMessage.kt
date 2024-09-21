@@ -1,9 +1,11 @@
 package kosh.libs.ledger
 
-import okio.Buffer
-import okio.BufferedSink
-import okio.BufferedSource
-import okio.ByteString
+import kotlinx.io.Buffer
+import kotlinx.io.Sink
+import kotlinx.io.Source
+import kotlinx.io.bytestring.ByteString
+import kotlinx.io.readByteString
+import kotlinx.io.write
 import kotlin.math.min
 
 internal const val PACKET_SIZE = 64
@@ -14,16 +16,16 @@ internal fun encodeBytes(
     channel: Int,
 ): ByteString {
     val data = Buffer().apply {
-        writeShort(message.size)
+        writeShort(message.size.toShort())
         write(message)
     }
     val buffer = Buffer()
 
     var counter = 0
     while (data.exhausted().not()) {
-        buffer.writeShort(channel)
-        buffer.writeByte(TAG)
-        buffer.writeShort(counter)
+        buffer.writeShort(channel.toShort())
+        buffer.writeByte(TAG.toByte())
+        buffer.writeShort(counter.toShort())
         buffer.write(data, min(PACKET_SIZE - 5L, data.size))
         counter++
     }
@@ -32,7 +34,7 @@ internal fun encodeBytes(
 }
 
 internal fun isHeader(
-    source: BufferedSource,
+    source: Source,
     channel: Int,
 ): Boolean = source.peek().let {
     it.exhausted().not() &&
@@ -42,8 +44,8 @@ internal fun isHeader(
 }
 
 internal fun decodeHeader(
-    source: BufferedSource,
-    sink: BufferedSink,
+    source: Source,
+    sink: Sink,
     channel: Int,
 ): Short {
     require(source.readShort() == channel.toShort())
@@ -55,15 +57,15 @@ internal fun decodeHeader(
     if (msgSize <= PACKET_SIZE - 7) {
         sink.write(source, msgSize.toLong())
     } else {
-        sink.writeAll(source)
+        sink.transferFrom(source)
     }
 
     return msgSize
 }
 
 internal fun decodeData(
-    source: BufferedSource,
-    sink: BufferedSink,
+    source: Source,
+    sink: Sink,
     channel: Int,
 ) {
     var counter = 1
@@ -75,7 +77,7 @@ internal fun decodeData(
         if (source.request(PACKET_SIZE - 5L)) {
             sink.write(source, PACKET_SIZE - 5L)
         } else {
-            sink.writeAll(source)
+            sink.transferFrom(source)
         }
         counter++
     }

@@ -1,7 +1,8 @@
+
 import kosh.eth.abi.Value
-import kosh.eth.abi.delegate.decode
+import kosh.eth.abi.coder.decode
 import kosh.eth.abi.dsl.abiFunction
-import okio.ByteString
+import kotlinx.io.bytestring.ByteString
 
 object Abis {
     val bar by abiFunction {
@@ -47,8 +48,10 @@ object Abis {
     }
 
     class G(data: ByteString) {
-        val array1 by g.decode<Value.Array<*>>(data)
-        val array2 by g.decode<Value.Array<*>>(data)
+        private val tuple by lazy { g.decode(data) }
+
+        val array1: Value.Array<Value.Array<Value.BigNumber>> by tuple
+        val array2: Value.Array<Value.String> by tuple
     }
 
     val tuple by abiFunction {

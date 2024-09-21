@@ -5,6 +5,8 @@ import kosh.libs.ledger.StatusWord
 import kosh.libs.ledger.exchange
 import kosh.libs.ledger.ledgerAPDU
 import kosh.libs.ledger.toInt
+import kotlinx.io.bytestring.decodeToString
+import kotlinx.io.readByteString
 
 suspend fun LedgerManager.Connection.ethereumAddress(
     derivationPath: List<UInt>,
@@ -17,7 +19,7 @@ suspend fun LedgerManager.Connection.ethereumAddress(
         p1 = showDisplay.toInt(),
         p2 = chainCode.toInt(),
     ) {
-        writeByte(derivationPath.size)
+        writeByte(derivationPath.size.toByte())
         derivationPath.forEach {
             writeInt(it.toInt())
         }
@@ -26,7 +28,7 @@ suspend fun LedgerManager.Connection.ethereumAddress(
     return exchange(ledgerAPDU) { sw ->
         sw.expectToBe(StatusWord.OK)
 
-        readByteString(readByte().toUByte().toLong())
-        "0x" + readByteString(readByte().toUByte().toLong()).utf8()
+        readByteString(readByte().toUByte().toInt())
+        "0x" + readByteString(readByte().toUByte().toInt()).decodeToString()
     }
 }

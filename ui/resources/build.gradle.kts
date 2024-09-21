@@ -23,6 +23,8 @@ kotlin {
     sourceSets {
         all {
             languageSettings {
+                optIn("kotlinx.io.bytestring.unsafe.UnsafeByteStringApi")
+                optIn("kotlin.ExperimentalStdlibApi")
                 optIn("org.jetbrains.compose.resources.ExperimentalResourceApi")
             }
         }
@@ -35,7 +37,7 @@ kotlin {
 
             api(projects.domain)
 
-            implementation(libs.okio)
+            implementation(libs.kotlinx.io)
             implementation(libs.kotlinx.serialization.cbor)
         }
 

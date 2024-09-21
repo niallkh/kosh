@@ -3,9 +3,10 @@ package kosh.libs.ledger
 import arrow.fx.coroutines.Resource
 import kosh.libs.usb.DeviceConfig
 import kotlinx.coroutines.flow.Flow
-import okio.Buffer
-import okio.BufferedSource
-import okio.ByteString
+import kotlinx.io.Buffer
+import kotlinx.io.Source
+import kotlinx.io.bytestring.ByteString
+import kotlinx.io.write
 
 internal const val LEDGER_VENDOR_ID: Int = 0x2c97
 internal const val LEDGER_PRODUCT_ID_NANO_S: Int = 0x10
@@ -51,7 +52,7 @@ data class LedgerDevice(
 
 suspend inline fun <T> LedgerManager.Connection.exchange(
     ledgerAPDU: LedgerAPDU,
-    handleResponse: BufferedSource.(StatusWord) -> T,
+    handleResponse: Source.(StatusWord) -> T,
 ): T {
     val (statusWord, response) = exchange(ledgerAPDU)
     val buffer = Buffer().apply { write(response) }

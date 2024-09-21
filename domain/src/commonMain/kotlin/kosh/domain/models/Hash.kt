@@ -8,7 +8,6 @@ import kosh.domain.serializers.ByteStringSerializer
 import kosh.domain.serializers.HashSerializer
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.UseSerializers
-import okio.ByteString.Companion.toByteString
 import kotlin.jvm.JvmInline
 
 @JvmInline
@@ -19,7 +18,7 @@ value class Hash private constructor(val value: ByteString) {
         check(value.value.size == 32)
     }
 
-    fun bytes(): okio.ByteString = value.value
+    fun bytes() = value.value
 
     override fun toString(): String {
         return value.toString()
@@ -28,7 +27,7 @@ value class Hash private constructor(val value: ByteString) {
     companion object {
         private val memo = ::Hash.memoize()
 
-        private val EMPTY = memo(ByteString(ByteArray(32).toByteString()))
+        private val EMPTY = memo(ByteString(32))
 
         operator fun invoke(): Hash = EMPTY
 

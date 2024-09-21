@@ -8,9 +8,8 @@ import arrow.core.raise.ensure
 import kosh.domain.failure.AppFailure
 import kosh.domain.serializers.AddressSerializer
 import kosh.eth.proposals.eip55.eip55
+import kotlinx.io.bytestring.hexToByteString
 import kotlinx.serialization.Serializable
-import okio.ByteString.Companion.decodeHex
-import okio.ByteString.Companion.toByteString
 import kotlin.jvm.JvmInline
 
 private val AddressRegex = Regex("^0x[0-9a-fA-F]{40}$")
@@ -27,14 +26,14 @@ value class Address private constructor(
         require(value.value.size == 20)
     }
 
-    fun bytes(): okio.ByteString = value.value
+    fun bytes() = value.value
 
     override fun toString(): String = eip55()
 
     companion object {
         private val memo = ::Address.memoize()
 
-        private val EMPTY = memo(ByteString(ByteArray(20).toByteString()))
+        private val EMPTY = memo(ByteString(20))
 
         operator fun invoke() = EMPTY
 
@@ -45,7 +44,7 @@ value class Address private constructor(
 
             val decodedAddress = address
                 .removePrefix("0x")
-                .decodeHex()
+                .hexToByteString()
                 .let { memo(ByteString(it)) }
 
             if (AddressLCRegex.matches(address).not()) {

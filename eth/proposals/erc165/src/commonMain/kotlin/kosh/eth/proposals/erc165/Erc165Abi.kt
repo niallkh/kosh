@@ -2,9 +2,8 @@ package kosh.eth.proposals.erc165
 
 import kosh.eth.abi.Value
 import kosh.eth.abi.abi
-import kosh.eth.abi.asBool
 import kosh.eth.abi.coder.decodeOutputs
-import kosh.eth.abi.coder.encodeInputs
+import kosh.eth.abi.coder.encode
 import kosh.eth.abi.dsl.abiViewFunction
 import kosh.eth.proposals.DefaultFunctionCall
 import kosh.eth.proposals.FunctionCall
@@ -19,7 +18,7 @@ public object Erc165Abi {
     public fun supportsInterface(
         interfaceId: Value.Bytes,
     ): FunctionCall<Boolean> = DefaultFunctionCall(
-        encoder = { supportsInterface.encodeInputs(interfaceId) },
+        encoder = { supportsInterface.encode(interfaceId) },
         decoder = { supportsInterface.decodeOutputs(it, "supports").asBool.value }
     )
 

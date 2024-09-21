@@ -30,6 +30,7 @@ import kosh.domain.serializers.PersistentHashSet
 import kosh.domain.serializers.PersistentHashSetSerializer
 import kosh.domain.serializers.PersistentMap
 import kosh.domain.serializers.PersistentMapSerializer
+import kosh.domain.utils.md5
 import kosh.domain.utils.pmap
 import kotlinx.collections.immutable.PersistentList
 import kotlinx.collections.immutable.persistentHashMapOf
@@ -37,9 +38,10 @@ import kotlinx.collections.immutable.persistentHashSetOf
 import kotlinx.collections.immutable.persistentMapOf
 import kotlinx.collections.immutable.toPersistentList
 import kotlinx.collections.immutable.toPersistentSet
+import kotlinx.io.Buffer
+import kotlinx.io.bytestring.toHexString
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.UseSerializers
-import okio.Buffer
 
 @optics
 @Serializable
@@ -203,10 +205,11 @@ fun AppState.Companion.balancesKey() = Getter<AppState, String> { state ->
     AppState.activeTokens().get(state).asSequence().map { it.id.value }
         .flatMap { AppState.activeAccounts().get(state) }.map { it.id.value }
         .fold(Buffer()) { buffer, uuid ->
-            buffer
-                .writeLong(uuid.mostSignificantBits)
-                .writeLong(uuid.leastSignificantBits)
+            buffer.apply {
+                writeLong(uuid.mostSignificantBits)
+                writeLong(uuid.leastSignificantBits)
+            }
         }
         .md5()
-        .base64()
+        .toHexString()
 }

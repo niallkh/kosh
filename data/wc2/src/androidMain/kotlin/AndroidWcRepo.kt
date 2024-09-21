@@ -71,12 +71,13 @@ import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.mapNotNull
 import kotlinx.coroutines.suspendCancellableCoroutine
 import kotlinx.coroutines.withContext
+import kotlinx.io.bytestring.decodeToString
+import kotlinx.io.bytestring.hexToByteString
 import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.Json
 import kotlinx.serialization.json.JsonElement
 import kotlinx.serialization.json.jsonObject
 import kotlinx.serialization.json.jsonPrimitive
-import okio.ByteString.Companion.decodeHex
 import org.koin.core.qualifier.named
 import kotlin.coroutines.resume
 import kotlin.coroutines.resumeWithException
@@ -835,7 +836,8 @@ class AndroidWcRepo(
             when (method) {
                 "personal_sign" -> {
                     val decodeParams = json.decodeFromString<List<String>>(params)
-                    val message = decodeParams[0].removePrefix("0x").decodeHex().utf8()
+                    val message =
+                        decodeParams[0].removePrefix("0x").hexToByteString().decodeToString()
                     val address = parseAddress(decodeParams[1])
 
                     WcRequest.Call.SignPersonal(
@@ -923,7 +925,7 @@ class AndroidWcRepo(
 
     private fun String.parseHexNumber() = removePrefix("0x").toBigInteger(16)
 
-    private fun String.parseHex() = ByteString(removePrefix("0x").decodeHex())
+    private fun String.parseHex() = ByteString(removePrefix("0x").hexToByteString())
 
     private fun Raise<WcFailure>.parseAddress(address: String) =
         withError({ WcFailure.WcInvalidRequest.Other(it.message) }) { Address(address).bind() }

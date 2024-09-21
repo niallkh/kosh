@@ -8,10 +8,13 @@ import kotlinx.serialization.descriptors.SerialDescriptor
 import kotlinx.serialization.encoding.Decoder
 import kotlinx.serialization.encoding.Encoder
 
+@Deprecated("")
 typealias Uri = @Serializable(UriSerializer::class) Uri
 
+@Deprecated("")
 object UriSerializer : KSerializer<Uri> {
     private val delegate = String.serializer()
+
     override val descriptor: SerialDescriptor = delegate.descriptor
 
     override fun deserialize(decoder: Decoder): Uri {

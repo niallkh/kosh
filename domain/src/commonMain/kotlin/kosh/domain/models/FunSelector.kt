@@ -2,11 +2,9 @@ package kosh.domain.models
 
 import androidx.compose.runtime.Immutable
 import arrow.core.memoize
-import kosh.eth.abi.selector
+import kosh.eth.abi.functionSelector
 import kotlinx.serialization.Serializable
-import okio.ByteString.Companion.toByteString
 import kotlin.jvm.JvmInline
-
 
 @JvmInline
 @Immutable
@@ -16,7 +14,7 @@ value class FunSelector private constructor(val value: ByteString) {
         check(value.value.size == 4)
     }
 
-    fun bytes(): okio.ByteString = value.value
+    fun bytes() = value.value
 
     override fun toString(): String {
         return value.toString()
@@ -25,7 +23,7 @@ value class FunSelector private constructor(val value: ByteString) {
     companion object {
         private val memo = ::FunSelector.memoize()
 
-        private val EMPTY = memo(ByteString(ByteArray(4).toByteString()))
+        private val EMPTY = memo(ByteString(kotlinx.io.bytestring.ByteString(ByteArray(4))))
 
         operator fun invoke(): FunSelector = EMPTY
 
@@ -33,4 +31,4 @@ value class FunSelector private constructor(val value: ByteString) {
     }
 }
 
-fun ByteString.funSelector() = bytes().selector()?.let { FunSelector(ByteString(it)) }
+fun ByteString.funSelector() = bytes().functionSelector()?.let { FunSelector(ByteString(it)) }

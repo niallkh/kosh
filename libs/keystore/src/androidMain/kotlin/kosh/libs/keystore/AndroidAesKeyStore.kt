@@ -10,11 +10,13 @@ import androidx.datastore.preferences.core.byteArrayPreferencesKey
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.withContext
-import okio.Buffer
-import okio.ByteString
+import kotlinx.io.Buffer
+import kotlinx.io.bytestring.ByteString
+import kotlinx.io.bytestring.unsafe.UnsafeByteStringOperations
+import kotlinx.io.files.Path
+import kotlinx.io.readByteArray
 import okio.ByteString.Companion.encodeUtf8
-import okio.ByteString.Companion.toByteString
-import okio.Path
+import okio.Path.Companion.toPath
 import java.security.Key
 import javax.crypto.KeyGenerator
 import javax.crypto.SecretKey
@@ -31,7 +33,7 @@ class AndroidAesKeyStore(
 
     private val store by lazy {
         PreferenceDataStoreFactory.createWithPath(
-            produceFile = { produceFile() },
+            produceFile = { produceFile().toString().toPath() },
         )
     }
 
@@ -93,7 +95,7 @@ class AndroidAesKeyStore(
         val buffer = Buffer().apply { write(cipherText) }
         val tLen = buffer.readInt()
         val ivLen = buffer.readInt()
-        val iv = buffer.readByteArray(ivLen.toLong())
+        val iv = buffer.readByteArray(ivLen)
 
         var cipher = Cipher.getInstance(SCHEME).also {
             it.init(Cipher.DECRYPT_MODE, getOrCreateKey(alias(key)), GCMParameterSpec(tLen, iv))
@@ -104,7 +106,7 @@ class AndroidAesKeyStore(
         } ?: return@withContext null
 
         cipher.updateAAD(key.encodeUtf8().toByteArray())
-        cipher.doFinal(buffer.readByteArray()).toByteString()
+        UnsafeByteStringOperations.wrapUnsafe(cipher.doFinal(buffer.readByteArray()))
     }
 
     private fun getOrCreateKey(

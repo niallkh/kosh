@@ -1,9 +1,10 @@
 package kosh.libs.ledger.cmds
 
-import okio.BufferedSource
-import okio.ByteString
+import kotlinx.io.Source
+import kotlinx.io.bytestring.ByteString
+import kotlinx.io.readByteString
 
-internal fun BufferedSource.readChunk(limit: Long): ByteString = if (request(limit)) {
+internal fun Source.readChunk(limit: Int): ByteString = if (request(limit.toLong())) {
     readByteString(limit)
 } else {
     readByteString()

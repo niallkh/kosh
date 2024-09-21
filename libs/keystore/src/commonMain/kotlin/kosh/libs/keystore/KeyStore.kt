@@ -2,7 +2,7 @@ package kosh.libs.keystore
 
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.IO
-import okio.ByteString
+import kotlinx.io.bytestring.ByteString
 import kotlin.coroutines.ContinuationInterceptor
 
 internal object SecurityDispatcher : ContinuationInterceptor by Dispatchers.IO.limitedParallelism(1)

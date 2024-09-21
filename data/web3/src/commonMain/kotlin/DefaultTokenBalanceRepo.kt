@@ -13,7 +13,8 @@ import kosh.domain.models.token.TokenMetadata
 import kosh.domain.repositories.TokenBalanceRepo
 import kosh.domain.serializers.Either
 import kosh.domain.usecases.network.NetworkService
-import kosh.eth.abi.abiAddress
+import kosh.eth.abi.abi
+import kosh.eth.abi.address
 import kosh.eth.proposals.ContractCall
 import kosh.eth.proposals.at
 import kosh.eth.proposals.erc1155.Erc1155Abi
@@ -86,20 +87,20 @@ class DefaultTokenBalanceRepo(
         token: TokenEntity,
     ): ContractCall<BigInteger> = when (token.type) {
         TokenEntity.Type.Native -> MulticallAbi
-            .getEthBalance(account.bytes().abiAddress)
+            .getEthBalance(account.bytes().abi.address)
             .at(MulticallAbi.address)
 
         TokenEntity.Type.Erc20 -> Erc20Abi
-            .balanceOf(account.bytes().abiAddress)
-            .at(token.address!!.bytes().abiAddress)
+            .balanceOf(account.bytes().abi.address)
+            .at(token.address!!.bytes().abi.address)
 
         TokenEntity.Type.Erc721 -> Erc721Abi
-            .balanceOf(account.bytes().abiAddress, token.tokenId!!)
-            .at(token.address!!.bytes().abiAddress)
+            .balanceOf(account.bytes().abi.address, token.tokenId!!)
+            .at(token.address!!.bytes().abi.address)
 
         TokenEntity.Type.Erc1155 -> Erc1155Abi
-            .balanceOf(account.bytes().abiAddress, token.tokenId!!)
-            .at(token.address!!.bytes().abiAddress)
+            .balanceOf(account.bytes().abi.address, token.tokenId!!)
+            .at(token.address!!.bytes().abi.address)
     }
 
     private fun mapToCall(

@@ -20,6 +20,13 @@ kotlin {
     jvm()
 
     sourceSets {
+        all {
+            languageSettings {
+                optIn("kotlinx.io.bytestring.unsafe.UnsafeByteStringApi")
+                optIn("kotlin.ExperimentalStdlibApi")
+            }
+        }
+
         commonMain.dependencies {
             api(projects.domain)
 

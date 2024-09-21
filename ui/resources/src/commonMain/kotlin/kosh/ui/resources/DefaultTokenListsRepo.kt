@@ -10,10 +10,12 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.flowOn
-import okio.Buffer
-import okio.ByteString
-import okio.ByteString.Companion.decodeHex
-import okio.ByteString.Companion.toByteString
+import kotlinx.io.Buffer
+import kotlinx.io.bytestring.ByteString
+import kotlinx.io.bytestring.hexToByteString
+import kotlinx.io.bytestring.unsafe.UnsafeByteStringOperations
+import kotlinx.io.readLine
+import kotlinx.io.write
 import kosh.domain.models.ByteString as DomainByteString
 
 public class DefaultTokenListsRepo : TokenListsRepo {
@@ -25,18 +27,19 @@ public class DefaultTokenListsRepo : TokenListsRepo {
     ): Flow<TokenMetadata> = flow {
 
         val bytes = catch({
-            Res.readBytes("files/token-lists/${chainId.value}.csv").toByteString()
+            val bytes = Res.readBytes("files/token-lists/${chainId.value}.csv")
+            UnsafeByteStringOperations.wrapUnsafe(bytes)
         }) {
             logger.w(it) { "Error happened during reading token list for ${chainId.value}" }
-            ByteString.EMPTY
+            ByteString()
         }
 
         val buffer = Buffer().apply { write(bytes) }
 
-        var line = buffer.readUtf8Line() // ignore first row
+        var line = buffer.readLine() // ignore first row
 
         while (line != null) {
-            line = buffer.readUtf8Line()?.takeUnless { it.isEmpty() } ?: break
+            line = buffer.readLine()?.takeUnless { it.isEmpty() } ?: break
 
             val parts = line.split(",")
 
@@ -46,7 +49,7 @@ public class DefaultTokenListsRepo : TokenListsRepo {
                     name = parts[0],
                     symbol = parts[1],
                     decimals = parts[2].toUByte(),
-                    address = Address(DomainByteString(parts[3].decodeHex())),
+                    address = Address(DomainByteString(parts[3].hexToByteString())),
                     icon = Icons.icon(parts[4]),
                     type = TokenMetadata.Type.valueOf(parts[5].uppercase())
                 )

@@ -4,7 +4,9 @@ import kosh.libs.ledger.LedgerManager
 import kosh.libs.ledger.StatusWord
 import kosh.libs.ledger.exchange
 import kosh.libs.ledger.ledgerAPDU
-import okio.ByteString
+import kotlinx.io.bytestring.ByteString
+import kotlinx.io.bytestring.decodeToString
+import kotlinx.io.readByteString
 
 suspend fun LedgerManager.Connection.getAppAndVersion(): AppData {
 
@@ -14,10 +16,10 @@ suspend fun LedgerManager.Connection.getAppAndVersion(): AppData {
         sw.expectToBe(StatusWord.OK)
 
         require(readByte() == 0x01.toByte()) { "App and version format not supported" }
-        val name = readByteString(readByte().toUByte().toLong()).utf8()
-        val version = readByteString(readByte().toUByte().toLong()).utf8()
-        val flags = if (!exhausted()) readByteString(readByte().toUByte().toLong())
-        else ByteString.EMPTY
+        val name = readByteString(readByte().toUByte().toInt()).decodeToString()
+        val version = readByteString(readByte().toUByte().toInt()).decodeToString()
+        val flags = if (!exhausted()) readByteString(readByte().toUByte().toInt())
+        else ByteString()
         AppData(name, version, flags)
     }
 }

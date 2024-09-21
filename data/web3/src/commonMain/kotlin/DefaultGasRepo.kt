@@ -17,7 +17,8 @@ import kosh.domain.serializers.Either
 import kosh.domain.usecases.network.GetRpcProvidersUC
 import kosh.domain.usecases.network.NetworkService
 import kosh.domain.usecases.network.invoke
-import kosh.eth.abi.abiAddress
+import kosh.eth.abi.abi
+import kosh.eth.abi.address
 import kosh.eth.rpc.Web3Provider
 import kosh.eth.rpc.Web3ProviderFactory
 import kotlinx.coroutines.Dispatchers
@@ -95,9 +96,9 @@ class DefaultGasRepo(
 
             val estimated = web3.catch(logger) {
                 web3.estimateGas(
-                    sender = from.bytes().abiAddress,
-                    target = to?.bytes()?.abiAddress,
-                    data = data?.bytes() ?: okio.ByteString.EMPTY,
+                    sender = from.bytes().abi.address,
+                    target = to?.bytes()?.abi?.address,
+                    data = data?.bytes() ?: kotlinx.io.bytestring.ByteString(),
                     value = value,
                     gas = gas?.toBigInteger(),
                 )

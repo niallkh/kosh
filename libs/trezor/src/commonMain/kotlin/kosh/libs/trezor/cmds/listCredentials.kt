@@ -6,7 +6,7 @@ import com.satoshilabs.trezor.lib.protobuf.WebAuthnCredentials
 import com.satoshilabs.trezor.lib.protobuf.WebAuthnListResidentCredentials
 import com.satoshilabs.trezor.lib.protobuf.WebAuthnRemoveResidentCredential
 import kosh.libs.trezor.TrezorManager
-import okio.ByteString
+import kotlinx.io.bytestring.ByteString
 
 suspend fun TrezorManager.Connection.listCredentials(): List<WebAuthnCredentials.WebAuthnCredential> {
     val response = exchange(WebAuthnListResidentCredentials())
@@ -19,6 +19,6 @@ suspend fun TrezorManager.Connection.deleteCredential(index: Int) {
 }
 
 suspend fun TrezorManager.Connection.addCredential(id: ByteString) {
-    exchange(WebAuthnAddResidentCredential(credential_id = id))
+    exchange(WebAuthnAddResidentCredential(credential_id = id.toOkio()))
         .expect<Success>()
 }

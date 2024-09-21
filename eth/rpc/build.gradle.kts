@@ -20,11 +20,18 @@ kotlin {
     linuxX64()
 
     sourceSets {
+        all {
+            languageSettings {
+                optIn("kotlinx.io.bytestring.unsafe.UnsafeByteStringApi")
+                optIn("kotlin.ExperimentalStdlibApi")
+            }
+        }
+
         commonMain {
             dependencies {
                 implementation(projects.eth.abi)
 
-                implementation(libs.okio)
+                implementation(libs.kotlinx.io)
                 implementation(libs.bignum)
                 implementation(libs.uri)
                 implementation(libs.crypto.sha3)

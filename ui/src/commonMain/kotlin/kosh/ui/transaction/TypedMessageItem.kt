@@ -15,6 +15,7 @@ import kosh.ui.component.single.single
 import kosh.ui.component.text.TextDate
 import kosh.ui.component.text.TextLine
 import kosh.ui.resources.icons.TypedSignature
+import kotlinx.io.bytestring.decodeToString
 
 @Composable
 fun TypedMessageItem(
@@ -23,7 +24,7 @@ fun TypedMessageItem(
     modifier: Modifier = Modifier,
 ) {
     val jsonEip712 by typedMessage.jsonTypeData.resolve {
-        JsonEip712.from(it.utf8())
+        JsonEip712.from(it.bytes().decodeToString())
     }
 
     ListItem(

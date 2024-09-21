@@ -29,14 +29,11 @@ kotlin {
         commonMain.dependencies {
             api(projects.domain)
 
+            api(projects.eth.abi)
             api(projects.eth.rpc)
             api(projects.libs.ipfs)
             api(projects.eth.wallet)
-            api(projects.eth.proposals.multicall)
-            api(projects.eth.proposals.erc20)
-            api(projects.eth.proposals.erc721)
-            api(projects.eth.proposals.erc1155)
-            api(projects.eth.proposals.erc165)
+            api(projects.eth.proposals)
 
             implementation(libs.arrow)
             implementation(libs.arrow.fx)
@@ -44,7 +41,7 @@ kotlin {
             implementation(libs.arrow.collectors)
             implementation(libs.ktor.client)
             implementation(libs.kotlinx.serialization.json)
-            implementation(libs.kotlinx.serialization.json.okio)
+            implementation(libs.kotlinx.serialization.json.io)
         }
 
         androidMain.dependencies {

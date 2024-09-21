@@ -3,14 +3,15 @@ package kosh.eth.rpc
 import com.ionspin.kotlin.bignum.integer.BigInteger
 import com.ionspin.kotlin.bignum.integer.toBigInteger
 import kosh.eth.abi.Value
+import kotlinx.io.bytestring.ByteString
+import kotlinx.io.bytestring.hexToByteString
+import kotlinx.io.bytestring.toHexString
 import kotlinx.serialization.KSerializer
 import kotlinx.serialization.descriptors.PrimitiveKind
 import kotlinx.serialization.descriptors.PrimitiveSerialDescriptor
 import kotlinx.serialization.descriptors.SerialDescriptor
 import kotlinx.serialization.encoding.Decoder
 import kotlinx.serialization.encoding.Encoder
-import okio.ByteString
-import okio.ByteString.Companion.decodeHex
 
 internal object BigIntegerSerializer : KSerializer<BigInteger> {
 
@@ -41,11 +42,11 @@ internal object ByteStringSerializer : KSerializer<ByteString> {
     override fun deserialize(decoder: Decoder): ByteString {
         return decoder.decodeString()
             .removePrefix("0x")
-            .decodeHex()
+            .hexToByteString()
     }
 
     override fun serialize(encoder: Encoder, value: ByteString) {
-        encoder.encodeString("0x${value.hex()}")
+        encoder.encodeString("0x${value.toHexString()}")
     }
 }
 

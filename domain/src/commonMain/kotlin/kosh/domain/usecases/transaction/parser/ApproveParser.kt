@@ -19,6 +19,7 @@ import kosh.domain.state.erc20Token
 import kosh.domain.state.tokens
 import kosh.domain.utils.optic
 import kosh.eth.abi.Value
+import kosh.eth.abi.selector
 import kosh.eth.proposals.erc20.Erc20Abi
 import kosh.eth.proposals.erc721.Erc721Abi
 
@@ -37,7 +38,7 @@ class ApproveParser(
         if (!value.isZero()) return@either null
 
         when (val selector = input.funSelector()?.bytes()) {
-            Erc20Abi.approve.selector -> {
+            Erc20Abi.approve.selector!! -> {
                 val (spender, value1) = Erc20Abi.approve(input.bytes())
 
                 val token = getToken(chainId, to)
@@ -65,7 +66,7 @@ class ApproveParser(
                 }
             }
 
-            Erc721Abi.setApprovalForAll.selector -> {
+            Erc721Abi.setApprovalForAll.selector!! -> {
                 val (operator, approved) = Erc721Abi.setApprovalForAll(input.bytes())
 
                 ContractCall.Approve(

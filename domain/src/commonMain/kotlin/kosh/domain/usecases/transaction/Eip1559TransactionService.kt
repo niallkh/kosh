@@ -11,7 +11,6 @@ import kosh.domain.entities.eip1559
 import kosh.domain.entities.gasPrice
 import kosh.domain.entities.logs
 import kosh.domain.entities.modifiedAt
-import kosh.domain.entities.networkId
 import kosh.domain.entities.receipt
 import kosh.domain.failure.TransactionFailure
 import kosh.domain.models.ByteString
@@ -69,7 +68,7 @@ class Eip1559TransactionService(
                 hash = hash,
                 value = transaction.tx.value,
                 nonce = transaction.nonce,
-                data = fileRepo.write(transaction.tx.input.value),
+                data = fileRepo.write(transaction.tx.input),
                 gasPrice = transaction.gasPrice,
                 gasLimit = transaction.gasLimit,
                 dapp = dapp,
@@ -114,7 +113,7 @@ class Eip1559TransactionService(
             }
         }
 
-        ByteString(hash.bytes())
+        ByteString(hash.value.bytes())
     }
 
     suspend fun finalize(

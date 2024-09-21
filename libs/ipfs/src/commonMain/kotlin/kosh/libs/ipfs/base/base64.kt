@@ -20,7 +20,6 @@ internal fun ByteString.encodeBase64(
     pads: Boolean = false,
 ): String = encodeBase64Internal(url = url, pads = pads)
 
-
 private fun ByteString.encodeBase64Internal(
     url: Boolean = false,
     pads: Boolean = false,
@@ -108,8 +107,7 @@ private fun String.decodeBase64Internal(): ByteString {
     return buffer.readByteString()
 }
 
-@Suppress("NOTHING_TO_INLINE")
-private inline fun alphabet(char: Char): Int = when (char) {
+private fun alphabet(char: Char): Int = when (char) {
     in '0'..'9' -> char.code + 52 - 48
     in 'A'..'Z' -> char.code - 65
     in 'a'..'z' -> char.code + 26 - 97

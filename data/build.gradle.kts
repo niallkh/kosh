@@ -27,12 +27,12 @@ kotlin {
 
             implementation(projects.libs.keystore)
 
-            api(libs.okio)
+            api(libs.kotlinx.io)
             implementation(libs.arrow)
             implementation(libs.arrow.fx)
             implementation(libs.arrow.resilience)
             implementation(libs.kotlinx.serialization.json)
-            implementation(libs.kotlinx.serialization.json.okio)
+            implementation(libs.kotlinx.serialization.json.io)
             implementation(libs.kotlinx.serialization.cbor)
         }
 

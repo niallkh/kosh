@@ -29,6 +29,8 @@ kotlin {
                 optIn("kotlin.ExperimentalUnsignedTypes")
                 optIn("kotlinx.serialization.ExperimentalSerializationApi")
                 optIn("kotlinx.coroutines.ExperimentalCoroutinesApi")
+                optIn("kotlinx.io.bytestring.unsafe.UnsafeByteStringApi")
+                optIn("kotlin.ExperimentalStdlibApi")
             }
         }
 
@@ -36,11 +38,9 @@ kotlin {
             api(compose.runtime)
 
             implementation(projects.eth.abi)
-            implementation(projects.eth.proposals.eip55)
-            implementation(projects.eth.proposals.erc20)
-            implementation(projects.eth.proposals.erc721)
-            implementation(projects.eth.proposals.erc1155)
+            implementation(projects.eth.proposals)
 
+            api(libs.kotlinx.io)
             api(libs.kotlinx.coroutines)
             api(libs.kotlinx.serialization.core)
             api(libs.kermit)
@@ -50,13 +50,14 @@ kotlin {
             api(libs.arrow.fx)
             api(libs.arrow.optics)
             api(libs.bignum)
+            api(libs.crypto.md)
             api(libs.kotlinx.collections.immutable)
 
             api(libs.kotlinx.datetime)
             api(libs.uuid)
             api(libs.uri)
 
-            implementation(libs.okio)
+            implementation(libs.kotlinx.io)
         }
 
         commonMain {

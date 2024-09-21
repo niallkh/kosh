@@ -3,7 +3,7 @@ package kosh.libs.trezor.cmds
 import com.satoshilabs.trezor.lib.protobuf.EthereumAddress
 import com.satoshilabs.trezor.lib.protobuf.EthereumGetAddress
 import kosh.libs.trezor.TrezorManager
-import okio.ByteString
+import kotlinx.io.bytestring.ByteString
 
 suspend fun TrezorManager.Connection.ethereumAddress(
     derivationPath: List<UInt>,
@@ -15,7 +15,7 @@ suspend fun TrezorManager.Connection.ethereumAddress(
             address_n = derivationPath.map { it.toInt() },
             show_display = showDisplay,
             chunkify = showDisplay,
-            encoded_network = networkDefinition
+            encoded_network = networkDefinition?.toOkio()
         )
     ).expect<EthereumAddress>()
 

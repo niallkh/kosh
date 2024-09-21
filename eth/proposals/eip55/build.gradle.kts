@@ -29,7 +29,7 @@ kotlin {
         commonMain {
             dependencies {
                 implementation(projects.eth.abi)
-                implementation(libs.okio)
+                implementation(libs.kotlinx.io)
             }
         }
         commonTest {

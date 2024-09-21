@@ -23,9 +23,8 @@ import kosh.domain.models.web3.TransactionData
 import kosh.domain.models.web3.gasPrice
 import kosh.domain.repositories.LedgerListener
 import kosh.domain.repositories.LedgerRepo
-import kosh.eth.abi.Eip712
-import kosh.eth.abi.Eip712V2
 import kosh.eth.abi.Value
+import kosh.eth.abi.eip712.Eip712
 import kosh.eth.wallet.Wallet
 import kosh.eth.wallet.transaction.Transaction.Type1559
 import kosh.eth.wallet.transaction.encode
@@ -48,7 +47,7 @@ import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.flowOn
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.withContext
-import okio.ByteString.Companion.encodeUtf8
+import kotlinx.io.bytestring.encodeToByteString
 
 class DefaultLedgerRepo(
     private val ledgerManager: LedgerManager,
@@ -140,7 +139,7 @@ class DefaultLedgerRepo(
             LedgerFailure.NotEthereumApp()
         }
 
-        val bytes = message.encodeUtf8()
+        val bytes = message.encodeToByteString()
 
         val signature = connection.signPersonalMessage(
             derivationPath = derivationPath.path,
@@ -182,7 +181,7 @@ class DefaultLedgerRepo(
         typedMessage: String,
         derivationPath: DerivationPath,
     ): Signature = coroutineScope {
-        val eip712 = Eip712V2.fromJson(typedMessage)
+        val eip712 = Eip712.fromJson(typedMessage)
         val parameters = async { ledgerOffChain.getEip712Parameters(typedMessage, eip712) }
 
         ledgerManager.open(

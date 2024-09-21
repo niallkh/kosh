@@ -1,7 +1,8 @@
 package kosh.eth.proposals
 
 import kosh.eth.abi.Value.Address
-import okio.ByteString
+import kotlinx.io.bytestring.ByteString
+import kotlinx.io.bytestring.decodeToString
 
 public interface ContractCall<out T : Any> {
 
@@ -33,7 +34,7 @@ public class DefaultContractCall<T : Any>(
     }
 
     override fun decodeError(data: ByteString) {
-        result = Result.failure(Throwable("Call failed: ${data.utf8()}"))
+        result = Result.failure(Throwable("Call failed: ${data.decodeToString()}"))
     }
 }
 

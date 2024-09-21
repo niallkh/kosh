@@ -4,10 +4,10 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.State
 import androidx.compose.runtime.produceState
 import androidx.compose.runtime.staticCompositionLocalOf
+import kosh.domain.models.ByteString
+import kosh.domain.serializers.Path
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
-import okio.ByteString
-import okio.Path
 
 fun interface PathResolver : suspend (Path) -> ByteString
 

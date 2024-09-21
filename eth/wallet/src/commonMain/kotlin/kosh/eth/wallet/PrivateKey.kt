@@ -1,7 +1,7 @@
 package kosh.eth.wallet
 
-import okio.ByteString
-import okio.ByteString.Companion.decodeHex
+import kotlinx.io.bytestring.ByteString
+import kotlinx.io.bytestring.hexToByteString
 import kotlin.jvm.JvmInline
 
 @JvmInline
@@ -14,6 +14,6 @@ public value class PrivateKey private constructor(internal val key: ByteString) 
         }
 
         public operator fun invoke(key: String): PrivateKey =
-            invoke(key.removePrefix("0x").decodeHex())
+            invoke(key.removePrefix("0x").hexToByteString())
     }
 }

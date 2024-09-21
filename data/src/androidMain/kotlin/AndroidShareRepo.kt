@@ -10,7 +10,7 @@ import androidx.activity.result.contract.ActivityResultContract
 import androidx.annotation.CallSuper
 import com.benasher44.uuid.uuid4
 import kosh.domain.repositories.ShareRepo
-import okio.IOException
+import kotlinx.io.IOException
 import kotlin.coroutines.cancellation.CancellationException
 import kotlin.coroutines.resume
 import kotlin.coroutines.resumeWithException

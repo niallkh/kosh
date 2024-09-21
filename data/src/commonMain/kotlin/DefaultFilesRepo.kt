@@ -3,21 +3,23 @@
 package kosh.data
 
 import com.benasher44.uuid.uuid4
+import kosh.domain.models.ByteString
 import kosh.domain.repositories.FilesRepo
 import kosh.domain.repositories.suspendLazy
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.IO
 import kotlinx.coroutines.withContext
+import kotlinx.io.Buffer
+import kotlinx.io.buffered
+import kotlinx.io.files.FileSystem
+import kotlinx.io.files.Path
+import kotlinx.io.readByteString
+import kotlinx.io.write
 import kotlinx.serialization.ExperimentalSerializationApi
 import kotlinx.serialization.KSerializer
 import kotlinx.serialization.json.Json
-import kotlinx.serialization.json.okio.decodeFromBufferedSource
-import kotlinx.serialization.json.okio.encodeToBufferedSink
-import okio.Buffer
-import okio.ByteString
-import okio.FileSystem
-import okio.IOException
-import okio.Path
+import kotlinx.serialization.json.io.decodeFromSource
+import kotlinx.serialization.json.io.encodeToSink
 
 class DefaultFilesRepo(
     private val fileSystem: FileSystem,
@@ -32,35 +34,32 @@ class DefaultFilesRepo(
     override suspend fun write(value: ByteString): Path = withContext(Dispatchers.IO) {
         val key = uuid4().toString()
 
-        val path = folder().resolve(key)
-        val tmpPath = folder().resolve("$key.tmp")
+        val path = Path(folder(), key)
+        val tmpPath = Path(folder(), "$key.tmp")
 
         try {
-            fileSystem.write(tmpPath) {
-                write(value)
-                flush()
+            fileSystem.sink(tmpPath).buffered().use {
+                it.write(value.bytes())
+                it.flush()
             }
 
-            try {
-                fileSystem.atomicMove(tmpPath, path)
-            } catch (e: IOException) {
-                fileSystem.copy(tmpPath, path)
-            }
+            fileSystem.atomicMove(tmpPath, path)
+
         } finally {
             fileSystem.delete(tmpPath)
         }
 
-        path.relativeTo(folder())
+        Path(key)
     }
 
     override suspend fun read(path: Path): ByteString = withContext(Dispatchers.IO) {
-        fileSystem.read(folder().resolve(path)) {
-            readByteString()
+        fileSystem.source(Path(folder(), path.name)).buffered().use {
+            ByteString(it.readByteString())
         }
     }
 
     override suspend fun delete(path: Path) = withContext(Dispatchers.IO) {
-        fileSystem.delete(folder().resolve(path))
+        fileSystem.delete(Path(folder(), path.name))
     }
 
     override suspend fun <T : Any> put(
@@ -68,14 +67,14 @@ class DefaultFilesRepo(
         serializer: KSerializer<T>,
     ): Path = withContext(Dispatchers.Default) {
         val buffer = Buffer()
-        json.encodeToBufferedSink(serializer, value, buffer)
-        write(buffer.readByteString())
+        json.encodeToSink(serializer, value, buffer)
+        write(ByteString(buffer.readByteString()))
     }
 
     override suspend fun <T : Any> get(
         path: Path,
         serializer: KSerializer<T>,
     ): T = withContext(Dispatchers.Default) {
-        json.decodeFromBufferedSource(serializer, Buffer().write(read(path)))
+        json.decodeFromSource(serializer, Buffer().apply { write(read(path)) })
     }
 }

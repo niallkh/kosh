@@ -4,6 +4,8 @@ import kosh.libs.ledger.LedgerManager
 import kosh.libs.ledger.StatusWord
 import kosh.libs.ledger.exchange
 import kosh.libs.ledger.ledgerAPDU
+import kotlinx.io.bytestring.decodeToString
+import kotlinx.io.readByteString
 
 suspend fun LedgerManager.Connection.getDeviceName(): String {
 
@@ -14,6 +16,6 @@ suspend fun LedgerManager.Connection.getDeviceName(): String {
     return exchange(ledgerAPDU) { sw ->
         sw.expectToBe(StatusWord.OK)
 
-        readByteString().utf8()
+        readByteString().decodeToString()
     }
 }

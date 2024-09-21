@@ -11,7 +11,6 @@ import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
 import arrow.core.raise.nullable
 import kosh.domain.entities.TransactionEntity
-import kosh.domain.models.ByteString
 import kosh.presentation.account.rememberAccount
 import kosh.presentation.network.rememberNetwork
 import kosh.presentation.transaction.rememberContractCall
@@ -37,7 +36,7 @@ fun TransactionItem(
             from = account.entity?.address ?: raise(null),
             to = transaction.target,
             value = transaction.value,
-            data = ByteString(data ?: raise(null)),
+            data = data ?: raise(null),
         )
     }
 

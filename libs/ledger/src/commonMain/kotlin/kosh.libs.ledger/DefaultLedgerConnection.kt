@@ -5,8 +5,11 @@ import kosh.libs.ledger.LedgerManager.Listener.ButtonRequest
 import kosh.libs.usb.Usb
 import kotlinx.coroutines.currentCoroutineContext
 import kotlinx.coroutines.ensureActive
-import okio.Buffer
-import okio.ByteString
+import kotlinx.io.Buffer
+import kotlinx.io.bytestring.ByteString
+import kotlinx.io.bytestring.toHexString
+import kotlinx.io.readByteString
+import kotlinx.io.write
 import kotlin.math.ceil
 import kotlin.random.Random
 
@@ -27,7 +30,7 @@ class DefaultLedgerConnection(
             }
         }
         logger.v {
-            "data = ${ledgerAPDU.data.hex()}"
+            "data = ${ledgerAPDU.data.toHexString()}"
         }
         with(ledgerAPDU) {
             write(cla, ins, p1, p2, data, channel)
@@ -47,10 +50,10 @@ class DefaultLedgerConnection(
     }
 
     private suspend fun write(
-        cla: Int,
-        ins: Int,
-        p1: Int,
-        p2: Int,
+        cla: Byte,
+        ins: Byte,
+        p1: Byte,
+        p2: Byte,
         data: ByteString,
         channel: Int,
     ) {
@@ -61,7 +64,7 @@ class DefaultLedgerConnection(
             writeByte(ins)
             writeByte(p1)
             writeByte(p2)
-            writeByte(data.size)
+            writeByte(data.size.toByte())
             write(data)
         }.readByteString()
 
@@ -85,7 +88,7 @@ class DefaultLedgerConnection(
             )
         }
 
-        val bytes = buffer.readByteString(buffer.size - 2)
+        val bytes = buffer.readByteString((buffer.size - 2).toInt())
         val code = buffer.readShort()
         val statusWord = StatusWord.entries.find { it.code.toShort() == code }
 

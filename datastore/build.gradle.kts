@@ -32,7 +32,7 @@ kotlin {
             implementation(libs.datastore)
             implementation(libs.datastore.okio)
             implementation(libs.kotlinx.serialization.json)
-            implementation(libs.kotlinx.serialization.json.okio)
+            implementation(libs.kotlinx.serialization.json.io)
             implementation(libs.kotlinx.serialization.cbor)
         }
     }

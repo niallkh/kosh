@@ -5,7 +5,8 @@ import kosh.domain.models.trezor.Passphrase
 import kosh.domain.repositories.KeyStoreListener
 import kosh.domain.repositories.KeyStoreRepo
 import kosh.libs.keystore.KeyStore
-import okio.ByteString.Companion.encodeUtf8
+import kotlinx.io.bytestring.decodeToString
+import kotlinx.io.bytestring.encodeToByteString
 
 class DefaultKeyStoreRepo(
     private val keyStore: KeyStore,
@@ -21,7 +22,7 @@ class DefaultKeyStoreRepo(
             key = key,
         ) ?: return null
 
-        return Passphrase(value.utf8())
+        return Passphrase(value.decodeToString())
     }
 
     override suspend fun contains(id: WalletEntity.Id): Boolean {
@@ -38,7 +39,7 @@ class DefaultKeyStoreRepo(
         keyStore.set(
             listener = KeyStoreListenerAdapter(listener),
             key = key,
-            value = checkNotNull(passphrase.value).encodeUtf8()
+            value = checkNotNull(passphrase.value).encodeToByteString()
         )
     }
 }

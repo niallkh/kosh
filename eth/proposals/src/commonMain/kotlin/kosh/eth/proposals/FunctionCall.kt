@@ -1,6 +1,7 @@
 package kosh.eth.proposals
 
-import okio.ByteString
+import kotlinx.io.bytestring.ByteString
+
 
 public interface FunctionCall<out T : Any> {
 

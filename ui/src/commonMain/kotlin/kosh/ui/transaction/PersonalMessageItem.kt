@@ -14,6 +14,7 @@ import kosh.ui.component.single.single
 import kosh.ui.component.text.TextDate
 import kosh.ui.component.text.TextLine
 import kosh.ui.resources.icons.PersonalSignature
+import kotlinx.io.bytestring.decodeToString
 
 @Composable
 fun PersonalMessageItem(
@@ -21,7 +22,7 @@ fun PersonalMessageItem(
     onClick: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
-    val message by personalMessage.message.resolve { it.utf8() }
+    val message by personalMessage.message.resolve { it.bytes().decodeToString() }
 
     ListItem(
         modifier = modifier.clickable(onClick = onClick.single()),

@@ -23,7 +23,7 @@ kotlin {
     sourceSets {
         commonMain {
             dependencies {
-                implementation(libs.okio)
+                implementation(libs.kotlinx.io)
                 implementation(libs.bignum)
                 implementation(libs.crypto.sha3)
                 implementation(libs.ktor.client)

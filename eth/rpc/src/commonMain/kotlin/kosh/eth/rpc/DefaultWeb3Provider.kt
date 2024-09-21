@@ -5,10 +5,11 @@ import kosh.eth.abi.Value
 import kosh.eth.rpc.Web3Provider.BlockTag
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
+import kotlinx.io.bytestring.ByteString
+import kotlinx.io.bytestring.toHexString
 import kotlinx.serialization.json.JsonPrimitive
 import kotlinx.serialization.json.decodeFromJsonElement
 import kotlinx.serialization.json.encodeToJsonElement
-import okio.ByteString
 
 internal class DefaultWeb3Provider(
     private val jsonRpcClient: JsonRpcClient,
@@ -93,7 +94,7 @@ internal class DefaultWeb3Provider(
     override suspend fun getBlockByHash(hash: Hash): EthBlock = withContext(Dispatchers.Default) {
         val result = jsonRpcClient.call(
             method = "eth_getBlockByHash",
-            JsonPrimitive("0x${hash.bytes.hex()}"),
+            JsonPrimitive("0x${hash.bytes.toHexString()}"),
             json.encodeToJsonElement(false),
         )
         json.decodeFromJsonElement(result)

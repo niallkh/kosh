@@ -15,7 +15,7 @@ import androidx.compose.ui.unit.dp
 import kosh.domain.models.Address
 import kosh.ui.component.colors.addressColor
 import kosh.ui.component.theme.LocalIsDark
-import okio.ByteString
+import kotlinx.io.bytestring.ByteString
 
 @Composable
 fun AccountIcon(

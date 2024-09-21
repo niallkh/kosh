@@ -22,7 +22,7 @@ kotlin {
 
     sourceSets {
         commonMain.dependencies {
-            implementation(libs.okio)
+            implementation(libs.kotlinx.io)
             implementation(libs.kotlinx.coroutines)
             implementation(libs.kotlinx.collections.immutable)
             implementation(libs.arrow)

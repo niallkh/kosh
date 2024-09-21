@@ -22,6 +22,7 @@ import kosh.domain.core.provider
 import kosh.domain.serializers.Uri
 import kosh.ui.resources.Res
 import okio.Buffer
+import okio.Path.Companion.toPath
 
 class AndroidImageComponent(
     networkComponent: NetworkComponent,
@@ -46,7 +47,6 @@ class AndroidImageComponent(
                 setupDefaultComponents(
                     httpClient = { httpClient },
                     context = context,
-                    fileSystem = fileSystem,
                 )
 
                 add(UriMapper())
@@ -64,8 +64,8 @@ class AndroidImageComponent(
                 painterMemoryCacheConfig {
                     maxSize(50)
                 }
-                diskCacheConfig(fileSystem) {
-                    directory(filesComponent.imagePath())
+                diskCacheConfig {
+                    directory(filesComponent.imagePath().toString().toPath())
                     maxSizeBytes(512L * 1024 * 1024) // 512MB
                 }
             }

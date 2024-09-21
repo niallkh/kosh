@@ -18,16 +18,21 @@ kotlin {
     iosSimulatorArm64()
     linuxX64()
 
-
-
     sourceSets {
+        all {
+            languageSettings {
+                optIn("kotlinx.io.bytestring.unsafe.UnsafeByteStringApi")
+                optIn("kotlin.ExperimentalStdlibApi")
+            }
+        }
+
         commonMain {
             dependencies {
                 implementation(projects.eth.abi)
 
                 implementation(libs.secp256k1)
                 implementation(libs.crypto.srandom)
-                implementation(libs.okio)
+                implementation(libs.kotlinx.io)
                 implementation(libs.bignum)
             }
         }

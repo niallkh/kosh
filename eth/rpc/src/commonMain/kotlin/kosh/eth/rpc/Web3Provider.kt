@@ -3,7 +3,8 @@ package kosh.eth.rpc
 import com.ionspin.kotlin.bignum.integer.BigInteger
 import kosh.eth.abi.Value
 import kosh.eth.rpc.Web3Provider.BlockTag
-import okio.ByteString
+import kotlinx.io.bytestring.ByteString
+import kotlinx.io.bytestring.toHexString
 import kotlin.jvm.JvmInline
 
 public interface Web3Provider : JsonRpcClient {
@@ -68,6 +69,5 @@ internal fun BlockTag.tag() = when (this) {
     BlockTag.Latest -> "latest"
     BlockTag.Pending -> "pending"
     is BlockTag.Number -> "0x${number.toString(16)}"
-    is BlockTag.Hash -> "0x${value.bytes.hex()}"
+    is BlockTag.Hash -> "0x${value.bytes.toHexString()}"
 }
-

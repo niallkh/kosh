@@ -4,8 +4,9 @@ import kosh.libs.ledger.LedgerManager
 import kosh.libs.ledger.StatusWord
 import kosh.libs.ledger.exchange
 import kosh.libs.ledger.ledgerAPDU
-import okio.Buffer
-import okio.ByteString
+import kotlinx.io.Buffer
+import kotlinx.io.bytestring.ByteString
+import kotlinx.io.write
 
 suspend fun LedgerManager.Connection.provideDomain(
     domain: DomainInfo,

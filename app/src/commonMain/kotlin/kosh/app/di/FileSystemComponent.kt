@@ -1,7 +1,7 @@
 package kosh.app.di
 
-import okio.FileSystem
-import okio.Path
+import kotlinx.io.files.FileSystem
+import kotlinx.io.files.Path
 
 interface FileSystemComponent {
     val filesDir: () -> Path

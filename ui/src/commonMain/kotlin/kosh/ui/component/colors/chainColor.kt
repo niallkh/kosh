@@ -4,7 +4,8 @@ import androidx.compose.material3.ColorScheme
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.remember
 import kosh.domain.models.ChainId
-import okio.Buffer
+import kosh.domain.utils.md5
+import kotlinx.io.Buffer
 
 @Composable
 internal fun chainColor(

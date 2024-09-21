@@ -17,6 +17,7 @@ import kosh.libs.ipfs.IpfsPlugin
 import okhttp3.Cache
 import okhttp3.logging.HttpLoggingInterceptor
 import okhttp3.logging.HttpLoggingInterceptor.Level
+import okio.Path.Companion.toPath
 
 class AndroidNetworkComponent(
     filesComponent: FilesComponent,
@@ -38,7 +39,7 @@ class AndroidNetworkComponent(
 
                     cache(
                         Cache(
-                            directory = filesComponent.httpPath().toFile(),
+                            directory = filesComponent.httpPath().toString().toPath().toFile(),
                             maxSize = 512L * 1024L * 1024L
                         )
                     )

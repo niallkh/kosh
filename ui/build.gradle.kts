@@ -39,9 +39,6 @@ kotlin {
             api(compose.components.uiToolingPreview)
 
             api(projects.eth.abi)
-            api(projects.eth.proposals.erc20)
-            api(projects.eth.proposals.erc721)
-            api(projects.eth.proposals.erc1155)
             api(projects.presentation)
             api(projects.ui.resources)
             api(libs.image.loader)

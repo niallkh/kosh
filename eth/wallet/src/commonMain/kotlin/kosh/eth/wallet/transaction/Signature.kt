@@ -1,6 +1,6 @@
 package kosh.eth.wallet.transaction
 
-import okio.ByteString
+import kotlinx.io.bytestring.ByteString
 
 public data class Signature(
     val data: ByteString,

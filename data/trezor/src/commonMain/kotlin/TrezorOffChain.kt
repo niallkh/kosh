@@ -12,13 +12,14 @@ import kosh.domain.models.Address
 import kosh.domain.models.ChainId
 import kosh.domain.models.account.DerivationPath
 import kosh.domain.models.account.slip44
-import kotlinx.serialization.json.Json
-import okio.Buffer
-import okio.BufferedSource
+import kotlinx.io.Buffer
+import kotlinx.io.Source
+import kotlinx.io.bytestring.ByteString
+import kotlinx.io.bytestring.toHexString
+import kotlinx.io.readByteString
 
 class TrezorOffChain(
     client: HttpClient,
-    private val json: Json = Json,
 ) {
     private val client = client.config {
         defaultRequest {
@@ -26,7 +27,7 @@ class TrezorOffChain(
         }
     }
 
-    suspend fun getNetworkDefinition(chainId: ChainId): okio.ByteString? {
+    suspend fun getNetworkDefinition(chainId: ChainId): ByteString? {
         val response = client.get {
             url {
                 appendPathSegments(
@@ -39,11 +40,11 @@ class TrezorOffChain(
         else null
     }
 
-    suspend fun getTokenDefinition(chainId: ChainId, address: Address): okio.ByteString? {
+    suspend fun getTokenDefinition(chainId: ChainId, address: Address): ByteString? {
         val response = client.get {
             url {
                 appendPathSegments(
-                    "chain-id", chainId.toString(), "token-${address.bytes().hex()}.dat"
+                    "chain-id", chainId.toString(), "token-${address.bytes().toHexString()}.dat"
                 )
             }
         }
@@ -53,7 +54,7 @@ class TrezorOffChain(
         else null
     }
 
-    suspend fun getNetworkDefinition(derivationPath: DerivationPath): okio.ByteString? {
+    suspend fun getNetworkDefinition(derivationPath: DerivationPath): ByteString? {
         val response = client.get {
             url {
                 appendPathSegments("slip44", derivationPath.slip44.toString(), "network.dat")
@@ -65,9 +66,9 @@ class TrezorOffChain(
     }
 }
 
-suspend fun ByteReadChannel.readBuffer(): BufferedSource {
+suspend fun ByteReadChannel.readBuffer(): Source {
     val buffer = Buffer()
-    val buff = ByteArray(8192)
+    val buff = ByteArray(4096)
     while (!isClosedForRead) {
         val read = readAvailable(buff)
         if (read == -1) continue

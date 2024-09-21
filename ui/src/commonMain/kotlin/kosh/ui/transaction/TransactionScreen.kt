@@ -21,7 +21,6 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import arrow.core.raise.nullable
 import kosh.domain.entities.TransactionEntity
-import kosh.domain.models.ByteString
 import kosh.domain.models.web3.ContractCall
 import kosh.presentation.account.rememberAccount
 import kosh.presentation.network.rememberNetwork
@@ -49,6 +48,7 @@ import kosh.ui.transaction.calls.FallbackCard
 import kosh.ui.transaction.calls.NativeTransferCard
 import kosh.ui.transaction.calls.TransferCard
 import kotlinx.datetime.Instant
+import kotlinx.io.bytestring.decodeToString
 
 @Composable
 fun TransactionScreen(
@@ -140,7 +140,7 @@ fun PersonalMessageContent(
 
         AccountItem(account.entity)
 
-        val message by personalMessage.message.resolve { it.utf8() }
+        val message by personalMessage.message.resolve { it.bytes().decodeToString() }
 
         PersonalMessageCard(message)
 
@@ -162,9 +162,7 @@ fun PersonalMessageContent(
 fun TypedMessageContent(
     typedMessage: TransactionEntity.Eip712,
 ) {
-    val jsonText by typedMessage.jsonTypeData.resolve {
-        it.utf8()
-    }
+    val jsonText by typedMessage.jsonTypeData.resolve { it.bytes().decodeToString() }
 
     Column(
         modifier = Modifier.verticalScroll(rememberScrollState()),
@@ -218,7 +216,7 @@ fun TransactionContent(
             from = account.entity?.address ?: raise(null),
             to = transaction.target,
             value = transaction.value,
-            data = ByteString(data ?: raise(null)),
+            data = data ?: raise(null),
         )
     }
 

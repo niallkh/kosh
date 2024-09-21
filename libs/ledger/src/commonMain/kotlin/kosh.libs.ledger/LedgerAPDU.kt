@@ -1,14 +1,15 @@
 package kosh.libs.ledger
 
-import okio.Buffer
-import okio.BufferedSink
-import okio.ByteString
+import kotlinx.io.Buffer
+import kotlinx.io.Sink
+import kotlinx.io.bytestring.ByteString
+import kotlinx.io.readByteString
 
 data class LedgerAPDU(
-    val cla: Int,
-    val ins: Int,
-    val p1: Int,
-    val p2: Int,
+    val cla: Byte,
+    val ins: Byte,
+    val p1: Byte,
+    val p2: Byte,
     val data: ByteString,
 )
 
@@ -17,8 +18,14 @@ fun ledgerAPDU(
     ins: Int,
     p1: Int,
     p2: Int,
-    data: BufferedSink.() -> Unit = {},
-) = LedgerAPDU(cla, ins, p1, p2, Buffer().apply { data() }.readByteString())
+    data: Sink.() -> Unit = {},
+) = LedgerAPDU(
+    cla.toByte(),
+    ins.toByte(),
+    p1.toByte(),
+    p2.toByte(),
+    Buffer().apply { data() }.readByteString()
+)
 
 fun Boolean.toInt(): Int = if (this) 0x01 else 0x00
 

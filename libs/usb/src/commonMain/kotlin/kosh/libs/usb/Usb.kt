@@ -2,8 +2,8 @@ package kosh.libs.usb
 
 import arrow.fx.coroutines.Resource
 import kotlinx.coroutines.flow.Flow
-import okio.BufferedSink
-import okio.BufferedSource
+import kotlinx.io.Sink
+import kotlinx.io.Source
 
 interface Usb {
 
@@ -18,11 +18,11 @@ interface Usb {
     interface Connection : AutoCloseable {
 
         suspend fun write(
-            source: BufferedSource,
+            source: Source,
         )
 
         suspend fun read(
-            sink: BufferedSink,
+            sink: Sink,
             length: Int,
         )
     }

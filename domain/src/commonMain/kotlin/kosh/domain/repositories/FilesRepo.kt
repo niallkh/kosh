@@ -1,8 +1,8 @@
 package kosh.domain.repositories
 
+import kosh.domain.models.ByteString
+import kosh.domain.serializers.Path
 import kotlinx.serialization.KSerializer
-import okio.ByteString
-import okio.Path
 
 interface FilesRepo : Repository {
 

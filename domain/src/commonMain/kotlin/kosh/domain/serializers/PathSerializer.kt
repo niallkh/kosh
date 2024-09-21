@@ -1,13 +1,12 @@
 package kosh.domain.serializers
 
+import kotlinx.io.files.Path
 import kotlinx.serialization.KSerializer
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.builtins.serializer
 import kotlinx.serialization.descriptors.SerialDescriptor
 import kotlinx.serialization.encoding.Decoder
 import kotlinx.serialization.encoding.Encoder
-import okio.Path
-import okio.Path.Companion.toPath
 
 typealias Path = @Serializable(PathSerializer::class) Path
 
@@ -16,7 +15,7 @@ object PathSerializer : KSerializer<Path> {
     override val descriptor: SerialDescriptor = delegate.descriptor
 
     override fun deserialize(decoder: Decoder): Path {
-        return delegate.deserialize(decoder).toPath()
+        return Path(delegate.deserialize(decoder))
     }
 
     override fun serialize(encoder: Encoder, value: Path) {

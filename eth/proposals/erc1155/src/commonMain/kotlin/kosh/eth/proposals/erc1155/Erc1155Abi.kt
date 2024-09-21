@@ -5,10 +5,8 @@ import com.ionspin.kotlin.bignum.integer.BigInteger
 import kosh.eth.abi.Abi
 import kosh.eth.abi.Value
 import kosh.eth.abi.abi
-import kosh.eth.abi.asBigNumber
-import kosh.eth.abi.asString
 import kosh.eth.abi.coder.decodeOutputs
-import kosh.eth.abi.coder.encodeInputs
+import kosh.eth.abi.coder.encode
 import kosh.eth.abi.delegate.decodeInputs
 import kosh.eth.abi.dsl.abiFunction
 import kosh.eth.abi.dsl.abiViewFunction
@@ -52,14 +50,14 @@ public object Erc1155Abi {
         address: Value.Address,
         tokenId: BigInteger,
     ): FunctionCall<BigInteger> = DefaultFunctionCall(
-        encoder = { balanceOf.encodeInputs(address, tokenId.abi) },
+        encoder = { balanceOf.encode(address, tokenId.abi) },
         decoder = { balanceOf.decodeOutputs(it, "balance").asBigNumber.value }
     )
 
     public fun uri(
         tokenId: BigInteger,
     ): FunctionCall<String> = DefaultFunctionCall(
-        encoder = { uri.encodeInputs(tokenId.abi) },
+        encoder = { uri.encode(tokenId.abi) },
         decoder = { uri.decodeOutputs(it, "uri").asString.value }
     )
 

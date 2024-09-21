@@ -8,9 +8,9 @@ package kosh.eth.rpc
 
 import com.ionspin.kotlin.bignum.integer.BigInteger
 import kosh.eth.abi.Value
+import kotlinx.io.bytestring.ByteString
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.UseSerializers
-import okio.ByteString
 import kotlin.jvm.JvmInline
 
 @JvmInline

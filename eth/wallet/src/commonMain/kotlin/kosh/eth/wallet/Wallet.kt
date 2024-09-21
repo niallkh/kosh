@@ -2,9 +2,11 @@ package kosh.eth.wallet
 
 import com.ionspin.kotlin.bignum.integer.BigInteger
 import com.ionspin.kotlin.bignum.integer.toBigInteger
-import kosh.eth.abi.Eip712
 import kosh.eth.abi.Value
-import kosh.eth.abi.coder.eip712StructHash
+import kosh.eth.abi.eip712.Eip712
+import kosh.eth.abi.eip712.Eip712Type
+import kosh.eth.abi.eip712.structHash
+import kosh.eth.abi.eip712.toValue
 import kosh.eth.abi.keccak256
 import kosh.eth.abi.rlp.toRlp
 import kosh.eth.wallet.transaction.Signature
@@ -13,9 +15,12 @@ import kosh.eth.wallet.transaction.Transaction
 import kosh.eth.wallet.transaction.concat
 import kosh.eth.wallet.transaction.encode
 import kosh.eth.wallet.transaction.vbg
-import okio.Buffer
-import okio.ByteString
-import okio.ByteString.Companion.decodeHex
+import kotlinx.io.Buffer
+import kotlinx.io.bytestring.ByteString
+import kotlinx.io.bytestring.hexToByteString
+import kotlinx.io.readByteString
+import kotlinx.io.write
+import kotlinx.io.writeString
 
 public object Wallet {
 
@@ -55,21 +60,20 @@ public object Wallet {
     public fun personalSign(
         privateKey: PrivateKey,
         message: ByteString,
-    ): Signature = personalHash(message)
-        .let { hash ->
-            Signature(
-                data = sign(privateKey, hash).concat(),
-                messageHash = hash,
-            )
-        }
-
-    public fun personalHash(message: ByteString): ByteString = Buffer().apply {
-        writeUtf8("\u0019Ethereum Signed Message:\n")
-        writeUtf8(message.size.toString())
-        write(message)
+    ): Signature = personalHash(message).let { hash ->
+        Signature(
+            data = sign(privateKey, hash).concat(),
+            messageHash = hash,
+        )
     }
-        .readByteString()
-        .keccak256()
+
+    public fun personalHash(message: ByteString): ByteString = Buffer().run {
+        writeString("\u0019Ethereum Signed Message:\n")
+        writeString(message.size.toString())
+        write(message)
+
+        readByteString()
+    }.keccak256()
 
     public fun signTypeData(
         privateKey: PrivateKey,
@@ -81,12 +85,12 @@ public object Wallet {
         )
     }
 
-    public fun typeDataHash(eip712: Eip712): ByteString = Buffer().apply {
-        write("1901".decodeHex())
-        write(eip712.domain.type.eip712StructHash(eip712.domain.value))
-        write(eip712.message.type.eip712StructHash(eip712.message.value))
-    }.readByteString()
-        .keccak256()
+    public fun typeDataHash(eip712: Eip712): ByteString = Buffer().run {
+        write("1901".hexToByteString())
+        write(eip712.types.structHash(eip712.primaryType, eip712.message))
+        write(eip712.types.structHash(Eip712Type.Tuple.Domain, eip712.domain.toValue()))
+        readByteString()
+    }.keccak256()
 
     public fun signTransaction(
         privateKey: PrivateKey,

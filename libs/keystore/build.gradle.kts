@@ -17,10 +17,17 @@ kotlin {
     jvm()
 
     sourceSets {
+        all {
+            languageSettings {
+                optIn("kotlinx.io.bytestring.unsafe.UnsafeByteStringApi")
+                optIn("kotlin.ExperimentalStdlibApi")
+            }
+        }
+
         commonMain {
             dependencies {
                 implementation(libs.datastore.prefs)
-                implementation(libs.okio)
+                implementation(libs.kotlinx.io)
                 implementation(libs.kotlinx.coroutines)
                 implementation(libs.arrow)
                 implementation(libs.arrow.fx)

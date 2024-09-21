@@ -26,7 +26,7 @@ kotlin {
                 api(projects.eth.rpc)
                 api(projects.eth.proposals)
 
-                implementation(libs.okio)
+                implementation(libs.kotlinx.io)
                 implementation(libs.bignum)
                 implementation(libs.ktor.client)
                 implementation(libs.kotlinx.serialization.json)

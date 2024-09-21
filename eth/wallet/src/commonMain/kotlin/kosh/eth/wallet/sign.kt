@@ -1,8 +1,9 @@
 package kosh.eth.wallet
 
 import kosh.eth.wallet.transaction.SignatureData
-import okio.Buffer
-import okio.ByteString
+import kotlinx.io.Buffer
+import kotlinx.io.bytestring.ByteString
+import kotlinx.io.readByteString
 
 internal fun sign(
     privkey: PrivateKey,
@@ -16,29 +17,29 @@ internal fun sign(
     val recId = determineRecId(
         signature = signature,
         messageHash = messageHash,
-        pubkey = Secp256k1.publicKey(privkey.key)
+        publicKey = Secp256k1.publicKey(privkey.key)
     ) ?: error("Couldn't sign, rec id not found")
 
     return SignatureData(
-        r = signature.substring(beginIndex = 0, endIndex = 32),
-        s = signature.substring(beginIndex = 32, endIndex = 64),
-        v = Buffer().apply { writeByte(recId + 27) }.readByteString()
+        r = signature.substring(0, 32),
+        s = signature.substring(32, 64),
+        v = Buffer().apply { writeByte((recId + 27u).toByte()) }.readByteString()
     )
 }
 
 internal fun determineRecId(
     signature: ByteString,
     messageHash: ByteString,
-    pubkey: ByteString,
-): Int? {
-    for (i in 0..3) {
-        val recoveredPubkey = Secp256k1.recover(
+    publicKey: ByteString,
+): UInt? {
+    for (i in 0u..3u) {
+        val recoveredPublicKey = Secp256k1.recover(
             signature = signature,
             messageHash = messageHash,
-            recId = i
+            recId = i.toInt()
         )
 
-        if (pubkey == recoveredPubkey) {
+        if (publicKey == recoveredPublicKey) {
             return i
         }
     }

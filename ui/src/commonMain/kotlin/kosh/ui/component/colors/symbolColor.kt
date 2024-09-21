@@ -3,7 +3,8 @@ package kosh.ui.component.colors
 import androidx.compose.material3.ColorScheme
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.remember
-import okio.ByteString.Companion.encodeUtf8
+import kosh.domain.utils.md5
+import kotlinx.io.bytestring.encodeToByteString
 
 @Composable
 internal fun symbolColor(
@@ -11,7 +12,7 @@ internal fun symbolColor(
     isDark: Boolean,
 ): ColorScheme = remember(symbol, isDark) {
     dynamicColor(
-        bytes = symbol.encodeUtf8().md5(),
+        bytes = symbol.encodeToByteString().md5(),
         isDark = isDark,
     )
 }

@@ -18,15 +18,22 @@ kotlin {
     jvm()
 
     sourceSets {
+        all {
+            languageSettings {
+                optIn("kotlinx.io.bytestring.unsafe.UnsafeByteStringApi")
+                optIn("kotlin.ExperimentalStdlibApi")
+            }
+        }
+
         commonMain {
             dependencies {
                 api(projects.libs.usb)
                 api(projects.eth.abi)
                 api(projects.eth.wallet)
-                api(projects.eth.proposals.eip55)
+                api(projects.eth.proposals)
 
                 implementation(libs.bignum)
-                implementation(libs.okio)
+                implementation(libs.kotlinx.io)
                 implementation(libs.kotlinx.coroutines)
                 implementation(libs.arrow)
                 implementation(libs.arrow.fx)

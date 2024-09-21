@@ -1,8 +1,10 @@
+@file:OptIn(ExperimentalStdlibApi::class)
+
 import kosh.eth.abi.Value
 import kosh.eth.abi.abi
-import kosh.eth.abi.coder.encodeInputs
-import okio.ByteString.Companion.decodeHex
-import okio.ByteString.Companion.encodeUtf8
+import kosh.eth.abi.coder.encode
+import kotlinx.io.bytestring.encodeToByteString
+import kotlinx.io.bytestring.hexToByteString
 import kotlin.test.Test
 import kotlin.test.assertEquals
 
@@ -13,12 +15,12 @@ class AbiEncoderTest {
         assertEquals(
             expected = ("fce353f6" +
                     "6162630000000000000000000000000000000000000000000000000000000000" +
-                    "6465660000000000000000000000000000000000000000000000000000000000").decodeHex(),
+                    "6465660000000000000000000000000000000000000000000000000000000000").hexToByteString(),
 
-            actual = Abis.bar.encodeInputs(
-                Value.array(
-                    "abc".encodeUtf8().abi,
-                    "def".encodeUtf8().abi,
+            actual = Abis.bar.encode(
+                "array" to Value.array(
+                    "abc".encodeToByteString().abi,
+                    "def".encodeToByteString().abi,
                 )
             ),
         )
@@ -32,13 +34,13 @@ class AbiEncoderTest {
                     "6162630000000000000000000000000000000000000000000000000000000000" +
                     "6465660000000000000000000000000000000000000000000000000000000000" +
                     "000000000000000000000000000000000000000000000000000000000000000d" +
-                    "48656c6c6f2c20776f726c642100000000000000000000000000000000000000").decodeHex(),
+                    "48656c6c6f2c20776f726c642100000000000000000000000000000000000000").hexToByteString(),
 
-            actual = Abis.bar2.encodeInputs(
-                "Hello, world!".encodeUtf8().abi,
-                Value.array(
-                    "abc".encodeUtf8().abi,
-                    "def".encodeUtf8().abi,
+            actual = Abis.bar2.encode(
+                "bytes" to "Hello, world!".encodeToByteString().abi,
+                "array" to Value.array(
+                    "abc".encodeToByteString().abi,
+                    "def".encodeToByteString().abi,
                 ),
             )
         )
@@ -49,11 +51,11 @@ class AbiEncoderTest {
         assertEquals(
             expected = ("cdcd77c0" +
                     "0000000000000000000000000000000000000000000000000000000000000045" +
-                    "0000000000000000000000000000000000000000000000000000000000000001").decodeHex(),
+                    "0000000000000000000000000000000000000000000000000000000000000001").hexToByteString(),
 
-            actual = Abis.baz.encodeInputs(
-                69u.abi,
-                Value.Bool(true)
+            actual = Abis.baz.encode(
+                "number" to 69u.abi,
+                "bool" to Value.Bool(true)
             ),
         )
     }
@@ -70,12 +72,12 @@ class AbiEncoderTest {
                     "0000000000000000000000000000000000000000000000000000000000000003" +
                     "0000000000000000000000000000000000000000000000000000000000000001" +
                     "0000000000000000000000000000000000000000000000000000000000000002" +
-                    "0000000000000000000000000000000000000000000000000000000000000003").decodeHex(),
+                    "0000000000000000000000000000000000000000000000000000000000000003").hexToByteString(),
 
-            actual = Abis.sam.encodeInputs(
-                "dave".encodeUtf8().abi,
-                Value.Bool(true),
-                Value.array(
+            actual = Abis.sam.encode(
+                "bytes" to "dave".encodeToByteString().abi,
+                "bool" to Value.Bool(true),
+                "array" to Value.array(
                     1u.abi,
                     2u.abi,
                     3u.abi,
@@ -96,16 +98,16 @@ class AbiEncoderTest {
                     "0000000000000000000000000000000000000000000000000000000000000456" +
                     "0000000000000000000000000000000000000000000000000000000000000789" +
                     "000000000000000000000000000000000000000000000000000000000000000d" +
-                    "48656c6c6f2c20776f726c642100000000000000000000000000000000000000").decodeHex(),
+                    "48656c6c6f2c20776f726c642100000000000000000000000000000000000000").hexToByteString(),
 
-            actual = Abis.f.encodeInputs(
-                0x123uL.abi,
-                Value.array(
+            actual = Abis.f.encode(
+                "number" to 0x123uL.abi,
+                "array" to Value.array(
                     0x456uL.abi,
                     0x789uL.abi,
                 ),
-                "1234567890".encodeUtf8().abi,
-                "Hello, world!".encodeUtf8().abi,
+                "bytes10" to "1234567890".encodeToByteString().abi,
+                "bytes" to "Hello, world!".encodeToByteString().abi,
             ),
         )
     }
@@ -133,10 +135,10 @@ class AbiEncoderTest {
                     "0000000000000000000000000000000000000000000000000000000000000003" +
                     "74776f0000000000000000000000000000000000000000000000000000000000" +
                     "0000000000000000000000000000000000000000000000000000000000000005" +
-                    "7468726565000000000000000000000000000000000000000000000000000000").decodeHex(),
+                    "7468726565000000000000000000000000000000000000000000000000000000").hexToByteString(),
 
-            actual = Abis.g.encodeInputs(
-                Value.array(
+            actual = Abis.g.encode(
+                "array1" to Value.array(
                     Value.array(
                         1uL.abi,
                         2uL.abi,
@@ -145,7 +147,7 @@ class AbiEncoderTest {
                         3uL.abi,
                     ),
                 ),
-                Value.array(
+                "array2" to Value.array(
                     "one".abi,
                     "two".abi,
                     "three".abi,

@@ -7,7 +7,7 @@ import com.ionspin.kotlin.bignum.integer.Sign
 import com.materialkolor.dynamicColorScheme
 import com.materialkolor.hct.Hct
 import com.materialkolor.ktx.toColor
-import okio.ByteString
+import kotlinx.io.bytestring.ByteString
 
 val dynamicColorMemo = ::calculateDynamicColor.memoize()
 

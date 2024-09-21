@@ -3,11 +3,8 @@ package kosh.eth.proposals.erc20
 import com.ionspin.kotlin.bignum.integer.BigInteger
 import kosh.eth.abi.Abi
 import kosh.eth.abi.Value
-import kosh.eth.abi.asBigNumber
-import kosh.eth.abi.asBool
-import kosh.eth.abi.asString
 import kosh.eth.abi.coder.decodeOutputs
-import kosh.eth.abi.coder.encodeInputs
+import kosh.eth.abi.coder.encode
 import kosh.eth.abi.coder.encodeTopics
 import kosh.eth.abi.delegate.decode
 import kosh.eth.abi.delegate.decodeInputs
@@ -81,35 +78,35 @@ public object Erc20Abi {
     }
 
     public fun name(): FunctionCall<String> = DefaultFunctionCall(
-        encoder = { name.encodeInputs() },
+        encoder = { name.encode() },
         decoder = {
             name.decodeOutputs(it, "name").asString.value
         }
     )
 
     public fun symbol(): FunctionCall<String> = DefaultFunctionCall(
-        encoder = { symbol.encodeInputs() },
+        encoder = { symbol.encode() },
         decoder = { symbol.decodeOutputs(it, "symbol").asString.value }
     )
 
     public fun decimals(): FunctionCall<UInt> = DefaultFunctionCall(
-        encoder = { decimals.encodeInputs() },
+        encoder = { decimals.encode() },
         decoder = { decimals.decodeOutputs(it, "decimals").asBigNumber.value.uintValue() }
     )
 
     public fun totalSupply(): FunctionCall<BigInteger> = DefaultFunctionCall(
-        encoder = { totalSupply.encodeInputs() },
+        encoder = { totalSupply.encode() },
         decoder = { totalSupply.decodeOutputs(it, "totalSupply").asBigNumber.value }
     )
 
     public fun balanceOf(address: Value.Address): FunctionCall<BigInteger> = DefaultFunctionCall(
-        encoder = { balanceOf.encodeInputs(address) },
+        encoder = { balanceOf.encode(address) },
         decoder = { balanceOf.decodeOutputs(it, "balance").asBigNumber.value }
     )
 
     public fun transfer(to: Value.Address, value: Value.BigNumber): FunctionCall<Boolean> =
         DefaultFunctionCall(
-            encoder = { transfer.encodeInputs(to, value) },
+            encoder = { transfer.encode(to, value) },
             decoder = {
                 val success by transfer.decode<Value.Bool>(it)
                 success.value
@@ -127,7 +124,7 @@ public object Erc20Abi {
         to: Value.Address,
         value: Value.BigNumber,
     ): FunctionCall<Boolean> = DefaultFunctionCall(
-        encoder = { transferFrom.encodeInputs(from, to, value) },
+        encoder = { transferFrom.encode(from, to, value) },
         decoder = { transferFrom.decodeOutputs(it, "success").asBool.value }
     )
 
@@ -143,13 +140,13 @@ public object Erc20Abi {
         spender: Value.Address,
     ): FunctionCall<Value.BigNumber> =
         DefaultFunctionCall(
-            encoder = { allowance.encodeInputs(owner, spender) },
+            encoder = { allowance.encode(owner, spender) },
             decoder = { allowance.decodeOutputs(it, "remaining").asBigNumber }
         )
 
     public fun approve(spender: Value.Address, value: Value.BigNumber): FunctionCall<Boolean> =
         DefaultFunctionCall(
-            encoder = { approve.encodeInputs(spender, value) },
+            encoder = { approve.encode(spender, value) },
             decoder = { approve.decodeOutputs(it, "success").asBool.value }
         )
 

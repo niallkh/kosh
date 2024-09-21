@@ -14,6 +14,7 @@ import kosh.libs.trezor.TrezorManager
 import kosh.libs.trezor.cmds.addCredential
 import kosh.libs.trezor.cmds.deleteCredential
 import kosh.libs.trezor.cmds.listCredentials
+import kosh.libs.trezor.cmds.toIo
 import kotlinx.collections.immutable.ImmutableList
 import kotlinx.collections.immutable.ImmutableSet
 import kotlinx.collections.immutable.toImmutableList
@@ -22,6 +23,8 @@ import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.flowOn
 import kotlinx.coroutines.withContext
+import kotlinx.io.bytestring.hexToByteString
+import kotlinx.io.bytestring.toHexString
 import kotlinx.serialization.KSerializer
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.descriptors.PrimitiveKind
@@ -31,7 +34,6 @@ import kotlinx.serialization.encodeToString
 import kotlinx.serialization.encoding.Decoder
 import kotlinx.serialization.encoding.Encoder
 import kotlinx.serialization.json.Json
-import okio.ByteString.Companion.decodeBase64
 
 class DefaultTrezorPasskeysRepo(
     private val trezorManager: TrezorManager,
@@ -125,10 +127,10 @@ class DefaultTrezorPasskeysRepo(
         credential: WebAuthnCredentials.WebAuthnCredential,
     ) = TrezorPasskey(
         index = TrezorPasskey.Index(credential.index!!),
-        id = TrezorPasskey.Id(ByteString(credential.id!!)),
+        id = TrezorPasskey.Id(ByteString(credential.id!!.toIo())),
         rpId = credential.rp_id,
         rpName = credential.rp_name,
-        userId = credential.user_id?.let { ByteString(it) },
+        userId = credential.user_id?.let { ByteString(it.toIo()) },
         userName = credential.user_name,
         userDisplayName = credential.user_display_name,
         creationTime = credential.creation_time,
@@ -152,22 +154,22 @@ class DefaultTrezorPasskeysRepo(
     @Serializable
     private data class TrezorPasskeysDto(
         @Serializable(ByteStringBase64Serializer::class)
-        val id: okio.ByteString,
+        val id: kotlinx.io.bytestring.ByteString,
         val rpName: String? = null,
         val userName: String? = null,
         val userDisplayName: String? = null,
     )
 }
 
-private object ByteStringBase64Serializer : KSerializer<okio.ByteString> {
+private object ByteStringBase64Serializer : KSerializer<kotlinx.io.bytestring.ByteString> {
     override val descriptor: SerialDescriptor =
         PrimitiveSerialDescriptor("okio.ByteString", PrimitiveKind.STRING)
 
-    override fun serialize(encoder: Encoder, value: okio.ByteString) {
-        encoder.encodeString(value.base64())
+    override fun serialize(encoder: Encoder, value: kotlinx.io.bytestring.ByteString) {
+        encoder.encodeString(value.toHexString())
     }
 
-    override fun deserialize(decoder: Decoder): okio.ByteString {
-        return decoder.decodeString().decodeBase64() ?: error("Expected base 64 string")
+    override fun deserialize(decoder: Decoder): kotlinx.io.bytestring.ByteString {
+        return decoder.decodeString().hexToByteString()
     }
 }

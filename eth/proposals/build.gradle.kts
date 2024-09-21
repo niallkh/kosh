@@ -20,12 +20,19 @@ kotlin {
     linuxX64()
 
     sourceSets {
+        all {
+            languageSettings {
+                optIn("kotlinx.io.bytestring.unsafe.UnsafeByteStringApi")
+                optIn("kotlin.ExperimentalStdlibApi")
+            }
+        }
+
         commonMain {
             dependencies {
                 api(projects.eth.abi)
                 api(projects.eth.rpc)
 
-                api(libs.okio)
+                api(libs.kotlinx.io)
                 api(libs.arrow)
                 api(libs.bignum)
                 implementation(libs.ktor.client)

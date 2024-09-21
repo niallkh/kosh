@@ -11,10 +11,13 @@ import io.ktor.http.isSuccess
 import io.ktor.utils.io.ByteReadChannel
 import io.ktor.utils.io.readAvailable
 import kosh.eth.abi.Abi
-import kosh.eth.abi.Eip712V2
 import kosh.eth.abi.Value
-import kosh.eth.abi.asAddress
+import kosh.eth.abi.abiAddress
+import kosh.eth.abi.at
+import kosh.eth.abi.base.decodeBase64
 import kosh.eth.abi.coder.decodeInputs
+import kosh.eth.abi.eip712.Eip712
+import kosh.eth.abi.functionSelector
 import kosh.eth.abi.json.JsonEip712
 import kosh.eth.abi.selector
 import kosh.eth.proposals.erc1155.Erc1155Abi
@@ -30,24 +33,26 @@ import kosh.libs.ledger.cmds.PluginInfo
 import kosh.libs.ledger.cmds.SignTransactionParameters
 import kosh.libs.ledger.cmds.SignTypedMessageParameters
 import kosh.libs.ledger.cmds.TokenInfo
-import kosh.libs.ledger.cmds.valueAt
 import kotlinx.coroutines.async
 import kotlinx.coroutines.coroutineScope
+import kotlinx.io.Buffer
+import kotlinx.io.Source
+import kotlinx.io.bytestring.ByteString
+import kotlinx.io.bytestring.encodeToByteString
+import kotlinx.io.bytestring.hexToByteString
+import kotlinx.io.bytestring.toHexString
+import kotlinx.io.bytestring.unsafe.UnsafeByteStringOperations
+import kotlinx.io.readByteString
+import kotlinx.io.readString
+import kotlinx.io.write
 import kotlinx.serialization.ExperimentalSerializationApi
 import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.Json
 import kotlinx.serialization.json.JsonElement
+import kotlinx.serialization.json.io.decodeFromSource
 import kotlinx.serialization.json.jsonArray
 import kotlinx.serialization.json.jsonObject
 import kotlinx.serialization.json.jsonPrimitive
-import kotlinx.serialization.json.okio.decodeFromBufferedSource
-import okio.Buffer
-import okio.BufferedSource
-import okio.ByteString
-import okio.ByteString.Companion.decodeBase64
-import okio.ByteString.Companion.decodeHex
-import okio.ByteString.Companion.encodeUtf8
-import okio.ByteString.Companion.toByteString
 import org.kotlincrypto.hash.sha2.SHA224
 
 private const val CRYPTO_ASSETS_API = "https://cdn.live.ledger.com/cryptoassets"
@@ -61,7 +66,7 @@ class LedgerOffChain(
 
     suspend fun getEip712Parameters(
         typedMessage: String,
-        eip712: Eip712V2,
+        eip712: Eip712,
     ): SignTypedMessageParameters? {
         val chainId = eip712.domain.chainId?.value?.ulongValue() ?: return null
 
@@ -71,7 +76,7 @@ class LedgerOffChain(
         else
             return null
 
-        val map = json.decodeFromBufferedSource<Map<String, Eip712Filters>>(bufferedSource)
+        val map = json.decodeFromSource<Map<String, Eip712Filters>>(bufferedSource)
 
         val filters = map[filterKey(typedMessage)]
 
@@ -82,9 +87,7 @@ class LedgerOffChain(
                 if (it.coinRef!! == 255) {
                     it.coinRef!! to eip712.domain.verifyingContract!!
                 } else {
-                    it.coinRef!! to eip712.types.getValue(eip712.primaryType)
-                        .valueAt(eip712.message, it.path.split("."))
-                        .asAddress
+                    it.coinRef!! to eip712.message.at(it.path.split(".")).abiAddress
                 }
             }
             ?.sortedBy { it.first }
@@ -113,7 +116,7 @@ class LedgerOffChain(
         input: ByteString,
     ): SignTransactionParameters? = coroutineScope {
         if (input.size < 4) return@coroutineScope null
-        val selector = input.selector()!!
+        val selector = input.functionSelector()!!
 
         val addresses = listOfNotNull(
             address.takeIf {
@@ -129,8 +132,9 @@ class LedgerOffChain(
 
         if (plugin?.erc20OfInterest?.isNotEmpty() == true) {
             plugin.erc20OfInterest.forEach { path ->
-                val pathArray = path.split(".").toTypedArray()
-                addresses.add(plugin.abi.decodeInputs(input, *pathArray) as Value.Address)
+                val value = plugin.abi.decodeInputs(input)
+                    .at(*path.split(".").toTypedArray())
+                addresses.add(value.abiAddress)
             }
         }
 
@@ -170,11 +174,11 @@ class LedgerOffChain(
         val response =
             client.get("$PLUGINS_API/ethereum.json")
         val jsonElement = if (response.status.isSuccess()) {
-            json.decodeFromBufferedSource<JsonElement>(response.bodyAsChannel().readBuffer())
+            json.decodeFromSource<JsonElement>(response.bodyAsChannel().readBuffer())
         } else null
 
-        val plugin = jsonElement?.jsonObject?.get("0x${address.value.hex()}")
-            ?.jsonObject?.get("0x${selector.hex()}")
+        val plugin = jsonElement?.jsonObject?.get("0x${address.value.toHexString()}")
+            ?.jsonObject?.get("0x${selector.toHexString()}")
             ?.jsonObject
             ?: return null
 
@@ -182,7 +186,7 @@ class LedgerOffChain(
             it.jsonPrimitive.content
         } ?: listOf()
 
-        val abi = jsonElement.jsonObject.get("0x${address.value.hex()}")
+        val abi = jsonElement.jsonObject.get("0x${address.value.toHexString()}")
             ?.jsonObject?.get("abi")!!
             .let { Abi.from(it) }
 
@@ -190,8 +194,8 @@ class LedgerOffChain(
 
         return ExternalPlugin(
             name = plugin.get("plugin")!!.jsonPrimitive.content,
-            data = plugin.get("serialized_data")!!.jsonPrimitive.content.decodeHex(),
-            signature = plugin.get("signature")!!.jsonPrimitive.content.decodeHex(),
+            data = plugin.get("serialized_data")!!.jsonPrimitive.content.hexToByteString(),
+            signature = plugin.get("signature")!!.jsonPrimitive.content.hexToByteString(),
             abi = item,
             erc20OfInterest = erc20OfInterest,
         )
@@ -218,17 +222,17 @@ class LedgerOffChain(
             }
         }
         val buffer = if (response.status.isSuccess()) {
-            json.decodeFromBufferedSource<String>(response.bodyAsChannel().readBuffer())
-                .decodeBase64()!!.let { Buffer().apply { write(it) } }
+            json.decodeFromSource<String>(response.bodyAsChannel().readBuffer())
+                .decodeBase64().let { Buffer().apply { write(it) } }
         } else
             return null
 
         return buildList {
             while (!buffer.exhausted()) {
-                val data = buffer.readByteString(buffer.readInt().toUInt().toLong())
+                val data = buffer.readByteString(buffer.readInt())
 
                 Buffer().apply { write(data) }.run {
-                    val ticker = readUtf8(readByte().toUByte().toLong())
+                    val ticker = readString(readByte().toUByte().toLong())
                     val address = Value.Address(readByteString(20))
                     val decimals = readInt().toUInt()
                     val chainId1 = readInt().toUInt()
@@ -260,21 +264,23 @@ class LedgerOffChain(
                     "names",
                     "ens",
                     "reverse",
-                    "0x${address.value.hex()}",
+                    "0x${address.value.toHexString()}",
                 )
 
-                parameter("challenge", ByteArray(4).fillSecureRandom().toByteString().hex())
+                val challenge = UnsafeByteStringOperations
+                    .wrapUnsafe(ByteArray(4).fillSecureRandom())
+                parameter("challenge", challenge.toHexString())
             }
         }
 
         val jsonElement = if (response.status.isSuccess())
-            json.decodeFromBufferedSource<JsonElement>(response.bodyAsChannel().readBuffer())
+            json.decodeFromSource<JsonElement>(response.bodyAsChannel().readBuffer())
         else
             return null
 
         return jsonElement.jsonObject["payload"]?.jsonPrimitive?.content
             ?.removePrefix("0x")
-            ?.decodeHex()
+            ?.hexToByteString()
             ?.let { DomainInfo(it) }
     }
 
@@ -287,18 +293,18 @@ class LedgerOffChain(
                 appendPathSegments(
                     chainId.toString(),
                     "contracts",
-                    "0x${contractAddress.value.hex()}"
+                    "0x${contractAddress.value.toHexString()}"
                 )
             }
         }
         val jsonElement = if (response.status.isSuccess())
-            json.decodeFromBufferedSource<JsonElement>(response.bodyAsChannel().readBuffer())
+            json.decodeFromSource<JsonElement>(response.bodyAsChannel().readBuffer())
         else
             return null
 
         return jsonElement.jsonObject["payload"]?.jsonPrimitive?.content
             ?.removePrefix("0x")
-            ?.decodeHex()
+            ?.hexToByteString()
             ?.let { NftInfo(it) }
     }
 
@@ -315,7 +321,6 @@ class LedgerOffChain(
             Erc721Abi.More.safeTransferFrom.selector,
             Erc1155Abi.safeTransferFrom.selector,
             Erc1155Abi.safeBatchTransferFrom.selector,
-            Erc1155Abi.setApprovalForAll.selector,
             -> Unit
 
             else -> return null
@@ -326,37 +331,42 @@ class LedgerOffChain(
                 appendPathSegments(
                     chainId.toString(),
                     "contracts",
-                    "0x${contractAddress.value.hex()}",
+                    "0x${contractAddress.value.toHexString()}",
                     "plugin-selector",
-                    "0x${selector.hex()}"
+                    "0x${selector.toHexString()}"
                 )
             }
         }
         val jsonElement = if (response.status.isSuccess())
-            json.decodeFromBufferedSource<JsonElement>(response.bodyAsChannel().readBuffer())
+            json.decodeFromSource<JsonElement>(response.bodyAsChannel().readBuffer())
         else
             return null
 
         return jsonElement.jsonObject["payload"]?.jsonPrimitive?.content
             ?.removePrefix("0x")
-            ?.decodeHex()
+            ?.hexToByteString()
     }
 
     private fun filterKey(typedMessage: String): String {
         val jsonEip712 = JsonEip712.from(typedMessage)
         val types = jsonEip712.types.entries.sortedBy { it.key }.associate { it.toPair() }
-        val schemaHash = json.encodeToString(types).encodeUtf8().sha224()
-        return "${jsonEip712.domain.chainId}:${jsonEip712.domain.verifyingContract}:${schemaHash.hex()}"
+        val schemaHash = json.encodeToString(types).encodeToByteString().sha224()
+        return "${jsonEip712.domain.chainId}:${jsonEip712.domain.verifyingContract}:${schemaHash.toHexString()}"
     }
 
-    private fun ByteString.sha224(): ByteString =
-        SHA224().digest(toByteArray()).toByteString()
+    private fun ByteString.sha224(): ByteString {
+        lateinit var result: ByteString
+        UnsafeByteStringOperations.withByteArrayUnsafe(this) {
+            result = UnsafeByteStringOperations.wrapUnsafe(SHA224().digest(it))
+        }
+        return result
+    }
 }
 
 
-internal suspend fun ByteReadChannel.readBuffer(): BufferedSource {
+internal suspend fun ByteReadChannel.readBuffer(): Source {
     val buffer = Buffer()
-    val buff = ByteArray(8192)
+    val buff = ByteArray(4096)
     while (!isClosedForRead) {
         val read = readAvailable(buff)
         if (read == -1) continue

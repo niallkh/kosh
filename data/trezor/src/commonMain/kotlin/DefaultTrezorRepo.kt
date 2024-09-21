@@ -18,7 +18,7 @@ import kosh.domain.models.web3.TransactionData
 import kosh.domain.models.web3.gasPrice
 import kosh.domain.repositories.TrezorListener
 import kosh.domain.repositories.TrezorRepo
-import kosh.eth.abi.Eip712
+import kosh.eth.abi.eip712.Eip712
 import kosh.eth.proposals.eip55.eip55
 import kosh.eth.wallet.transaction.Transaction.Type1559
 import kosh.libs.trezor.TrezorManager
@@ -36,6 +36,7 @@ import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.flowOn
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.withContext
+import kotlinx.io.bytestring.encodeToByteString
 import okio.ByteString.Companion.encodeUtf8
 import kosh.eth.wallet.Wallet as SignerWallet
 
@@ -136,7 +137,7 @@ class DefaultTrezorRepo(
 
                 listener.onConnected(WalletEntity.Id(Address(mainAddress).getOrNull()!!))
 
-                val bytes = message.encodeUtf8()
+                val bytes = message.encodeToByteString()
 
                 val (signature, address) = connection.signPersonalMessage(
                     derivationPath = derivationPath.path,

@@ -10,10 +10,15 @@ import androidx.datastore.preferences.core.byteArrayPreferencesKey
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.withContext
-import okio.Buffer
-import okio.ByteString
+import kotlinx.io.Buffer
+import kotlinx.io.bytestring.ByteString
+import kotlinx.io.files.Path
+import kotlinx.io.readByteString
+import kotlinx.io.readString
+import kotlinx.io.write
+import kotlinx.io.writeString
 import okio.ByteString.Companion.toByteString
-import okio.Path
+import okio.Path.Companion.toPath
 import java.security.Key
 import java.security.KeyPairGenerator
 import java.security.PrivateKey
@@ -32,7 +37,7 @@ class AndroidRsaKeyStore(
 
     private val store by lazy {
         PreferenceDataStoreFactory.createWithPath(
-            produceFile = { produceFile() },
+            produceFile = { produceFile().toString().toPath() },
         )
     }
 
@@ -51,7 +56,7 @@ class AndroidRsaKeyStore(
     ): Unit = withContext(SecurityDispatcher) {
         val keyValue = Buffer().apply {
             writeInt(key.length)
-            writeUtf8(key)
+            writeString(key)
             write(value)
         }.readByteString()
 
@@ -100,7 +105,7 @@ class AndroidRsaKeyStore(
 
         val buffer = Buffer().apply { write(message) }
         val keyLen = buffer.readInt()
-        val restoredKey = buffer.readUtf8(keyLen.toLong())
+        val restoredKey = buffer.readString(keyLen.toLong())
         check(key == restoredKey)
         buffer.readByteString()
     }

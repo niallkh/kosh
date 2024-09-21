@@ -27,7 +27,8 @@ import kosh.domain.serializers.BigInteger
 import kosh.domain.serializers.Either
 import kosh.domain.usecases.network.GetRpcProvidersUC
 import kosh.domain.usecases.network.invoke
-import kosh.eth.abi.abiAddress
+import kosh.eth.abi.abi
+import kosh.eth.abi.address
 import kosh.eth.proposals.at
 import kosh.eth.proposals.erc1155.Erc1155Abi
 import kosh.eth.proposals.erc165.Erc165Abi
@@ -38,11 +39,11 @@ import kosh.eth.rpc.Web3ProviderFactory
 import kotlinx.collections.immutable.toImmutableList
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
+import kotlinx.io.Buffer
+import kotlinx.io.Source
 import kotlinx.serialization.ExperimentalSerializationApi
 import kotlinx.serialization.json.Json
-import kotlinx.serialization.json.okio.decodeFromBufferedSource
-import okio.Buffer
-import okio.BufferedSource
+import kotlinx.serialization.json.io.decodeFromSource
 
 class DefaultTokenRepo(
     private val web3ProviderFactory: Web3ProviderFactory,
@@ -65,7 +66,7 @@ class DefaultTokenRepo(
             nullable {
                 val web3Provider = web3ProviderFactory(getRpcProvidersUC(chainId))
 
-                val abiAddress = address.bytes().abiAddress
+                val abiAddress = address.bytes().abi.address
                 val isErc165 =
                     Erc165Abi.supportsInterface(Erc165Abi.Erc165InterfaceId).at(abiAddress)
                 val isInvalidErc165 =
@@ -142,7 +143,7 @@ class DefaultTokenRepo(
                     Type.ERC20 -> error("Erc20 doesn't have nft metadata")
                     Type.ERC721 -> Erc721Abi.tokenUri(tokenId)
                     Type.ERC1155 -> Erc1155Abi.uri(tokenId)
-                }.at(address.bytes().abiAddress)
+                }.at(address.bytes().abi.address)
 
                 web3Provider.catch(logger) {
                     web3Provider.multicall(tokenUriCall)
@@ -207,13 +208,13 @@ class DefaultTokenRepo(
             }
         }.bind()
 
-        return json.decodeFromBufferedSource<Metadata>(response.bodyAsChannel().readBuffer())
+        return json.decodeFromSource<Metadata>(response.bodyAsChannel().readBuffer())
     }
 }
 
-internal suspend fun ByteReadChannel.readBuffer(): BufferedSource {
+internal suspend fun ByteReadChannel.readBuffer(): Source {
     val buffer = Buffer()
-    val buff = ByteArray(8192)
+    val buff = ByteArray(4096)
     while (!isClosedForRead) {
         val read = readAvailable(buff)
         if (read == -1) continue

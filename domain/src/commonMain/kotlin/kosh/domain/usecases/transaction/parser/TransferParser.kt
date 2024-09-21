@@ -17,6 +17,7 @@ import kosh.domain.state.AppStateProvider
 import kosh.domain.state.erc20Token
 import kosh.domain.state.tokens
 import kosh.domain.utils.optic
+import kosh.eth.abi.selector
 import kosh.eth.proposals.erc1155.Erc1155Abi
 import kosh.eth.proposals.erc20.Erc20Abi
 import kosh.eth.proposals.erc721.Erc721Abi
@@ -36,7 +37,7 @@ class TransferParser(
         if (!value.isZero()) return@either null
 
         when (val selector = input.funSelector()?.bytes()) {
-            Erc20Abi.transfer.selector -> {
+            Erc20Abi.transfer.selector!! -> {
                 val (dest, value1) = Erc20Abi.transfer(input.bytes())
 
                 ContractCall.Transfer(
@@ -52,7 +53,7 @@ class TransferParser(
                 )
             }
 
-            Erc20Abi.transferFrom.selector -> {
+            Erc20Abi.transferFrom.selector!! -> {
                 val (src, dest, value1) = Erc20Abi.transferFrom(input.bytes())
 
                 val token = getToken(chainId, to)
@@ -86,7 +87,7 @@ class TransferParser(
                 }
             }
 
-            Erc721Abi.safeTransferFrom.selector -> {
+            Erc721Abi.safeTransferFrom.selector!! -> {
                 val (src, dest, tokenId) = Erc721Abi.safeTransferFrom(input.bytes())
 
                 ContractCall.Transfer(
@@ -102,7 +103,7 @@ class TransferParser(
                 )
             }
 
-            Erc721Abi.More.safeTransferFrom.selector -> {
+            Erc721Abi.More.safeTransferFrom.selector!! -> {
                 val (src, dest, tokenId, data) = Erc721Abi.More.safeTransferFrom(input.bytes())
 
                 ContractCall.Transfer(
@@ -118,7 +119,7 @@ class TransferParser(
                 )
             }
 
-            Erc1155Abi.safeTransferFrom.selector -> {
+            Erc1155Abi.safeTransferFrom.selector!! -> {
                 val (src, dest, tokenId, value1, data) = Erc1155Abi.safeTransferFrom(input.bytes())
 
                 ContractCall.Transfer(
@@ -134,7 +135,7 @@ class TransferParser(
                 )
             }
 
-            Erc1155Abi.safeBatchTransferFrom.selector -> {
+            Erc1155Abi.safeBatchTransferFrom.selector!! -> {
                 val (src, dest, tokenIds, values, data) = Erc1155Abi.safeBatchTransferFrom(input.bytes())
 
                 ContractCall.Transfer(

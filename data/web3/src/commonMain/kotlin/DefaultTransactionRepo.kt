@@ -19,7 +19,8 @@ import kosh.domain.serializers.Either
 import kosh.domain.usecases.network.GetRpcProvidersUC
 import kosh.domain.usecases.network.NetworkService
 import kosh.domain.usecases.network.invoke
-import kosh.eth.abi.abiAddress
+import kosh.eth.abi.abi
+import kosh.eth.abi.address
 import kosh.eth.abi.keccak256
 import kosh.eth.rpc.Web3ProviderFactory
 import kotlinx.coroutines.Dispatchers
@@ -41,7 +42,7 @@ class DefaultTransactionRepo(
         either {
             val web3 = web3ProviderFactory(getRpcProvidersUC(chainId))
 
-            web3.getNonce(address = address.bytes().abiAddress)
+            web3.getNonce(address = address.bytes().abi.address)
         }
     }
 
@@ -65,7 +66,7 @@ class DefaultTransactionRepo(
             val web3 = web3ProviderFactory(networkService.getRpc(networkId))
 
             val receipt = web3.catch(logger) {
-                getTransactionReceipt(kosh.eth.rpc.Hash(hash.bytes()))
+                getTransactionReceipt(kosh.eth.rpc.Hash(hash.value.bytes()))
             }.bind()
 
             if (receipt == null) return@either null

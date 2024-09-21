@@ -19,7 +19,7 @@ import kotlinx.coroutines.withContext
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.json.Json
-import kotlinx.serialization.json.okio.decodeFromBufferedSource
+import kotlinx.serialization.json.io.decodeFromSource
 
 private const val REGISTRY = "https://www.4byte.directory/api/v1/signatures"
 
@@ -44,7 +44,7 @@ class DefaultFunctionSignatureRepo(
                     }
                 }
                     .let {
-                        json.decodeFromBufferedSource<Response>(it.bodyAsChannel().readBuffer())
+                        json.decodeFromSource<Response>(it.bodyAsChannel().readBuffer())
                     }
             }
 

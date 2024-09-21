@@ -1,7 +1,7 @@
 package kosh.eth.wallet.transaction
 
 import com.ionspin.kotlin.bignum.integer.BigInteger
-import okio.ByteString
+import kotlinx.io.bytestring.ByteString
 
 public sealed interface Transaction {
 

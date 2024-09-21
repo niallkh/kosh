@@ -1,7 +1,7 @@
 package kosh.eth.abi.dsl
 
 import kosh.eth.abi.Abi
-import kosh.eth.abi.Type
+import kosh.eth.abi.coder.AbiType
 import kotlin.properties.ReadOnlyProperty
 
 
@@ -14,7 +14,7 @@ public inline fun abiEvent(
     val item = lazy {
         Abi.Item.Event(
             name = name,
-            inputs = Type.Tuple(null, AbiTupleDsl().apply(inputs).parameters),
+            inputs = AbiType.Tuple(null, AbiTupleDsl().apply(inputs).parameters),
             anonymous = anonymous
         )
     }

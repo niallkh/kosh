@@ -23,7 +23,8 @@ import kotlinx.coroutines.NonCancellable
 import kotlinx.coroutines.currentCoroutineContext
 import kotlinx.coroutines.ensureActive
 import kotlinx.coroutines.withContext
-import okio.Buffer
+import kotlinx.io.Buffer
+import kotlinx.io.write
 import kotlin.math.ceil
 import kotlin.random.Random
 

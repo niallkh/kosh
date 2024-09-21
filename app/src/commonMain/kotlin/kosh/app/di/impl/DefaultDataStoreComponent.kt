@@ -5,6 +5,8 @@ import kosh.app.di.FilesComponent
 import kosh.app.di.SerializationComponent
 import kosh.datastore.AppStateDataStore
 import kosh.datastore.DataStoreComponent
+import okio.FileSystem
+import okio.SYSTEM
 
 class DefaultDataStoreComponent(
     filesComponent: FilesComponent,
@@ -17,7 +19,7 @@ class DefaultDataStoreComponent(
 
     override val appStateDataStore: AppStateDataStore = AppStateDataStore(
         path = appDataStorePath,
-        fileSystem = fileSystem,
+        fileSystem = FileSystem.SYSTEM,
         cbor = cbor,
         debug = debug
     )

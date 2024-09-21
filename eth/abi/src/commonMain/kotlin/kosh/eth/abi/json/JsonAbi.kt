@@ -1,7 +1,7 @@
 package kosh.eth.abi.json
 
 import kosh.eth.abi.Abi
-import kosh.eth.abi.Type
+import kosh.eth.abi.coder.AbiType
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.json.Json
 import kotlinx.serialization.json.JsonElement
@@ -26,8 +26,8 @@ internal data class JsonAbi(
         @Serializable
         data class Parameter(
             val type: String,
+            val name: String,
             val internalType: String? = null,
-            val name: String? = null,
             val components: List<Parameter>? = null,
             val indexed: Boolean? = null,
         )
@@ -54,7 +54,8 @@ internal data class JsonAbi(
     }
 
     companion object {
-        fun from(json: String): JsonAbi = JsonAbi(Json.decodeFromString<List<Item>>(json))
+        fun from(json: String): JsonAbi =
+            JsonAbi(Json.decodeFromString<List<Item>>(json))
 
         fun from(element: JsonElement): JsonAbi =
             JsonAbi(Json.decodeFromJsonElement<List<Item>>(element))
@@ -65,7 +66,7 @@ internal fun JsonAbi.toAbi() = Abi(map(JsonAbi.Item::toAbiItem))
 
 private fun JsonAbi.Item.toAbiItem(): Abi.Item = when (type) {
     JsonAbi.Item.Type.constructor -> Abi.Item.Constructor(
-        inputs = Type.Tuple(null, parameters = inputs.map { it.toTupleParameter() }),
+        inputs = AbiType.Tuple(null, parameters = inputs.map { it.toTupleParameter() }),
         stateMutability = stateMutability.map()
     )
 
@@ -79,20 +80,20 @@ private fun JsonAbi.Item.toAbiItem(): Abi.Item = when (type) {
 
     JsonAbi.Item.Type.function -> Abi.Item.Function(
         name = requireNotNull(name),
-        inputs = Type.Tuple(parameters = inputs.map { it.toTupleParameter() }),
-        outputs = Type.Tuple(parameters = outputs.map { it.toTupleParameter() }),
+        inputs = AbiType.Tuple(parameters = inputs.map { it.toTupleParameter() }),
+        outputs = AbiType.Tuple(parameters = outputs.map { it.toTupleParameter() }),
         stateMutability = stateMutability.map(),
     )
 
     JsonAbi.Item.Type.event -> Abi.Item.Event(
         name = requireNotNull(name),
-        inputs = Type.Tuple(null, inputs.map { it.toTupleParameter() }),
+        inputs = AbiType.Tuple(null, inputs.map { it.toTupleParameter() }),
         anonymous = anonymous ?: false,
     )
 
     JsonAbi.Item.Type.error -> Abi.Item.Error(
         name = requireNotNull(name),
-        inputs = Type.Tuple(null, inputs.map { it.toTupleParameter() })
+        inputs = AbiType.Tuple(null, inputs.map { it.toTupleParameter() })
     )
 }
 
@@ -104,13 +105,13 @@ private fun JsonAbi.Item.StateMutability?.map() = when (this) {
     else -> Abi.Item.StateMutability.NonPayable
 }
 
-private fun JsonAbi.Item.Parameter.toTupleParameter() = Type.Tuple.Parameter(
+private fun JsonAbi.Item.Parameter.toTupleParameter() = AbiType.Tuple.Parameter(
     type = toType(),
     name = name,
     indexed = indexed ?: false,
 )
 
-private fun JsonAbi.Item.Parameter.toType(): Type {
+private fun JsonAbi.Item.Parameter.toType(): AbiType {
     val arrays = arrayRegex.findAll(type).toMutableList()
     val typeName = arrays.removeFirst().value
 
@@ -119,19 +120,33 @@ private fun JsonAbi.Item.Parameter.toType(): Type {
     }
 }
 
-private fun JsonAbi.Item.Parameter.typeOf(typeName: String): Type = when {
-    typeName.startsWith("uint") -> Type.UInt(typeName.removePrefix("uint").toUIntOrNull() ?: 256u)
-    typeName.startsWith("int") -> Type.Int(typeName.removePrefix("int").toUIntOrNull() ?: 256u)
-    typeName == "address" -> Type.Address
-    typeName == "bool" -> Type.Bool
-    typeName.startsWith("bytes") -> if (typeName.length == 5) Type.DynamicBytes
-    else Type.FixedBytes(typeName.removePrefix("bytes").toUInt())
+private fun JsonAbi.Item.Parameter.typeOf(typeName: String): AbiType = when {
+    typeName.startsWith("uint") -> AbiType.UInt(
+        typeName.removePrefix("uint").toUIntOrNull() ?: 256u
+    )
 
-    typeName == "string" -> Type.DynamicString
-    typeName == "function" -> Type.Function
+    typeName.startsWith("int") -> AbiType.Int(typeName.removePrefix("int").toUIntOrNull() ?: 256u)
+    typeName == "address" -> AbiType.Address
+    typeName == "bool" -> AbiType.Bool
+    typeName.startsWith("bytes") -> if (typeName.length == 5) AbiType.DynamicBytes
+    else AbiType.FixedBytes(typeName.removePrefix("bytes").toUInt())
+
+    typeName == "string" -> AbiType.DynamicString
+    typeName == "function" -> AbiType.Function
     typeName.startsWith("tuple") -> checkNotNull(components)
         .map(JsonAbi.Item.Parameter::toTupleParameter)
-        .let { Type.Tuple(internalType, it) }
+        .let { AbiType.Tuple(internalType, it) }
 
     else -> error("Invalid type: $typeName")
+}
+
+private fun arrayTypeOf(
+    arr: String,
+    childType: AbiType,
+): AbiType {
+    val size = arr.removePrefix("[").removeSuffix("]").toUIntOrNull()
+    return if (size != null) AbiType.FixedArray(
+        size,
+        childType
+    ) else AbiType.DynamicArray(childType)
 }

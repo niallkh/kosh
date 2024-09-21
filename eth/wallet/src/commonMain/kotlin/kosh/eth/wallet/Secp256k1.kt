@@ -1,41 +1,78 @@
 package kosh.eth.wallet
 
-import okio.ByteString
-import okio.ByteString.Companion.toByteString
+import kotlinx.io.bytestring.ByteString
+import kotlinx.io.bytestring.unsafe.UnsafeByteStringOperations
 import fr.acinq.secp256k1.Secp256k1 as LibSecp256k1
 
 internal object Secp256k1 {
     fun sign(
         messageHash: ByteString,
         privateKey: ByteString,
-    ): ByteString = LibSecp256k1.sign(
-        message = messageHash.toByteArray(),
-        privkey = privateKey.toByteArray()
-    ).toByteString()
+    ): ByteString {
+        lateinit var signature: ByteString
+        UnsafeByteStringOperations.withByteArrayUnsafe(messageHash) { hash ->
+            UnsafeByteStringOperations.withByteArrayUnsafe(privateKey) { pk ->
+                signature = UnsafeByteStringOperations.wrapUnsafe(
+                    LibSecp256k1.sign(
+                        message = hash,
+                        privkey = pk
+                    )
+                )
+            }
+        }
+        return signature
+    }
 
     fun recover(
         signature: ByteString,
         messageHash: ByteString,
         recId: Int,
-    ): ByteString = LibSecp256k1.ecdsaRecover(
-        sig = signature.toByteArray(),
-        message = messageHash.toByteArray(),
-        recid = recId
-    ).toByteString()
+    ): ByteString {
+        lateinit var recovered: ByteString
+        UnsafeByteStringOperations.withByteArrayUnsafe(signature) { sig ->
+            UnsafeByteStringOperations.withByteArrayUnsafe(messageHash) { hash ->
+                recovered = UnsafeByteStringOperations.wrapUnsafe(
+                    LibSecp256k1.ecdsaRecover(
+                        sig = sig,
+                        message = hash,
+                        recid = recId
+                    )
+                )
+            }
+        }
+        return recovered
+    }
 
     fun verify(
         signature: ByteString,
         messageHash: ByteString,
         publicKey: ByteString,
-    ): Boolean = LibSecp256k1.verify(
-        signature = signature.toByteArray(),
-        message = messageHash.toByteArray(),
-        pubkey = publicKey.toByteArray()
-    )
+    ): Boolean {
+        var verified: Boolean
+        UnsafeByteStringOperations.withByteArrayUnsafe(signature) { sig ->
+            UnsafeByteStringOperations.withByteArrayUnsafe(messageHash) { hash ->
+                UnsafeByteStringOperations.withByteArrayUnsafe(publicKey) { pk ->
+                    verified = LibSecp256k1.verify(
+                        signature = sig,
+                        message = hash,
+                        pubkey = pk
+                    )
+
+                }
+            }
+        }
+        return verified
+    }
 
     fun publicKey(
         privateKey: ByteString,
-    ): ByteString = LibSecp256k1.pubkeyCreate(
-        privkey = privateKey.toByteArray()
-    ).toByteString()
+    ): ByteString {
+        lateinit var publicKey: ByteString
+        UnsafeByteStringOperations.withByteArrayUnsafe(privateKey) { pk ->
+            publicKey = UnsafeByteStringOperations.wrapUnsafe(
+                LibSecp256k1.pubkeyCreate(pk)
+            )
+        }
+        return publicKey
+    }
 }

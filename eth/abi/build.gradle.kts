@@ -9,6 +9,7 @@ plugins {
 
 kotlin {
     explicitApi()
+
     androidTarget {
         compilerOptions {
             jvmTarget = JvmTarget.JVM_11
@@ -24,12 +25,15 @@ kotlin {
         all {
             languageSettings {
                 optIn("kotlinx.serialization.ExperimentalSerializationApi")
+                optIn("kotlinx.io.bytestring.unsafe.UnsafeByteStringApi")
+                optIn("kotlin.ExperimentalStdlibApi")
             }
         }
 
         commonMain.dependencies {
-            implementation(libs.okio)
             implementation(libs.bignum)
+            implementation(libs.kotlinx.io)
+            implementation(libs.kotlinx.serialization.core)
             implementation(libs.kotlinx.serialization.json)
             implementation(libs.crypto.sha3)
         }

@@ -7,6 +7,7 @@ import arrow.optics.typeclasses.At
 import kosh.domain.entities.AccountEntity
 import kosh.domain.entities.TransactionEntity
 import kosh.domain.failure.TransactionFailure
+import kosh.domain.models.ByteString
 import kosh.domain.models.ChainId
 import kosh.domain.models.wc.DappMetadata
 import kosh.domain.models.web3.JsonTypeData
@@ -20,7 +21,7 @@ import kosh.domain.state.AppState
 import kosh.domain.state.network
 import kosh.domain.state.transactions
 import kosh.domain.utils.pmap
-import okio.ByteString.Companion.encodeUtf8
+import kotlinx.io.bytestring.encodeToByteString
 
 class TypedTransactionService(
     private val fileRepo: FilesRepo,
@@ -33,7 +34,7 @@ class TypedTransactionService(
         chainId: ChainId?,
         dapp: DappMetadata,
     ): Ior<Nel<TransactionFailure>, Signature> = iorNel {
-        val jsonPath = fileRepo.write(jsonTypeData.json.encodeUtf8())
+        val jsonPath = fileRepo.write(ByteString(jsonTypeData.json.encodeToByteString()))
 
         val eip712 = TransactionEntity.Eip712(
             sender = AccountEntity.Id(signature.signer),

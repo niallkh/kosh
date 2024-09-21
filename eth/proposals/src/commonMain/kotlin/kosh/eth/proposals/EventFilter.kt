@@ -1,8 +1,7 @@
 package kosh.eth.proposals
 
-import okio.ByteString
+import kotlinx.io.bytestring.ByteString
 
-@Deprecated("")
 public interface EventFilter<T : Any> {
 
     public fun create(): List<ByteString?>

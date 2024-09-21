@@ -4,7 +4,8 @@ import androidx.compose.material3.ColorScheme
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.remember
 import com.eygraber.uri.Uri
-import okio.ByteString.Companion.encodeUtf8
+import kosh.domain.utils.md5
+import kotlinx.io.bytestring.encodeToByteString
 
 @Composable
 internal fun uriColor(
@@ -12,7 +13,7 @@ internal fun uriColor(
     isDark: Boolean,
 ): ColorScheme = remember(uri, isDark) {
     dynamicColor(
-        bytes = uri.host.orEmpty().encodeUtf8().md5(),
+        bytes = uri.host.orEmpty().encodeToByteString().md5(),
         isDark = isDark,
     )
 }

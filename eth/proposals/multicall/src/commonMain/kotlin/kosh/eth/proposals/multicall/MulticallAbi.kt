@@ -3,12 +3,9 @@ package kosh.eth.proposals.multicall
 import com.ionspin.kotlin.bignum.integer.BigInteger
 import kosh.eth.abi.Value
 import kosh.eth.abi.abi
-import kosh.eth.abi.asBigNumber
-import kosh.eth.abi.asBool
-import kosh.eth.abi.asBytes
+import kosh.eth.abi.coder.decode
 import kosh.eth.abi.coder.decodeOutputs
-import kosh.eth.abi.coder.encodeInputs
-import kosh.eth.abi.delegate.decode
+import kosh.eth.abi.coder.encode
 import kosh.eth.abi.dsl.abiFunction
 import kosh.eth.proposals.DefaultFunctionCall
 import kosh.eth.proposals.FunctionCall
@@ -46,19 +43,22 @@ public object MulticallAbi {
         calls: List<Call>,
     ): FunctionCall<TryBlockAndAggregateResult> = DefaultFunctionCall(
         encoder = {
-            tryBlockAndAggregate.encodeInputs(
+            tryBlockAndAggregate.encode(
                 requireSuccess.abi,
                 Value.Array(calls.map { Value.tuple(it.target, it.data) })
             )
         },
-        decoder = { TryBlockAndAggregateResult(it) }
+        decoder = {
+            tryBlockAndAggregate.decode(it)
+            TryBlockAndAggregateResult(it)
+        }
     )
 
     public fun getEthBalance(
         address: Value.Address,
     ): FunctionCall<BigInteger> = DefaultFunctionCall(
         encoder = {
-            getEthBalance.encodeInputs(address)
+            getEthBalance.encode(address)
         },
         decoder = { getEthBalance.decodeOutputs(it, "balance").asBigNumber.value }
     )

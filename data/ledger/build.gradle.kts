@@ -20,22 +20,26 @@ kotlin {
     jvm()
 
     sourceSets {
+        all {
+            languageSettings {
+                optIn("kotlinx.io.bytestring.unsafe.UnsafeByteStringApi")
+                optIn("kotlin.ExperimentalStdlibApi")
+            }
+        }
+
         commonMain.dependencies {
             api(projects.domain)
 
             implementation(projects.libs.ledger)
             implementation(projects.eth.abi)
-            implementation(projects.eth.proposals.erc20)
-            implementation(projects.eth.proposals.erc721)
-            implementation(projects.eth.proposals.erc1155)
             implementation(projects.eth.wallet)
 
-            implementation(libs.okio)
+            implementation(libs.kotlinx.io)
             implementation(libs.arrow)
             implementation(libs.arrow.fx)
             implementation(libs.arrow.resilience)
             implementation(libs.kotlinx.serialization.json)
-            implementation(libs.kotlinx.serialization.json.okio)
+            implementation(libs.kotlinx.serialization.json.io)
             implementation(libs.crypto.sha2)
             implementation(libs.ktor.client)
         }

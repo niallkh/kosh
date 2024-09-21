@@ -1,0 +1,2 @@
+package kosh.eth.proposals
+

@@ -24,7 +24,7 @@ kotlin {
                 implementation(project(":crypto"))
                 implementation(project(":abi"))
                 implementation(project(":contracts"))
-                implementation(libs.okio)
+                implementation(libs.kotlinx.io)
                 implementation(libs.bignum)
                 implementation(libs.ktor.client)
                 implementation(libs.kotlinx.serialization.json)

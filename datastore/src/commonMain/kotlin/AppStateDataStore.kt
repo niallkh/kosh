@@ -7,9 +7,10 @@ import androidx.datastore.core.handlers.ReplaceFileCorruptionHandler
 import androidx.datastore.core.okio.OkioStorage
 import kosh.datastore.migrations.migration1
 import kosh.domain.state.AppState
+import kotlinx.io.files.Path
 import kotlinx.serialization.cbor.Cbor
 import okio.FileSystem
-import okio.Path
+import okio.Path.Companion.toPath
 
 class AppStateDataStore(
     path: () -> Path,
@@ -19,7 +20,7 @@ class AppStateDataStore(
 ) : DataStore<AppState> by DataStoreFactory.create(
     storage = OkioStorage(
         fileSystem = fileSystem,
-        producePath = path,
+        producePath = { path().toString().toPath() },
         serializer = AppStateSerializer(cbor),
     ),
     migrations = listOf(

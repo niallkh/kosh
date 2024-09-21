@@ -32,7 +32,7 @@ kotlin {
             implementation(libs.sqldelight)
             implementation(libs.sqldelight.coroutines)
             implementation(libs.kotlinx.serialization.cbor)
-            implementation(libs.okio)
+            implementation(libs.kotlinx.io)
         }
 
         androidMain.dependencies {

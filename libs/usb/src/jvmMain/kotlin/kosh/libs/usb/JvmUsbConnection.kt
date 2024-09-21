@@ -5,8 +5,8 @@ import kotlinx.coroutines.suspendCancellableCoroutine
 import kotlinx.coroutines.sync.Mutex
 import kotlinx.coroutines.sync.withLock
 import kotlinx.coroutines.withContext
-import okio.BufferedSink
-import okio.BufferedSource
+import kotlinx.io.Sink
+import kotlinx.io.Source
 import javax.usb.UsbInterface
 import javax.usb.UsbIrp
 import javax.usb.UsbPipe
@@ -35,14 +35,16 @@ class JvmUsbConnection(
         writePipe.open()
     }
 
-    override suspend fun write(source: BufferedSource): Unit = writeMutex.withLock {
-        val length = source.read(writeBuffer)
+    override suspend fun write(
+        source: Source,
+    ): Unit = writeMutex.withLock {
+        val length = source.readAtMostTo(writeBuffer)
         val usbIrp = DefaultUsbIrp(writeBuffer, 0, ceil((length / 64.0)).toInt() * 64, false)
         writePipe.transferAsync(usbIrp)
     }
 
     override suspend fun read(
-        sink: BufferedSink,
+        sink: Sink,
         length: Int,
     ): Unit = readMutex.withLock {
         val usbIrp = DefaultUsbIrp(readBuffer, 0, ceil((length / 64.0)).toInt() * 64, false)

@@ -9,6 +9,7 @@ import arrow.optics.typeclasses.At
 import kosh.domain.entities.AccountEntity
 import kosh.domain.entities.TransactionEntity
 import kosh.domain.failure.TransactionFailure
+import kosh.domain.models.ByteString
 import kosh.domain.models.wc.DappMetadata
 import kosh.domain.models.web3.EthMessage
 import kosh.domain.models.web3.Signature
@@ -19,7 +20,7 @@ import kosh.domain.serializers.Nel
 import kosh.domain.state.AppState
 import kosh.domain.state.transactions
 import kosh.domain.utils.pmap
-import okio.ByteString.Companion.encodeUtf8
+import kotlinx.io.bytestring.encodeToByteString
 import kotlin.experimental.ExperimentalTypeInference
 
 class PersonalTransactionService(
@@ -36,7 +37,7 @@ class PersonalTransactionService(
         val personalMessage = TransactionEntity.PersonalMessage(
             sender = AccountEntity.Id(signature.signer),
             dapp = dapp,
-            message = fileRepo.write(message.value.encodeUtf8()),
+            message = fileRepo.write(ByteString(message.value.encodeToByteString())),
         )
 
         appStateRepo.modify {

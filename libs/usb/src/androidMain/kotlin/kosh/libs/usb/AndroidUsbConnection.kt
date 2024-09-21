@@ -9,8 +9,10 @@ import kotlinx.coroutines.suspendCancellableCoroutine
 import kotlinx.coroutines.sync.Mutex
 import kotlinx.coroutines.sync.withLock
 import kotlinx.coroutines.withContext
-import okio.BufferedSink
-import okio.BufferedSource
+import kotlinx.io.Sink
+import kotlinx.io.Source
+import kotlinx.io.readAtMostTo
+import kotlinx.io.write
 import java.nio.ByteBuffer
 import kotlin.coroutines.resume
 import kotlin.coroutines.resumeWithException
@@ -44,10 +46,10 @@ class AndroidUsbConnection(
     }
 
     override suspend fun write(
-        source: BufferedSource,
+        source: Source,
     ): Unit = writeMutex.withLock {
         writeBuffer.clear()
-        source.read(writeBuffer)
+        source.readAtMostTo(writeBuffer)
         writeBuffer.flip()
         writeBuffer.limit(ceil((writeBuffer.limit() / packetSize.toFloat())).toInt() * packetSize)
         logger.v { "write(size = ${writeBuffer.limit()})" }
@@ -55,7 +57,7 @@ class AndroidUsbConnection(
     }
 
     override suspend fun read(
-        sink: BufferedSink,
+        sink: Sink,
         length: Int,
     ): Unit = readMutex.withLock {
         readBuffer.clear()

@@ -3,6 +3,8 @@
 package kosh.domain.serializers
 
 import kosh.domain.models.ByteString
+import kotlinx.io.Buffer
+import kotlinx.io.readByteString
 import kotlinx.serialization.ExperimentalSerializationApi
 import kotlinx.serialization.KSerializer
 import kotlinx.serialization.descriptors.SerialDescriptor
@@ -11,8 +13,6 @@ import kotlinx.serialization.encoding.CompositeDecoder.Companion.DECODE_DONE
 import kotlinx.serialization.encoding.Decoder
 import kotlinx.serialization.encoding.Encoder
 import kotlinx.serialization.encoding.decodeStructure
-import okio.Buffer
-
 
 object ByteStringSerializer : KSerializer<ByteString> {
     override val descriptor: SerialDescriptor =
@@ -35,12 +35,12 @@ object ByteStringSerializer : KSerializer<ByteString> {
                     ?: error("Expected size of byte string")
 
                 repeat(size) {
-                    buffer.writeByte(decodeByteElement(descriptor, it).toInt())
+                    buffer.writeByte(decodeByteElement(descriptor, it))
                 }
             } else {
                 var index = decodeElementIndex(descriptor)
                 while (index != DECODE_DONE) {
-                    buffer.writeByte(decodeByteElement(descriptor, index).toInt())
+                    buffer.writeByte(decodeByteElement(descriptor, index))
                     index = decodeElementIndex(descriptor)
                 }
             }

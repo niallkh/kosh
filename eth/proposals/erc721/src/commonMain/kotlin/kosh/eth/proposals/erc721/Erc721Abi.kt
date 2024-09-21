@@ -5,11 +5,8 @@ import com.ionspin.kotlin.bignum.integer.BigInteger
 import kosh.eth.abi.Abi
 import kosh.eth.abi.Value
 import kosh.eth.abi.abi
-import kosh.eth.abi.asAddress
-import kosh.eth.abi.asBigNumber
-import kosh.eth.abi.asString
 import kosh.eth.abi.coder.decodeOutputs
-import kosh.eth.abi.coder.encodeInputs
+import kosh.eth.abi.coder.encode
 import kosh.eth.abi.delegate.decodeInputs
 import kosh.eth.abi.dsl.abiFunction
 import kosh.eth.abi.dsl.abiViewFunction
@@ -86,22 +83,22 @@ public object Erc721Abi {
     }
 
     public fun name(): FunctionCall<String> = DefaultFunctionCall(
-        encoder = { name.encodeInputs() },
+        encoder = { name.encode() },
         decoder = { name.decodeOutputs(it, "name").asString.value },
     )
 
     public fun symbol(): FunctionCall<String> = DefaultFunctionCall(
-        encoder = { symbol.encodeInputs() },
+        encoder = { symbol.encode() },
         decoder = { symbol.decodeOutputs(it, "symbol").asString.value },
     )
 
     public fun tokenUri(tokenId: BigInteger): FunctionCall<String> = DefaultFunctionCall(
-        encoder = { tokenURI.encodeInputs(tokenId.abi) },
+        encoder = { tokenURI.encode(tokenId.abi) },
         decoder = { tokenURI.decodeOutputs(it, "uri").asString.value }
     )
 
     public fun balanceOf(address: Value.Address): FunctionCall<BigInteger> = DefaultFunctionCall(
-        encoder = { balanceOf.encodeInputs(address) },
+        encoder = { balanceOf.encode(address) },
         decoder = { balanceOf.decodeOutputs(it, "balance").asBigNumber.value }
     )
 
@@ -110,7 +107,7 @@ public object Erc721Abi {
         tokenId: BigInteger,
     ): FunctionCall<BigInteger> =
         DefaultFunctionCall(
-            encoder = { ownerOf.encodeInputs(tokenId.abi) },
+            encoder = { ownerOf.encode(tokenId.abi) },
             decoder = {
                 val owner = ownerOf.decodeOutputs(it, "owner").asAddress
                 if (owner == address) BigInteger.ONE else BigInteger.ZERO
@@ -118,7 +115,7 @@ public object Erc721Abi {
         )
 
     public fun ownerOf(tokenId: BigInteger): FunctionCall<Value.Address> = DefaultFunctionCall(
-        encoder = { ownerOf.encodeInputs(tokenId.abi) },
+        encoder = { ownerOf.encode(tokenId.abi) },
         decoder = { ownerOf.decodeOutputs(it, "owner").asAddress }
     )
 

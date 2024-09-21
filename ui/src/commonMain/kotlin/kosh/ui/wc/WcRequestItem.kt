@@ -11,7 +11,7 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.produceState
 import androidx.compose.ui.Modifier
 import kosh.domain.models.wc.WcRequest
-import kosh.eth.abi.Eip712V2
+import kosh.eth.abi.eip712.Eip712
 import kosh.presentation.transaction.rememberContractCall
 import kosh.ui.component.dapp.DappIcon
 import kosh.ui.component.single.single
@@ -50,9 +50,9 @@ fun WcRequestItem(
                 }
 
                 is WcRequest.Call.SignTyped -> {
-                    val domain by produceState<Eip712V2.Domain?>(null, call.json.json) {
+                    val domain by produceState<Eip712.Domain?>(null, call.json.json) {
                         value = call.json.json.let {
-                            Eip712V2.fromJson(it).domain
+                            Eip712.fromJson(it).domain
                         }
                     }
 
