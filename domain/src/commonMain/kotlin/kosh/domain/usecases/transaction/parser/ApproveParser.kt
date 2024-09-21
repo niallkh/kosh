@@ -111,17 +111,3 @@ fun TokenEntity.toTokenMetadata(chainId: ChainId) = TokenMetadata(
     decimals = decimals,
     icon = icon,
 )
-
-fun defaultTokenMetadata(
-    chainId: ChainId,
-    address: Address,
-    type: TokenMetadata.Type = TokenMetadata.Type.ERC20,
-) = TokenMetadata(
-    type = type,
-    chainId = chainId,
-    address = address,
-    name = "Unknown Token",
-    symbol = "UNKWN",
-    decimals = 0u,
-    icon = null,
-)

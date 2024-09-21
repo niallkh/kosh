@@ -19,6 +19,10 @@ public fun Abi.Item.Function.encode(
     vararg values: Pair<String, Value>,
 ): ByteString = encodeSignature().keccak256().substring(0, 4) + encodeData(inputs, *values)
 
+public fun AbiType.Tuple.encode(
+    vararg values: Pair<String, Value>,
+): ByteString = encodeData(this, *values)
+
 public fun Abi.Item.Event.encodeTopics(vararg values: Value?): List<ByteString?> {
     val parameters = inputs.filter { it.indexed }
     val size = if (anonymous) inputs.size else inputs.size + 1
@@ -50,7 +54,7 @@ public fun Abi.Item.Event.encodeTopics(vararg values: Value?): List<ByteString?>
     }
 }
 
-internal fun Abi.Item.Constructor.encodeDeploy(
+public fun Abi.Item.Constructor.encodeDeploy(
     byteCode: ByteString,
     vararg values: Pair<String, Value>,
 ): ByteString = byteCode + encodeData(inputs, *values)

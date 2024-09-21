@@ -13,7 +13,7 @@ import kotlinx.serialization.descriptors.SerialDescriptor
 import kotlinx.serialization.encoding.Decoder
 import kotlinx.serialization.encoding.Encoder
 
-internal object BigIntegerSerializer : KSerializer<BigInteger> {
+public object BigIntegerSerializer : KSerializer<BigInteger> {
 
     override val descriptor: SerialDescriptor =
         PrimitiveSerialDescriptor("bignum.BigInteger", PrimitiveKind.STRING)
@@ -34,7 +34,7 @@ internal object BigIntegerSerializer : KSerializer<BigInteger> {
     }
 }
 
-internal object ByteStringSerializer : KSerializer<ByteString> {
+public object ByteStringSerializer : KSerializer<ByteString> {
 
     override val descriptor: SerialDescriptor =
         PrimitiveSerialDescriptor("okio.ByteString", PrimitiveKind.STRING)
@@ -50,7 +50,7 @@ internal object ByteStringSerializer : KSerializer<ByteString> {
     }
 }
 
-internal object AddressSerializer : KSerializer<Value.Address> {
+public object AddressSerializer : KSerializer<Value.Address> {
 
     override val descriptor: SerialDescriptor =
         PrimitiveSerialDescriptor("Value.Address", PrimitiveKind.STRING)

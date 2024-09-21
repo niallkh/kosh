@@ -108,8 +108,8 @@ class DefaultTokenBalanceRepo(
         token: TokenMetadata,
     ): ContractCall<BigInteger>? = when (token.type) {
         TokenMetadata.Type.ERC20 -> Erc20Abi
-            .balanceOf(account.bytes().abiAddress)
-            .at(token.address.bytes().abiAddress)
+            .balanceOf(account.bytes().abi.address)
+            .at(token.address.bytes().abi.address)
 
         TokenMetadata.Type.ERC721 -> null
         TokenMetadata.Type.ERC1155 -> null

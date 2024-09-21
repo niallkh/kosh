@@ -17,6 +17,5 @@ public data class DefaultEventFilter<T : Any>(
     private val decoder: (List<ByteString>, ByteString) -> T,
 ) : EventFilter<T> {
     override fun create(): List<ByteString?> = filter()
-
     override fun decode(topics: List<ByteString>, data: ByteString): T = decoder(topics, data)
 }

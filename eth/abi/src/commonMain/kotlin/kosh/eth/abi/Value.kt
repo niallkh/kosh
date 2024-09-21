@@ -3,6 +3,7 @@ package kosh.eth.abi
 import com.ionspin.kotlin.bignum.integer.BigInteger
 import com.ionspin.kotlin.bignum.integer.toBigInteger
 import kotlinx.io.bytestring.ByteString
+import kotlinx.io.bytestring.hexToByteString
 import kotlin.jvm.JvmInline
 
 public sealed interface Value {
@@ -64,6 +65,10 @@ public sealed interface Value {
             public operator fun invoke(byteString: ByteString? = null): Address {
                 require(byteString == null || byteString.size == 20)
                 return if (byteString == null || byteString.size == 0) ZERO else Address(byteString)
+            }
+
+            public operator fun invoke(string: kotlin.String): Address {
+                return Address(string.removePrefix("0x").hexToByteString())
             }
         }
     }

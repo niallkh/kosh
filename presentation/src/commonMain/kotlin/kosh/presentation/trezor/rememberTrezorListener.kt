@@ -8,11 +8,11 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.node.Ref
-import co.touchlab.kermit.Logger
 import kosh.domain.entities.WalletEntity
 import kosh.domain.failure.RequestCanceledException
 import kosh.domain.models.trezor.Passphrase
 import kosh.domain.models.trezor.PinMatrix
+import kosh.domain.models.trezor.enterOnDevice
 import kosh.domain.repositories.KeyStoreListener
 import kosh.domain.repositories.TrezorListener
 import kosh.domain.repositories.TrezorListener.ButtonRequest
@@ -42,8 +42,6 @@ fun rememberTrezorListener(
 
     val listener = remember(id, keyStoreListener) {
         object : TrezorListener {
-
-            private val logger = Logger.withTag("[K]TrezorListener")
 
             override suspend fun passphraseRequest(): Passphrase =
                 id?.let { trezorPassphraseService.get(keyStoreListener, id) } ?: run {
@@ -86,7 +84,7 @@ fun rememberTrezorListener(
         enterPassphrase = { passphrase, save ->
             passphraseContinuation.value?.resume(passphrase)
             passphraseRequest = null
-            savedPassphrase = passphrase.takeIf { save && passphrase.value != null }
+            savedPassphrase = passphrase.takeIf { save && !passphrase.enterOnDevice }
             passphraseContinuation.value = null
         },
         cancelPassphrase = {

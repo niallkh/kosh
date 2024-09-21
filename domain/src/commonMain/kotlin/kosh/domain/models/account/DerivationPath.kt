@@ -51,23 +51,6 @@ val DerivationPath.ledgerAddressIndex: UInt
 val DerivationPath.slip44: UInt
     get() = path[1]
 
-internal fun derivationPathOf(path: String): DerivationPath {
-    val segments = path.split("/")
-    check(segments.firstOrNull() == "m")
-
-    return segments.asSequence()
-        .drop(1)
-        .map {
-            if (it.last() == '\'') {
-                it.dropLast(1).toUInt().hardened
-            } else {
-                it.toUInt()
-            }
-        }
-        .toList()
-        .let { DerivationPath(*it.toUIntArray()) }
-}
-
 private val UInt.hardened: UInt
     inline get() = hardenedIndex + this
 

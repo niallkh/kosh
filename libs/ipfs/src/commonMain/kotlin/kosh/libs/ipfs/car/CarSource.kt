@@ -66,8 +66,6 @@ internal class CarSource(
 
                             null
                         }
-
-                        else -> error("Invalid UnixFs format")
                     }
 
                     else -> error("Invalid Car data format")

@@ -1,7 +1,6 @@
 package kosh.domain.usecases.transaction
 
 import arrow.core.Ior
-import arrow.core.identity
 import arrow.core.raise.IorRaise
 import arrow.core.raise.iorNel
 import arrow.optics.dsl.at
@@ -21,7 +20,6 @@ import kosh.domain.state.AppState
 import kosh.domain.state.transactions
 import kosh.domain.utils.pmap
 import kotlinx.io.bytestring.encodeToByteString
-import kotlin.experimental.ExperimentalTypeInference
 
 class PersonalTransactionService(
     private val appStateRepo: AppStateRepo,
@@ -61,13 +59,3 @@ inline fun <Error> IorRaise<Nel<Error>>.ensureAccumulating(condition: Boolean, r
 inline fun <Error> IorRaise<Nel<Error>>.accumulate(raise: () -> Error) {
     return Ior.bothNel(raise(), Unit).bind()
 }
-
-@OptIn(ExperimentalTypeInference::class)
-inline fun <Error, A> recoverIorNel(
-    @BuilderInference block: IorRaise<Nel<Error>>.() -> A,
-    @BuilderInference recover: (errors: Nel<Error>) -> Unit,
-): A? = iorNel { block() }.fold(
-    { recover(it); null },
-    ::identity,
-    { e, v -> recover(e); v },
-)
