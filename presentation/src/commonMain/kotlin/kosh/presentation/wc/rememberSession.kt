@@ -5,7 +5,7 @@ import kosh.domain.failure.WcFailure
 import kosh.domain.models.wc.WcSession
 import kosh.domain.models.wc.WcSessionAggregated
 import kosh.domain.usecases.wc.WcSessionService
-import kosh.presentation.LoadContent
+import kosh.presentation.Load
 import kosh.presentation.di.di
 
 @Composable
@@ -13,14 +13,13 @@ fun rememberSession(
     id: WcSession.Id,
     proposalService: WcSessionService = di { domain.wcSessionService },
 ): SessionState {
-
-    val content = LoadContent(id) {
+    val content = Load(id) {
         proposalService.get(id).bind()
     }
 
     return SessionState(
-        loading = content.loading,
         session = content.content,
+        loading = content.loading,
         failure = content.failure,
         retry = { content.retry() },
     )

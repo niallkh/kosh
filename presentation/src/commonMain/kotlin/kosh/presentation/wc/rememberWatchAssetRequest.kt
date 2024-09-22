@@ -12,15 +12,15 @@ import kosh.domain.failure.WcFailure
 import kosh.domain.models.wc.WcRequest
 import kosh.domain.usecases.wc.WcRequestService
 import kosh.presentation.di.di
-import kosh.presentation.di.rememberSerializable
+import kosh.presentation.di.rememberRetainable
 
 @Composable
 fun rememberWatchAssetRequest(
     id: WcRequest.Id,
     requestService: WcRequestService = di { domain.wcRequestService },
 ): WatchAssetRequestState {
-    var request by rememberSerializable { mutableStateOf<WcRequest?>(null) }
-    var call by rememberSerializable { mutableStateOf<WcRequest.Call.WatchAsset?>(null) }
+    var request by rememberRetainable { mutableStateOf<WcRequest?>(null) }
+    var call by rememberRetainable { mutableStateOf<WcRequest.Call.WatchAsset?>(null) }
     var loading by remember { mutableStateOf(false) }
     var failure by remember { mutableStateOf<WcFailure?>(null) }
 

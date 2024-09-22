@@ -6,7 +6,7 @@ import kosh.domain.failure.Web3Failure
 import kosh.domain.models.web3.GasEstimation
 import kosh.domain.models.web3.Transaction
 import kosh.domain.repositories.GasRepo
-import kosh.presentation.LoadContent
+import kosh.presentation.Load
 import kosh.presentation.di.di
 
 @Composable
@@ -14,7 +14,7 @@ fun rememberEstimateGas(
     transaction: Transaction,
     gasRepo: GasRepo = di { appRepositories.gasRepo },
 ): EstimateGasState {
-    val gasEstimation = LoadContent {
+    val gasEstimation = Load {
         with(transaction) {
             gasRepo.estimate(chainId, from, to, value, input, gas).bind()
         }

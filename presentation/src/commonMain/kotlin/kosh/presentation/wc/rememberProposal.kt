@@ -5,7 +5,7 @@ import kosh.domain.failure.WcFailure
 import kosh.domain.models.wc.WcProposal
 import kosh.domain.models.wc.WcProposalAggregated
 import kosh.domain.usecases.wc.WcProposalService
-import kosh.presentation.LoadContent
+import kosh.presentation.Load
 import kosh.presentation.di.di
 
 @Composable
@@ -15,7 +15,7 @@ fun rememberProposal(
     proposalService: WcProposalService = di { domain.wcProposalService },
 ): ProposalState {
 
-    val content = LoadContent(id, requestId) {
+    val content = Load(id, requestId) {
         proposalService.get(id, requestId).bind()
     }
 

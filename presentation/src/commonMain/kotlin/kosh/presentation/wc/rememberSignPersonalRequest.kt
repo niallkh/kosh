@@ -16,7 +16,7 @@ import kosh.domain.models.wc.WcRequest
 import kosh.domain.models.web3.Signature
 import kosh.domain.usecases.wc.WcRequestService
 import kosh.presentation.di.di
-import kosh.presentation.di.rememberSerializable
+import kosh.presentation.di.rememberRetainable
 import kosh.presentation.models.SignRequest
 import kosh.presentation.transaction.rememberSignPersonal
 
@@ -25,8 +25,8 @@ fun rememberSignPersonalRequest(
     id: WcRequest.Id,
     requestService: WcRequestService = di { domain.wcRequestService },
 ): SignPersonalRequestState {
-    var request by rememberSerializable { mutableStateOf<WcRequest?>(null) }
-    var call by rememberSerializable { mutableStateOf<WcRequest.Call.SignPersonal?>(null) }
+    var request by rememberRetainable { mutableStateOf<WcRequest?>(null) }
+    var call by rememberRetainable { mutableStateOf<WcRequest.Call.SignPersonal?>(null) }
     var loading by remember { mutableStateOf(false) }
     var failure by remember { mutableStateOf<WcFailure?>(null) }
     var retry by remember { mutableIntStateOf(0) }

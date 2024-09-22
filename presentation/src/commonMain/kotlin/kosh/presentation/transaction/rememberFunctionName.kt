@@ -5,7 +5,7 @@ import androidx.compose.runtime.Immutable
 import kosh.domain.failure.Web3Failure
 import kosh.domain.models.FunSelector
 import kosh.domain.repositories.FunctionSignatureRepo
-import kosh.presentation.LoadContent
+import kosh.presentation.Load
 import kosh.presentation.di.di
 import kotlinx.serialization.Serializable
 import kotlin.jvm.JvmInline
@@ -15,7 +15,7 @@ fun rememberFunctionName(
     funSelector: FunSelector,
     functionSignatureRepo: FunctionSignatureRepo = di { appRepositories.functionSignatureRepo },
 ): FunctionNameState {
-    val functionName = LoadContent(funSelector) {
+    val functionName = Load(funSelector) {
         functionSignatureRepo.get(funSelector).bind()
             ?.let { FunctionName(it.substringBefore("(")) }
             ?: FunctionName(funSelector.toString())

@@ -75,10 +75,6 @@ fun WcSessionScreen(
         )
     }
 
-    AppFailureMessage(update.failure) {
-        update.retry()
-    }
-
     LaunchedEffect(update.updated) {
         if (update.updated) {
             onFinish()
@@ -127,6 +123,10 @@ fun WcSessionContent(
             }
         }
     ) { paddingValues ->
+
+        AppFailureMessage(update.failure) {
+            update.retry()
+        }
 
         LazyColumn(
             contentPadding = paddingValues,

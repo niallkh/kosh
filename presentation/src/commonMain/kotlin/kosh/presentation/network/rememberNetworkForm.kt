@@ -33,6 +33,7 @@ fun rememberNetworkForm(
 ): NetworkFormState {
     val network = id?.let { rememberNetwork(it) }
     val token = network?.entity?.chainId?.let { rememberNativeToken(it) }
+
     val networkNameTextField = rememberTextField(network?.entity?.name) {
         networkNameValidator(it)
     }

@@ -13,14 +13,12 @@ import kosh.domain.failure.Web3Failure
 import kosh.domain.models.Address
 import kosh.domain.models.token.TokenMetadata
 import kosh.domain.serializers.ImmutableList
-import kosh.domain.serializers.ImmutableListSerializer
 import kosh.domain.serializers.Uri
 import kosh.domain.usecases.token.TokenDiscoveryService
 import kosh.presentation.di.di
-import kosh.presentation.di.rememberSerializable
+import kosh.presentation.di.rememberRetainable
 import kotlinx.collections.immutable.mutate
 import kotlinx.collections.immutable.persistentListOf
-import kotlinx.collections.immutable.toImmutableList
 import kotlinx.collections.immutable.toPersistentList
 
 @Composable
@@ -29,11 +27,7 @@ fun rememberSearchToken(
     icon: Pair<Address, Uri>? = null,
     tokenDiscoveryService: TokenDiscoveryService = di { domain.tokenDiscoveryService },
 ): SearchTokenState {
-    var tokens by rememberSerializable(
-        stateSerializer = ImmutableListSerializer(TokenMetadata.serializer())
-    ) {
-        mutableStateOf(persistentListOf())
-    }
+    var tokens by rememberRetainable { mutableStateOf(persistentListOf<TokenMetadata>()) }
     var loading by remember { mutableStateOf(false) }
     var failure by remember { mutableStateOf<Web3Failure?>(null) }
     var retry by remember { mutableIntStateOf(0) }
@@ -42,7 +36,7 @@ fun rememberSearchToken(
         loading = true
 
         recover({
-            tokens = tokenDiscoveryService.searchToken(query).bind().toImmutableList()
+            tokens = tokenDiscoveryService.searchToken(query).bind().toPersistentList()
 
             loading = false
         }) {

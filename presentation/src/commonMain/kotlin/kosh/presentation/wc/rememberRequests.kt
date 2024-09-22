@@ -7,11 +7,10 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import kosh.domain.models.wc.WcRequest
 import kosh.domain.serializers.ImmutableList
-import kosh.domain.serializers.ImmutableListSerializer
 import kosh.domain.usecases.wc.WcRequestService
 import kosh.presentation.di.di
 import kosh.presentation.di.rememberLifecycleState
-import kosh.presentation.di.rememberSerializable
+import kosh.presentation.di.rememberRetainable
 import kotlinx.collections.immutable.persistentListOf
 import kotlinx.collections.immutable.toPersistentList
 
@@ -19,9 +18,7 @@ import kotlinx.collections.immutable.toPersistentList
 fun rememberRequests(
     requestService: WcRequestService = di { domain.wcRequestService },
 ): RequestsState {
-    var requests by rememberSerializable(
-        stateSerializer = ImmutableListSerializer(WcRequest.serializer())
-    ) { mutableStateOf(persistentListOf()) }
+    var requests by rememberRetainable { mutableStateOf(persistentListOf<WcRequest>()) }
 
     if (rememberLifecycleState()) {
         LaunchedEffect(Unit) {

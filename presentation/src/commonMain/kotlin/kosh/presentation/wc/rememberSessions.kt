@@ -1,29 +1,33 @@
 package kosh.presentation.wc
 
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.collectAsState
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.saveable.rememberSaveable
+import kosh.domain.failure.AppFailure
 import kosh.domain.models.wc.WcSession
 import kosh.domain.usecases.wc.WcSessionService
+import kosh.presentation.Collect
 import kosh.presentation.di.di
-import kosh.presentation.di.serializableSaver
+import kotlinx.collections.immutable.ImmutableList
+import kotlinx.collections.immutable.persistentListOf
+import kotlinx.collections.immutable.toPersistentList
+import kotlinx.coroutines.flow.map
 
 @Composable
 fun rememberSessions(
     sessionService: WcSessionService = di { domain.wcSessionService },
 ): SessionsState {
-    val sessions by sessionService.sessions.collectAsState(null)
+    val sessions = Collect<AppFailure, _> {
+        sessionService.sessions.map { it.toPersistentList() }
+    }
 
     return SessionsState(
-        sessions = rememberSaveable(sessions, saver = serializableSaver()) {
-            sessions ?: emptyList()
-        },
-        loading = sessions == null,
+        sessions = sessions.content ?: persistentListOf(),
+        init = sessions.init,
+        loading = sessions.loading,
     )
 }
 
 data class SessionsState(
-    val sessions: List<WcSession>,
+    val sessions: ImmutableList<WcSession>,
+    val init: Boolean,
     val loading: Boolean,
 )

@@ -6,24 +6,20 @@ import androidx.compose.runtime.Stable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.saveable.Saver
-import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import arrow.core.raise.Raise
 import arrow.core.raise.recover
 import kosh.domain.failure.AppFailure
+import kosh.presentation.di.rememberLifecycleState
+import kosh.presentation.di.rememberRetainable
 import kotlinx.coroutines.flow.Flow
-import kotlinx.serialization.KSerializer
-import kotlinx.serialization.cbor.Cbor
-import kotlinx.serialization.serializer
 
 @Stable
-class ContentState<E : AppFailure, C : Any>(
-    initial: C?,
-) {
+class ContentState<E : AppFailure, C : Any> {
+    var init: Boolean by mutableStateOf(false)
     var loading: Boolean by mutableStateOf(false)
     var failure: E? by mutableStateOf(null)
-    var content: C? by mutableStateOf(initial)
+    var content: C? by mutableStateOf(null)
     private var retry: Int by mutableIntStateOf(0)
 
     fun retry() {
@@ -41,9 +37,11 @@ class ContentState<E : AppFailure, C : Any>(
             recover({
                 content = block()
 
+                init = true
                 loading = false
                 failure = null
             }) {
+                init = true
                 failure = it
                 loading = false
             }
@@ -60,44 +58,27 @@ class ContentState<E : AppFailure, C : Any>(
 
             recover({
                 block().collect {
+                    init = true
                     loading = false
                     failure = null
 
                     content = it
                 }
             }) {
+                init = true
                 failure = it
                 loading = false
             }
         }
     }
-
-    companion object {
-        fun <E : AppFailure, C : Any> Saver(
-            serializer: KSerializer<C>,
-        ): Saver<ContentState<E, C>, ByteArray> = Saver(
-            save = { state ->
-                state.content
-                    ?.let { Cbor.encodeToByteArray(serializer, it) }
-                    ?: ByteArray(0)
-            },
-            restore = { bytes ->
-                bytes.takeIf { it.isNotEmpty() }
-                    ?.let { Cbor.decodeFromByteArray(serializer, it) }
-                    .let { ContentState(it) }
-            },
-        )
-    }
 }
 
 @Composable
 inline fun <reified E : AppFailure, reified C : Any> rememberContent(): ContentState<E, C> =
-    rememberSaveable(saver = ContentState.Saver(serializer())) {
-        ContentState(null)
-    }
+    rememberRetainable { ContentState() }
 
 @Composable
-inline fun <reified C : Any, reified E : AppFailure> LoadContent(
+inline fun <reified E : AppFailure, reified C : Any> Load(
     vararg keys: Any?,
     noinline block: suspend Raise<E>.() -> C,
 ): ContentState<E, C> {
@@ -105,6 +86,22 @@ inline fun <reified C : Any, reified E : AppFailure> LoadContent(
 
     contentState.Load(*keys) {
         block()
+    }
+
+    return contentState
+}
+
+@Composable
+inline fun <reified E : AppFailure, reified C : Any> Collect(
+    vararg keys: Any?,
+    noinline block: suspend Raise<E>.() -> Flow<C>,
+): ContentState<E, C> {
+    val contentState = rememberContent<E, C>()
+
+    if (rememberLifecycleState()) {
+        contentState.Collect(*keys) {
+            block()
+        }
     }
 
     return contentState

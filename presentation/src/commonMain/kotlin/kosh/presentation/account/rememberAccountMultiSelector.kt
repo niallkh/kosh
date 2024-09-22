@@ -25,10 +25,7 @@ fun rememberAccountMultiSelector(
     appStateProvider: AppStateProvider = di { domain.appStateProvider },
 ): AccountMultiSelectorState {
     val accounts by appStateProvider.collectAsState().optic(optic)
-
-    var selected: Set<AccountEntity.Id> by rememberSerializable {
-        mutableStateOf(initialSelected)
-    }
+    var selected by rememberSerializable { mutableStateOf(initialSelected) }
 
     return AccountMultiSelectorState(
         selected = selected,

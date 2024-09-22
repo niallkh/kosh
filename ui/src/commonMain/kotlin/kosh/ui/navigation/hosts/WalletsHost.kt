@@ -3,7 +3,7 @@ package kosh.ui.navigation.hosts
 import androidx.compose.runtime.Composable
 import com.arkivanov.decompose.router.stack.push
 import com.arkivanov.decompose.router.stack.replaceCurrent
-import kosh.domain.entities.WalletEntity
+import kosh.domain.entities.WalletEntity.Type
 import kosh.ui.account.AccountScreen
 import kosh.ui.account.DeleteAccountScreen
 import kosh.ui.account.DiscoveryAccountTokensScreen
@@ -33,8 +33,8 @@ fun WalletsHost(
                 onOpen = { push(WalletsRoute.Account(it)) },
                 onAdd = { type ->
                     when (type) {
-                        WalletEntity.Type.Trezor -> push(WalletsRoute.NewTrezorAccount)
-                        WalletEntity.Type.Ledger -> push(WalletsRoute.NewLedgerAccount)
+                        Type.Trezor -> push(WalletsRoute.NewTrezorAccount)
+                        Type.Ledger -> push(WalletsRoute.NewLedgerAccount)
                     }
                 }
             )
@@ -63,7 +63,7 @@ fun WalletsHost(
 
             is WalletsRoute.TokensDiscovery -> DiscoveryAccountTokensScreen(
                 id = route.id,
-                onFinish = { finish() }
+                onFinish = { pop() }
             )
         }
 
