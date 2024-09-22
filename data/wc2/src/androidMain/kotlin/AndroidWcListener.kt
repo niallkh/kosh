@@ -56,7 +56,7 @@ class AndroidWcListener : WcListener, SignClient.WalletDelegate {
     }
 
     override fun onSessionExtend(session: Sign.Model.Session) {
-        logger.d { "onSessionExpired()" }
+        logger.d { "onSessionExtend()" }
         smthChanged.tryEmit(Any())
     }
 
@@ -94,6 +94,14 @@ class AndroidWcListener : WcListener, SignClient.WalletDelegate {
     override fun onError(error: Sign.Model.Error) {
         logger.w(error.throwable) { "Error happened in WC" }
         smthChanged.tryEmit(Any())
+    }
+
+    override fun onProposalExpired(proposal: Sign.Model.ExpiredProposal) {
+        logger.d { "onProposalExpired()" }
+    }
+
+    override fun onRequestExpired(request: Sign.Model.ExpiredRequest) {
+        logger.d { "onRequestExpired()" }
     }
 
     override fun onChanged() {

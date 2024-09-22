@@ -14,7 +14,6 @@ import co.touchlab.kermit.Logger
 import com.ionspin.kotlin.bignum.integer.toBigInteger
 import com.walletconnect.android.Core
 import com.walletconnect.android.CoreClient
-import com.walletconnect.android.internal.common.di.AndroidCommonDITags
 import com.walletconnect.android.internal.common.exception.CannotFindSequenceForTopic
 import com.walletconnect.android.internal.common.exception.ExpiredPairingException
 import com.walletconnect.android.internal.common.exception.ExpiredPairingURIException
@@ -22,7 +21,6 @@ import com.walletconnect.android.internal.common.exception.MalformedWalletConnec
 import com.walletconnect.android.internal.common.exception.NoConnectivityException
 import com.walletconnect.android.internal.common.exception.PairWithExistingPairingIsNotAllowed
 import com.walletconnect.android.internal.common.exception.RequestExpiredException
-import com.walletconnect.android.internal.common.wcKoinApp
 import com.walletconnect.android.relay.ConnectionType
 import com.walletconnect.sign.client.Sign
 import com.walletconnect.sign.client.Sign.Model.Validation
@@ -78,10 +76,8 @@ import kotlinx.serialization.json.Json
 import kotlinx.serialization.json.JsonElement
 import kotlinx.serialization.json.jsonObject
 import kotlinx.serialization.json.jsonPrimitive
-import org.koin.core.qualifier.named
 import kotlin.coroutines.resume
 import kotlin.coroutines.resumeWithException
-import com.walletconnect.foundation.util.Logger as WcLogger
 
 private const val EIP155 = "eip155"
 
@@ -159,8 +155,6 @@ class AndroidWcRepo(
 
     private suspend fun init() = withContext(Dispatchers.Default) {
         logger.d { "init()" }
-
-        wcKoinApp.koin.declare<WcLogger>(WcLoggerAdapter, named(AndroidCommonDITags.LOGGER))
 
         val serverUrl = "wss://relay.walletconnect.com?projectId=$projectId"
 

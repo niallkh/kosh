@@ -1,19 +1,24 @@
 package kosh.app
 
+import android.annotation.SuppressLint
 import android.app.Notification
 import android.app.NotificationChannel
 import android.app.NotificationManager
 import android.app.PendingIntent
-import android.app.Service
 import android.content.Intent
 import android.content.pm.ServiceInfo
 import android.os.Build
-import android.os.IBinder
 import androidx.core.app.NotificationCompat
 import androidx.core.app.NotificationManagerCompat
 import androidx.core.app.ServiceCompat
+import androidx.lifecycle.LifecycleService
+import androidx.lifecycle.lifecycleScope
 import co.touchlab.kermit.Logger
+import kosh.app.KoshApplication.Companion.applicationScope
 import kosh.domain.repositories.NotificationRepo.Type
+import kosh.domain.repositories.WcRepo
+import kosh.domain.usecases.notification.NotificationService
+import kosh.domain.usecases.wc.WcConnectionService
 import kosh.domain.usecases.wc.useConnection
 import kosh.ui.navigation.deeplink
 import kosh.ui.navigation.routes.wcAuthentication
@@ -31,28 +36,26 @@ import kosh.domain.repositories.Notification as AppNotification
 private const val KOSH_SERVICE_CH_ID = "KOSH_SERVICE_CH_ID"
 private const val STOP_ACTION = "STOP_SERVICE"
 
-class KoshService : Service() {
+class KoshService : LifecycleService() {
 
     private val logger = Logger.withTag("[K]KoshService")
 
-    private val notificationManager by lazy { NotificationManagerCompat.from(this) }
-    private val applicationScope by lazy {
-        KoshApplication.applicationScope.coroutinesComponent.applicationScope
-    }
-    private val wcConnectionService by lazy {
-        KoshApplication.applicationScope.domainComponent.wcConnectionService
-    }
-    private val notificationService by lazy {
-        KoshApplication.applicationScope.domainComponent.notificationService
-    }
-    private val wcRepo by lazy {
-        KoshApplication.applicationScope.appRepositoriesComponent.wcRepo
-    }
+    private lateinit var notificationManager: NotificationManagerCompat
+    private lateinit var wcConnectionService: WcConnectionService
+    private lateinit var notificationService: NotificationService
+    private lateinit var wcRepo: WcRepo
 
     private val started = MutableStateFlow(false)
 
-    init {
-        applicationScope.launch {
+    override fun onCreate() {
+        super.onCreate()
+
+        notificationManager = NotificationManagerCompat.from(this)
+        wcConnectionService = applicationScope.domainComponent.wcConnectionService
+        notificationService = applicationScope.domainComponent.notificationService
+        wcRepo = applicationScope.appRepositoriesComponent.wcRepo
+
+        lifecycleScope.launch {
             ActivityCallbacks.background.collectLatest { background ->
                 if (background) {
                     delay(5.minutes)
@@ -61,7 +64,7 @@ class KoshService : Service() {
             }
         }
 
-        applicationScope.launch {
+        lifecycleScope.launch {
             started.collectLatest { started ->
                 if (started) {
                     collectWcRequests()
@@ -70,10 +73,7 @@ class KoshService : Service() {
         }
     }
 
-    override fun onBind(intent: Intent?): IBinder? {
-        return null
-    }
-
+    @SuppressLint("MissingSuperCall")
     override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int {
         logger.d { "onStartCommand(action=${intent?.action})" }
 

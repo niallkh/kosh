@@ -40,6 +40,7 @@ kotlin {
 
             implementation(libs.androidx.startup)
             implementation(libs.androidx.splash)
+            implementation(libs.androidx.lifecycle.service)
             implementation(libs.decompose.android)
             implementation(libs.ktor.client.okhttp)
             implementation(libs.wc2.android)
