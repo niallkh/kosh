@@ -19,7 +19,8 @@ import kosh.app.di.FilesComponent
 import kosh.app.di.ImageComponent
 import kosh.app.di.NetworkComponent
 import kosh.domain.core.provider
-import kosh.domain.serializers.Uri
+import kosh.domain.models.Uri
+import kosh.domain.models.toLibUri
 import kosh.ui.resources.Res
 import okio.Buffer
 import okio.Path.Companion.toPath
@@ -93,7 +94,7 @@ private class UriMapper : Mapper<Url> {
     }
 
     private fun isApplicable(uri: Uri): Boolean {
-        return uri.scheme in arrayOf("http", "https", "ipfs")
+        return uri.toLibUri().scheme in arrayOf("http", "https", "ipfs")
     }
 }
 
@@ -101,8 +102,9 @@ private class ComposeResourceFetcher private constructor(
     private val uri: Uri,
 ) : Fetcher {
     override suspend fun fetch(): FetchResult {
+        val uri1 = uri.toLibUri()
         return FetchResult.OfSource(
-            source = Buffer().apply { write(Res.readBytes(uri.host + uri.encodedPath)) },
+            source = Buffer().apply { write(Res.readBytes(uri1.host + uri1.encodedPath)) },
         )
     }
 

@@ -4,7 +4,7 @@ import androidx.compose.runtime.Immutable
 import arrow.optics.optics
 import kosh.domain.models.Address
 import kosh.domain.models.Hash
-import kosh.domain.models.wc.DappMetadata
+import kosh.domain.models.Uri
 import kosh.domain.models.web3.GasPrice
 import kosh.domain.models.web3.Receipt
 import kosh.domain.serializers.BigInteger
@@ -25,7 +25,7 @@ private val namespace = uuid5(UuidNil, "TokenEntity")
 @optics
 sealed interface TransactionEntity : Entity {
     override val id: Id
-    val dapp: DappMetadata
+    val dapp: Dapp
 
     @Serializable
     @Immutable
@@ -38,7 +38,7 @@ sealed interface TransactionEntity : Entity {
         val target: Address?,
         val value: BigInteger,
         val data: Path,
-        override val dapp: DappMetadata,
+        override val dapp: Dapp,
         val nonce: ULong,
         val gasLimit: ULong,
         val gasPrice: GasPrice,
@@ -57,7 +57,7 @@ sealed interface TransactionEntity : Entity {
                 target: Address?,
                 value: BigInteger,
                 data: Path,
-                dapp: DappMetadata,
+                dapp: Dapp,
                 nonce: ULong,
                 gasLimit: ULong,
                 hash: Hash,
@@ -89,7 +89,7 @@ sealed interface TransactionEntity : Entity {
     data class PersonalMessage(
         override val id: Id,
         val sender: AccountEntity.Id,
-        override val dapp: DappMetadata,
+        override val dapp: Dapp,
         val message: Path,
         override val createdAt: Instant,
         override val modifiedAt: Instant,
@@ -98,7 +98,7 @@ sealed interface TransactionEntity : Entity {
         companion object {
             operator fun invoke(
                 sender: AccountEntity.Id,
-                dapp: DappMetadata,
+                dapp: Dapp,
                 message: Path,
             ) = PersonalMessage(
                 id = Id(
@@ -122,7 +122,7 @@ sealed interface TransactionEntity : Entity {
         override val id: Id,
         val networkId: NetworkEntity.Id?,
         val sender: AccountEntity.Id,
-        override val dapp: DappMetadata,
+        override val dapp: Dapp,
         val jsonTypeData: Path,
         override val createdAt: Instant,
         override val modifiedAt: Instant,
@@ -131,7 +131,7 @@ sealed interface TransactionEntity : Entity {
         companion object {
             operator fun invoke(
                 sender: AccountEntity.Id,
-                dapp: DappMetadata,
+                dapp: Dapp,
                 networkId: NetworkEntity.Id?,
                 jsonTypeData: Path,
             ) = Eip712(
@@ -197,6 +197,14 @@ sealed interface TransactionEntity : Entity {
             )
         }
     }
+
+    @Serializable
+    @Immutable
+    data class Dapp(
+        val name: String,
+        val url: Uri?,
+        val icon: Uri?,
+    )
 
     companion object
 }

@@ -1,8 +1,9 @@
 package kosh.data.web3
 
 import co.touchlab.kermit.Logger
-import com.eygraber.uri.Uri
 import kosh.domain.models.ChainId
+import kosh.domain.models.Uri
+import kosh.domain.models.toLibUri
 import kosh.domain.repositories.NetworkRepo
 import kosh.eth.rpc.Web3ProviderFactory
 
@@ -16,7 +17,7 @@ class DefaultNetworkRepo(
         chainId: ChainId,
         rpc: Uri,
     ): Boolean {
-        val web3Provider = web3ProviderFactory(rpc)
+        val web3Provider = web3ProviderFactory(rpc.toLibUri())
         return runCatching { web3Provider.chainId() == chainId.value }
             .getOrElse {
                 logger.i(it) { "Rpc url is invalid" }

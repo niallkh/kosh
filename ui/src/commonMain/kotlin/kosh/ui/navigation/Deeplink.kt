@@ -54,11 +54,11 @@ private fun wcRequestRoute(uriStr: String) = RootRoute.WcRequest(
 private fun appRoute(uri: Uri): RootRoute? = uri.host?.decodeBase64()
     ?.let { Cbor.decodeFromByteArray(RootRoute.serializer().nullable, it.toByteArray()) }
 
-fun deeplink(route: RootRoute?): Uri {
+fun deeplink(route: RootRoute?): kosh.domain.models.Uri {
     val screen = Cbor.encodeToByteArray(RootRoute.serializer().nullable, route).toByteString()
         .base64Url()
 
-    return Uri.parse("route://${screen}")
+    return kosh.domain.models.Uri("route://${screen}")
 }
 
 tailrec fun Route?.isDeeplink(): Boolean {

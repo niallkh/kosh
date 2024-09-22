@@ -8,6 +8,7 @@ import kosh.domain.models.Address
 import kosh.domain.models.ByteString
 import kosh.domain.models.ChainId
 import kosh.domain.models.Hash
+import kosh.domain.models.toLibUri
 import kosh.domain.models.web3.GasPrice
 import kosh.domain.models.web3.Log
 import kosh.domain.models.web3.Receipt
@@ -40,7 +41,7 @@ class DefaultTransactionRepo(
         address: Address,
     ): Either<Web3Failure, ULong> = withContext(Dispatchers.Default) {
         either {
-            val web3 = web3ProviderFactory(getRpcProvidersUC(chainId))
+            val web3 = web3ProviderFactory(getRpcProvidersUC(chainId).toLibUri())
 
             web3.getNonce(address = address.bytes().abi.address)
         }
@@ -51,7 +52,7 @@ class DefaultTransactionRepo(
         transaction: Signature,
     ): Either<Web3Failure, Hash> = withContext(Dispatchers.Default) {
         either {
-            val web3 = web3ProviderFactory(getRpcProvidersUC(chainId, write = true))
+            val web3 = web3ProviderFactory(getRpcProvidersUC(chainId, write = true).toLibUri())
             val hash = web3.sendRawTransaction(transaction.data.bytes())
             check(hash.bytes == transaction.data.bytes().keccak256())
             Hash(ByteString(transaction.data.bytes().keccak256()))
@@ -63,7 +64,7 @@ class DefaultTransactionRepo(
         hash: Hash,
     ): Either<Web3Failure, ReceiptLogs?> = withContext(Dispatchers.Default) {
         either {
-            val web3 = web3ProviderFactory(networkService.getRpc(networkId))
+            val web3 = web3ProviderFactory(networkService.getRpc(networkId).toLibUri())
 
             val receipt = web3.catch(logger) {
                 getTransactionReceipt(kosh.eth.rpc.Hash(hash.value.bytes()))

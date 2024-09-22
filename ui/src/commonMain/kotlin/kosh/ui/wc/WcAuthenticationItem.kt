@@ -21,7 +21,10 @@ fun WcAuthenticationItem(
     ListItem(
         modifier = modifier.clickable(onClick = { onSelect(authentication) }.single()),
         leadingContent = {
-            DappIcon(authentication.dapp)
+            DappIcon(
+                authentication.dapp.url,
+                authentication.dapp.icon
+            )
         },
         headlineContent = {
             TextLine(authentication.dapp.name)

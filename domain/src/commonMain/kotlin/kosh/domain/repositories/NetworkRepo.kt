@@ -1,7 +1,7 @@
 package kosh.domain.repositories
 
-import com.eygraber.uri.Uri
 import kosh.domain.models.ChainId
+import kosh.domain.models.Uri
 
 interface NetworkRepo : Repository {
 

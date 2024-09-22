@@ -113,14 +113,20 @@ fun WcSendTransactionContent(
     KoshScaffold(
         title = {
             if (sendTransaction.failure == null) {
-                DappTitle(sendTransaction.request?.dapp)
+                DappTitle(
+                    sendTransaction.request?.dapp?.name,
+                    sendTransaction.request?.dapp?.url,
+                )
             }
         },
         onNavigateUp = onNavigateUp,
 
         actions = {
             if (sendTransaction.failure == null) {
-                DappIcon(sendTransaction.request?.dapp)
+                DappIcon(
+                    sendTransaction.request?.dapp?.url,
+                    sendTransaction.request?.dapp?.icon,
+                )
             }
             Spacer(Modifier.width(8.dp))
         }

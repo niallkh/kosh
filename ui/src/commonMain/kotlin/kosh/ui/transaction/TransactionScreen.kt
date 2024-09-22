@@ -74,11 +74,11 @@ fun TransactionContent(
     onDelete: (TransactionEntity.Id) -> Unit,
 ) {
     KoshScaffold(
-        title = { DappTitle(transaction?.dapp) },
+        title = { DappTitle(transaction?.dapp?.name, transaction?.dapp?.url) },
         onNavigateUp = onNavigateUp,
 
         actions = {
-            DappIcon(transaction?.dapp)
+            DappIcon(transaction?.dapp?.url, transaction?.dapp?.icon)
 
             AdaptiveMoreMenu { dismiss ->
                 if (transaction is TransactionEntity.Eip1559) {

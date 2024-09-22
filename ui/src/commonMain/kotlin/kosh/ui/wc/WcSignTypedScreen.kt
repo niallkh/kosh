@@ -90,14 +90,20 @@ fun WcSignTypedContent(
     KoshScaffold(
         title = {
             if (signTyped.failure == null) {
-                DappTitle(signTyped.request?.dapp)
+                DappTitle(
+                    signTyped.request?.dapp?.name,
+                    signTyped.request?.dapp?.url,
+                )
             }
         },
         onNavigateUp = onNavigateUp,
 
         actions = {
             if (signTyped.failure == null) {
-                DappIcon(signTyped.request?.dapp)
+                DappIcon(
+                    signTyped.request?.dapp?.url,
+                    signTyped.request?.dapp?.icon,
+                )
             }
             Spacer(Modifier.width(8.dp))
         }

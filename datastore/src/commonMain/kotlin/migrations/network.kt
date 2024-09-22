@@ -2,9 +2,9 @@ package kosh.datastore.migrations
 
 import arrow.optics.dsl.at
 import arrow.optics.typeclasses.At
-import com.eygraber.uri.Uri
 import kosh.domain.entities.NetworkEntity
 import kosh.domain.models.ChainId
+import kosh.domain.models.Uri
 import kosh.domain.state.AppState
 import kosh.domain.state.enabledNetworkIds
 import kosh.domain.state.networks
@@ -29,7 +29,7 @@ internal fun Copy<AppState>.network(
         name = name,
         readRpcProvider = readRpcProvider,
         writeRpcProvider = writeRpcProvider,
-        explorers = explorers.map { Uri.parse(it) }.toPersistentList(),
+        explorers = explorers.map { Uri(it) }.toPersistentList(),
         testnet = testnet,
         icon = Icons.icon(icon.lowercase()),
     )

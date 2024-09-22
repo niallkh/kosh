@@ -11,11 +11,18 @@ import com.eygraber.uri.Uri.Companion as LibUri
 value class Uri private constructor(
     internal val value: String,
 ) {
+
+    override fun toString(): String = value
+
     companion object {
+        private val EMPTY = Uri(com.eygraber.uri.Uri.EMPTY.toString())
+
         operator fun invoke(value: String): Uri {
             checkNotNull(LibUri.parseOrNull(value))
             return Uri(value)
         }
+
+        operator fun invoke(): Uri = EMPTY
     }
 }
 

@@ -5,11 +5,11 @@ import arrow.optics.optics
 import kosh.domain.models.Address
 import kosh.domain.models.ByteString
 import kosh.domain.models.ChainId
+import kosh.domain.models.Uri
 import kosh.domain.models.web3.EthMessage
 import kosh.domain.models.web3.JsonTypeData
 import kosh.domain.models.web3.Transaction
 import kosh.domain.serializers.BigInteger
-import kosh.domain.serializers.Uri
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 import kotlin.jvm.JvmInline

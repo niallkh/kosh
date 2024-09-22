@@ -15,8 +15,8 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
-import com.eygraber.uri.Uri
 import kosh.domain.models.ChainId
+import kosh.domain.models.Uri
 import kosh.ui.component.icon.ChainBadge
 import kosh.ui.component.image.NftImage
 import kosh.ui.component.single.single

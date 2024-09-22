@@ -1,8 +1,8 @@
 package kosh.domain.repositories
 
 import androidx.compose.runtime.Immutable
+import kosh.domain.models.Uri
 import kosh.domain.repositories.NotificationRepo.Type
-import kosh.domain.serializers.Uri
 import kotlinx.coroutines.flow.Flow
 import kotlinx.serialization.Serializable
 

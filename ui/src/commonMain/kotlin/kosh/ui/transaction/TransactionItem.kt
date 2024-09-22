@@ -44,7 +44,11 @@ fun TransactionItem(
         modifier = modifier.clickable(onClick = onClick.single()),
         overlineContent = { TextDate(transaction.receipt?.time ?: transaction.createdAt) },
         leadingContent = {
-            DappIcon(transaction.dapp, networkId = transaction.networkId)
+            DappIcon(
+                transaction.dapp.url,
+                transaction.dapp.icon,
+                networkId = transaction.networkId
+            )
         },
         headlineContent = {
             TextFunctionName(parsed?.contractCall)

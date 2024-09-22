@@ -18,10 +18,10 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.unit.dp
-import com.eygraber.uri.Uri
 import kosh.domain.entities.TokenEntity
 import kosh.domain.models.Address
 import kosh.domain.models.ChainId
+import kosh.domain.models.Uri
 import kosh.domain.models.at
 import kosh.domain.serializers.BigInteger
 import kosh.domain.utils.orZero
@@ -138,7 +138,7 @@ fun TokenAmountItem(
                     .clip(CircleShape)
                     .placeholder(tokenEntity == null),
                 symbol = tokenEntity?.symbol.orEmpty(),
-                icon = tokenEntity?.image ?: tokenEntity?.icon ?: Uri.EMPTY,
+                icon = tokenEntity?.image ?: tokenEntity?.icon ?: Uri(),
             )
         },
         headlineContent = {

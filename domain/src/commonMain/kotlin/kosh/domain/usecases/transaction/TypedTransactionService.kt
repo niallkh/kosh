@@ -39,7 +39,11 @@ class TypedTransactionService(
         val eip712 = TransactionEntity.Eip712(
             sender = AccountEntity.Id(signature.signer),
             jsonTypeData = jsonPath,
-            dapp = dapp,
+            dapp = TransactionEntity.Dapp(
+                name = dapp.name,
+                url = dapp.url,
+                icon = dapp.icon
+            ),
             networkId = chainId?.let { appStateRepo.optic(AppState.network(it)).value?.id }
         )
 

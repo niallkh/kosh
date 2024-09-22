@@ -117,13 +117,19 @@ fun WcSessionProposalContent(
     KoshScaffold(
         title = {
             if (proposal.failure == null) {
-                DappTitle(proposal.proposal?.proposal?.dapp)
+                DappTitle(
+                    proposal.proposal?.proposal?.dapp?.name,
+                    proposal.proposal?.proposal?.dapp?.url,
+                )
             }
         },
 
         actions = {
             if (proposal.failure == null) {
-                DappIcon(proposal.proposal?.proposal?.dapp)
+                DappIcon(
+                    proposal.proposal?.proposal?.dapp?.url,
+                    proposal.proposal?.proposal?.dapp?.icon,
+                )
                 Spacer(Modifier.width(8.dp))
             }
         },

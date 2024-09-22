@@ -10,8 +10,8 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import arrow.core.raise.recover
 import kosh.domain.failure.Web3Failure
+import kosh.domain.models.Uri
 import kosh.domain.models.token.NftExtendedMetadata
-import kosh.domain.serializers.Uri
 import kosh.domain.usecases.token.TokenDiscoveryService
 import kosh.presentation.di.di
 import kosh.presentation.di.rememberSerializable

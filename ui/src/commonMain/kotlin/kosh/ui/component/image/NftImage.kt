@@ -12,7 +12,7 @@ import androidx.compose.ui.graphics.vector.rememberVectorPainter
 import androidx.compose.ui.layout.ContentScale
 import com.seiko.imageloader.model.ImageRequest
 import com.seiko.imageloader.rememberImagePainter
-import kosh.domain.serializers.Uri
+import kosh.domain.models.Uri
 import kosh.ui.resources.illustrations.NftEmpty
 
 @Composable

@@ -3,12 +3,12 @@ package kosh.domain.usecases.token
 import kosh.domain.entities.NetworkEntity
 import kosh.domain.failure.Web3Failure
 import kosh.domain.models.Address
+import kosh.domain.models.Uri
 import kosh.domain.models.token.NftExtendedMetadata
 import kosh.domain.models.token.NftMetadata
 import kosh.domain.models.token.TokenMetadata
 import kosh.domain.serializers.BigInteger
 import kosh.domain.serializers.Either
-import kosh.domain.serializers.Uri
 import kotlinx.coroutines.flow.Flow
 
 interface TokenDiscoveryService {

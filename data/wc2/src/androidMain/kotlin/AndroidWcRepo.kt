@@ -11,7 +11,6 @@ import arrow.core.raise.ensure
 import arrow.core.raise.withError
 import arrow.core.right
 import co.touchlab.kermit.Logger
-import com.eygraber.uri.Uri
 import com.ionspin.kotlin.bignum.integer.toBigInteger
 import com.walletconnect.android.Core
 import com.walletconnect.android.CoreClient
@@ -39,6 +38,7 @@ import kosh.domain.models.ChainAddress
 import kosh.domain.models.ChainAddress.Companion.fromCaip10
 import kosh.domain.models.ChainId
 import kosh.domain.models.ChainId.Companion.fromCaip2
+import kosh.domain.models.Uri
 import kosh.domain.models.caip10
 import kosh.domain.models.caip2
 import kosh.domain.models.did
@@ -747,8 +747,8 @@ class AndroidWcRepo(
             dapp = DappMetadata(
                 name = proposal.name,
                 description = proposal.description,
-                url = proposal.url.let(Uri::parse),
-                icon = proposal.icons.firstOrNull()?.toString()?.let(Uri::parse),
+                url = proposal.url.let(Uri::invoke),
+                icon = proposal.icons.firstOrNull()?.toString()?.let(Uri::invoke),
             ),
             verifyContext = verifyContext?.let { verifyContext(it) }
                 ?: getVerifyContext(requestId)
@@ -766,8 +766,8 @@ class AndroidWcRepo(
                 DappMetadata(
                     name = metadata?.name!!,
                     description = metadata?.description,
-                    url = metadata?.url?.let(Uri::parse),
-                    icon = metadata?.icons?.firstOrNull()?.let(Uri::parse),
+                    url = metadata?.url?.let(Uri::invoke),
+                    icon = metadata?.icons?.firstOrNull()?.let(Uri::invoke),
                 )
             },
             verifyContext = verifyContext?.let { verifyContext(it) }
@@ -782,8 +782,8 @@ class AndroidWcRepo(
         dapp = DappMetadata(
             name = session.metaData?.name!!,
             description = session.metaData?.description,
-            url = session.metaData?.url?.let(Uri::parse),
-            icon = session.metaData?.icons?.firstOrNull()?.let(Uri::parse),
+            url = session.metaData?.url?.let(Uri::invoke),
+            icon = session.metaData?.icons?.firstOrNull()?.let(Uri::invoke),
         ),
     )
 
@@ -797,8 +797,8 @@ class AndroidWcRepo(
             dapp = DappMetadata(
                 name = request.peerMetaData!!.name,
                 description = request.peerMetaData?.description,
-                url = request.peerMetaData?.url?.let(Uri::parse),
-                icon = request.peerMetaData?.icons?.firstOrNull()?.let(Uri::parse),
+                url = request.peerMetaData?.url?.let(Uri::invoke),
+                icon = request.peerMetaData?.icons?.firstOrNull()?.let(Uri::invoke),
             ),
             call = parseRpcRequest(
                 requestChainId = request.chainId?.let { fromCaip2(it) },
@@ -877,12 +877,12 @@ class AndroidWcRepo(
                             "Expected token decimals"
                         },
                         rpcProviders = checkNotNull(
-                            addNetwork.rpcUrls?.map { Uri.parse(it) }?.takeIf { it.isNotEmpty() }
+                            addNetwork.rpcUrls?.map { Uri(it) }?.takeIf { it.isNotEmpty() }
                         ) {
                             "Expected rpc provider"
                         },
-                        explorers = addNetwork.blockExplorerUrls?.map { Uri.parse(it) } ?: listOf(),
-                        icons = addNetwork.iconUrls?.map { Uri.parse(it) } ?: listOf(),
+                        explorers = addNetwork.blockExplorerUrls?.map { Uri(it) } ?: listOf(),
+                        icons = addNetwork.iconUrls?.map { Uri(it) } ?: listOf(),
                     )
                 }
 
@@ -894,7 +894,7 @@ class AndroidWcRepo(
                         chainId = requestChainId,
                         address = parseAddress(watchAsset.options.address),
                         tokenId = watchAsset.options.tokenId?.let(BigInteger::parseString),
-                        icon = watchAsset.options.image?.let(Uri::parse),
+                        icon = watchAsset.options.image?.let(Uri::invoke),
                     )
                 }
 

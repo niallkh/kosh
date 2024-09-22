@@ -87,14 +87,20 @@ fun WcSignPersonalContent(
     KoshScaffold(
         title = {
             if (signPersonal.failure == null) {
-                DappTitle(signPersonal.request?.dapp)
+                DappTitle(
+                    signPersonal.request?.dapp?.name,
+                    signPersonal.request?.dapp?.url,
+                )
             }
         },
         onNavigateUp = onNavigateUp,
 
         actions = {
             if (signPersonal.failure == null) {
-                DappIcon(signPersonal.request?.dapp)
+                DappIcon(
+                    signPersonal.request?.dapp?.url,
+                    signPersonal.request?.dapp?.icon,
+                )
             }
             Spacer(Modifier.width(8.dp))
         }

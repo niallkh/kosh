@@ -4,9 +4,9 @@ import androidx.compose.runtime.Immutable
 import arrow.core.memoize
 import arrow.optics.optics
 import kosh.domain.models.Address
+import kosh.domain.models.Uri
 import kosh.domain.models.eip55
 import kosh.domain.serializers.BigInteger
-import kosh.domain.serializers.Uri
 import kosh.domain.serializers.Uuid
 import kosh.domain.serializers.UuidSerializer
 import kosh.domain.serializers.serializer

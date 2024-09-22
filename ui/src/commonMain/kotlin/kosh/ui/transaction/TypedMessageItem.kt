@@ -40,7 +40,8 @@ fun TypedMessageItem(
         },
         leadingContent = {
             DappIcon(
-                typedMessage.dapp,
+                typedMessage.dapp.url,
+                typedMessage.dapp.icon,
                 networkId = typedMessage.networkId
             )
         },

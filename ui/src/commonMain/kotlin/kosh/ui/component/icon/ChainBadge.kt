@@ -13,7 +13,7 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.unit.dp
 import kosh.domain.entities.NetworkEntity
 import kosh.domain.models.ChainId
-import kosh.domain.serializers.Uri
+import kosh.domain.models.Uri
 
 @Composable
 fun ChainBadge(

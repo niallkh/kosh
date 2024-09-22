@@ -33,7 +33,10 @@ fun PersonalMessageItem(
             )
         },
         leadingContent = {
-            DappIcon(personalMessage.dapp)
+            DappIcon(
+                dapp = personalMessage.dapp.url,
+                icon = personalMessage.dapp.icon
+            )
         },
         trailingContent = {
             Icon(PersonalSignature, "PersonalSignature")

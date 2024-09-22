@@ -15,8 +15,7 @@ import androidx.compose.ui.unit.dp
 import com.seiko.imageloader.model.ImageRequest
 import com.seiko.imageloader.rememberImagePainter
 import kosh.domain.entities.NetworkEntity
-import kosh.domain.models.wc.DappMetadata
-import kosh.domain.serializers.Uri
+import kosh.domain.models.Uri
 import kosh.presentation.network.rememberNetwork
 import kosh.ui.component.colors.uriColor
 import kosh.ui.component.icon.ChainBadge
@@ -27,14 +26,15 @@ import kosh.ui.resources.icons.DappUnknown
 
 @Composable
 fun DappIcon(
-    dapp: DappMetadata?,
+    dapp: Uri?,
+    icon: Uri?,
     modifier: Modifier = Modifier,
     networkId: NetworkEntity.Id? = null,
 ) {
     Box {
         DappIcon(
-            dapp?.url,
-            dapp?.icon,
+            dapp,
+            icon,
             modifier.placeholder(dapp == null)
         )
 
@@ -65,7 +65,7 @@ private fun DappIcon(
     }
 
     val dappPainter = @Composable {
-        val colorScheme = uriColor(dapp ?: Uri.EMPTY, LocalIsDark.current)
+        val colorScheme = uriColor(dapp ?: Uri(), LocalIsDark.current)
 
         val painter = rememberVectorPainter(DappUnknown)
 

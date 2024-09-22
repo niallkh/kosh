@@ -3,8 +3,8 @@ package kosh.domain.usecases.network
 import kosh.domain.entities.NetworkEntity
 import kosh.domain.failure.NetworkFailure
 import kosh.domain.models.ChainId
+import kosh.domain.models.Uri
 import kosh.domain.serializers.Either
-import kosh.domain.serializers.Uri
 
 interface NetworkService {
 

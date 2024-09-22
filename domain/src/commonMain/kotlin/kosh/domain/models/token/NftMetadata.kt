@@ -3,8 +3,8 @@ package kosh.domain.models.token
 import androidx.compose.runtime.Immutable
 import kosh.domain.models.Address
 import kosh.domain.models.ChainId
+import kosh.domain.models.Uri
 import kosh.domain.serializers.BigInteger
-import kosh.domain.serializers.Uri
 import kotlinx.serialization.Serializable
 
 @Serializable

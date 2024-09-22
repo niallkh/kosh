@@ -13,9 +13,9 @@ import kosh.domain.entities.NetworkEntity
 import kosh.domain.failure.Web3Failure
 import kosh.domain.models.Address
 import kosh.domain.models.ChainAddress
+import kosh.domain.models.Uri
 import kosh.domain.models.token.NftMetadata
 import kosh.domain.models.token.TokenMetadata
-import kosh.domain.serializers.Uri
 import kosh.domain.usecases.token.TokenDiscoveryService
 import kosh.presentation.di.di
 

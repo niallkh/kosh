@@ -13,7 +13,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
-import com.eygraber.uri.Uri
+import kosh.domain.models.Uri
 import kosh.domain.models.orZero
 import kosh.domain.models.wc.WcRequest
 import kosh.presentation.wc.AddNetworkRequestState
@@ -125,7 +125,7 @@ fun WcAddNetworkContent(
                 key = { Text("Rpc Provider") },
                 value = {
                     TextUri(
-                        addNetwork.call?.rpcProviders?.first() ?: Uri.EMPTY,
+                        addNetwork.call?.rpcProviders?.first() ?: Uri(),
                         Modifier.placeholder(addNetwork.call == null)
                     )
                 },

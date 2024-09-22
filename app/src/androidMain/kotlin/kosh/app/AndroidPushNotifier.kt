@@ -8,11 +8,11 @@ import android.app.PendingIntent
 import android.content.Context
 import android.content.Intent
 import android.content.pm.PackageManager
+import android.net.Uri
 import androidx.core.app.ActivityCompat
 import androidx.core.app.NotificationCompat
 import androidx.core.app.NotificationManagerCompat
 import co.touchlab.kermit.Logger
-import com.eygraber.uri.toAndroidUri
 import kosh.domain.repositories.NotificationRepo
 import kosh.domain.usecases.notification.NotificationService
 import kotlinx.coroutines.CoroutineScope
@@ -84,7 +84,7 @@ class AndroidPushNotifier(
     ): Notification {
         val intent = Intent(
             /* action = */ Intent.ACTION_VIEW,
-            /* uri = */ appNotification.uri.toAndroidUri(),
+            /* uri = */ Uri.parse(appNotification.uri.toString()),
             /* packageContext = */ context,
             /* cls = */ KoshActivity::class.java
         )

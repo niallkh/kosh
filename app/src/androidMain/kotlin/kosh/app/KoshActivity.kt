@@ -25,7 +25,6 @@ import com.arkivanov.decompose.defaultComponentContext
 import com.arkivanov.decompose.router.stack.push
 import com.arkivanov.essenty.lifecycle.asEssentyLifecycle
 import com.arkivanov.essenty.lifecycle.doOnStop
-import com.eygraber.uri.toAndroidUri
 import com.eygraber.uri.toUri
 import com.seiko.imageloader.LocalImageLoader
 import kosh.app.di.AndroidWindowScope
@@ -177,7 +176,7 @@ class KoshActivity : FragmentActivity() {
             this,
             KoshActivity::class.java
         ).apply {
-            data = deeplink(rootRoute).toAndroidUri()
+            data = Uri.parse(deeplink(rootRoute).toString())
         }
 
         TaskStackBuilder.create(this)

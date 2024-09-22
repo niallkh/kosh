@@ -16,11 +16,11 @@ import kosh.domain.entities.symbol
 import kosh.domain.entities.writeRpcProvider
 import kosh.domain.failure.NetworkFailure
 import kosh.domain.models.ChainId
+import kosh.domain.models.Uri
 import kosh.domain.repositories.AppStateRepo
 import kosh.domain.repositories.NetworkRepo
 import kosh.domain.repositories.modify
 import kosh.domain.repositories.state
-import kosh.domain.serializers.Uri
 import kosh.domain.state.AppState
 import kosh.domain.state.enabledNetworkIds
 import kosh.domain.state.nativeToken

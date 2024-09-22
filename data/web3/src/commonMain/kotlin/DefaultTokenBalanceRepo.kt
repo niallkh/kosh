@@ -8,6 +8,7 @@ import kosh.domain.entities.TokenEntity
 import kosh.domain.failure.Web3Failure
 import kosh.domain.models.Address
 import kosh.domain.models.ChainId
+import kosh.domain.models.toLibUri
 import kosh.domain.models.token.Balance
 import kosh.domain.models.token.TokenMetadata
 import kosh.domain.repositories.TokenBalanceRepo
@@ -44,7 +45,7 @@ class DefaultTokenBalanceRepo(
 
             val calls = tokens.map { token -> mapToCall(account, token) }
 
-            val web3 = web3ProviderFactory(networkService.getRpc(networkId))
+            val web3 = web3ProviderFactory(networkService.getRpc(networkId).toLibUri())
 
             web3.catch(logger) {
                 web3.multicall(*calls.toTypedArray())
@@ -68,7 +69,8 @@ class DefaultTokenBalanceRepo(
 
             val calls = tokens.mapNotNull { token -> mapToCall(account, token) }
 
-            val web3 = web3ProviderFactory(networkService.getRpc(NetworkEntity.Id(chainId)))
+            val web3 =
+                web3ProviderFactory(networkService.getRpc(NetworkEntity.Id(chainId)).toLibUri())
 
             web3.catch(logger) {
                 web3.multicall(*calls.toTypedArray())

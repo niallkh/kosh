@@ -4,7 +4,7 @@ import androidx.compose.runtime.Immutable
 import arrow.core.memoize
 import arrow.optics.optics
 import kosh.domain.models.ChainId
-import kosh.domain.serializers.Uri
+import kosh.domain.models.Uri
 import kosh.domain.serializers.Uuid
 import kosh.domain.serializers.UuidSerializer
 import kosh.domain.serializers.serializer

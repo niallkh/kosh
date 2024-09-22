@@ -117,14 +117,20 @@ fun WcAuthenticationContent(
     KoshScaffold(
         title = {
             if (authentication.failure == null) {
-                DappTitle(authentication.auth?.dapp)
+                DappTitle(
+                    authentication.auth?.dapp?.name,
+                    authentication.auth?.dapp?.url,
+                )
             }
         },
         onNavigateUp = { onNavigateUp() },
 
         actions = {
             if (authentication.failure == null) {
-                DappIcon(authentication.auth?.dapp)
+                DappIcon(
+                    authentication.auth?.dapp?.url,
+                    authentication.auth?.dapp?.icon,
+                )
             }
             Spacer(Modifier.width(8.dp))
         }

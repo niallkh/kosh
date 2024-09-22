@@ -6,7 +6,6 @@ import arrow.core.raise.Raise
 import arrow.core.raise.either
 import arrow.core.raise.nullable
 import co.touchlab.kermit.Logger
-import com.eygraber.uri.Uri
 import io.ktor.client.HttpClient
 import io.ktor.client.request.get
 import io.ktor.client.request.headers
@@ -18,6 +17,8 @@ import io.ktor.utils.io.readAvailable
 import kosh.domain.failure.Web3Failure
 import kosh.domain.models.Address
 import kosh.domain.models.ChainId
+import kosh.domain.models.Uri
+import kosh.domain.models.toLibUri
 import kosh.domain.models.token.NftExtendedMetadata
 import kosh.domain.models.token.NftMetadata
 import kosh.domain.models.token.TokenMetadata
@@ -64,7 +65,7 @@ class DefaultTokenRepo(
     ): Either<Web3Failure, TokenMetadata?> = withContext(Dispatchers.Default) {
         either {
             nullable {
-                val web3Provider = web3ProviderFactory(getRpcProvidersUC(chainId))
+                val web3Provider = web3ProviderFactory(getRpcProvidersUC(chainId).toLibUri())
 
                 val abiAddress = address.bytes().abi.address
                 val isErc165 =
@@ -137,7 +138,7 @@ class DefaultTokenRepo(
     ): Either<Web3Failure, NftMetadata?> = withContext(Dispatchers.Default) {
         either {
             nullable {
-                val web3Provider = web3ProviderFactory(getRpcProvidersUC(chainId))
+                val web3Provider = web3ProviderFactory(getRpcProvidersUC(chainId).toLibUri())
 
                 val tokenUriCall = when (type) {
                     Type.ERC20 -> error("Erc20 doesn't have nft metadata")
@@ -162,12 +163,12 @@ class DefaultTokenRepo(
                     chainId = chainId,
                     address = address,
                     tokenId = tokenId,
-                    uri = tokenUri.let { Uri.parse(it) },
+                    uri = Uri(tokenUri),
                     name = metadata.name,
-                    image = Uri.parse(image),
+                    image = Uri(image),
                     decimals = metadata.decimals,
                     symbol = metadata.symbol,
-                    external = metadata.externalUrl?.let(Uri::parse),
+                    external = metadata.externalUrl?.let(Uri::invoke),
                     description = metadata.description,
                 )
             }

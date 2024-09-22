@@ -14,7 +14,7 @@ import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.Dp
-import kosh.domain.serializers.Uri
+import kosh.domain.models.Uri
 import kosh.ui.component.modifier.optionalClickable
 
 @Composable

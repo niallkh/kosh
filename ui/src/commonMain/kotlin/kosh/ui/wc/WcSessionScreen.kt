@@ -111,14 +111,20 @@ fun WcSessionContent(
         modifier = modifier,
         title = {
             if (session.failure == null) {
-                DappTitle(session.session?.session?.dapp)
+                DappTitle(
+                    session.session?.session?.dapp?.name,
+                    session.session?.session?.dapp?.url,
+                )
             }
         },
 
         onNavigateUp = { onNavigateUp() },
         actions = {
             if (session.failure == null) {
-                DappIcon(session.session?.session?.dapp)
+                DappIcon(
+                    session.session?.session?.dapp?.url,
+                    session.session?.session?.dapp?.icon,
+                )
                 Spacer(Modifier.width(8.dp))
             }
         }

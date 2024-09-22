@@ -71,7 +71,11 @@ class Eip1559TransactionService(
                 data = fileRepo.write(transaction.tx.input),
                 gasPrice = transaction.gasPrice,
                 gasLimit = transaction.gasLimit,
-                dapp = dapp,
+                dapp = TransactionEntity.Dapp(
+                    name = dapp.name,
+                    url = dapp.url,
+                    icon = dapp.icon
+                ),
             )
 
             ensure(eip1559.id !in AppState.transactions.get()) {

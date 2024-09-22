@@ -18,12 +18,12 @@ import kosh.domain.entities.type
 import kosh.domain.failure.TokenFailure
 import kosh.domain.models.Address
 import kosh.domain.models.ChainId
+import kosh.domain.models.Uri
 import kosh.domain.repositories.AppStateRepo
 import kosh.domain.repositories.modify
 import kosh.domain.repositories.optic
 import kosh.domain.serializers.BigInteger
 import kosh.domain.serializers.Either
-import kosh.domain.serializers.Uri
 import kosh.domain.state.AppState
 import kosh.domain.state.network
 import kosh.domain.state.optionalToken

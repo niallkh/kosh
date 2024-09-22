@@ -34,7 +34,11 @@ class PersonalTransactionService(
 
         val personalMessage = TransactionEntity.PersonalMessage(
             sender = AccountEntity.Id(signature.signer),
-            dapp = dapp,
+            dapp = TransactionEntity.Dapp(
+                name = dapp.name,
+                url = dapp.url,
+                icon = dapp.icon
+            ),
             message = fileRepo.write(ByteString(message.value.encodeToByteString())),
         )
 

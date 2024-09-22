@@ -1,8 +1,8 @@
 package kosh.domain.usecases.network
 
-import com.eygraber.uri.Uri
 import kosh.domain.entities.NetworkEntity
 import kosh.domain.models.ChainId
+import kosh.domain.models.Uri
 import kosh.domain.repositories.AppStateRepo
 import kosh.domain.repositories.state
 import kosh.domain.state.AppState

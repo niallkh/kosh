@@ -8,6 +8,7 @@ import kosh.domain.failure.Web3Failure
 import kosh.domain.models.Address
 import kosh.domain.models.ByteString
 import kosh.domain.models.ChainId
+import kosh.domain.models.toLibUri
 import kosh.domain.models.web3.GasEstimation
 import kosh.domain.models.web3.GasPrice
 import kosh.domain.models.web3.GasPrices
@@ -36,7 +37,7 @@ class DefaultGasRepo(
         id: NetworkEntity.Id,
     ): Either<Web3Failure, GasPrices> = withContext(Dispatchers.Default) {
         either {
-            val web3 = web3ProviderFactory(networkService.getRpc(id))
+            val web3 = web3ProviderFactory(networkService.getRpc(id).toLibUri())
 
             val feeHistory = web3.catch(logger) {
                 web3.feeHistory(
@@ -92,7 +93,7 @@ class DefaultGasRepo(
         gas: ULong?,
     ): Either<Web3Failure, GasEstimation> = withContext(Dispatchers.Default) {
         either {
-            val web3 = web3ProviderFactory(getRpcProvidersUC(chainId))
+            val web3 = web3ProviderFactory(getRpcProvidersUC(chainId).toLibUri())
 
             val estimated = web3.catch(logger) {
                 web3.estimateGas(

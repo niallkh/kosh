@@ -15,6 +15,7 @@ import kosh.domain.failure.Web3Failure
 import kosh.domain.failure.logFailure
 import kosh.domain.models.Address
 import kosh.domain.models.ChainId
+import kosh.domain.models.Uri
 import kosh.domain.models.token.NftExtendedMetadata
 import kosh.domain.models.token.NftMetadata
 import kosh.domain.models.token.TokenMetadata
@@ -22,7 +23,6 @@ import kosh.domain.repositories.TokenListsRepo
 import kosh.domain.repositories.TokenRepo
 import kosh.domain.serializers.BigInteger
 import kosh.domain.serializers.Either
-import kosh.domain.serializers.Uri
 import kosh.domain.state.AppState
 import kosh.domain.state.AppStateProvider
 import kosh.domain.state.activeNetworks

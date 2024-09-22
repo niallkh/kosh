@@ -6,9 +6,9 @@ import kosh.domain.entities.TokenEntity.Type
 import kosh.domain.failure.TokenFailure
 import kosh.domain.models.Address
 import kosh.domain.models.ChainId
+import kosh.domain.models.Uri
 import kosh.domain.serializers.BigInteger
 import kosh.domain.serializers.Either
-import kosh.domain.serializers.Uri
 import kotlinx.coroutines.flow.Flow
 
 interface TokenService {

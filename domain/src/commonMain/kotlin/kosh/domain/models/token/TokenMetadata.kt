@@ -5,7 +5,7 @@ import arrow.optics.optics
 import kosh.domain.entities.TokenEntity
 import kosh.domain.models.Address
 import kosh.domain.models.ChainId
-import kosh.domain.serializers.Uri
+import kosh.domain.models.Uri
 import kotlinx.serialization.Serializable
 
 @Serializable

@@ -29,10 +29,10 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.platform.LocalUriHandler
 import androidx.compose.ui.unit.dp
 import arrow.core.raise.nullable
-import com.eygraber.uri.Uri
 import kosh.domain.entities.TokenEntity
 import kosh.domain.entities.TokenEntity.Type
 import kosh.domain.entities.isNft
+import kosh.domain.models.Uri
 import kosh.domain.models.orZero
 import kosh.domain.models.token.AccountBalance
 import kosh.domain.models.token.NftExtendedMetadata
@@ -339,7 +339,7 @@ private fun InfoSection(
                 key = { TextLine(text = "Uri") },
                 value = {
                     TextUri(
-                        token.entity?.uri ?: Uri.EMPTY,
+                        token.entity?.uri ?: Uri(),
                         Modifier.placeholder(token.entity == null),
                         maxWidth = 240.dp,
                         clickable = true,
@@ -352,7 +352,7 @@ private fun InfoSection(
                 key = { TextLine(text = "Image") },
                 value = {
                     TextUri(
-                        token.entity?.image ?: Uri.EMPTY,
+                        token.entity?.image ?: Uri(),
                         Modifier.placeholder(token.entity == null),
                         maxWidth = 240.dp,
                         clickable = true,
@@ -365,7 +365,7 @@ private fun InfoSection(
                 key = { TextLine(text = "Website") },
                 value = {
                     TextUri(
-                        token.entity?.external ?: Uri.EMPTY,
+                        token.entity?.external ?: Uri(),
                         Modifier.placeholder(token.entity == null),
                         maxWidth = 240.dp,
                         clickable = true,

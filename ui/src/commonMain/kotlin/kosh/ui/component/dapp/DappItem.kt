@@ -31,7 +31,7 @@ fun DappItem(
             }
         },
         leadingContent = {
-            DappIcon(dapp)
+            DappIcon(dapp.url, dapp.icon)
         },
     )
 }

@@ -10,7 +10,7 @@ import androidx.compose.ui.layout.ContentScale
 import com.seiko.imageloader.model.ImageRequest
 import com.seiko.imageloader.rememberImagePainter
 import kosh.domain.models.ChainId
-import kosh.domain.serializers.Uri
+import kosh.domain.models.Uri
 import kosh.ui.component.colors.chainColor
 import kosh.ui.component.theme.LocalIsDark
 

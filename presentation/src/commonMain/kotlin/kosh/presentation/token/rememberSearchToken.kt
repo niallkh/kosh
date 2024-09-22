@@ -11,9 +11,9 @@ import androidx.compose.runtime.setValue
 import arrow.core.raise.recover
 import kosh.domain.failure.Web3Failure
 import kosh.domain.models.Address
+import kosh.domain.models.Uri
 import kosh.domain.models.token.TokenMetadata
 import kosh.domain.serializers.ImmutableList
-import kosh.domain.serializers.Uri
 import kosh.domain.usecases.token.TokenDiscoveryService
 import kosh.presentation.di.di
 import kosh.presentation.di.rememberRetainable
