@@ -2,41 +2,37 @@ package kosh.libs.ledger
 
 import co.touchlab.kermit.Logger
 import kosh.libs.ledger.LedgerManager.Listener.ButtonRequest
-import kosh.libs.usb.Usb
-import kotlinx.coroutines.currentCoroutineContext
-import kotlinx.coroutines.ensureActive
+import kosh.libs.transport.Transport
 import kotlinx.io.Buffer
 import kotlinx.io.bytestring.ByteString
 import kotlinx.io.bytestring.toHexString
 import kotlinx.io.readByteString
 import kotlinx.io.write
-import kotlin.math.ceil
-import kotlin.random.Random
 
 class DefaultLedgerConnection(
-    private val usbConnection: Usb.Connection,
+    private val connection: Transport.Connection,
     private val listener: LedgerManager.Listener,
 ) : LedgerManager.Connection {
+
     private val logger = Logger.withTag("[K]LedgerConnection")
 
     override suspend fun exchange(
         ledgerAPDU: LedgerAPDU,
     ): Pair<StatusWord, ByteString> {
-        val channel = Random.nextInt()
         logger.d {
             with(ledgerAPDU) {
-                "-> 0x${cla.toString(16)} 0x${ins.toString(16)} " +
-                        "0x${p1.toString(16)} 0x${p2.toString(16)}"
+                "-> 0x${cla.toUByte().toString(16)} 0x${ins.toUByte().toString(16)} " +
+                        "0x${p1.toUByte().toString(16)} 0x${p2.toUByte().toString(16)}"
             }
         }
         logger.v {
             "data = ${ledgerAPDU.data.toHexString()}"
         }
         with(ledgerAPDU) {
-            write(cla, ins, p1, p2, data, channel)
+            write(cla, ins, p1, p2, data)
         }
         logger.v { "---" }
-        val (statusWord, bytes) = read(channel)
+        val (statusWord, bytes) = read()
         logger.d { "<- $statusWord" }
 
         return when (statusWord) {
@@ -55,7 +51,6 @@ class DefaultLedgerConnection(
         p1: Byte,
         p2: Byte,
         data: ByteString,
-        channel: Int,
     ) {
         require(data.size < 256)
 
@@ -68,25 +63,11 @@ class DefaultLedgerConnection(
             write(data)
         }.readByteString()
 
-        usbConnection.write(Buffer().apply { write(encodeBytes(message, channel)) })
+        connection.write(message)
     }
 
-    private suspend fun read(
-        channel: Int,
-    ): Pair<StatusWord, ByteString> {
-        val buffer = Buffer()
-
-        val msgSize = decodeHeader(source = readHeader(channel), sink = buffer, channel = channel)
-
-        if (msgSize > buffer.size) {
-            val left = msgSize - buffer.size.toInt()
-            val checks = ceil(left / 59.0).toInt() * 5
-            decodeData(
-                source = Buffer().apply { usbConnection.read(this, left + checks) },
-                sink = buffer,
-                channel = channel,
-            )
-        }
+    private suspend fun read(): Pair<StatusWord, ByteString> {
+        val buffer = Buffer().apply { write(connection.read()) }
 
         val bytes = buffer.readByteString((buffer.size - 2).toInt())
         val code = buffer.readShort()
@@ -97,23 +78,5 @@ class DefaultLedgerConnection(
         }
 
         return statusWord to bytes
-    }
-
-    private suspend fun readHeader(
-        channel: Int,
-    ): Buffer {
-        logger.v { "readHeader()" }
-        val buffer = Buffer()
-        while (true) {
-            currentCoroutineContext().ensureActive()
-
-            buffer.clear()
-
-            usbConnection.read(buffer, PACKET_SIZE)
-
-            if (isHeader(buffer, channel)) {
-                return buffer
-            }
-        }
     }
 }

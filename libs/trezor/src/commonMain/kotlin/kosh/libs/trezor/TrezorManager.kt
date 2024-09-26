@@ -5,18 +5,20 @@ import com.satoshilabs.trezor.lib.protobuf.ButtonRequest
 import com.satoshilabs.trezor.lib.protobuf.Failure
 import com.satoshilabs.trezor.lib.protobuf.Features
 import com.squareup.wire.Message
-import kosh.libs.usb.DeviceConfig
+import kosh.libs.usb.UsbConfig
 import kotlinx.coroutines.flow.Flow
 
-internal const val TREZOR_VENDOR_ID_ONE: Int = 0x534c
-internal const val TREZOR_PRODUCT_ID_ONE: Int = 0x0001
-internal const val TREZOR_VENDOR_ID: Int = 0x1209
-internal const val TREZOR_PRODUCT_ID: Int = 0x53c0
-internal const val TREZOR_PRODUCT_ID_2: Int = 0x53c1
+private const val TREZOR_VENDOR_ID_ONE: Int = 0x534c
+private const val TREZOR_PRODUCT_ID_ONE: Int = 0x0001
+private const val TREZOR_VENDOR_ID: Int = 0x1209
+private const val TREZOR_PRODUCT_ID: Int = 0x53c0
+private const val TREZOR_PRODUCT_ID_2: Int = 0x53c1
 
-internal val trezorUsbConfig = DeviceConfig(
+internal val trezorUsbConfig = UsbConfig(
     usbInterfaceNumber = 0x00,
-    packetSize = PACKET_SIZE
+    packetSize = 64,
+    vendorIds = listOf(TREZOR_VENDOR_ID, TREZOR_VENDOR_ID_ONE),
+    productIds = listOf(TREZOR_PRODUCT_ID, TREZOR_PRODUCT_ID_2, TREZOR_PRODUCT_ID_ONE),
 )
 
 interface TrezorManager {

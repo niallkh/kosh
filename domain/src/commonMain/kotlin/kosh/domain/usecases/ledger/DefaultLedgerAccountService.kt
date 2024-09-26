@@ -78,20 +78,20 @@ class DefaultLedgerAccountService(
     override suspend fun sign(
         listener: LedgerListener,
         ledger: Ledger,
-        data: TransactionData,
+        transaction: TransactionData,
     ): Either<LedgerFailure, Signature> = either {
 
-        val account = appStateRepo.optic(AppState.account(data.tx.from)).firstOrNull()
+        val account = appStateRepo.optic(AppState.account(transaction.tx.from)).firstOrNull()
             ?: raise(LedgerFailure.Other())
 
         val signature = ledgerRepo.signTransaction(
             listener = listener,
             ledger = ledger,
-            transaction = data,
+            transaction = transaction,
             derivationPath = account.derivationPath,
         ).bind()
 
-        ensure(signature.signer == data.tx.from) {
+        ensure(signature.signer == transaction.tx.from) {
             LedgerFailure.InvalidState()
         }
 

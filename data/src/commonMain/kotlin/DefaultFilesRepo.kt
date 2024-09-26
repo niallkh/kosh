@@ -37,16 +37,19 @@ class DefaultFilesRepo(
         val path = Path(folder(), key)
         val tmpPath = Path(folder(), "$key.tmp")
 
+        fileSystem.sink(tmpPath).buffered().use {
+            it.write(value.bytes())
+            it.flush()
+        }
+
         try {
-            fileSystem.sink(tmpPath).buffered().use {
-                it.write(value.bytes())
-                it.flush()
-            }
-
             fileSystem.atomicMove(tmpPath, path)
-
-        } finally {
+        } catch (e: UnsupportedOperationException) {
             fileSystem.delete(tmpPath)
+
+            fileSystem.sink(path).buffered().use {
+                it.write(value.bytes())
+            }
         }
 
         Path(key)

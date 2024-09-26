@@ -1,4 +1,4 @@
-<img src="images/logo.png" alt="logo" width="64" height="64">
+<img src="images/logo.webp" alt="logo" width="64" height="64">
 
 # Kosh
 
@@ -41,15 +41,15 @@ Some things you can expect in the future:
 
 <div>
     <p>
-        <img src="images/assets.png" width="160"  alt="Assets">
-        <img src="images/activity.png" width="160"  alt="Activity">
-        <img src="images/networks.png" width="160"  alt="Networks">
-        <img src="images/nft.png" width="160"  alt="NFT">
+        <img src="images/assets.webp" width="160"  alt="Assets">
+        <img src="images/activity.webp" width="160"  alt="Activity">
+        <img src="images/networks.webp" width="160"  alt="Networks">
+        <img src="images/nft.webp" width="160"  alt="NFT">
     </p>
     <p>
-        <img src="images/send_tx.png" width="160"  alt="Send Transaction">
-        <img src="images/add_wallet.png" width="160"  alt="Add Hardware Wallet">
-        <img src="images/illustration_light.png" width="160"  alt="Illustration Light">
-        <img src="images/illustration_dark.png" width="160"  alt="Illustration Dark">
+        <img src="images/send_tx.webp" width="160"  alt="Send Transaction">
+        <img src="images/add_wallet.webp" width="160"  alt="Add Hardware Wallet">
+        <img src="images/illustration_light.webp" width="160"  alt="Illustration Light">
+        <img src="images/illustration_dark.webp" width="160"  alt="Illustration Dark">
     </p>
 </div>

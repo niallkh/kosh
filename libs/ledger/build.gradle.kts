@@ -22,12 +22,14 @@ kotlin {
             languageSettings {
                 optIn("kotlinx.io.bytestring.unsafe.UnsafeByteStringApi")
                 optIn("kotlin.ExperimentalStdlibApi")
+                optIn("kotlin.uuid.ExperimentalUuidApi")
             }
         }
 
         commonMain {
             dependencies {
                 api(projects.libs.usb)
+                api(projects.libs.ble)
                 api(projects.eth.abi)
                 api(projects.eth.wallet)
                 api(projects.eth.proposals)

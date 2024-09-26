@@ -25,7 +25,7 @@ class JvmUsb : Usb {
 
     override suspend fun open(
         id: Long,
-        config: DeviceConfig,
+        config: UsbConfig,
     ): Resource<Usb.Connection> = withContext(Dispatchers.IO) {
         val usbServices = UsbHostManager.getUsbServices()
         val device = requireNotNull(
@@ -93,7 +93,7 @@ private fun UsbHub.listDevices(): Set<UsbDevice> {
 
 private fun usbInterface(
     usbDevice: UsbDevice,
-    config: DeviceConfig,
+    config: UsbConfig,
 ): UsbInterface {
     return usbDevice.activeUsbConfiguration
         .getUsbInterface(config.usbInterfaceNumber.toByte())
@@ -101,7 +101,7 @@ private fun usbInterface(
 }
 
 private fun usbEndpoint(
-    config: DeviceConfig,
+    config: UsbConfig,
     usbInterface: UsbInterface,
     write: Boolean,
 ): UsbEndpoint {

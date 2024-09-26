@@ -21,7 +21,14 @@ kotlin {
     jvm()
 
     sourceSets {
+        all {
+            languageSettings {
+                optIn("kotlinx.io.bytestring.unsafe.UnsafeByteStringApi")
+            }
+        }
         commonMain.dependencies {
+            api(projects.libs.transport)
+
             implementation(libs.kotlinx.io)
             implementation(libs.kotlinx.coroutines)
             implementation(libs.kotlinx.collections.immutable)

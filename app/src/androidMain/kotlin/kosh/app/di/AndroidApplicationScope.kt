@@ -5,11 +5,11 @@ import kosh.app.AndroidPushNotifier
 import kosh.app.di.impl.AndroidDataComponent
 import kosh.app.di.impl.AndroidFileSystemComponent
 import kosh.app.di.impl.AndroidImageComponent
+import kosh.app.di.impl.AndroidLedgerComponent
 import kosh.app.di.impl.AndroidNetworkComponent
+import kosh.app.di.impl.AndroidTransportComponent
 import kosh.app.di.impl.AndroidTrezorComponent
 import kosh.app.di.impl.DefaultApplicationScope
-import kosh.app.kosh.app.di.impl.AndroidLedgerComponent
-import kosh.app.kosh.app.di.impl.AndroidUsbComponent
 import kosh.data.DataComponent
 import kosh.data.trezor.LedgerComponent
 import kosh.data.trezor.TrezorComponent
@@ -41,19 +41,21 @@ class AndroidApplicationScope(
         )
     }
 
-    override val usbComponent: UsbComponent by provider {
-        AndroidUsbComponent(androidComponent = androidComponent)
+    override val transportComponent: TransportComponent by provider {
+        AndroidTransportComponent(
+            androidComponent = androidComponent
+        )
     }
 
     override val trezorComponent: TrezorComponent by provider {
         AndroidTrezorComponent(
-            usbComponent = usbComponent
+            usbComponent = transportComponent
         )
     }
 
     override val ledgerComponent: LedgerComponent by provider {
         AndroidLedgerComponent(
-            usbComponent = usbComponent,
+            usbComponent = transportComponent,
         )
     }
 

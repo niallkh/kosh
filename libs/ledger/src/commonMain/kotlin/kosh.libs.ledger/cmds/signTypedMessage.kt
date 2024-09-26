@@ -81,7 +81,7 @@ suspend fun LedgerManager.Connection.signTypedMessage(
     }
 
     return Buffer().run {
-        write(response, 1, 64)
+        write(response, 1, 65)
         write(response, 0, 1)
         readByteString()
     }

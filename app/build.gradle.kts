@@ -67,6 +67,7 @@ kotlin {
             implementation(projects.libs.trezor)
             implementation(projects.libs.ledger)
             implementation(projects.libs.usb)
+            implementation(projects.libs.ble)
             implementation(projects.libs.keystore)
 
             implementation(libs.kotlinx.serialization.json)

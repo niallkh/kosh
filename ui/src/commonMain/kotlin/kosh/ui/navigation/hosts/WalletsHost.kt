@@ -11,7 +11,9 @@ import kosh.ui.account.WalletsScreen
 import kosh.ui.analytics.LogScreen
 import kosh.ui.ledger.NewLedgerAccountScreen
 import kosh.ui.navigation.RouteResult
-import kosh.ui.navigation.animation.stackAnimationSharedAxisY
+import kosh.ui.navigation.animation.materialStackAnimation
+import kosh.ui.navigation.animation.sharedAxisX
+import kosh.ui.navigation.animation.sharedAxisY
 import kosh.ui.navigation.routes.WalletsRoute
 import kosh.ui.navigation.stack.StackHost
 import kosh.ui.trezor.NewTrezorAccountScreen
@@ -25,7 +27,12 @@ fun WalletsHost(
         start = WalletsRoute.List,
         link = link,
         onResult = onResult,
-        animation = stackAnimationSharedAxisY(),
+        animation = materialStackAnimation {
+            when (it) {
+                is WalletsRoute.Account -> sharedAxisY()
+                else -> sharedAxisX()
+            }
+        },
     ) { route ->
         when (route) {
             is WalletsRoute.List -> WalletsScreen(

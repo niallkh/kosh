@@ -20,6 +20,8 @@ import arrow.resilience.Schedule
 import arrow.resilience.retry
 import arrow.resilience.retryOrElse
 import co.touchlab.kermit.Logger
+import kosh.libs.transport.Device
+import kosh.libs.transport.Transport
 import kotlinx.collections.immutable.PersistentList
 import kotlinx.collections.immutable.minus
 import kotlinx.collections.immutable.plus
@@ -30,6 +32,7 @@ import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.channelFlow
 import kotlinx.coroutines.flow.conflate
 import kotlinx.coroutines.flow.distinctUntilChanged
+import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.suspendCancellableCoroutine
 import kotlinx.coroutines.withContext
 import kotlin.coroutines.resume
@@ -42,19 +45,25 @@ private val retrySchedule = Schedule.linear<Throwable>(300.milliseconds) and Sch
 class AndroidUsb(
     private val context: Context,
 ) : Usb {
-
     private val logger = Logger.withTag("[K]Usb")
 
-    override val devices: Flow<List<Device>>
-        get() = listDevices(context)
-            .distinctUntilChanged()
+    override fun devices(config: UsbConfig): Flow<List<Device>> = listDevices(context)
+        .map { devices ->
+            devices
+                .filter {
+                    it.vendorId in config.vendorIds &&
+                            (it.productId in config.productIds || it.productId shr 8 in config.productIds)
+                }
+                .map { it.mapDevice() }
+        }
+        .distinctUntilChanged()
 
     override suspend fun open(
-        id: Long,
-        config: DeviceConfig,
-    ): Resource<Usb.Connection> = withContext(Dispatchers.IO) {
+        id: String,
+        config: UsbConfig,
+    ): Resource<Transport.Connection> = withContext(Dispatchers.IO) {
         logger.d { "open(id = ${id})" }
-        val usbDevice = context.usbManager.requireDevice { it.deviceId.toLong() == id }
+        val usbDevice = context.usbManager.requireDevice { it.deviceId.toString() == id }
 
         if (context.usbManager.hasPermission(usbDevice).not()) {
             logger.i { "requestPermission(id = ${id})" }
@@ -136,15 +145,15 @@ class AndroidUsb(
     )
 }
 
-private fun listDevices(context: Context): Flow<List<Device>> = channelFlow {
+private fun listDevices(context: Context): Flow<List<UsbDevice>> = channelFlow {
     Logger.v { "listDevices()" }
 
     val initialDevices = withContext(Dispatchers.IO) {
-        context.usbManager.deviceList.values.toList().map { it.mapDevice() }.toPersistentList()
+        context.usbManager.deviceList.values.toList().toPersistentList()
     }
     val devices = AtomicRef(initialDevices)
 
-    fun update(block: (PersistentList<Device>) -> PersistentList<Device> = { it }) {
+    fun update(block: (PersistentList<UsbDevice>) -> PersistentList<UsbDevice> = { it }) {
         trySend(devices.updateAndGet(block))
     }
 
@@ -153,11 +162,11 @@ private fun listDevices(context: Context): Flow<List<Device>> = channelFlow {
             Logger.v { "BroadcastReceiver1#onReceive(action = ${intent.action})" }
             when (intent.action) {
                 UsbManager.ACTION_USB_DEVICE_ATTACHED -> {
-                    update { it + checkNotNull(intent.usbDevice).mapDevice() }
+                    update { it + checkNotNull(intent.usbDevice) }
                 }
 
                 UsbManager.ACTION_USB_DEVICE_DETACHED -> {
-                    update { it - checkNotNull(intent.usbDevice).mapDevice() }
+                    update { it - checkNotNull(intent.usbDevice) }
                 }
             }
         }
@@ -230,11 +239,11 @@ private fun getUsbPermissionIntent(context: Context): PendingIntent {
 
 private fun usbInterface(
     usbDevice: UsbDevice,
-    config: DeviceConfig,
+    config: UsbConfig,
 ): UsbInterface = usbDevice.getInterface(config.usbInterfaceNumber)
 
 private fun usbEndpoint(
-    config: DeviceConfig,
+    config: UsbConfig,
     usbInterface: UsbInterface,
     write: Boolean,
 ): UsbEndpoint {
@@ -260,9 +269,6 @@ internal val Intent.usbDevice: UsbDevice?
     }
 
 internal fun UsbDevice.mapDevice(): Device = Device(
-    id = deviceId.toLong(),
-    vendorId = vendorId,
-    productId = productId,
-    productName = productName,
-    manufacturerName = manufacturerName,
+    id = deviceId.toString(),
+    name = productName,
 )

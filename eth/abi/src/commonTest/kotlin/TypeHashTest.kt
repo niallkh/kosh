@@ -1,6 +1,7 @@
-import kosh.eth.abi.eip712.Eip712Types
+
 import kosh.eth.abi.eip712.Eip712Type
 import kosh.eth.abi.eip712.Eip712Type.Tuple.Parameter
+import kosh.eth.abi.eip712.Eip712Types
 import kosh.eth.abi.eip712.typeHash
 import kosh.eth.abi.keccak256
 import kotlinx.io.bytestring.encodeToByteString
@@ -43,28 +44,6 @@ class TypeHashTest {
                 Parameter("name", Eip712Type.DynamicString),
             )
         )
-
-//        val type = Type.tuple("Transaction") {
-//            tuple("from", typeName = "Person") {
-//                address("wallet")
-//                string("name")
-//            }
-//
-//            tuple("to", typeName = "Person") {
-//                address("wallet")
-//                string("name")
-//            }
-//
-//            array("txs") {
-//                array(10u) {
-//                    tuple(typeName = "Asset") {
-//                        address("token")
-//                        uint256("amount")
-//                    }
-//                }
-//            }
-//        }
-
 
         assertEquals(
             expected.encodeToByteString().keccak256(),

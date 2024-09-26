@@ -14,6 +14,6 @@ data class Ledger(
     @JvmInline
     @Immutable
     @Serializable
-    value class Id(val value: Long)
+    value class Id(val value: String)
 }
 

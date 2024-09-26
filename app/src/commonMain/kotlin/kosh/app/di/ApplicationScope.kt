@@ -23,6 +23,6 @@ interface ApplicationScope {
     val web3Component: Web3Component
     val imageComponent: ImageComponent
     val domainComponent: DomainComponent
-    val usbComponent: UsbComponent
+    val transportComponent: TransportComponent
 }
 

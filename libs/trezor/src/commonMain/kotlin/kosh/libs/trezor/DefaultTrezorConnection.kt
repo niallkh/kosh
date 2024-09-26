@@ -8,28 +8,27 @@ import com.satoshilabs.trezor.lib.protobuf.Cancel
 import com.satoshilabs.trezor.lib.protobuf.Failure
 import com.satoshilabs.trezor.lib.protobuf.Features
 import com.satoshilabs.trezor.lib.protobuf.Initialize
+import com.satoshilabs.trezor.lib.protobuf.MessageType
 import com.satoshilabs.trezor.lib.protobuf.PassphraseAck
 import com.satoshilabs.trezor.lib.protobuf.PassphraseRequest
 import com.satoshilabs.trezor.lib.protobuf.PinMatrixAck
 import com.satoshilabs.trezor.lib.protobuf.PinMatrixRequest
-import com.satoshilabs.trezor.lib.protobuf.Ping
-import com.satoshilabs.trezor.lib.protobuf.Success
 import com.squareup.wire.Message
+import kosh.libs.transport.Transport
 import kosh.libs.trezor.TrezorManager.Connection.Listener.TrezorFailureException
 import kosh.libs.trezor.cmds.expect
 import kosh.libs.trezor.cmds.expectOrNull
-import kosh.libs.usb.Usb
 import kotlinx.coroutines.NonCancellable
-import kotlinx.coroutines.currentCoroutineContext
-import kotlinx.coroutines.ensureActive
 import kotlinx.coroutines.withContext
 import kotlinx.io.Buffer
+import kotlinx.io.Source
+import kotlinx.io.bytestring.ByteString
+import kotlinx.io.readByteArray
+import kotlinx.io.readByteString
 import kotlinx.io.write
-import kotlin.math.ceil
-import kotlin.random.Random
 
 internal class DefaultTrezorConnection(
-    private val usbConnection: Usb.Connection,
+    private val connection: Transport.Connection,
     private val listener: TrezorManager.Connection.Listener,
     private val sessionCache: SessionCache,
 ) : TrezorManager.Connection {
@@ -75,55 +74,16 @@ internal class DefaultTrezorConnection(
     }
 
     private suspend fun write(message: Message<*, *>) {
-        usbConnection.write(Buffer().apply { write(encode(message)) })
+        connection.write(encode(message))
     }
 
     private suspend fun read(): Message<*, *> {
-        val buffer = Buffer()
+        val buffer = Buffer().apply { write(connection.read()) }
 
-        val (msgType, msgSize) = decodeHeader(source = readHeader(), sink = buffer)
+        val msg = buffer.readByteString((buffer.size - 2).toInt())
+        val msgType = buffer.readShort()
 
-        if (msgSize > buffer.size) {
-            val left = msgSize - buffer.size.toInt()
-            val checks = ceil(left / 63.0).toInt()
-            decodeData(
-                source = Buffer().apply { usbConnection.read(this, left + checks) },
-                sink = buffer
-            )
-        }
-
-        return decode(msgType = msgType, data = buffer)
-    }
-
-    private suspend fun readHeader(): Buffer {
-        logger.v { "readHeader()" }
-        val buffer = Buffer()
-        while (true) {
-            currentCoroutineContext().ensureActive()
-
-            buffer.clear()
-
-            usbConnection.read(buffer, 64)
-
-            if (isHeader(buffer)) {
-                return buffer
-            }
-        }
-    }
-
-    private suspend fun clearReadQueue() {
-        logger.v { "clearReadQueue()" }
-        cancel()
-
-        val message = Random.nextInt().toString().padStart(10, '0')
-        var response = exchange(Ping(message = message))
-
-        while (true) {
-            if (response.expectOrNull<Success>()?.message == message) {
-                break
-            }
-            response = read()
-        }
+        return decode(msgType = msgType, data = Buffer().apply { write(msg) })
     }
 
     private suspend fun cancel() {
@@ -192,5 +152,22 @@ internal class DefaultTrezorConnection(
         }
 
         this.features = features.copy(session_id = null)
+    }
+
+    private fun encode(message: Message<*, *>): ByteString = Buffer().run {
+        write(message.encode())
+        writeShort(message.toMessageType().value.toShort())
+        readByteString()
+    }
+
+    private fun decode(
+        msgType: Short,
+        data: Source,
+    ): Message<*, *> {
+        val messageType = checkNotNull(MessageType.fromValue(msgType.toInt())) {
+            "Unknown message type $msgType"
+        }
+
+        return messageType.toAdapter().decode(data.readByteArray())
     }
 }

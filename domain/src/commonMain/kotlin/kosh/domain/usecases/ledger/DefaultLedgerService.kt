@@ -14,9 +14,16 @@ class DefaultLedgerService(
     applicationScope: CoroutineScope,
 ) : LedgerService {
 
-    val list = ledgerRepo.list.map { it.firstOrNull() }
+    private val list = ledgerRepo.list.map { it.firstOrNull() }
         .distinctUntilChanged()
-        .stateIn(applicationScope, SharingStarted.Lazily, null)
+        .stateIn(
+            applicationScope,
+            SharingStarted.WhileSubscribed(
+                stopTimeoutMillis = 10_000,
+                replayExpirationMillis = 10_000
+            ),
+            null
+        )
 
     override fun getCurrentDevice(): Flow<Ledger?> = list
 }

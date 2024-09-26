@@ -32,3 +32,5 @@ suspend fun LedgerManager.Connection.ethereumAddress(
         "0x" + readByteString(readByte().toUByte().toInt()).decodeToString()
     }
 }
+// 050000001ae002000015058000002c8000003c800000000000000000000000
+// aa0000001ae002000015058000002c8000003c800000000000000000000000

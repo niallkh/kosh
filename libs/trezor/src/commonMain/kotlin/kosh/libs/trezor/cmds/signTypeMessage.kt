@@ -171,10 +171,10 @@ private fun Eip712.toByteString(
     )
 
     is Eip712Type.Tuple -> {
-        val tuple = types.keys.toList()[memberPath.first()]
+        val paramType = types.getValue(type)[memberPath.first()]
         toByteString(
-            type = tuple,
-            value = (value as Value.Tuple).getValue(tuple.name),
+            type = paramType.type,
+            value = (value as Value.Tuple).getValue(paramType.name),
             memberPath = memberPath.drop(1)
         )
     }

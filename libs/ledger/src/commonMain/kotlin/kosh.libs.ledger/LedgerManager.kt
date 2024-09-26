@@ -1,12 +1,14 @@
 package kosh.libs.ledger
 
 import arrow.fx.coroutines.Resource
-import kosh.libs.usb.DeviceConfig
+import kosh.libs.ble.BleConfig
+import kosh.libs.usb.UsbConfig
 import kotlinx.coroutines.flow.Flow
 import kotlinx.io.Buffer
 import kotlinx.io.Source
 import kotlinx.io.bytestring.ByteString
 import kotlinx.io.write
+import kotlin.uuid.Uuid
 
 internal const val LEDGER_VENDOR_ID: Int = 0x2c97
 internal const val LEDGER_PRODUCT_ID_NANO_S: Int = 0x10
@@ -15,10 +17,40 @@ internal const val LEDGER_PRODUCT_ID_NANO_S_P: Int = 0x50
 internal const val LEDGER_PRODUCT_ID_STAX: Int = 0x60
 internal const val LEDGER_PRODUCT_ID_FLEX: Int = 0x70
 
-internal val ledgerUsbConfig = DeviceConfig(
+internal val ledgerUsbConfig = UsbConfig(
     usbInterfaceNumber = 0x00,
-    packetSize = PACKET_SIZE
+    packetSize = 64,
+    vendorIds = listOf(LEDGER_VENDOR_ID),
+    productIds = listOf(
+        LEDGER_PRODUCT_ID_NANO_S,
+        LEDGER_PRODUCT_ID_NANO_X,
+        LEDGER_PRODUCT_ID_NANO_S_P,
+        LEDGER_PRODUCT_ID_STAX,
+    )
 )
+
+internal val ledgerBleConfig = BleConfig(
+    serviceUuid = listOf(
+        Uuid.parse("13d63400-2c97-0004-0000-4c6564676572"),
+        Uuid.parse("13d63400-2c97-6004-0000-4c6564676572"),
+        Uuid.parse("13d63400-2c97-3004-0000-4c6564676572"),
+    ),
+    notifyUuid = listOf(
+        Uuid.parse("13d63400-2c97-0004-0001-4c6564676572"),
+        Uuid.parse("13d63400-2c97-6004-0001-4c6564676572"),
+        Uuid.parse("13d63400-2c97-3004-0001-4c6564676572"),
+    ),
+    writeUuid = listOf(
+        Uuid.parse("13d63400-2c97-0004-0003-4c6564676572"),
+        Uuid.parse("13d63400-2c97-6004-0003-4c6564676572"),
+        Uuid.parse("13d63400-2c97-3004-0003-4c6564676572"),
+        Uuid.parse("13d63400-2c97-0004-0002-4c6564676572"),
+        Uuid.parse("13d63400-2c97-6004-0002-4c6564676572"),
+        Uuid.parse("13d63400-2c97-3004-0002-4c6564676572"),
+    )
+)
+
+internal const val TAG = 0x05
 
 interface LedgerManager {
 
@@ -26,7 +58,7 @@ interface LedgerManager {
 
     suspend fun open(
         listener: Listener,
-        id: Long,
+        id: String,
     ): Resource<Connection>
 
     interface Connection {
@@ -46,7 +78,7 @@ interface LedgerManager {
 }
 
 data class LedgerDevice(
-    val id: Long,
+    val id: String,
     val product: String?,
 )
 

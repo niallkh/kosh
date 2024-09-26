@@ -87,8 +87,8 @@ public object Wallet {
 
     public fun typeDataHash(eip712: Eip712): ByteString = Buffer().run {
         write("1901".hexToByteString())
-        write(eip712.types.structHash(eip712.primaryType, eip712.message))
         write(eip712.types.structHash(Eip712Type.Tuple.Domain, eip712.domain.toValue()))
+        write(eip712.types.structHash(eip712.primaryType, eip712.message))
         readByteString()
     }.keccak256()
 

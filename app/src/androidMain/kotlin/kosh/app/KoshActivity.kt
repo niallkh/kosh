@@ -8,6 +8,7 @@ import android.os.Bundle
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.activity.result.contract.ActivityResultContracts.RequestPermission
 import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.runtime.Composable
@@ -98,6 +99,7 @@ class KoshActivity : FragmentActivity() {
                 )
 
                 NotificationPermission()
+                BluetoothPermission()
                 HideSplashScreen(splashScreen)
                 EdgeToEdge()
             }
@@ -106,11 +108,33 @@ class KoshActivity : FragmentActivity() {
 
     @Composable
     private fun NotificationPermission() {
-        val launcher = rememberLauncherForActivityResult(RequestPermission()) {}
+        val launcher = rememberLauncherForActivityResult(RequestPermission()) {
+            logger.v { "NotificationPermission() = $it" }
+        }
 
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
             LaunchedEffect(Unit) {
                 launcher.launch(Manifest.permission.POST_NOTIFICATIONS)
+            }
+        }
+    }
+
+    @Composable
+    private fun BluetoothPermission() {
+        val launcher = rememberLauncherForActivityResult(
+            ActivityResultContracts.RequestMultiplePermissions()
+        ) {
+            logger.v { "BluetoothPermission() = $it" }
+        }
+
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
+            LaunchedEffect(Unit) {
+                launcher.launch(
+                    arrayOf(
+                        Manifest.permission.BLUETOOTH_SCAN,
+                        Manifest.permission.BLUETOOTH_CONNECT,
+                    )
+                )
             }
         }
     }
