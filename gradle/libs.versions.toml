@@ -1,12 +1,13 @@
 [versions]
 kotlin = "2.0.20"
 compose-plugin = "1.7.0-beta02"
-kotlinx-coroutines = "1.8.1"
+kotlinx-coroutines = "1.9.0"
 kotlinx-serialization = "1.7.2"
 kotlinx-datetime = "0.6.0"
 kotlinx-collections-immutable = "0.3.8"
 kotlinx-io = "0.5.3"
 decompose = "3.1.0"
+essenty = "2.1.0"
 image-loader = "1.8.1"
 arrow = "1.2.4"
 okio = "3.9.0"
@@ -24,6 +25,8 @@ material-kolor = "1.7.0"
 ktor = "2.3.12"
 uri = "0.0.18"
 ksp = "2.0.20-1.0.25"
+kable = "0.34.0"
+blue-falcon = "1.2.1"
 
 agp = "8.3.2"
 android-compileSdk = "34"
@@ -36,7 +39,7 @@ androidx-core-ktx = "1.13.1"
 androidx-espresso-core = "3.5.1"
 androidx-material = "1.12.0"
 androidx-test-junit = "1.2.1"
-androidx-startup = "1.1.1"
+androidx-startup = "1.2.0"
 androidx-work = "2.9.1"
 androidx-splash = "1.0.1"
 androidx-biometric = "1.2.0-alpha05"
@@ -48,6 +51,7 @@ usb4java = "1.3.0"
 
 [libraries]
 kotlinx-coroutines = { module = "org.jetbrains.kotlinx:kotlinx-coroutines-core", version.ref = "kotlinx-coroutines" }
+kotlinx-coroutines-android = { module = "org.jetbrains.kotlinx:kotlinx-coroutines-android", version.ref = "kotlinx-coroutines" }
 kotlinx-serialization-core = { module = "org.jetbrains.kotlinx:kotlinx-serialization-core", version.ref = "kotlinx-serialization" }
 kotlinx-serialization-json = { module = "org.jetbrains.kotlinx:kotlinx-serialization-json", version.ref = "kotlinx-serialization" }
 kotlinx-serialization-json-okio = { module = "org.jetbrains.kotlinx:kotlinx-serialization-json-okio", version.ref = "kotlinx-serialization" }
@@ -64,12 +68,17 @@ ktor-client-negotiation = { module = "io.ktor:ktor-client-content-negotiation", 
 ktor-client-negotiation-json = { module = "io.ktor:ktor-serialization-kotlinx-json", version.ref = "ktor" }
 ktor-client-cio = { module = "io.ktor:ktor-client-cio", version.ref = "ktor" }
 ktor-client-okhttp = { module = "io.ktor:ktor-client-okhttp", version.ref = "ktor" }
+ktor-client-darwin = { module = "io.ktor:ktor-client-darwin", version.ref = "ktor" }
 kotlin-test = { module = "org.jetbrains.kotlin:kotlin-test", version.ref = "kotlin" }
 kotlin-test-junit = { module = "org.jetbrains.kotlin:kotlin-test-junit", version.ref = "kotlin" }
 
 decompose = { module = "com.arkivanov.decompose:decompose", version.ref = "decompose" }
 decompose-compose = { module = "com.arkivanov.decompose:extensions-compose", version.ref = "decompose" }
 decompose-android = { module = "com.arkivanov.decompose:extensions-android", version.ref = "decompose" }
+essenty-lifecycle = { module = "com.arkivanov.essenty:lifecycle", version.ref = "essenty" }
+essenty-state-keeper = { module = "com.arkivanov.essenty:state-keeper", version.ref = "essenty" }
+essenty-instance-keeper = { module = "com.arkivanov.essenty:instance-keeper", version.ref = "essenty" }
+essenty-back-handler = { module = "com.arkivanov.essenty:back-handler", version.ref = "essenty" }
 image-loader = { module = "io.github.qdsfdhvh:image-loader", version.ref = "image-loader" }
 uuid = { module = "com.benasher44:uuid", version.ref = "uuid" }
 crypto-sha3 = { module = "org.kotlincrypto.hash:sha3", version.ref = "crypto-hash" }
@@ -103,6 +112,8 @@ sqldelight-coroutines = { module = "app.cash.sqldelight:coroutines-extensions", 
 sqldelight-android = { module = "app.cash.sqldelight:android-driver", version.ref = "sqldelight" }
 sqldelight-native = { module = "app.cash.sqldelight:native-driver", version.ref = "sqldelight" }
 sqldelight-jvm = { module = "app.cash.sqldelight:sqlite-driver", version.ref = "sqldelight" }
+kable = { module = "com.juul.kable:kable-core", version.ref = "kable" }
+blue-falcon = { module = "dev.bluefalcon:blue-falcon", version.ref = "blue-falcon" }
 
 androidx-activity-compose = { module = "androidx.activity:activity-compose", version.ref = "androidx-activity" }
 androidx-startup = { module = "androidx.startup:startup-runtime", version.ref = "androidx-startup" }

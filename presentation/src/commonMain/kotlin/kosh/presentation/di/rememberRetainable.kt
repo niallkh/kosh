@@ -67,14 +67,14 @@ private class InstanceHolder<T>(
     }
 
     private fun put() {
-        if (instanceKeeper.get(key) != null) {
-            instanceKeeper.remove(key)
-        }
+        remove()
         instanceKeeper.put(key, this)
     }
 
     private fun remove() {
-        instanceKeeper.remove(key)
+        if (instanceKeeper.get(key) != null) {
+            instanceKeeper.remove(key)
+        }
     }
 
     override fun onRemembered() {

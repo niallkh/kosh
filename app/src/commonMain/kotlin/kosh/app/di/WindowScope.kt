@@ -7,7 +7,5 @@ interface WindowScope {
 
     val routeScopeFactory: RouteScopeFactory
 
-    val serializationComponent: SerializationComponent
-
     val windowRepositoriesComponent: WindowRepositoriesComponent
 }

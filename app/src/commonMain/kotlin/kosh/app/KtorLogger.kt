@@ -1,11 +1,10 @@
 package kosh.app
 
-import io.ktor.client.plugins.logging.Logger
-import co.touchlab.kermit.Logger.Companion as KermitLogger
+import co.touchlab.kermit.Logger
 
-object KtorLogger : Logger {
+object KtorLogger : io.ktor.client.plugins.logging.Logger {
 
-    private val logger = KermitLogger.withTag("[K]Ktor")
+    private val logger = Logger.withTag("[K]Ktor")
 
     override fun log(message: String) {
         logger.v(message)

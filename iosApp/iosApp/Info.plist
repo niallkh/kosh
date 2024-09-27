@@ -46,5 +46,11 @@
 		<string>UIInterfaceOrientationLandscapeLeft</string>
 		<string>UIInterfaceOrientationLandscapeRight</string>
 	</array>
+	<key>GROVE_KEY</key>
+	<string>$(GROVE_KEY)</string>
+	<key>WC_PROJECT</key>
+	<string>$(WC_PROJECT)</string>
+	<key>NSBluetoothAlwaysUsageDescription</key>
+	<string>This app uses Bluetooth to connect to your hardware wallets.</string>
 </dict>
 </plist>

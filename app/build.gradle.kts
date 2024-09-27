@@ -1,3 +1,4 @@
+
 import org.jetbrains.compose.internal.utils.getLocalProperty
 import org.jetbrains.kotlin.gradle.dsl.JvmTarget
 
@@ -21,8 +22,15 @@ kotlin {
         iosSimulatorArm64()
     ).forEach { iosTarget ->
         iosTarget.binaries.framework {
-            baseName = "Kosh"
+            baseName = "App"
             isStatic = true
+
+            export(libs.decompose)
+            export(libs.essenty.lifecycle)
+            export(libs.essenty.lifecycle)
+            export(libs.essenty.state.keeper)
+            export(libs.essenty.instance.keeper)
+            export(libs.essenty.back.handler)
         }
     }
 
@@ -75,6 +83,17 @@ kotlin {
             implementation(libs.ktor.client)
             implementation(libs.ktor.client.logging)
             implementation(libs.ktor.client.encoding)
+
+            api(libs.decompose)
+            api(libs.essenty.lifecycle)
+            api(libs.essenty.lifecycle)
+            api(libs.essenty.state.keeper)
+            api(libs.essenty.instance.keeper)
+            api(libs.essenty.back.handler)
+        }
+
+        iosMain.dependencies {
+            implementation(libs.ktor.client.darwin)
         }
     }
 }

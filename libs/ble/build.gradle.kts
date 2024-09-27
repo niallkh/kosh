@@ -27,7 +27,7 @@ kotlin {
                 optIn("kotlin.uuid.ExperimentalUuidApi")
                 optIn("kotlin.ExperimentalStdlibApi")
                 optIn("kotlinx.io.bytestring.unsafe.UnsafeByteStringApi")
-
+                optIn("kotlinx.cinterop.ExperimentalForeignApi")
             }
         }
 
@@ -45,6 +45,7 @@ kotlin {
         }
 
         androidMain.dependencies {
+            implementation(libs.kotlinx.coroutines.android)
         }
 
         jvmMain.dependencies {

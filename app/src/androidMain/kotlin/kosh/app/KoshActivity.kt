@@ -14,7 +14,6 @@ import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.ui.graphics.toArgb
 import androidx.core.app.TaskStackBuilder
 import androidx.core.content.ContextCompat
 import androidx.core.os.bundleOf
@@ -95,7 +94,6 @@ class KoshActivity : FragmentActivity() {
             ) {
                 App(
                     stackRouter = rootRouter,
-                    onBackgroundColorChanged = { window.decorView.setBackgroundColor(it.toArgb()) }
                 )
 
                 NotificationPermission()

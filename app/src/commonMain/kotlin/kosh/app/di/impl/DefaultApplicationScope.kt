@@ -4,6 +4,8 @@ import kosh.app.di.ApplicationScope
 import kosh.app.di.CoroutinesComponent
 import kosh.app.di.FilesComponent
 import kosh.app.di.SerializationComponent
+import kosh.data.trezor.LedgerComponent
+import kosh.data.trezor.TrezorComponent
 import kosh.data.web3.Web3Component
 import kosh.datastore.DataStoreComponent
 import kosh.domain.DomainComponent
@@ -46,6 +48,18 @@ abstract class DefaultApplicationScope : ApplicationScope {
             applicationScope = coroutinesComponent.applicationScope,
             appRepositoriesComponent = appRepositoriesComponent,
             windowRepositoriesComponent = object : WindowRepositoriesComponent {},
+        )
+    }
+
+    override val trezorComponent: TrezorComponent by provider {
+        DefaultTrezorComponent(
+            transportComponent = transportComponent,
+        )
+    }
+
+    override val ledgerComponent: LedgerComponent by provider {
+        DefaultLedgerComponent(
+            transportComponent = transportComponent
         )
     }
 }

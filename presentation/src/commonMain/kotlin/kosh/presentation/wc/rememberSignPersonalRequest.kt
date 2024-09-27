@@ -30,7 +30,7 @@ fun rememberSignPersonalRequest(
     var loading by remember { mutableStateOf(false) }
     var failure by remember { mutableStateOf<WcFailure?>(null) }
     var retry by remember { mutableIntStateOf(0) }
-    var sent by rememberSaveable { mutableStateOf(false) }
+    var sent by remember { mutableStateOf(false) }
 
     val signPersonal = rememberSignPersonal()
 

@@ -1,24 +1,29 @@
-package kosh.app.di
+package kosh.app.di.impl
 
-import kosh.app.di.impl.DefaultDomainComponent
+import kosh.app.di.ApplicationScope
+import kosh.app.di.SerializationComponent
+import kosh.app.di.WindowScope
 import kosh.domain.AppRepositoriesComponent
 import kosh.domain.DomainComponent
 import kosh.domain.WindowRepositoriesComponent
 import kosh.domain.core.provider
 import kosh.presentation.di.RouteScope
+import kosh.presentation.di.RouteScopeFactory
 import kotlinx.serialization.cbor.Cbor
 
-class AndroidRouteScope(
+class DefaultRouteScope(
     applicationScope: ApplicationScope,
     windowScope: WindowScope,
-) : RouteScope, WindowScope by windowScope, ApplicationScope by applicationScope {
+) : RouteScope,
+    WindowScope by windowScope,
+    ApplicationScope by applicationScope {
 
     override val cbor: Cbor by provider {
         serializationComponent.cbor
     }
 
     override val serializationComponent: SerializationComponent by provider {
-        windowScope.serializationComponent
+        applicationScope.serializationComponent
     }
 
     override val domain: DomainComponent by provider {
@@ -34,4 +39,14 @@ class AndroidRouteScope(
 
     override val windowRepositories: WindowRepositoriesComponent
         get() = windowRepositoriesComponent
+}
+
+class DefaultRouteScopeFactory(
+    private val applicationScope: ApplicationScope,
+    private val windowScope: WindowScope,
+) : RouteScopeFactory {
+    override fun invoke(): RouteScope = DefaultRouteScope(
+        applicationScope = applicationScope,
+        windowScope = windowScope,
+    )
 }

@@ -35,18 +35,18 @@ internal val ledgerBleConfig = BleConfig(
         Uuid.parse("13d63400-2c97-6004-0000-4c6564676572"),
         Uuid.parse("13d63400-2c97-3004-0000-4c6564676572"),
     ),
-    notifyUuid = listOf(
+    charNotifyUuid = listOf(
         Uuid.parse("13d63400-2c97-0004-0001-4c6564676572"),
         Uuid.parse("13d63400-2c97-6004-0001-4c6564676572"),
         Uuid.parse("13d63400-2c97-3004-0001-4c6564676572"),
     ),
-    writeUuid = listOf(
+    charWriteUuid = listOf(
         Uuid.parse("13d63400-2c97-0004-0003-4c6564676572"),
         Uuid.parse("13d63400-2c97-6004-0003-4c6564676572"),
         Uuid.parse("13d63400-2c97-3004-0003-4c6564676572"),
-        Uuid.parse("13d63400-2c97-0004-0002-4c6564676572"),
-        Uuid.parse("13d63400-2c97-6004-0002-4c6564676572"),
-        Uuid.parse("13d63400-2c97-3004-0002-4c6564676572"),
+//        Uuid.parse("13d63400-2c97-0004-0002-4c6564676572"),
+//        Uuid.parse("13d63400-2c97-6004-0002-4c6564676572"),
+//        Uuid.parse("13d63400-2c97-3004-0002-4c6564676572"),
     )
 )
 

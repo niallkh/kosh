@@ -5,10 +5,10 @@ import kosh.app.AndroidPushNotifier
 import kosh.app.di.impl.AndroidDataComponent
 import kosh.app.di.impl.AndroidFileSystemComponent
 import kosh.app.di.impl.AndroidImageComponent
-import kosh.app.di.impl.AndroidLedgerComponent
+import kosh.app.di.impl.DefaultLedgerComponent
 import kosh.app.di.impl.AndroidNetworkComponent
 import kosh.app.di.impl.AndroidTransportComponent
-import kosh.app.di.impl.AndroidTrezorComponent
+import kosh.app.di.impl.DefaultTrezorComponent
 import kosh.app.di.impl.DefaultApplicationScope
 import kosh.data.DataComponent
 import kosh.data.trezor.LedgerComponent
@@ -48,14 +48,14 @@ class AndroidApplicationScope(
     }
 
     override val trezorComponent: TrezorComponent by provider {
-        AndroidTrezorComponent(
-            usbComponent = transportComponent
+        DefaultTrezorComponent(
+            transportComponent = transportComponent
         )
     }
 
     override val ledgerComponent: LedgerComponent by provider {
-        AndroidLedgerComponent(
-            usbComponent = transportComponent,
+        DefaultLedgerComponent(
+            transportComponent = transportComponent,
         )
     }
 
@@ -65,11 +65,18 @@ class AndroidApplicationScope(
         )
     }
 
-
     override val dataComponent: DataComponent by provider {
         AndroidDataComponent(
             androidComponent = androidComponent,
             dataStoreComponent = dataStoreComponent,
+            filesComponent = filesComponent,
+        )
+    }
+
+    override val imageComponent: ImageComponent by provider {
+        AndroidImageComponent(
+            networkComponent = networkComponent,
+            androidComponent = androidComponent,
             filesComponent = filesComponent,
         )
     }
@@ -85,14 +92,6 @@ class AndroidApplicationScope(
             coroutinesComponent = coroutinesComponent,
             filesComponent = filesComponent,
             ledgerComponent = ledgerComponent,
-        )
-    }
-
-    override val imageComponent: ImageComponent by provider {
-        AndroidImageComponent(
-            networkComponent = networkComponent,
-            androidComponent = androidComponent,
-            filesComponent = filesComponent,
         )
     }
 }

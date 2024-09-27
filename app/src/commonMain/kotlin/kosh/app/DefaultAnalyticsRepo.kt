@@ -1,9 +1,9 @@
-package kosh.app.firebase
+package kosh.app
 
 import co.touchlab.kermit.Logger
 import kosh.domain.analytics.AnalyticsRepo
 
-object FirebaseAnalyticsRepo : AnalyticsRepo {
+object DefaultAnalyticsRepo : AnalyticsRepo {
 
     private val logger = Logger.withTag("[K]AnalyticsRepo")
 

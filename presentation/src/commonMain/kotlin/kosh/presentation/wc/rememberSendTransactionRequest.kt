@@ -7,7 +7,6 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
-import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import arrow.core.raise.recover
 import kosh.domain.failure.TransactionFailure
@@ -29,7 +28,7 @@ fun rememberSendTransactionRequest(
     var loading by remember { mutableStateOf(false) }
     var failure by remember { mutableStateOf<WcFailure?>(null) }
     var retry by remember { mutableIntStateOf(0) }
-    var sent by rememberSaveable { mutableStateOf(false) }
+    var sent by remember { mutableStateOf(false) }
 
     val sendTransaction = kosh.presentation.transaction.rememberSendTransaction()
 

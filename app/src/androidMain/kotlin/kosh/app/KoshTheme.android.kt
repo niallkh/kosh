@@ -13,10 +13,9 @@ import androidx.compose.ui.platform.LocalContext
 import kosh.ui.component.theme.LocalIsDark
 
 @Composable
-fun KoshTheme(
-    darkTheme: Boolean = isSystemInDarkTheme(),
-    content: @Composable () -> Unit,
-) {
+actual fun KoshTheme(content: @Composable () -> Unit) {
+    val darkTheme: Boolean = isSystemInDarkTheme()
+
     val colorScheme = when {
         Build.VERSION.SDK_INT >= Build.VERSION_CODES.S -> {
             val context = LocalContext.current

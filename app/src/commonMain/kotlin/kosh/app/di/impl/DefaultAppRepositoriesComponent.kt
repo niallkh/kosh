@@ -1,5 +1,6 @@
 package kosh.app.di.impl
 
+import kosh.app.DefaultAnalyticsRepo
 import kosh.app.di.CoroutinesComponent
 import kosh.app.di.FilesComponent
 import kosh.app.di.NetworkComponent
@@ -24,6 +25,7 @@ import kosh.data.web3.DefaultTokenRepo
 import kosh.data.web3.DefaultTransactionRepo
 import kosh.data.web3.Web3Component
 import kosh.domain.AppRepositoriesComponent
+import kosh.domain.analytics.AnalyticsRepo
 import kosh.domain.core.provider
 import kosh.domain.repositories.AppStateRepo
 import kosh.domain.repositories.FilesRepo
@@ -158,4 +160,7 @@ abstract class DefaultAppRepositoriesComponent(
     override val functionSignatureRepo: FunctionSignatureRepo by provider {
         DefaultFunctionSignatureRepo(client = httpClient)
     }
+
+    override val analyticsRepo: AnalyticsRepo
+        get() = DefaultAnalyticsRepo
 }

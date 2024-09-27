@@ -7,9 +7,10 @@ import kosh.libs.trezor.DefaultTrezorManager
 import kosh.libs.trezor.SessionsCache
 import kosh.libs.trezor.TrezorManager
 
-class AndroidTrezorComponent(
-    usbComponent: TransportComponent,
-) : TrezorComponent, TransportComponent by usbComponent {
+class DefaultTrezorComponent(
+    transportComponent: TransportComponent,
+) : TrezorComponent, TransportComponent by transportComponent {
+
     override val trezorManager: TrezorManager by provider {
         DefaultTrezorManager(
             usb = usb,

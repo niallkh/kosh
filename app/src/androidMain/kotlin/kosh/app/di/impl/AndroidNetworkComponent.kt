@@ -5,13 +5,11 @@ import io.ktor.client.HttpClient
 import io.ktor.client.engine.okhttp.OkHttp
 import io.ktor.client.plugins.HttpRequestRetry
 import io.ktor.client.plugins.HttpTimeout
-import io.ktor.client.plugins.api.createClientPlugin
 import io.ktor.client.plugins.compression.ContentEncoding
-import io.ktor.client.request.headers
-import io.ktor.http.HttpHeaders
 import kosh.app.BuildConfig
 import kosh.app.di.FilesComponent
 import kosh.app.di.NetworkComponent
+import kosh.app.di.grovePlugin
 import kosh.domain.core.provider
 import kosh.libs.ipfs.IpfsPlugin
 import okhttp3.Cache
@@ -63,17 +61,7 @@ class AndroidNetworkComponent(
 
             install(IpfsPlugin)
 
-            install(DRpcPlugin)
-        }
-    }
-}
-
-private val DRpcPlugin = createClientPlugin("DRpcPlugin") {
-    onRequest { request, _ ->
-        if (request.url.host.endsWith("rpc.grove.city")) {
-            request.headers {
-                append(HttpHeaders.UserAgent, BuildConfig.GROVE_KEY)
-            }
+            install(grovePlugin(BuildConfig.GROVE_KEY))
         }
     }
 }

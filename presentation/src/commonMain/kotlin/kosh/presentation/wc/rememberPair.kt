@@ -16,15 +16,15 @@ import kosh.domain.models.wc.WcProposal
 import kosh.domain.serializers.Either
 import kosh.domain.usecases.wc.WcProposalService
 import kosh.presentation.di.di
-import kosh.presentation.di.rememberSerializable
+import kosh.presentation.di.rememberRetainable
 
 @Composable
 fun rememberPair(
     initial: PairingUri?,
     proposalService: WcProposalService = di { domain.wcProposalService },
 ): PairState {
-    var pairingUri by rememberSerializable { mutableStateOf(initial) }
-    var proposal by rememberSerializable {
+    var pairingUri by rememberRetainable { mutableStateOf(initial) }
+    var proposal by rememberRetainable {
         mutableStateOf<Either<WcProposal, WcAuthentication>?>(null)
     }
     var loading by remember { mutableStateOf(false) }

@@ -122,11 +122,14 @@ class StateHolder<T : Any>(
     }
 
     private fun register() {
+        unregister()
         stateKeeper.register(key, serializer) { value }
     }
 
     private fun unregister() {
-        stateKeeper.unregister(key)
+        if (stateKeeper.isRegistered(key)) {
+            stateKeeper.unregister(key)
+        }
     }
 
     override fun onRemembered() {
