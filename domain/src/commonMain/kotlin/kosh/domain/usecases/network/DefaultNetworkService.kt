@@ -11,9 +11,9 @@ import kosh.domain.entities.modifiedAt
 import kosh.domain.entities.name
 import kosh.domain.entities.networkId
 import kosh.domain.entities.nullableIcon
+import kosh.domain.entities.nullableWriteRpcProvider
 import kosh.domain.entities.readRpcProvider
 import kosh.domain.entities.symbol
-import kosh.domain.entities.writeRpcProvider
 import kosh.domain.failure.NetworkFailure
 import kosh.domain.models.ChainId
 import kosh.domain.models.Uri
@@ -144,7 +144,7 @@ class DefaultNetworkService(
             inside(AppState.optionalNetwork(id)) {
                 NetworkEntity.name set name
                 NetworkEntity.readRpcProvider set readRpcProvider
-                NetworkEntity.writeRpcProvider set readRpcProvider
+                NetworkEntity.nullableWriteRpcProvider set writeRpcProvider
                 NetworkEntity.explorers set explorers
                 NetworkEntity.nullableIcon set icon
                 NetworkEntity.modifiedAt set Clock.System.now()
