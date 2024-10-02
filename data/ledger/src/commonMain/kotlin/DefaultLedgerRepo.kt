@@ -16,7 +16,9 @@ import kosh.domain.models.ByteString
 import kosh.domain.models.Hash
 import kosh.domain.models.account.DerivationPath
 import kosh.domain.models.account.ledgerDerivationPath
-import kosh.domain.models.ledger.Ledger
+import kosh.domain.models.hw.HardwareWallet
+import kosh.domain.models.hw.HardwareWallet.Transport
+import kosh.domain.models.hw.Ledger
 import kosh.domain.models.web3.Signature
 import kosh.domain.models.web3.Signer
 import kosh.domain.models.web3.TransactionData
@@ -28,6 +30,7 @@ import kosh.eth.abi.eip712.Eip712
 import kosh.eth.wallet.Wallet
 import kosh.eth.wallet.transaction.Transaction.Type1559
 import kosh.eth.wallet.transaction.encode
+import kosh.libs.ledger.LedgerDevice
 import kosh.libs.ledger.LedgerManager
 import kosh.libs.ledger.cmds.ethereumAddress
 import kosh.libs.ledger.cmds.getAppAndVersion
@@ -58,9 +61,7 @@ class DefaultLedgerRepo(
 
     override val list: Flow<ImmutableList<Ledger>>
         get() = ledgerManager.devices
-            .map { devices ->
-                devices.map { Ledger(Ledger.Id(it.id), it.product) }.toImmutableList()
-            }
+            .map { devices -> devices.map { mapLedger(it) }.toImmutableList() }
             .flowOn(Dispatchers.Default)
 
     override fun accounts(
@@ -301,4 +302,10 @@ class DefaultLedgerRepo(
             else -> LedgerFailure.Other()
         }
     }
+
+    private fun mapLedger(it: LedgerDevice) = Ledger(
+        id = HardwareWallet.Id(it.id),
+        product = it.product,
+        transport = if (it.ble) Transport.BLE else Transport.USB
+    )
 }

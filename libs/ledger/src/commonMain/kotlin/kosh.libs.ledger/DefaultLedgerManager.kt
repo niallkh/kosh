@@ -1,5 +1,6 @@
 package kosh.libs.ledger
 
+import arrow.core.partially2
 import arrow.fx.coroutines.Resource
 import arrow.fx.coroutines.resource
 import co.touchlab.kermit.Logger
@@ -19,29 +20,40 @@ class DefaultLedgerManager(
 
     override val devices: Flow<List<LedgerDevice>>
         get() = combine(
-            usb.devices(ledgerUsbConfig),
-            ble.devices(ledgerBleConfig),
+            usb.devices(ledgerUsbConfig)
+                .map { it.map(::mapLedgerDevice.partially2(false)) },
+            ble.devices(ledgerBleConfig)
+                .map { it.map(::mapLedgerDevice.partially2(true)) },
         ) { d1, d2 -> d1 + d2 }
-            .map { it.map(::mapLedgerDevice) }
 
     override suspend fun open(
-        listener: LedgerManager.Listener,
         id: String,
+        listener: LedgerManager.Listener,
     ): Resource<LedgerManager.Connection> = resource {
         logger.i { "open(id = ${id})" }
 
-        id.toLongOrNull()?.let {
+        val parsedId = LedgerDevice.parseId(id)
+
+        if (LedgerDevice.isBle(id)) {
             DefaultLedgerConnection(
-                connection = LedgerUsbFormat(usb.open(id, ledgerUsbConfig).bind()),
+                connection = LedgerBleFormat(ble.open(parsedId, ledgerBleConfig).bind()),
                 listener = listener,
             )
-        } ?: DefaultLedgerConnection(
-            connection = LedgerBleFormat(ble.open(id, ledgerBleConfig).bind()),
-            listener = listener,
-        )
+        } else {
+            DefaultLedgerConnection(
+                connection = LedgerUsbFormat(usb.open(parsedId, ledgerUsbConfig).bind()),
+                listener = listener,
+            )
+        }
     }
 }
 
-internal fun mapLedgerDevice(device: Device): LedgerDevice =
-    LedgerDevice(device.id, device.name)
+internal fun mapLedgerDevice(
+    device: Device,
+    ble: Boolean,
+): LedgerDevice = LedgerDevice(
+    id = if (ble) LedgerDevice.bleId(device.id) else LedgerDevice.usbId(device.id),
+    product = device.name,
+    ble = ble
+)
 

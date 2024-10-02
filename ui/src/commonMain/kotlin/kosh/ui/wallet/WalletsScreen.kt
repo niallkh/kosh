@@ -1,4 +1,4 @@
-package kosh.ui.account
+package kosh.ui.wallet
 
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
@@ -26,7 +26,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.key
 import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
+import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -36,7 +36,7 @@ import androidx.compose.ui.unit.dp
 import arrow.core.partially1
 import kosh.domain.entities.AccountEntity
 import kosh.domain.entities.WalletEntity
-import kosh.domain.entities.WalletEntity.Type
+import kosh.domain.models.hw.HardwareWallet
 import kosh.domain.serializers.ImmutableList
 import kosh.domain.serializers.ImmutableSet
 import kosh.presentation.account.rememberToggleAccount
@@ -59,7 +59,7 @@ fun WalletsScreen(
     modifier: Modifier = Modifier,
     onNavigateUp: () -> Unit,
     onOpen: (AccountEntity.Id) -> Unit,
-    onAdd: (Type) -> Unit,
+    onAdd: (HardwareWallet) -> Unit,
 ) {
     val wallets = rememberWallets()
 
@@ -80,7 +80,7 @@ fun WalletsScreen(
 fun WalletsContent(
     wallets: ImmutableList<Pair<WalletEntity, PersistentList<AccountEntity>>>,
     enabled: ImmutableSet<AccountEntity.Id>,
-    onAdd: (Type) -> Unit,
+    onAdd: (HardwareWallet) -> Unit,
     onSelect: (AccountEntity) -> Unit,
     onToggle: (AccountEntity, Boolean) -> Unit,
     onNavigateUp: () -> Unit,
@@ -90,12 +90,12 @@ fun WalletsContent(
         modifier = modifier,
         title = { Text(stringResource(Res.string.wallets_title)) },
         floatingActionButton = {
-            var selectorVisible by remember { mutableStateOf(false) }
+            var selectorVisible by rememberSaveable { mutableStateOf(false) }
 
-            WalletTypeSelector(
+            HardwareWalletSelector(
                 visible = selectorVisible,
-                onSelected = { onAdd(it) },
-                onDismiss = { selectorVisible = false }
+                onDismiss = { selectorVisible = false },
+                onSelected = onAdd
             )
 
             FloatingActionButton(

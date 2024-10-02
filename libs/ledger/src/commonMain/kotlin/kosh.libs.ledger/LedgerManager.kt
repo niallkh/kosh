@@ -57,8 +57,8 @@ interface LedgerManager {
     val devices: Flow<List<LedgerDevice>>
 
     suspend fun open(
-        listener: Listener,
         id: String,
+        listener: Listener,
     ): Resource<Connection>
 
     interface Connection {
@@ -80,7 +80,22 @@ interface LedgerManager {
 data class LedgerDevice(
     val id: String,
     val product: String?,
-)
+    val ble: Boolean,
+) {
+    companion object {
+        fun usbId(id: String) = "usb:$id"
+
+        fun bleId(id: String) = "ble:$id"
+
+        fun isBle(id: String) = id.startsWith("ble:")
+
+        fun parseId(id: String) = when {
+            id.startsWith("usb:") -> id.removePrefix("usb:")
+            id.startsWith("ble:") -> id.removePrefix("ble:")
+            else -> id
+        }
+    }
+}
 
 suspend inline fun <T> LedgerManager.Connection.exchange(
     ledgerAPDU: LedgerAPDU,

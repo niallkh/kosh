@@ -159,7 +159,6 @@ class DefaultDomainComponent(
     override val trezorService: TrezorService by provider {
         DefaultTrezorService(
             trezorRepo = trezorRepo,
-            applicationScope = applicationScope,
         )
     }
 
@@ -173,7 +172,6 @@ class DefaultDomainComponent(
     override val ledgerService: LedgerService by provider {
         DefaultLedgerService(
             ledgerRepo = ledgerRepo,
-            applicationScope = applicationScope,
         )
     }
 

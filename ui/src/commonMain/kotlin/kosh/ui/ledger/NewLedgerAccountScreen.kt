@@ -9,12 +9,11 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.ui.Modifier
 import kosh.domain.entities.AccountEntity
-import kosh.domain.failure.LedgerFailure
 import kosh.domain.models.account.ledgerAddressIndex
+import kosh.domain.models.hw.Ledger
 import kosh.domain.models.web3.Signer
 import kosh.presentation.account.rememberCreateAccount
 import kosh.presentation.ledger.LedgerAccountsState
-import kosh.presentation.ledger.rememberLedger
 import kosh.presentation.ledger.rememberLedgerAccounts
 import kosh.presentation.ledger.rememberLedgerListener
 import kosh.ui.component.LoadingIndicator
@@ -25,6 +24,7 @@ import kosh.ui.failure.AppFailureMessage
 
 @Composable
 fun NewLedgerAccountScreen(
+    ledger: Ledger,
     onNavigateUp: () -> Unit,
     onFinish: (AccountEntity.Id) -> Unit,
 ) {
@@ -32,43 +32,36 @@ fun NewLedgerAccountScreen(
         title = { Text("Ledger New Account") },
         onNavigateUp = onNavigateUp,
     ) { paddingValues ->
-        val ledgerState = rememberLedger()
 
-        ledgerState.ledger?.let { ledger ->
-            val ledgerListenerState = rememberLedgerListener()
+        val ledgerListenerState = rememberLedgerListener()
 
-            LedgerButtonRequest(
-                request = ledgerListenerState.buttonRequest,
-                onConfirm = ledgerListenerState.confirm,
-                onDismiss = ledgerListenerState.dismiss
-            )
+        LedgerButtonRequest(
+            request = ledgerListenerState.buttonRequest,
+            onConfirm = ledgerListenerState.confirm,
+            onDismiss = ledgerListenerState.dismiss
+        )
 
-            val createAccountState = rememberCreateAccount()
+        val createAccountState = rememberCreateAccount()
 
-            AppFailureMessage(createAccountState.failure)
+        AppFailureMessage(createAccountState.failure)
 
-            LaunchedEffect(createAccountState.createdAccount) {
-                createAccountState.createdAccount?.let(onFinish)
-            }
+        LaunchedEffect(createAccountState.createdAccount) {
+            createAccountState.createdAccount?.let(onFinish)
+        }
 
-            val ledgerAccountsState = rememberLedgerAccounts(
-                listener = ledgerListenerState.listener,
-                ledger = ledger,
-            )
+        val ledgerAccountsState = rememberLedgerAccounts(
+            listener = ledgerListenerState.listener,
+            ledger = ledger,
+        )
 
-            NewLedgerAccountContent(
-                ledgerAccountsState = ledgerAccountsState,
-                paddingValues = paddingValues,
-                onSelect = { createAccountState.create(it) },
-            )
+        NewLedgerAccountContent(
+            ledgerAccountsState = ledgerAccountsState,
+            paddingValues = paddingValues,
+            onSelect = { createAccountState.create(it) },
+        )
 
-            LoadingIndicator(
-                createAccountState.loading || ledgerAccountsState.loading,
-                Modifier.padding(paddingValues),
-            )
-
-        } ?: AppFailureItem(
-            LedgerFailure.NotConnected(),
+        LoadingIndicator(
+            createAccountState.loading || ledgerAccountsState.loading,
             Modifier.padding(paddingValues),
         )
     }

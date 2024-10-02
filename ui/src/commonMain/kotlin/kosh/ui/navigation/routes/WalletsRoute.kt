@@ -1,6 +1,7 @@
 package kosh.ui.navigation.routes
 
 import kosh.domain.entities.AccountEntity
+import kosh.domain.models.hw.HardwareWallet
 import kotlinx.serialization.Serializable
 
 @Serializable
@@ -16,10 +17,7 @@ sealed class WalletsRoute : Route {
     data class DeleteAccount(val id: AccountEntity.Id) : WalletsRoute()
 
     @Serializable
-    data object NewTrezorAccount : WalletsRoute()
-
-    @Serializable
-    data object NewLedgerAccount : WalletsRoute()
+    data class NewAccount(val hw: HardwareWallet) : WalletsRoute()
 
     @Serializable
     data class TokensDiscovery(val id: AccountEntity.Id) : WalletsRoute()

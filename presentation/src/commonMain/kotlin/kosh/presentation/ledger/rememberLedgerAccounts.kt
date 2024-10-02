@@ -12,7 +12,7 @@ import androidx.compose.runtime.setValue
 import androidx.compose.runtime.snapshots.SnapshotStateList
 import arrow.core.raise.recover
 import kosh.domain.failure.LedgerFailure
-import kosh.domain.models.ledger.Ledger
+import kosh.domain.models.hw.Ledger
 import kosh.domain.models.web3.Signer
 import kosh.domain.repositories.LedgerListener
 import kosh.domain.usecases.ledger.LedgerAccountService

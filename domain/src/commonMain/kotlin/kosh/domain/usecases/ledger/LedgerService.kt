@@ -1,9 +1,10 @@
 package kosh.domain.usecases.ledger
 
-import kosh.domain.models.ledger.Ledger
+import kosh.domain.models.hw.Ledger
 import kotlinx.coroutines.flow.Flow
 
 interface LedgerService {
-    fun getCurrentDevice(): Flow<Ledger?>
+
+    fun list(): Flow<List<Ledger>>
 }
 

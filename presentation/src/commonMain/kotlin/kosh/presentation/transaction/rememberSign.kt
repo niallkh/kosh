@@ -4,23 +4,21 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.Immutable
 import kosh.domain.failure.LedgerFailure
 import kosh.domain.failure.TrezorFailure
+import kosh.domain.models.hw.HardwareWallet
+import kosh.domain.models.hw.Ledger
+import kosh.domain.models.hw.Trezor
 import kosh.domain.repositories.LedgerListener
 import kosh.domain.repositories.TrezorListener
-import kosh.presentation.ledger.rememberLedger
 import kosh.presentation.ledger.rememberSignLedger
 import kosh.presentation.models.SignRequest
 import kosh.presentation.models.SignedRequest
 import kosh.presentation.trezor.rememberSignTrezor
-import kosh.presentation.trezor.rememberTrezor
 
 @Composable
 fun rememberSign(
     trezorListener: TrezorListener,
     ledgerListener: LedgerListener,
 ): SignState {
-    val ledger = rememberLedger()
-    val trezor = rememberTrezor()
-
     val signTrezor = rememberSignTrezor(trezorListener)
     val signLedger = rememberSignLedger(ledgerListener)
 
@@ -30,23 +28,14 @@ fun rememberSign(
         ledgerFailure = signLedger.failure,
         trezorFailure = signTrezor.failure,
 
-        sign = { request ->
-            when {
-                trezor.trezor != null -> signTrezor.sign(trezor.trezor, request)
-                ledger.ledger != null -> signLedger.sign(ledger.ledger, request)
-                else -> signTrezor.sign(trezor.trezor, request)
+        sign = { hw, request ->
+            when (hw) {
+                is Trezor -> signTrezor.sign(hw, request)
+                is Ledger -> signLedger.sign(hw, request)
             }
         },
-        retry = {
-            when {
-                trezor.trezor != null -> signTrezor.retry(trezor.trezor)
-                ledger.ledger != null -> signLedger.retry(ledger.ledger)
-                else -> signTrezor.retry(trezor.trezor)
-            }
-        }
     )
 }
-
 
 @Immutable
 data class SignState(
@@ -55,6 +44,5 @@ data class SignState(
     val ledgerFailure: LedgerFailure?,
     val trezorFailure: TrezorFailure?,
 
-    val sign: (SignRequest) -> Unit,
-    val retry: () -> Unit,
+    val sign: (HardwareWallet, SignRequest) -> Unit,
 )

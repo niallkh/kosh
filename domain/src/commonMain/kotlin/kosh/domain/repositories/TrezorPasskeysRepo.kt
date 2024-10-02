@@ -2,7 +2,7 @@ package kosh.domain.repositories
 
 import arrow.core.Either
 import kosh.domain.failure.TrezorFailure
-import kosh.domain.models.trezor.Trezor
+import kosh.domain.models.hw.Trezor
 import kosh.domain.models.trezor.TrezorPasskey
 import kotlinx.collections.immutable.ImmutableList
 import kotlinx.collections.immutable.ImmutableSet

@@ -20,12 +20,12 @@ class DefaultTrezorManager(
             .map { it.map(::mapTrezorDevice) }
 
     override suspend fun open(
-        id: Long,
+        id: String,
         listener: TrezorManager.Connection.Listener,
     ): Resource<TrezorManager.Connection> = resource {
         logger.d { "open(id = ${id})" }
         DefaultTrezorConnection(
-            connection = TrezorUsbFormat(usb.open(id.toString(), trezorUsbConfig).bind()),
+            connection = TrezorUsbFormat(usb.open(id, trezorUsbConfig).bind()),
             listener = listener,
             sessionCache = sessionsCache.create(id)
         )
@@ -33,7 +33,7 @@ class DefaultTrezorManager(
 }
 
 internal fun mapTrezorDevice(device: Device): TrezorDevice = TrezorDevice(
-    id = device.id.toLong(),
+    id = device.id,
     product = device.name
 )
 

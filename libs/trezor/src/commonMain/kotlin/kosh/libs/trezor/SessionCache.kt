@@ -8,18 +8,18 @@ value class SessionId(val value: ByteString)
 
 class SessionsCache {
 
-    private val cache = mutableMapOf<Long, SessionId>()
+    private val cache = mutableMapOf<String, SessionId>()
 
-    fun get(id: Long): SessionId? = cache[id]
+    fun get(id: String): SessionId? = cache[id]
 
-    fun set(id: Long, sessionId: SessionId) {
+    fun set(id: String, sessionId: SessionId) {
         cache[id] = sessionId
     }
 }
 
 internal class SessionCache(
     private val sessionsCache: SessionsCache,
-    private val id: Long,
+    private val id: String,
 ) {
     fun get(): SessionId? = sessionsCache.get(id)
 
@@ -28,4 +28,4 @@ internal class SessionCache(
     }
 }
 
-internal fun SessionsCache.create(id: Long) = SessionCache(this, id)
+internal fun SessionsCache.create(id: String) = SessionCache(this, id)

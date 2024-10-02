@@ -1,29 +1,12 @@
 package kosh.domain.usecases.ledger
 
-import kosh.domain.models.ledger.Ledger
+import kosh.domain.models.hw.Ledger
 import kosh.domain.repositories.LedgerRepo
-import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.SharingStarted
-import kotlinx.coroutines.flow.distinctUntilChanged
-import kotlinx.coroutines.flow.map
-import kotlinx.coroutines.flow.stateIn
 
 class DefaultLedgerService(
-    ledgerRepo: LedgerRepo,
-    applicationScope: CoroutineScope,
+    private val ledgerRepo: LedgerRepo,
 ) : LedgerService {
 
-    private val list = ledgerRepo.list.map { it.firstOrNull() }
-        .distinctUntilChanged()
-        .stateIn(
-            applicationScope,
-            SharingStarted.WhileSubscribed(
-                stopTimeoutMillis = 10_000,
-                replayExpirationMillis = 10_000
-            ),
-            null
-        )
-
-    override fun getCurrentDevice(): Flow<Ledger?> = list
+    override fun list(): Flow<List<Ledger>> = ledgerRepo.list
 }

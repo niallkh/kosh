@@ -1,9 +1,9 @@
 package kosh.domain.usecases.trezor
 
-import kosh.domain.models.trezor.Trezor
+import kosh.domain.models.hw.Trezor
 import kotlinx.coroutines.flow.Flow
 
 interface TrezorService {
 
-    fun getCurrentDevice(): Flow<Trezor?>
+    fun list(): Flow<List<Trezor>>
 }

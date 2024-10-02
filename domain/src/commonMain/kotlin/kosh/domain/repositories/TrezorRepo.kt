@@ -3,7 +3,7 @@ package kosh.domain.repositories
 import arrow.core.Either
 import kosh.domain.failure.TrezorFailure
 import kosh.domain.models.account.DerivationPath
-import kosh.domain.models.trezor.Trezor
+import kosh.domain.models.hw.Trezor
 import kosh.domain.models.web3.Signature
 import kosh.domain.models.web3.Signer
 import kosh.domain.models.web3.TransactionData

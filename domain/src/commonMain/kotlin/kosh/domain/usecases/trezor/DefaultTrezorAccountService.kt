@@ -7,7 +7,7 @@ import co.touchlab.kermit.Logger
 import kosh.domain.failure.TrezorFailure
 import kosh.domain.models.Address
 import kosh.domain.models.account.ethereumDerivationPath
-import kosh.domain.models.trezor.Trezor
+import kosh.domain.models.hw.Trezor
 import kosh.domain.models.web3.EthMessage
 import kosh.domain.models.web3.JsonTypeData
 import kosh.domain.models.web3.Signature

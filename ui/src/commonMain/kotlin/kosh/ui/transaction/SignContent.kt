@@ -1,7 +1,11 @@
 package kosh.ui.transaction
 
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.saveable.rememberSaveable
+import androidx.compose.runtime.setValue
 import kosh.domain.models.Address
 import kosh.presentation.account.rememberAccount
 import kosh.presentation.keystore.rememberKeyStoreListener
@@ -14,6 +18,7 @@ import kosh.ui.failure.AppFailureMessage
 import kosh.ui.keystore.KeyStoreListenerContent
 import kosh.ui.ledger.LedgerButtonRequest
 import kosh.ui.trezor.TrezorListenerContent
+import kosh.ui.wallet.HardwareWalletSelector
 
 @Composable
 fun SignContent(
@@ -46,23 +51,26 @@ fun SignContent(
         ledgerListener = ledgerListener.listener,
     )
 
-    AppFailureMessage(sign.ledgerFailure) {
-        sign.retry()
-    }
+    AppFailureMessage(sign.ledgerFailure)
 
-    AppFailureMessage(sign.trezorFailure) {
-        sign.retry()
-    }
+    AppFailureMessage(sign.trezorFailure)
 
-    LaunchedEffect(sign.signedRequest) {
-        sign.signedRequest?.let {
-        }
-    }
+    var selectorVisible by rememberSaveable { mutableStateOf(false) }
+    var signRequest by remember { mutableStateOf<SignRequest?>(null) }
+
+    HardwareWalletSelector(
+        visible = selectorVisible,
+        onDismiss = { selectorVisible = false },
+        onSelected = { hw -> signRequest?.let { sign.sign(hw, it) } }
+    )
 
     return SignState(
         signing = sign.loading,
         signedRequest = sign.signedRequest,
-        sign = sign.sign
+        sign = {
+            signRequest = it
+            selectorVisible = true
+        }
     )
 }
 

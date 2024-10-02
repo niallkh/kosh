@@ -6,7 +6,7 @@ import arrow.core.raise.ensure
 import kosh.domain.failure.LedgerFailure
 import kosh.domain.models.Address
 import kosh.domain.models.account.ledgerDerivationPath
-import kosh.domain.models.ledger.Ledger
+import kosh.domain.models.hw.Ledger
 import kosh.domain.models.web3.EthMessage
 import kosh.domain.models.web3.JsonTypeData
 import kosh.domain.models.web3.Signature

@@ -11,7 +11,8 @@ import kosh.domain.models.ByteString
 import kosh.domain.models.Hash
 import kosh.domain.models.account.DerivationPath
 import kosh.domain.models.account.ethereumDerivationPath
-import kosh.domain.models.trezor.Trezor
+import kosh.domain.models.hw.HardwareWallet
+import kosh.domain.models.hw.Trezor
 import kosh.domain.models.web3.Signature
 import kosh.domain.models.web3.Signer
 import kosh.domain.models.web3.TransactionData
@@ -37,7 +38,6 @@ import kotlinx.coroutines.flow.flowOn
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.withContext
 import kotlinx.io.bytestring.encodeToByteString
-import okio.ByteString.Companion.encodeUtf8
 import kosh.eth.wallet.Wallet as SignerWallet
 
 class DefaultTrezorRepo(
@@ -50,7 +50,7 @@ class DefaultTrezorRepo(
     override val list: Flow<ImmutableList<Trezor>>
         get() = trezorManager.devices
             .map { devices ->
-                devices.map { Trezor(Trezor.Id(it.id), it.product) }.toImmutableList()
+                devices.map { Trezor(HardwareWallet.Id(it.id), it.product) }.toImmutableList()
             }
             .flowOn(Dispatchers.Default)
 

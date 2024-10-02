@@ -17,19 +17,20 @@ import android.os.Build
 import android.os.Handler
 import android.os.HandlerThread
 import android.os.ParcelUuid
+import arrow.core.continuations.AtomicRef
 import arrow.fx.coroutines.Resource
 import arrow.fx.coroutines.resource
 import co.touchlab.kermit.Logger
 import kosh.libs.transport.Device
 import kosh.libs.transport.Transport
+import kotlinx.collections.immutable.persistentSetOf
+import kotlinx.collections.immutable.plus
 import kotlinx.coroutines.android.asCoroutineDispatcher
 import kotlinx.coroutines.channels.awaitClose
 import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.channelFlow
 import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.emptyFlow
-import kotlinx.coroutines.flow.flatMapLatest
 import kotlinx.coroutines.flow.flowOn
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.withContext
@@ -48,18 +49,10 @@ class AndroidBle(
     private val scanner: BluetoothLeScanner?
         get() = bluetoothManager.adapter.bluetoothLeScanner
 
-    private val connected = MutableStateFlow(false)
-
     @SuppressLint("MissingPermission")
     override fun devices(config: BleConfig): Flow<List<Device>> =
-        connected.flatMapLatest { connected ->
-            if (!connected) {
-                scanner?.let { listDevices(it, config) } ?: emptyFlow()
-            } else {
-                emptyFlow()
-            }
-        }
-            .map { listOf(Device(it.address, it.name)) }
+        (scanner?.let { listDevices(it, config) } ?: emptyFlow())
+            .map { list -> list.map { Device(it.address, it.name) } }
             .distinctUntilChanged()
             .flowOn(dispatcher)
 
@@ -77,9 +70,6 @@ class AndroidBle(
         val device = bluetoothManager.adapter.getRemoteDevice(id)
 
         resource {
-
-            connected.value = true
-            onRelease { connected.value = false }
 
             val connection = install(
                 { AndroidBleConnection(config, dispatcher) },
@@ -124,6 +114,8 @@ private fun listDevices(
 ) = channelFlow {
     val logger = Logger.withTag("[K]BluetoothScan")
 
+    val devices = AtomicRef(persistentSetOf<BluetoothDevice>())
+
     val scanCallback: ScanCallback = object : ScanCallback() {
         override fun onScanResult(callbackType: Int, result: ScanResult?) {
             super.onScanResult(callbackType, result)
@@ -138,7 +130,7 @@ private fun listDevices(
         }
 
         private fun addDevice(device: BluetoothDevice) {
-            trySend(device)
+            trySend(devices.updateAndGet { it + device })
         }
 
         override fun onScanFailed(errorCode: Int) {

@@ -3,11 +3,11 @@ package kosh.ui.navigation.hosts
 import androidx.compose.runtime.Composable
 import com.arkivanov.decompose.router.stack.push
 import com.arkivanov.decompose.router.stack.replaceCurrent
-import kosh.domain.entities.WalletEntity.Type
+import kosh.domain.models.hw.Ledger
+import kosh.domain.models.hw.Trezor
 import kosh.ui.account.AccountScreen
 import kosh.ui.account.DeleteAccountScreen
 import kosh.ui.account.DiscoveryAccountTokensScreen
-import kosh.ui.account.WalletsScreen
 import kosh.ui.analytics.LogScreen
 import kosh.ui.ledger.NewLedgerAccountScreen
 import kosh.ui.navigation.RouteResult
@@ -17,6 +17,7 @@ import kosh.ui.navigation.animation.sharedAxisY
 import kosh.ui.navigation.routes.WalletsRoute
 import kosh.ui.navigation.stack.StackHost
 import kosh.ui.trezor.NewTrezorAccountScreen
+import kosh.ui.wallet.WalletsScreen
 
 @Composable
 fun WalletsHost(
@@ -38,12 +39,7 @@ fun WalletsHost(
             is WalletsRoute.List -> WalletsScreen(
                 onNavigateUp = { navigateUp() },
                 onOpen = { push(WalletsRoute.Account(it)) },
-                onAdd = { type ->
-                    when (type) {
-                        Type.Trezor -> push(WalletsRoute.NewTrezorAccount)
-                        Type.Ledger -> push(WalletsRoute.NewLedgerAccount)
-                    }
-                }
+                onAdd = { hw -> push(WalletsRoute.NewAccount(hw)) }
             )
 
             is WalletsRoute.Account -> AccountScreen(
@@ -58,15 +54,19 @@ fun WalletsHost(
                 onFinish = { pop() }
             )
 
-            is WalletsRoute.NewTrezorAccount -> NewTrezorAccountScreen(
-                onFinish = { replaceCurrent(WalletsRoute.TokensDiscovery(it)) },
-                onNavigateUp = { navigateUp() },
-            )
+            is WalletsRoute.NewAccount -> when (route.hw) {
+                is Trezor -> NewTrezorAccountScreen(
+                    trezor = route.hw,
+                    onFinish = { replaceCurrent(WalletsRoute.TokensDiscovery(it)) },
+                    onNavigateUp = { navigateUp() },
+                )
 
-            is WalletsRoute.NewLedgerAccount -> NewLedgerAccountScreen(
-                onFinish = { replaceCurrent(WalletsRoute.TokensDiscovery(it)) },
-                onNavigateUp = { navigateUp() }
-            )
+                is Ledger -> NewLedgerAccountScreen(
+                    ledger = route.hw,
+                    onFinish = { replaceCurrent(WalletsRoute.TokensDiscovery(it)) },
+                    onNavigateUp = { navigateUp() },
+                )
+            }
 
             is WalletsRoute.TokensDiscovery -> DiscoveryAccountTokensScreen(
                 id = route.id,

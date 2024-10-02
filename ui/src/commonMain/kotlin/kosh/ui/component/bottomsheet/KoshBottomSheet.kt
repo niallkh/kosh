@@ -1,6 +1,7 @@
 package kosh.ui.component.bottomsheet
 
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.ColumnScope
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.windowInsetsBottomHeight
 import androidx.compose.foundation.rememberScrollState
@@ -22,7 +23,7 @@ fun KoshModalBottomSheet(
     onDismissRequest: () -> Unit,
     dragHandle: @Composable (() -> Unit)? = { BottomSheetDefaults.DragHandle() },
     shape: Shape = BottomSheetDefaults.ExpandedShape,
-    content: @Composable (DismissCallback) -> Unit,
+    content: @Composable ColumnScope.(DismissCallback) -> Unit,
 ) {
     val bottomSheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true)
     val scope = rememberCoroutineScope()

@@ -6,7 +6,7 @@ import co.touchlab.kermit.Logger
 import com.satoshilabs.trezor.lib.protobuf.WebAuthnCredentials
 import kosh.domain.failure.TrezorFailure
 import kosh.domain.models.ByteString
-import kosh.domain.models.trezor.Trezor
+import kosh.domain.models.hw.Trezor
 import kosh.domain.models.trezor.TrezorPasskey
 import kosh.domain.repositories.TrezorListener
 import kosh.domain.repositories.TrezorPasskeysRepo

@@ -9,13 +9,12 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.ui.Modifier
 import kosh.domain.entities.AccountEntity
-import kosh.domain.failure.TrezorFailure
 import kosh.domain.models.account.ethereumAddressIndex
+import kosh.domain.models.hw.Trezor
 import kosh.domain.models.web3.Signer
 import kosh.presentation.account.rememberCreateAccount
 import kosh.presentation.keystore.rememberKeyStoreListener
 import kosh.presentation.trezor.TrezorAccountsState
-import kosh.presentation.trezor.rememberTrezor
 import kosh.presentation.trezor.rememberTrezorAccounts
 import kosh.presentation.trezor.rememberTrezorListener
 import kosh.ui.component.LoadingIndicator
@@ -27,6 +26,7 @@ import kosh.ui.keystore.KeyStoreListenerContent
 
 @Composable
 fun NewTrezorAccountScreen(
+    trezor: Trezor,
     onNavigateUp: () -> Unit,
     onFinish: (AccountEntity.Id) -> Unit,
     modifier: Modifier = Modifier,
@@ -36,46 +36,40 @@ fun NewTrezorAccountScreen(
         title = { Text("Trezor New Account") },
         onNavigateUp = onNavigateUp
     ) { paddingValues ->
-        val trezor = rememberTrezor()
 
-        trezor.trezor?.let { ledger ->
-            val keyStoreListener = rememberKeyStoreListener()
+        val keyStoreListener = rememberKeyStoreListener()
 
-            val trezorListener = rememberTrezorListener(null, keyStoreListener.listener)
+        val trezorListener = rememberTrezorListener(null, keyStoreListener.listener)
 
-            TrezorListenerContent(
-                trezorListener = trezorListener,
-            )
+        TrezorListenerContent(
+            trezorListener = trezorListener,
+        )
 
-            KeyStoreListenerContent(
-                keyStoreListener = keyStoreListener
-            )
+        KeyStoreListenerContent(
+            keyStoreListener = keyStoreListener
+        )
 
-            val createAccountState = rememberCreateAccount()
+        val createAccountState = rememberCreateAccount()
 
-            AppFailureMessage(createAccountState.failure)
+        AppFailureMessage(createAccountState.failure)
 
-            LaunchedEffect(createAccountState.createdAccount) {
-                createAccountState.createdAccount?.let(onFinish)
-            }
+        LaunchedEffect(createAccountState.createdAccount) {
+            createAccountState.createdAccount?.let(onFinish)
+        }
 
-            val trezorAccounts = rememberTrezorAccounts(
-                listener = trezorListener.listener,
-                trezor = ledger,
-            )
+        val trezorAccounts = rememberTrezorAccounts(
+            listener = trezorListener.listener,
+            trezor = trezor,
+        )
 
-            NewTrezorAccountContent(
-                trezorAccounts = trezorAccounts,
-                paddingValues = paddingValues,
-                onSelect = { createAccountState.create(it) },
-            )
+        NewTrezorAccountContent(
+            trezorAccounts = trezorAccounts,
+            paddingValues = paddingValues,
+            onSelect = { createAccountState.create(it) },
+        )
 
-            LoadingIndicator(
-                createAccountState.loading || trezorAccounts.loading,
-                Modifier.padding(paddingValues),
-            )
-        } ?: AppFailureItem(
-            TrezorFailure.NotConnected(),
+        LoadingIndicator(
+            createAccountState.loading || trezorAccounts.loading,
             Modifier.padding(paddingValues),
         )
     }

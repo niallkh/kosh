@@ -10,7 +10,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import arrow.core.raise.recover
 import kosh.domain.failure.TrezorFailure
-import kosh.domain.models.trezor.Trezor
+import kosh.domain.models.hw.Trezor
 import kosh.domain.repositories.TrezorListener
 import kosh.domain.usecases.trezor.TrezorAccountService
 import kosh.presentation.di.di
@@ -79,10 +79,9 @@ fun rememberSignTrezor(
             signRequest = request
             trezor = trezor1
         },
-        retry = { trezor1 ->
+        retry = {
             retry++
             refresh = true
-            trezor = trezor1
         }
     )
 }
@@ -93,6 +92,6 @@ data class SignTrezorState(
     val loading: Boolean,
     val failure: TrezorFailure?,
 
-    val sign: (Trezor?, SignRequest) -> Unit,
-    val retry: (Trezor?) -> Unit,
+    val sign: (Trezor, SignRequest) -> Unit,
+    val retry: () -> Unit,
 )

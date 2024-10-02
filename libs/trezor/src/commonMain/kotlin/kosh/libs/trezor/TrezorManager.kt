@@ -26,7 +26,7 @@ interface TrezorManager {
     val devices: Flow<List<TrezorDevice>>
 
     suspend fun open(
-        id: Long,
+        id: String,
         listener: Connection.Listener,
     ): Resource<Connection>
 
@@ -55,6 +55,6 @@ interface TrezorManager {
 }
 
 data class TrezorDevice(
-    val id: Long,
+    val id: String,
     val product: String?,
 )

@@ -12,7 +12,7 @@ import androidx.compose.runtime.setValue
 import androidx.compose.runtime.snapshots.SnapshotStateList
 import arrow.core.raise.recover
 import kosh.domain.failure.TrezorFailure
-import kosh.domain.models.trezor.Trezor
+import kosh.domain.models.hw.Trezor
 import kosh.domain.models.web3.Signer
 import kosh.domain.repositories.TrezorListener
 import kosh.domain.usecases.trezor.TrezorAccountService
