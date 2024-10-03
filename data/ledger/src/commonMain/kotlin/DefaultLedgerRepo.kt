@@ -76,7 +76,8 @@ class DefaultLedgerRepo(
                 listener = LedgerListenerAdapter(listener),
                 id = ledger.id.value,
             ).use { connection ->
-                ensure(connection.getAppAndVersion().name == "Ethereum") {
+
+            ensure(connection.getAppAndVersion().name == "Ethereum") {
                     LedgerFailure.NotEthereumApp()
                 }
 
@@ -136,7 +137,8 @@ class DefaultLedgerRepo(
         id = ledger.id.value,
         listener = LedgerListenerAdapter(listener),
     ).use { connection ->
-        ensure(connection.getAppAndVersion().name == "Ethereum") {
+
+    ensure(connection.getAppAndVersion().name == "Ethereum") {
             LedgerFailure.NotEthereumApp()
         }
 
@@ -189,7 +191,8 @@ class DefaultLedgerRepo(
             id = ledger.id.value,
             listener = LedgerListenerAdapter(listener),
         ).use { connection ->
-            ensure(connection.getAppAndVersion().name == "Ethereum") {
+
+        ensure(connection.getAppAndVersion().name == "Ethereum") {
                 LedgerFailure.NotEthereumApp()
             }
 
@@ -249,9 +252,11 @@ class DefaultLedgerRepo(
             id = ledger.id.value,
             listener = LedgerListenerAdapter(listener),
         ).use { connection ->
+
             ensure(connection.getAppAndVersion().name == "Ethereum") {
                 LedgerFailure.NotEthereumApp()
             }
+
             val type1559 = Type1559(
                 chainId = transaction.tx.chainId.value,
                 data = transaction.tx.input.bytes(),

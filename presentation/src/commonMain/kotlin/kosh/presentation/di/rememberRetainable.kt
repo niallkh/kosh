@@ -81,11 +81,9 @@ private class InstanceHolder<T>(
         put()
     }
 
-    override fun onAbandoned() {
-        true
+    override fun onForgotten() { // TODO
     }
 
-    override fun onForgotten() {
-        true
+    override fun onAbandoned() { // TODO
     }
 }

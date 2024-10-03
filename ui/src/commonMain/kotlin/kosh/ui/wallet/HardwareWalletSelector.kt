@@ -1,7 +1,13 @@
+@file:OptIn(ExperimentalAnimationApi::class)
+
 package kosh.ui.wallet
 
+import androidx.compose.animation.Crossfade
+import androidx.compose.animation.ExperimentalAnimationApi
+import androidx.compose.animation.core.updateTransition
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Bluetooth
@@ -35,17 +41,25 @@ fun HardwareWalletSelector(
         ) { dismiss ->
             val deviceList = rememberHardwareWallets()
 
-            if (deviceList.wallets.isEmpty()) {
-                Box(Modifier.fillMaxWidth()) {
-                    CircularProgressIndicator(Modifier.align(Alignment.Center))
-                }
-            } else {
-                for (hw in deviceList.wallets) {
-                    key(hw.id.value) {
-                        HardwareWallet(
-                            hardwareWallet = hw,
-                            onSelected = { dismiss { onSelected(it) } }
-                        )
+            val transition = updateTransition(deviceList.wallets)
+
+            transition.Crossfade(
+                contentKey = { it.isEmpty() }
+            ) {
+                if (it.isEmpty()) {
+                    Box(Modifier.fillMaxWidth()) {
+                        CircularProgressIndicator(Modifier.align(Alignment.Center))
+                    }
+                } else {
+                    Column {
+                        for (hw in it) {
+                            key(hw.id.value) {
+                                HardwareWallet(
+                                    hardwareWallet = hw,
+                                    onSelected = { dismiss { onSelected(it) } }
+                                )
+                            }
+                        }
                     }
                 }
             }

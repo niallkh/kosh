@@ -3,10 +3,14 @@ package kosh.presentation.wallet
 import androidx.compose.runtime.Composable
 import kosh.domain.failure.AppFailure
 import kosh.domain.models.hw.HardwareWallet
+import kosh.domain.serializers.ImmutableList
 import kosh.domain.usecases.ledger.LedgerService
 import kosh.domain.usecases.trezor.TrezorService
 import kosh.presentation.Collect
 import kosh.presentation.di.di
+import kotlinx.collections.immutable.persistentListOf
+import kotlinx.collections.immutable.plus
+import kotlinx.collections.immutable.toPersistentList
 
 @Composable
 fun rememberHardwareWallets(
@@ -21,11 +25,13 @@ fun rememberHardwareWallets(
         ledgerService.list()
     }
 
+    val trezors1 = trezors.content?.toPersistentList() ?: persistentListOf()
+    val ledgers1 = ledgers.content?.toPersistentList() ?: persistentListOf()
     return DeviceListState(
-        wallets = (trezors.content ?: listOf()) + (ledgers.content ?: listOf()),
+        wallets = trezors1 + ledgers1,
     )
 }
 
 data class DeviceListState(
-    val wallets: List<HardwareWallet>,
+    val wallets: ImmutableList<HardwareWallet>,
 )

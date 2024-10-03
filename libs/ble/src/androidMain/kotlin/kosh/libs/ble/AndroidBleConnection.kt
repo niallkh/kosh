@@ -19,12 +19,18 @@ import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.sync.Mutex
 import kotlinx.coroutines.sync.withLock
 import kotlinx.coroutines.withContext
+import kotlinx.coroutines.withTimeoutOrNull
 import kotlinx.io.Buffer
 import kotlinx.io.bytestring.ByteString
 import kotlinx.io.bytestring.unsafe.UnsafeByteStringOperations
 import kotlinx.io.readByteString
+import kotlin.time.Duration.Companion.seconds
 import kotlin.uuid.toJavaUuid
 import kotlin.uuid.toKotlinUuid
+
+private const val MTU_HEADER = 5
+private const val MTU_MIN = 23
+private const val MTU_MAX = 517
 
 class AndroidBleConnection(
     private val config: BleConfig,
@@ -43,16 +49,18 @@ class AndroidBleConnection(
     private val writeCharacteristic = CompletableDeferred<BluetoothGattCharacteristic>()
     private val readBuffer = Buffer()
 
-    override var mtu: Int = 23
+    override var mtu: Int = MTU_MIN - MTU_HEADER
 
     @SuppressLint("MissingPermission")
     suspend fun initialize() {
         logger.d { "init()" }
-        connected.first { it }
+        withTimeoutOrNull(10.seconds) {
+            connected.first { it }
+        } ?: error("Failed to connect to Bluetooth Device")
         check(gatt.discoverServices())
         writeCharacteristic.await()
         notificationDeferred.await()
-        check(gatt.requestMtu(517))
+        check(gatt.requestMtu(MTU_MAX))
         mtuDeferred.await()
     }
 
@@ -60,6 +68,7 @@ class AndroidBleConnection(
     override suspend fun write(data: ByteString) = withContext(dispatcher) {
         writeMutex.withLock {
             logger.v { "write(${data.size})" }
+            require(connected.value) { "Bluetooth Device Disconnected" }
 
             val characteristic = writeCharacteristic.await()
 
@@ -86,6 +95,7 @@ class AndroidBleConnection(
             logger.v { "read" }
 
             while (readBuffer.size == 0L) {
+                require(connected.value) { "Bluetooth Device Disconnected" }
                 delay(10)
             }
 
@@ -107,7 +117,7 @@ class AndroidBleConnection(
         logger.v { "onMtuChanged($mtu, $status)" }
         this.gatt = gatt
         if (status == BluetoothStatusCodes.SUCCESS) {
-            this.mtu = mtu
+            this.mtu = mtu - MTU_HEADER
             mtuDeferred.complete(Unit)
         } else {
             mtuDeferred.completeExceptionally(IllegalStateException("Failed to set MTU"))
@@ -174,6 +184,7 @@ class AndroidBleConnection(
         }
     }
 
+    @Deprecated("Deprecated in Java")
     override fun onCharacteristicChanged(
         gatt: BluetoothGatt,
         characteristic: BluetoothGattCharacteristic,
@@ -181,5 +192,15 @@ class AndroidBleConnection(
         logger.v { "onCharacteristicChanged(${characteristic.uuid})" }
         this.gatt = gatt
         readBuffer.write(characteristic.value)
+    }
+
+    override fun onCharacteristicChanged(
+        gatt: BluetoothGatt,
+        characteristic: BluetoothGattCharacteristic,
+        value: ByteArray,
+    ) {
+        logger.v { "onCharacteristicChanged(${characteristic.uuid})" }
+        this.gatt = gatt
+        readBuffer.write(value)
     }
 }

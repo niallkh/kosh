@@ -31,7 +31,6 @@ import kotlinx.coroutines.channels.awaitClose
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.channelFlow
 import kotlinx.coroutines.flow.conflate
-import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.suspendCancellableCoroutine
 import kotlinx.coroutines.withContext
@@ -55,8 +54,8 @@ class AndroidUsb(
                             (it.productId in config.productIds || it.productId shr 8 in config.productIds)
                 }
                 .map { it.mapDevice() }
+                .sortedBy { it.id }
         }
-        .distinctUntilChanged()
 
     override suspend fun open(
         id: String,

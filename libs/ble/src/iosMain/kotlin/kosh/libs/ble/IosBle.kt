@@ -98,7 +98,10 @@ class IosBle : Ble {
             )
         }
         .onCompletion { bleManager.stopScan() }
-        .map { listOf(Device(it.identifier.UUIDString, it.name)) }
+        .map {
+            listOf(Device(it.identifier.UUIDString, it.name))
+                .sortedBy { it.id }
+        }
 
     override suspend fun open(
         id: String,

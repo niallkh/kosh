@@ -2,36 +2,44 @@ package kosh.libs.ble
 
 import android.Manifest
 import android.annotation.SuppressLint
+import android.bluetooth.BluetoothAdapter
+import android.bluetooth.BluetoothAdapter.EXTRA_STATE
 import android.bluetooth.BluetoothDevice
-import android.bluetooth.BluetoothDevice.TRANSPORT_AUTO
+import android.bluetooth.BluetoothDevice.TRANSPORT_LE
 import android.bluetooth.BluetoothManager
-import android.bluetooth.le.BluetoothLeScanner
 import android.bluetooth.le.ScanCallback
 import android.bluetooth.le.ScanFilter
 import android.bluetooth.le.ScanResult
 import android.bluetooth.le.ScanSettings
+import android.bluetooth.le.ScanSettings.CALLBACK_TYPE_ALL_MATCHES
+import android.bluetooth.le.ScanSettings.CALLBACK_TYPE_FIRST_MATCH
+import android.bluetooth.le.ScanSettings.CALLBACK_TYPE_MATCH_LOST
+import android.bluetooth.le.ScanSettings.SCAN_MODE_LOW_LATENCY
+import android.content.BroadcastReceiver
 import android.content.Context
 import android.content.Context.BLUETOOTH_SERVICE
+import android.content.Intent
+import android.content.IntentFilter
 import android.content.pm.PackageManager
 import android.os.Build
 import android.os.Handler
 import android.os.HandlerThread
 import android.os.ParcelUuid
 import arrow.core.continuations.AtomicRef
+import arrow.core.continuations.update
 import arrow.fx.coroutines.Resource
 import arrow.fx.coroutines.resource
 import co.touchlab.kermit.Logger
 import kosh.libs.transport.Device
 import kosh.libs.transport.Transport
+import kotlinx.collections.immutable.minus
 import kotlinx.collections.immutable.persistentSetOf
 import kotlinx.collections.immutable.plus
 import kotlinx.coroutines.android.asCoroutineDispatcher
 import kotlinx.coroutines.channels.awaitClose
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.channelFlow
-import kotlinx.coroutines.flow.distinctUntilChanged
-import kotlinx.coroutines.flow.emptyFlow
-import kotlinx.coroutines.flow.flowOn
+import kotlinx.coroutines.flow.conflate
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.withContext
 import kotlin.uuid.toJavaUuid
@@ -46,15 +54,14 @@ class AndroidBle(
     private val handler by lazy { Handler(handlerThread.looper) }
     private val dispatcher by lazy { handler.asCoroutineDispatcher() }
 
-    private val scanner: BluetoothLeScanner?
-        get() = bluetoothManager.adapter.bluetoothLeScanner
-
     @SuppressLint("MissingPermission")
-    override fun devices(config: BleConfig): Flow<List<Device>> =
-        (scanner?.let { listDevices(it, config) } ?: emptyFlow())
-            .map { list -> list.map { Device(it.address, it.name) } }
-            .distinctUntilChanged()
-            .flowOn(dispatcher)
+    override fun devices(config: BleConfig): Flow<List<Device>> {
+        return listDevices(context, config)
+            .map { list ->
+                list.map { Device(it.address, it.name) }
+                    .sortedBy { it.id }
+            }
+    }
 
     @SuppressLint("MissingPermission")
     override suspend fun open(
@@ -82,7 +89,7 @@ class AndroidBle(
                         context,
                         false,
                         connection,
-                        TRANSPORT_AUTO,
+                        TRANSPORT_LE,
                         BluetoothDevice.PHY_LE_1M_MASK,
                         handler,
                     )
@@ -109,51 +116,89 @@ class AndroidBle(
 
 @SuppressLint("MissingPermission")
 private fun listDevices(
-    scanner: BluetoothLeScanner,
+    context: Context,
     config: BleConfig,
 ) = channelFlow {
     val logger = Logger.withTag("[K]BluetoothScan")
 
+    val bluetoothManager = context.getSystemService(BLUETOOTH_SERVICE) as BluetoothManager
+
     val devices = AtomicRef(persistentSetOf<BluetoothDevice>())
 
+    fun addDevice(device: BluetoothDevice) {
+        trySend(devices.updateAndGet { it + device })
+    }
+
+    fun removeDevice(device: BluetoothDevice) {
+        trySend(devices.updateAndGet { it - device })
+    }
+
     val scanCallback: ScanCallback = object : ScanCallback() {
-        override fun onScanResult(callbackType: Int, result: ScanResult?) {
-            super.onScanResult(callbackType, result)
-            result?.device?.let { device ->
-                addDevice(device)
+        override fun onScanResult(callbackType: Int, result: ScanResult) {
+            when (callbackType) {
+                CALLBACK_TYPE_ALL_MATCHES,
+                CALLBACK_TYPE_FIRST_MATCH,
+                    -> addDevice(result.device)
+
+                CALLBACK_TYPE_MATCH_LOST -> removeDevice(result.device)
             }
         }
 
         override fun onBatchScanResults(results: List<ScanResult>) {
-            super.onBatchScanResults(results)
             results.forEach { addDevice(it.device) }
         }
 
-        private fun addDevice(device: BluetoothDevice) {
-            trySend(devices.updateAndGet { it + device })
-        }
-
         override fun onScanFailed(errorCode: Int) {
-            super.onScanFailed(errorCode)
             logger.e { "onScanFailed, code=$errorCode" }
         }
     }
 
     fun start() {
         logger.v { "start" }
-        val scanSettings = ScanSettings.Builder().build()
+        val scanSettings = ScanSettings.Builder()
+            .setScanMode(SCAN_MODE_LOW_LATENCY)
+            .build()
 
         val filters = config.serviceUuid
             .map { ScanFilter.Builder().setServiceUuid(ParcelUuid(it.toJavaUuid())).build() }
 
-        scanner.startScan(filters, scanSettings, scanCallback)
+        bluetoothManager.adapter.bluetoothLeScanner?.startScan(filters, scanSettings, scanCallback)
     }
 
     fun stop() {
         logger.v { "stop" }
-        scanner.stopScan(scanCallback)
+        bluetoothManager.adapter.bluetoothLeScanner?.stopScan(scanCallback)
     }
 
+    val receiver = object : BroadcastReceiver() {
+        override fun onReceive(context: Context, intent: Intent) {
+            when (intent.action) {
+                BluetoothAdapter.ACTION_STATE_CHANGED -> {
+                    val state = intent.getIntExtra(EXTRA_STATE, BluetoothAdapter.ERROR)
+                    logger.v { "bluetooth state changed: $state" }
+                    devices.update { persistentSetOf() }
+
+                    when (state) {
+                        BluetoothAdapter.STATE_ON -> start()
+                        else -> stop()
+                    }
+                }
+            }
+        }
+    }
+
+    fun register() {
+        context.registerReceiver(receiver, IntentFilter(BluetoothAdapter.ACTION_STATE_CHANGED))
+    }
+
+    fun unregister() = context.unregisterReceiver(receiver)
+
+    register()
     start()
-    awaitClose { stop() }
+
+    awaitClose {
+        unregister()
+        stop()
+    }
 }
+    .conflate()
