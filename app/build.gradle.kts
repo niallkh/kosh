@@ -110,8 +110,8 @@ android {
         applicationId = "eth.kosh.app"
         minSdk = libs.versions.android.minSdk.get().toInt()
         targetSdk = libs.versions.android.compileSdk.get().toInt()
-        versionCode = 6
-        versionName = "0.0.2"
+        versionCode = 7
+        versionName = "0.0.3"
     }
 
     buildTypes {

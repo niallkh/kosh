@@ -13,7 +13,7 @@ Some things you can do now:
 * EIP-191, EIP-712, EIP-1559
 * Trezor Safe 3, Safe 5, T, One
 * Link Trezor Passphrase to Biometrics
-* Ledger Nano X, Nano S Plus, Stax (USB)
+* Ledger Nano X, Nano S Plus, Stax
 * NFTs
 * Material You design
 * IPFS trustless client
@@ -26,7 +26,6 @@ Some things you can expect in the future:
 * WalletConnect Inbox
 * ENS
 * Keystone (USB)
-* Ledger (Bluetooth)
 * iOS
 
 ## Built With
