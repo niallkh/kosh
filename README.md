@@ -2,53 +2,46 @@
 
 # Kosh
 
-Bridge the gap between your hardware wallet and dapps. Manage your crypto and interact with dapp
+![GitHub Tag](https://img.shields.io/github/v/tag/niallkh/kosh)
+
+Bridge the gap between your hardware wallet and dapps. Manage your crypto and interact with dapps
 from your mobile device.
+
+**Note:** Kosh is currently in development and may be unstable.
+
+[<img src="images/get_on_github.webp" alt="Download app from GitHub" height="80">](https://github.com/niallkh/kosh/releases)
+
+## Screenshots
+
+<div>
+    <img src="images/assets.webp" width="19%"  alt="Assets">
+    <img src="images/nft.webp" width="19%"  alt="NFT">
+    <img src="images/networks.webp" width="19%"  alt="Networks">
+    <img src="images/add_wallet.webp" width="19%"  alt="Add Hardware Wallet">
+    <img src="images/illustration.webp" width="19%"  alt="Illustration Dark">
+</div>
 
 ## Features
 
-Some things you can do now:
-
-* WalletConnect Sign, Auth
-* EIP-191, EIP-712, EIP-1559
-* Trezor Safe 3, Safe 5, T, One
-* Link Trezor Passphrase to Biometrics
-* Ledger Nano X, Nano S Plus, Stax
-* NFTs
-* Material You design
-* IPFS trustless client
-
-## Roadmap
-
-Some things you can expect in the future:
-
-* Export/Import passkeys
-* WalletConnect Inbox
-* ENS
-* Keystone (USB)
-* iOS
+- [x] Android
+- [x] WalletConnect Sign, Auth
+- [x] Trezor Safe 3, Safe 5, T, One
+- [x] Link Trezor Passphrase to Biometrics
+- [x] Ledger Nano X, Nano S Plus, Stax
+- [x] Tokens, NFTs
+- [x] Material You design
+- [x] IPFS Trustless client
+- [x] EIP-191, EIP-712, EIP-1559
+- [ ] iOS
+- [ ] WalletConnect Inbox
+- [ ] ENS
+- [ ] Keystone (USB)
+- [ ] Export/Import passkeys
 
 ## Built With
 
 * [Kotlin Multiplatform](https://github.com/JetBrains/kotlin)
 * [Kotlin Compose](https://github.com/JetBrains/compose-multiplatform)
 * [Secp256k1](https://github.com/ACINQ/secp256k1-kmp)
-* [Decompose](https://github.com/arkivanov/Decompose) for navigation
+* [Decompose](https://github.com/arkivanov/Decompose)
 * [Compose ImageLoader](https://github.com/qdsfdhvh/compose-imageloader)
-
-## Screenshots
-
-<div>
-    <p>
-        <img src="images/assets.webp" width="160"  alt="Assets">
-        <img src="images/activity.webp" width="160"  alt="Activity">
-        <img src="images/networks.webp" width="160"  alt="Networks">
-        <img src="images/nft.webp" width="160"  alt="NFT">
-    </p>
-    <p>
-        <img src="images/send_tx.webp" width="160"  alt="Send Transaction">
-        <img src="images/add_wallet.webp" width="160"  alt="Add Hardware Wallet">
-        <img src="images/illustration_light.webp" width="160"  alt="Illustration Light">
-        <img src="images/illustration_dark.webp" width="160"  alt="Illustration Dark">
-    </p>
-</div>
