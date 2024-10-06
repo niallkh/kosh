@@ -13,7 +13,7 @@ import kosh.domain.models.sepolia
 import kosh.domain.state.AppState
 import kosh.domain.utils.Copy
 
-internal inline fun Copy<AppState>.chains() {
+internal fun Copy<AppState>.chains() {
     ethereum()
     arbitrumOne()
     optimism()
@@ -24,7 +24,7 @@ internal inline fun Copy<AppState>.chains() {
     bnbChain()
 }
 
-internal inline fun Copy<AppState>.ethereum() {
+internal fun Copy<AppState>.ethereum() {
     network(
         chainId = ethereum,
         name = "Ethereum Mainnet",
@@ -42,7 +42,7 @@ internal inline fun Copy<AppState>.ethereum() {
     )
 }
 
-internal inline fun Copy<AppState>.optimism() {
+internal fun Copy<AppState>.optimism() {
     network(
         chainId = optimism,
         name = "OP Mainnet",
@@ -60,7 +60,7 @@ internal inline fun Copy<AppState>.optimism() {
     )
 }
 
-internal inline fun Copy<AppState>.arbitrumOne() {
+internal fun Copy<AppState>.arbitrumOne() {
     network(
         chainId = arbitrumOne,
         name = "Arbitrum One",
@@ -78,7 +78,7 @@ internal inline fun Copy<AppState>.arbitrumOne() {
     )
 }
 
-internal inline fun Copy<AppState>.base() {
+internal fun Copy<AppState>.base() {
     network(
         chainId = base,
         name = "Base",
@@ -96,7 +96,7 @@ internal inline fun Copy<AppState>.base() {
     )
 }
 
-internal inline fun Copy<AppState>.polygonPos() {
+internal fun Copy<AppState>.polygonPos() {
     network(
         chainId = polygonPos,
         name = "Polygon Mainnet",
@@ -114,7 +114,7 @@ internal inline fun Copy<AppState>.polygonPos() {
     )
 }
 
-internal inline fun Copy<AppState>.bnbChain() {
+internal fun Copy<AppState>.bnbChain() {
     network(
         chainId = bnbChain,
         name = "BNB Chain",
@@ -132,7 +132,7 @@ internal inline fun Copy<AppState>.bnbChain() {
     )
 }
 
-internal inline fun Copy<AppState>.avalanche() {
+internal fun Copy<AppState>.avalanche() {
     network(
         chainId = avalanche,
         name = "Avalanche C-Chain",
@@ -150,7 +150,7 @@ internal inline fun Copy<AppState>.avalanche() {
     )
 }
 
-internal inline fun Copy<AppState>.gnosis() {
+internal fun Copy<AppState>.gnosis() {
     network(
         chainId = gnosis,
         name = "Gnosis",
@@ -169,7 +169,7 @@ internal inline fun Copy<AppState>.gnosis() {
     )
 }
 
-internal inline fun Copy<AppState>.sepolia() {
+internal fun Copy<AppState>.sepolia() {
     network(
         chainId = sepolia,
         name = "Sepolia Testnet",

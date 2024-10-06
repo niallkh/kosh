@@ -3,21 +3,20 @@ package kosh.domain.repositories
 import kotlinx.coroutines.sync.Mutex
 import kotlinx.coroutines.sync.withLock
 
-
-val NULL = Any()
+val NIL = Any()
 
 fun <T> suspendLazy(factory: suspend () -> T): suspend () -> T {
     val mutex = Mutex()
-    var value: Any? = NULL
+    var value: Any? = NIL
     var localFactory: (suspend () -> T)? = factory
 
     return suspend {
-        if (value !== NULL) {
+        if (value !== NIL) {
             @Suppress("UNCHECKED_CAST")
             value as T
         } else {
             mutex.withLock {
-                if (value !== NULL) {
+                if (value !== NIL) {
                     @Suppress("UNCHECKED_CAST")
                     value as T
                 } else {

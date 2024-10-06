@@ -22,6 +22,12 @@ kotlin {
     jvm()
 
     sourceSets {
+        all {
+            languageSettings {
+                optIn("kotlin.uuid.ExperimentalUuidApi")
+            }
+        }
+
         commonMain.dependencies {
             api(projects.domain)
 

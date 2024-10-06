@@ -10,7 +10,7 @@ import androidx.compose.runtime.snapshots.Snapshot
 import androidx.compose.runtime.structuralEqualityPolicy
 import arrow.optics.Getter
 import arrow.optics.Lens
-import kosh.domain.repositories.NULL
+import kosh.domain.repositories.NIL
 import kotlinx.coroutines.flow.FlowCollector
 import kotlinx.coroutines.flow.StateFlow
 
@@ -19,7 +19,7 @@ fun <T, A> StateFlow<T>.optic(g: Getter<T, A>): StateFlow<A> = object : StateFlo
         get() = g.get(this@optic.value)
 
     override suspend fun collect(collector: FlowCollector<A>): Nothing {
-        var last: Any? = NULL
+        var last: Any? = NIL
         this@optic.collect {
             val new = g.get(it)
             if (new != last) {

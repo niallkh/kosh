@@ -31,14 +31,10 @@ kotlin {
 
             api(projects.eth.abi)
             api(projects.eth.rpc)
-            api(projects.libs.ipfs)
             api(projects.eth.wallet)
             api(projects.eth.proposals)
+            api(projects.libs.ipfs)
 
-            implementation(libs.arrow)
-            implementation(libs.arrow.fx)
-            implementation(libs.arrow.resilience)
-            implementation(libs.arrow.collectors)
             implementation(libs.ktor.client)
             implementation(libs.kotlinx.serialization.json)
             implementation(libs.kotlinx.serialization.json.io)

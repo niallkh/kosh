@@ -10,10 +10,9 @@ import kosh.domain.models.wc.PairingUri
 import kosh.domain.models.wc.SessionTopic
 import kosh.domain.models.wc.WcAuthentication
 import kosh.domain.models.wc.WcEvent
-import kosh.domain.models.wc.WcNamespace
-import kosh.domain.models.wc.WcProposal
 import kosh.domain.models.wc.WcRequest
 import kosh.domain.models.wc.WcSession
+import kosh.domain.models.wc.WcSessionProposal
 import kosh.domain.models.web3.EthMessage
 import kosh.domain.models.web3.Signature
 import kosh.domain.repositories.WcRepo
@@ -27,14 +26,14 @@ class IosWcRepo : WcRepo {
         get() = flowOf(false)
     override val sessions: Flow<List<WcSession>>
         get() = flowOf(listOf())
-    override val proposals: Flow<List<WcProposal>>
+    override val proposals: Flow<List<WcSessionProposal>>
         get() = flowOf(listOf())
     override val requests: Flow<List<WcRequest>>
         get() = flowOf(listOf())
     override val authentications: Flow<List<WcAuthentication>>
         get() = flowOf(listOf())
 
-    override fun proposalQueue(): Flow<WcProposal> {
+    override fun proposalQueue(): Flow<WcSessionProposal> {
         return emptyFlow()
     }
 
@@ -63,7 +62,7 @@ class IosWcRepo : WcRepo {
         return WcFailure.NoConnection().left()
     }
 
-    override suspend fun getProposal(id: WcProposal.Id): Either<WcFailure, WcProposal> {
+    override suspend fun getProposal(id: WcSessionProposal.Id): Either<WcFailure, WcSessionProposal> {
         return WcFailure.NoConnection().left()
     }
 
@@ -88,23 +87,15 @@ class IosWcRepo : WcRepo {
         return WcFailure.NoConnection().left()
     }
 
-    override suspend fun getNamespace(id: WcProposal.Id): Either<WcFailure, WcNamespace> {
-        return WcFailure.NoConnection().left()
-    }
-
-    override suspend fun getNamespace(id: WcSession.Id): Either<WcFailure, WcNamespace> {
-        return WcFailure.NoConnection().left()
-    }
-
     override suspend fun approveSessionProposal(
-        id: WcProposal.Id,
+        id: WcSessionProposal.Id,
         approvedAccounts: List<ChainAddress>,
     ): Either<WcFailure, Unit> {
         return WcFailure.NoConnection().left()
     }
 
     override suspend fun rejectSessionProposal(
-        id: WcProposal.Id,
+        id: WcSessionProposal.Id,
         reason: String,
     ): Either<WcFailure, Unit> {
         return WcFailure.NoConnection().left()

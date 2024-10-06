@@ -9,6 +9,8 @@ import com.arkivanov.decompose.ComponentContext
 import com.arkivanov.decompose.router.stack.push
 import com.seiko.imageloader.LocalImageLoader
 import kosh.app.di.IosApplicationScope
+import kosh.app.di.impl.IosReownComponent
+import kosh.libs.reown.ReownAdapter
 import kosh.presentation.core.defaultAppContext
 import kosh.presentation.di.DefaultRouteContext
 import kosh.presentation.di.LocalRouteContext
@@ -25,17 +27,22 @@ import platform.UIKit.UIViewController
 
 fun rootViewController(
     root: ComponentContext,
+    reownAdapter: ReownAdapter,
 ): UIViewController {
 
-    val applicationScope = IosApplicationScope()
+    val applicationScope = IosApplicationScope(
+        reownComponent = IosReownComponent(reownAdapter)
+    )
 
     Logger.setTag("[K]")
+
+    Logger.d { "isDebug=${applicationScope.appComponent.debug}" }
 
     if (applicationScope.appComponent.debug) {
         Logger.setMinSeverity(Severity.Verbose)
         Logger.setLogWriters(NSLogWriter())
     } else {
-        Logger.setMinSeverity(Severity.Info)
+        Logger.setMinSeverity(Severity.Verbose)
         Logger.setLogWriters(NSLogWriter())
     }
 

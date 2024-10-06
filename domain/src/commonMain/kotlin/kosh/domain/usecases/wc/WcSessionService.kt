@@ -1,7 +1,6 @@
 package kosh.domain.usecases.wc
 
 import arrow.core.Either
-import arrow.core.raise.Raise
 import arrow.core.raise.either
 import arrow.core.raise.recover
 import co.touchlab.kermit.Logger
@@ -12,7 +11,7 @@ import kosh.domain.models.ChainAddress
 import kosh.domain.models.ChainId
 import kosh.domain.models.wc.WcSession
 import kosh.domain.models.wc.WcSessionAggregated
-import kosh.domain.repositories.WcRepo
+import kosh.domain.repositories.ReownRepo
 import kosh.domain.serializers.ImmutableList
 import kosh.domain.state.AppState
 import kosh.domain.state.AppStateProvider
@@ -28,20 +27,18 @@ import kotlinx.coroutines.launch
 
 class WcSessionService(
     private val applicationScope: CoroutineScope,
-    private val wcRepo: WcRepo,
+    private val reownRepo: ReownRepo,
     private val appStateProvider: AppStateProvider,
 ) {
     private val logger = Logger.withTag("[K]WcSessionService")
 
     val sessions: Flow<ImmutableList<WcSession>>
-        get() = wcRepo.sessions.map { it.toImmutableList() }
+        get() = reownRepo.sessions.map { it.toImmutableList() }
 
     suspend fun get(
         id: WcSession.Id,
     ): Either<WcFailure, WcSessionAggregated> = either {
-        wcSessionAggregated(
-            session = wcRepo.getSession(id).bind(),
-        )
+        wcSessionAggregated(reownRepo.getSession(id).bind())
     }
 
     suspend fun update(
@@ -49,7 +46,7 @@ class WcSessionService(
         approvedAccounts: List<Address>,
         approvedChains: List<ChainId>,
     ): Either<WcFailure, Unit> {
-        return wcRepo.updateSession(
+        return reownRepo.updateSession(
             id = id,
             approvedAccounts = approvedChains.flatMap { chainId ->
                 approvedAccounts.map { account -> ChainAddress(chainId, account) }
@@ -62,14 +59,15 @@ class WcSessionService(
         chainId: ChainId,
     ): Either<WcFailure, Unit> = either {
 
-        val namespace = wcRepo.getNamespace(id).bind()
+        val session = reownRepo.getSession(id).bind()
 
-        if (chainId !in namespace.approvedChainIds) {
-            val approvedAccounts = namespace.approvedAccounts
+        if (chainId !in session.approved.chains) {
+            val approvedAccounts = session.approved.accounts
+
             val newAccounts = approvedAccounts.distinctBy { it.address }
                 .map { ChainAddress(chainId, it.address) }
 
-            wcRepo.updateSession(
+            reownRepo.updateSession(
                 id = id,
                 approvedAccounts = approvedAccounts + newAccounts,
             )
@@ -80,29 +78,28 @@ class WcSessionService(
         id: WcSession.Id,
     ) = applicationScope.launch {
         recover({
-            wcRepo.disconnect(id).bind()
+            reownRepo.disconnectSession(id).bind()
         }) {
             logger.logFailure(it)
         }
     }
 
-    private suspend fun Raise<WcFailure>.wcSessionAggregated(
+    private fun wcSessionAggregated(
         session: WcSession,
     ): WcSessionAggregated {
-        val namespace = wcRepo.getNamespace(session.id).bind()
 
         val networks = appStateProvider.optic(AppState.networks).value.values
         val accounts = appStateProvider.optic(AppState.accounts).value.values
-        val approvedAccounts = namespace.approvedAccounts.map { it.address }.distinct()
+        val approvedAccounts = session.approved.accounts.map { it.address }.distinct()
 
         return WcSessionAggregated(
             session = session,
             availableNetworks = networks
-                .filter { it.chainId in namespace.requiredChains || it.chainId in namespace.optionalChains }
+                .filter { it.chainId in session.required.chains || it.chainId in session.optional.chains }
                 .map { it.id }
                 .toPersistentHashSet(),
             requiredNetworks = networks
-                .filter { it.chainId in namespace.requiredChains }
+                .filter { it.chainId in session.required.chains }
                 .map { it.id }
                 .toPersistentHashSet(),
             approvedAccounts = accounts
@@ -110,7 +107,7 @@ class WcSessionService(
                 .map { it.id }
                 .toPersistentHashSet(),
             approvedNetworks = networks
-                .filter { it.chainId in namespace.approvedChainIds }
+                .filter { it.chainId in session.approved.chains }
                 .map { it.id }
                 .toPersistentHashSet(),
         )

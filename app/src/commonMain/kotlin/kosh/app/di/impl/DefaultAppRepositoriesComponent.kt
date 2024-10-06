@@ -17,6 +17,8 @@ import kosh.data.trezor.LedgerComponent
 import kosh.data.trezor.LedgerOffChain
 import kosh.data.trezor.TrezorComponent
 import kosh.data.trezor.TrezorOffChain
+import kosh.data.wc2.DefaultReownRepo
+import kosh.data.wc2.ReownComponent
 import kosh.data.web3.DefaultFunctionSignatureRepo
 import kosh.data.web3.DefaultGasRepo
 import kosh.data.web3.DefaultNetworkRepo
@@ -35,6 +37,7 @@ import kosh.domain.repositories.KeyStoreRepo
 import kosh.domain.repositories.LedgerRepo
 import kosh.domain.repositories.NetworkRepo
 import kosh.domain.repositories.NotificationRepo
+import kosh.domain.repositories.ReownRepo
 import kosh.domain.repositories.TokenBalanceRepo
 import kosh.domain.repositories.TokenListsRepo
 import kosh.domain.repositories.TokenRepo
@@ -54,6 +57,7 @@ abstract class DefaultAppRepositoriesComponent(
     coroutinesComponent: CoroutinesComponent,
     filesComponent: FilesComponent,
     ledgerComponent: LedgerComponent,
+    reownComponent: ReownComponent,
 ) : AppRepositoriesComponent,
     DataComponent by dataComponent,
     TrezorComponent by trezorComponent,
@@ -62,7 +66,8 @@ abstract class DefaultAppRepositoriesComponent(
     SerializationComponent by serializationComponent,
     FilesComponent by filesComponent,
     CoroutinesComponent by coroutinesComponent,
-    LedgerComponent by ledgerComponent {
+    LedgerComponent by ledgerComponent,
+    ReownComponent by reownComponent {
 
     private val networkService by provider {
         DefaultNetworkService(
@@ -163,4 +168,10 @@ abstract class DefaultAppRepositoriesComponent(
 
     override val analyticsRepo: AnalyticsRepo
         get() = DefaultAnalyticsRepo
+
+    override val reownRepo: ReownRepo by provider {
+        DefaultReownRepo(
+            adapter = reownAdapter,
+        )
+    }
 }

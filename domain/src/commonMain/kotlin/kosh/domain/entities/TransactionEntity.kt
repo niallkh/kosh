@@ -18,7 +18,7 @@ import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 import kotlin.jvm.JvmInline
 
-private val namespace = uuid5(UuidNil, "TokenEntity")
+val transactionsNamespace = uuid5(UuidNil, "TokenEntity")
 
 @Serializable
 @Immutable
@@ -161,7 +161,7 @@ sealed interface TransactionEntity : Entity {
                 nonce: ULong,
             ) = Id(
                 uuid5(
-                    namespace,
+                    transactionsNamespace,
                     listOfNotNull(
                         network.value.toString(),
                         sender.value.toString(),
@@ -175,7 +175,7 @@ sealed interface TransactionEntity : Entity {
                 sender: AccountEntity.Id,
             ) = Id(
                 uuid5(
-                    namespace,
+                    transactionsNamespace,
                     listOfNotNull(
                         networkId?.value?.toString(),
                         sender.value.toString(),
@@ -188,7 +188,7 @@ sealed interface TransactionEntity : Entity {
                 message: Path,
             ) = Id(
                 uuid5(
-                    namespace,
+                    transactionsNamespace,
                     listOfNotNull(
                         sender.value.toString(),
                         message.toString(),

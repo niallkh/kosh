@@ -8,16 +8,17 @@ plugins {
 
 kotlin {
     explicitApi()
+
     androidTarget {
         compilerOptions {
             jvmTarget = JvmTarget.JVM_11
         }
     }
-    jvm()
     iosX64()
     iosArm64()
     iosSimulatorArm64()
-    linuxX64()
+
+    jvm()
 
     sourceSets {
         all {
@@ -35,6 +36,7 @@ kotlin {
                 api(libs.kotlinx.io)
                 api(libs.arrow)
                 api(libs.bignum)
+
                 implementation(libs.ktor.client)
                 implementation(libs.kotlinx.serialization.json)
             }

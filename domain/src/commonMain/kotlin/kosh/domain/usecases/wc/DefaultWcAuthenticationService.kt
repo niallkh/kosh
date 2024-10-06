@@ -7,9 +7,10 @@ import kosh.domain.failure.WcFailure
 import kosh.domain.failure.logFailure
 import kosh.domain.models.Address
 import kosh.domain.models.ChainId
+import kosh.domain.models.at
 import kosh.domain.models.wc.WcAuthentication
 import kosh.domain.models.web3.Signature
-import kosh.domain.repositories.WcRepo
+import kosh.domain.repositories.ReownRepo
 import kosh.domain.state.AppState
 import kosh.domain.state.AppStateProvider
 import kosh.domain.state.networks
@@ -25,7 +26,7 @@ import kotlinx.coroutines.withTimeoutOrNull
 import kotlin.time.Duration.Companion.seconds
 
 class DefaultWcAuthenticationService(
-    private val wcRepo: WcRepo,
+    private val reownRepo: ReownRepo,
     private val applicationScope: CoroutineScope,
     private val notificationService: NotificationService,
     private val appStateProvider: AppStateProvider,
@@ -34,7 +35,7 @@ class DefaultWcAuthenticationService(
     private val logger = Logger.withTag("[K]WcAuthenticationService")
 
     override val authentications: Flow<List<WcAuthentication>>
-        get() = wcRepo.authentications
+        get() = reownRepo.authentications
 
     override suspend fun get(
         id: WcAuthentication.Id,
@@ -42,7 +43,7 @@ class DefaultWcAuthenticationService(
         notificationService.cancel(id.value)
 
         val authentication = withTimeoutOrNull(10.seconds) {
-            wcRepo.authentications.flatMapConcat { it.asFlow() }
+            reownRepo.authentications.flatMapConcat { it.asFlow() }
                 .first { it.id == id }
         }
             ?: raise(WcFailure.AuthenticationNotFound())
@@ -56,10 +57,9 @@ class DefaultWcAuthenticationService(
         chainId: ChainId,
     ): Either<WcFailure, WcAuthentication.Message> = either {
 
-        val formattedMessage = wcRepo.getAuthenticationMessage(
+        val formattedMessage = reownRepo.getAuthenticationMessage(
             id = id,
-            account = account,
-            chain = chainId,
+            account = chainId.at(account),
             supportedChains = appStateProvider.optic(AppState.networks).value.map { it.value.chainId }
         ).bind()
 
@@ -73,10 +73,9 @@ class DefaultWcAuthenticationService(
         signature: Signature,
     ) = applicationScope.launch {
         arrow.core.raise.recover({
-            wcRepo.approveAuthentication(
+            reownRepo.approveAuthentication(
                 id = id,
-                account = account,
-                chain = chainId,
+                account = chainId.at(account),
                 signature = signature,
                 supportedChains = appStateProvider.optic(AppState.networks).value.map { it.value.chainId }
             ).bind()
@@ -89,10 +88,7 @@ class DefaultWcAuthenticationService(
         id: WcAuthentication.Id,
     ) = applicationScope.launch {
         arrow.core.raise.recover({
-            wcRepo.rejectAuthentication(
-                id = id,
-                reason = "Rejected"
-            ).bind()
+            reownRepo.rejectAuthentication(id).bind()
         }) {
             logger.logFailure(it)
         }

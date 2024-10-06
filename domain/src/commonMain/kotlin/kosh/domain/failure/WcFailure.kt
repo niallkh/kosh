@@ -63,6 +63,8 @@ sealed interface WcFailure : AppFailure {
             get() = "Verify Context not found"
     }
 
+    class Other(override val message: String) : WcFailure
+
     @Immutable
     sealed interface WcInvalidDapp : WcFailure {
 

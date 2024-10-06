@@ -15,7 +15,7 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import kosh.domain.entities.TransactionEntity
 import kosh.domain.models.wc.WcAuthentication
-import kosh.domain.models.wc.WcProposal
+import kosh.domain.models.wc.WcSessionProposal
 import kosh.domain.models.wc.WcRequest
 import kosh.domain.serializers.ImmutableList
 import kosh.presentation.transaction.rememberFinalizeTransactions
@@ -35,7 +35,7 @@ import kosh.ui.wc.WcRequestItem
 fun ActivityScreen(
     paddingValues: PaddingValues,
     onOpenTransaction: (TransactionEntity.Id) -> Unit,
-    onOpenProposal: (WcProposal) -> Unit,
+    onOpenProposal: (WcSessionProposal) -> Unit,
     onOpenAuth: (WcAuthentication) -> Unit,
     onOpenRequest: (WcRequest) -> Unit,
 ) {
@@ -65,11 +65,11 @@ fun ActivityScreen(
 fun ActivityContent(
     paddingValues: PaddingValues,
     transactions: ImmutableList<TransactionEntity>,
-    proposals: ImmutableList<WcProposal>,
+    proposals: ImmutableList<WcSessionProposal>,
     authentications: ImmutableList<WcAuthentication>,
     requests: ImmutableList<WcRequest>,
     onSelectTransaction: (TransactionEntity) -> Unit,
-    onSelectProposal: (WcProposal) -> Unit,
+    onSelectProposal: (WcSessionProposal) -> Unit,
     onSelectAuthentication: (WcAuthentication) -> Unit,
     onSelectRequest: (WcRequest) -> Unit,
 ) {
@@ -117,11 +117,11 @@ fun ActivityContent(
 
 private fun LazyListScope.activity(
     transactions: ImmutableList<TransactionEntity>,
-    proposals: ImmutableList<WcProposal>,
+    proposals: ImmutableList<WcSessionProposal>,
     authentications: ImmutableList<WcAuthentication>,
     requests: ImmutableList<WcRequest>,
     onSelectTransaction: (TransactionEntity) -> Unit,
-    onSelectProposal: (WcProposal) -> Unit,
+    onSelectProposal: (WcSessionProposal) -> Unit,
     onSelectAuthentication: (WcAuthentication) -> Unit,
     onSelectRequest: (WcRequest) -> Unit,
 ) {
@@ -157,8 +157,8 @@ private fun LazyListScope.requests(
 }
 
 private fun LazyListScope.proposals(
-    proposals: ImmutableList<WcProposal>,
-    onSelect: (WcProposal) -> Unit,
+    proposals: ImmutableList<WcSessionProposal>,
+    onSelect: (WcSessionProposal) -> Unit,
 ) {
     if (proposals.isNotEmpty()) {
         stickyHeader {

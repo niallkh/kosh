@@ -28,6 +28,7 @@ import com.arkivanov.essenty.lifecycle.doOnStop
 import com.eygraber.uri.toUri
 import com.seiko.imageloader.LocalImageLoader
 import kosh.app.di.AndroidWindowScope
+import kosh.domain.usecases.trezor.DefaultTrezorService
 import kosh.presentation.app.rememberInitApp
 import kosh.presentation.core.defaultAppContext
 import kosh.presentation.di.DefaultRouteContext
@@ -54,6 +55,7 @@ class KoshActivity : FragmentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         val splashScreen = installSplashScreen()
         super.onCreate(savedInstanceState)
+
         logger.d { "onCreate()" }
         splashScreen.setKeepOnScreenCondition { true }
 

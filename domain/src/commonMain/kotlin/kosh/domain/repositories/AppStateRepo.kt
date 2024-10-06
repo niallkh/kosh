@@ -1,5 +1,7 @@
 package kosh.domain.repositories
 
+import androidx.compose.runtime.MutableState
+import androidx.compose.runtime.snapshots.Snapshot.Companion.takeMutableSnapshot
 import arrow.optics.Getter
 import kosh.domain.state.AppState
 import kosh.domain.utils.Copy
@@ -26,6 +28,21 @@ inline fun AppStateRepo.modify(update: Copy<AppState>.() -> Unit) {
         val nextValue = prevValue.copy { update() }
         if (compareAndSet(prevValue, nextValue)) {
             return
+        }
+    }
+}
+
+fun <T> MutableState<T>.compareAndSet(expect: T, update: T): Boolean {
+    takeMutableSnapshot().run {
+        try {
+            if (value == expect) {
+                value = update
+            } else {
+                return false
+            }
+            return apply().succeeded
+        } finally {
+            dispose()
         }
     }
 }

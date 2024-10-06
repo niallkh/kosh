@@ -18,7 +18,7 @@ from your mobile device.
     <img src="images/nft.webp" width="19%"  alt="NFT">
     <img src="images/networks.webp" width="19%"  alt="Networks">
     <img src="images/add_wallet.webp" width="19%"  alt="Add Hardware Wallet">
-    <img src="images/illustration.webp" width="19%"  alt="Illustration Dark">
+    <img src="images/illustration.webp" width="19%"  alt="Illustration">
 </div>
 
 ## Features

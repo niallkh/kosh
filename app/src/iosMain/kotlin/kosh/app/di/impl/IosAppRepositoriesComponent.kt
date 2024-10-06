@@ -7,11 +7,9 @@ import kosh.app.di.SerializationComponent
 import kosh.data.DataComponent
 import kosh.data.trezor.LedgerComponent
 import kosh.data.trezor.TrezorComponent
-import kosh.data.wc2.IosWcRepo
+import kosh.data.wc2.ReownComponent
 import kosh.data.web3.Web3Component
 import kosh.domain.AppRepositoriesComponent
-import kosh.domain.core.provider
-import kosh.domain.repositories.WcRepo
 
 class IosAppRepositoriesComponent(
     dataComponent: DataComponent,
@@ -22,6 +20,7 @@ class IosAppRepositoriesComponent(
     coroutinesComponent: CoroutinesComponent,
     filesComponent: FilesComponent,
     ledgerComponent: LedgerComponent,
+    reownComponent: ReownComponent,
 ) : AppRepositoriesComponent,
     DefaultAppRepositoriesComponent(
         dataComponent = dataComponent,
@@ -32,9 +31,5 @@ class IosAppRepositoriesComponent(
         coroutinesComponent = coroutinesComponent,
         filesComponent = filesComponent,
         ledgerComponent = ledgerComponent,
-    ) {
-
-    override val wcRepo: WcRepo by provider {
-        IosWcRepo()
-    }
-}
+        reownComponent = reownComponent
+    )

@@ -16,7 +16,7 @@ import androidx.lifecycle.lifecycleScope
 import co.touchlab.kermit.Logger
 import kosh.app.KoshApplication.Companion.applicationScope
 import kosh.domain.repositories.NotificationRepo.Type
-import kosh.domain.repositories.WcRepo
+import kosh.domain.repositories.ReownRepo
 import kosh.domain.usecases.notification.NotificationService
 import kosh.domain.usecases.wc.WcConnectionService
 import kosh.domain.usecases.wc.useConnection
@@ -43,7 +43,7 @@ class KoshService : LifecycleService() {
     private lateinit var notificationManager: NotificationManagerCompat
     private lateinit var wcConnectionService: WcConnectionService
     private lateinit var notificationService: NotificationService
-    private lateinit var wcRepo: WcRepo
+    private lateinit var reownRepo: ReownRepo
 
     private val started = MutableStateFlow(false)
 
@@ -53,7 +53,7 @@ class KoshService : LifecycleService() {
         notificationManager = NotificationManagerCompat.from(this)
         wcConnectionService = applicationScope.domainComponent.wcConnectionService
         notificationService = applicationScope.domainComponent.notificationService
-        wcRepo = applicationScope.appRepositoriesComponent.wcRepo
+        reownRepo = applicationScope.appRepositoriesComponent.reownRepo
 
         lifecycleScope.launch {
             ActivityCallbacks.background.collectLatest { background ->
@@ -110,7 +110,7 @@ class KoshService : LifecycleService() {
         }
 
         launch {
-            wcRepo.requestQueue()
+            reownRepo.newRequest
                 .collect {
                     notificationService.send(
                         AppNotification(
@@ -125,7 +125,7 @@ class KoshService : LifecycleService() {
         }
 
         launch {
-            wcRepo.proposalQueue()
+            reownRepo.newProposal
                 .collect {
                     notificationService.send(
                         AppNotification(
@@ -140,7 +140,7 @@ class KoshService : LifecycleService() {
         }
 
         launch {
-            wcRepo.authenticationQueue()
+            reownRepo.newAuthentication
                 .collect {
                     notificationService.send(
                         AppNotification(
