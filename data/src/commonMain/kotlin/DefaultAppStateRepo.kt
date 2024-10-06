@@ -5,7 +5,7 @@ import kosh.data.sources.AppStateSource
 import kosh.domain.repositories.AppStateRepo
 import kosh.domain.repositories.suspendLazy
 import kosh.domain.state.AppState
-import kosh.domain.utils.selectorLatest
+import kosh.domain.utils.selectLatest
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.first
@@ -29,7 +29,7 @@ class DefaultAppStateRepo(
     init {
         applicationScope.launch {
             init()
-            state.selectorLatest { newState ->
+            state.selectLatest { newState ->
                 appStateSource.update { newState }
             }
         }

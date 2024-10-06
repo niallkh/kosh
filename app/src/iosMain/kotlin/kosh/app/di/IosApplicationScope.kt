@@ -9,14 +9,17 @@ import kosh.app.di.impl.IosFileSystemComponent
 import kosh.app.di.impl.IosImageComponent
 import kosh.app.di.impl.IosNetworkComponent
 import kosh.app.di.impl.IosTransportComponent
+import kosh.app.di.impl.IosWindowRepositoriesComponent
 import kosh.data.DataComponent
+import kosh.data.wc2.ReownComponent
 import kosh.domain.AppRepositoriesComponent
 import kosh.domain.WindowRepositoriesComponent
 import kosh.domain.core.provider
 import kosh.presentation.di.RouteScopeFactory
 
-class IosApplicationScope() :
-    DefaultApplicationScope(),
+class IosApplicationScope(
+    override val reownComponent: ReownComponent,
+) : DefaultApplicationScope(),
     WindowScope {
 
     override val appComponent: AppComponent by provider {
@@ -51,7 +54,7 @@ class IosApplicationScope() :
     }
 
     override val windowRepositoriesComponent: WindowRepositoriesComponent by provider {
-        DefaultWindowRepositoriesComponent()
+        IosWindowRepositoriesComponent()
     }
 
     override val appRepositoriesComponent: AppRepositoriesComponent by provider {
@@ -64,6 +67,7 @@ class IosApplicationScope() :
             coroutinesComponent = coroutinesComponent,
             filesComponent = filesComponent,
             ledgerComponent = ledgerComponent,
+            reownComponent = reownComponent,
         )
     }
 }

@@ -28,6 +28,8 @@ kotlin {
                 optIn("kotlin.ExperimentalStdlibApi")
                 optIn("kotlinx.io.bytestring.unsafe.UnsafeByteStringApi")
                 optIn("kotlinx.cinterop.ExperimentalForeignApi")
+                optIn("kotlinx.cinterop.BetaInteropApi")
+                optIn("kotlinx.coroutines.ExperimentalCoroutinesApi")
             }
         }
 

@@ -25,6 +25,10 @@ kotlin {
             baseName = "App"
             isStatic = true
 
+            export(projects.domain)
+            export(projects.libs.reown)
+
+            export(libs.arrow)
             export(libs.decompose)
             export(libs.essenty.lifecycle)
             export(libs.essenty.lifecycle)
@@ -40,6 +44,9 @@ kotlin {
                 optIn("androidx.compose.material3.ExperimentalMaterial3Api")
                 optIn("kotlinx.serialization.ExperimentalSerializationApi")
                 optIn("org.jetbrains.compose.resources.ExperimentalResourceApi")
+                optIn("kotlinx.cinterop.BetaInteropApi")
+                optIn("kotlinx.cinterop.ExperimentalForeignApi")
+                optIn("kotlinx.io.bytestring.unsafe.UnsafeByteStringApi")
             }
         }
 
@@ -62,20 +69,22 @@ kotlin {
             implementation(compose.ui)
             implementation(compose.components.uiToolingPreview)
 
+            api(projects.domain)
             implementation(projects.ui)
             implementation(projects.presentation)
-            implementation(projects.domain)
-            implementation(projects.libs.ipfs)
             implementation(projects.data)
             implementation(projects.data.trezor)
             implementation(projects.data.ledger)
-            implementation(projects.data.web3)
-            implementation(projects.data.wc2)
+            api(projects.data.web3)
+            api(projects.data.wc2)
             implementation(projects.datastore)
+            implementation(projects.eth.wallet)
+            implementation(projects.eth.abi)
             implementation(projects.libs.trezor)
             implementation(projects.libs.ledger)
             implementation(projects.libs.usb)
             implementation(projects.libs.ble)
+            implementation(projects.libs.ipfs)
             implementation(projects.libs.keystore)
 
             implementation(libs.kotlinx.serialization.json)
@@ -84,6 +93,7 @@ kotlin {
             implementation(libs.ktor.client.logging)
             implementation(libs.ktor.client.encoding)
 
+            api(libs.arrow)
             api(libs.decompose)
             api(libs.essenty.lifecycle)
             api(libs.essenty.lifecycle)

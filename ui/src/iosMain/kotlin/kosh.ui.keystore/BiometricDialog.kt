@@ -14,5 +14,7 @@ actual fun BiometricDialog(
     onError: () -> Unit,
     onCanceled: () -> Unit,
 ) {
-    TODO("Not yet implemented")
+    require(cipherRequest == null) {
+        "Biometric dialog not implemented on iOS"
+    }
 }

@@ -16,7 +16,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import arrow.core.raise.nullable
 import arrow.optics.Getter
-import kosh.domain.models.wc.WcProposal
+import kosh.domain.models.wc.WcSessionProposal
 import kosh.domain.state.AppState
 import kosh.domain.state.accounts
 import kosh.domain.state.networks
@@ -50,7 +50,7 @@ import org.jetbrains.compose.resources.stringResource
 
 @Composable
 fun WcProposalScreen(
-    id: WcProposal.Id,
+    id: WcSessionProposal.Id,
     requestId: Long,
     onResult: () -> Unit,
     onCancel: () -> Unit,

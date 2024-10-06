@@ -12,11 +12,11 @@ kotlin {
             jvmTarget = JvmTarget.JVM_11
         }
     }
-    jvm()
     iosX64()
     iosArm64()
     iosSimulatorArm64()
-    linuxX64()
+
+    jvm()
 
     sourceSets {
         all {

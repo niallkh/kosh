@@ -15,9 +15,9 @@ import kosh.domain.models.ChainAddress
 import kosh.domain.models.ChainId
 import kosh.domain.models.wc.PairingUri
 import kosh.domain.models.wc.WcAuthentication
-import kosh.domain.models.wc.WcProposal
 import kosh.domain.models.wc.WcProposalAggregated
-import kosh.domain.repositories.WcRepo
+import kosh.domain.models.wc.WcSessionProposal
+import kosh.domain.repositories.ReownRepo
 import kosh.domain.state.AppState
 import kosh.domain.state.AppStateProvider
 import kosh.domain.state.networks
@@ -39,21 +39,21 @@ import kotlinx.coroutines.withTimeoutOrNull
 import kotlin.time.Duration.Companion.seconds
 
 class DefaultWcProposalService(
-    private val wcRepo: WcRepo,
+    private val reownRepo: ReownRepo,
     private val appStateProvider: AppStateProvider,
     private val notificationService: NotificationService,
     private val applicationScope: CoroutineScope,
 ) : WcProposalService {
     private val logger = Logger.withTag("WcSessionProposal")
 
-    override val proposals: Flow<List<WcProposal>>
-        get() = wcRepo.proposals
+    override val proposals: Flow<List<WcSessionProposal>>
+        get() = reownRepo.proposals
 
     override suspend fun pair(
         uri: PairingUri,
-    ): Either<WcFailure, Either<WcProposal, WcAuthentication>> = either {
+    ): Either<WcFailure, Either<WcSessionProposal, WcAuthentication>> = either {
         withTimeoutOrNull(10.seconds) {
-            wcRepo.pair(uri = uri).bind()
+            reownRepo.pair(uri = uri).bind()
         } ?: raise(WcFailure.PairingUriInvalid())
 
         getNextProposalOrAuthentication(uri).bind()
@@ -61,15 +61,15 @@ class DefaultWcProposalService(
 
     private suspend fun getNextProposalOrAuthentication(
         uri: PairingUri,
-    ): Either<WcFailure, Either<WcProposal, WcAuthentication>> = coroutineScope {
+    ): Either<WcFailure, Either<WcSessionProposal, WcAuthentication>> = coroutineScope {
 
         val asyncProposal = async {
-            wcRepo.proposals.flatMapConcat { it.asFlow() }
+            reownRepo.proposals.flatMapConcat { it.asFlow() }
                 .first { it.id.pairingTopic.value in uri.value }
         }
 
         val asyncAuthentication = async {
-            wcRepo.authentications.flatMapConcat { it.asFlow() }
+            reownRepo.authentications.flatMapConcat { it.asFlow() }
                 .first {
                     logger.w { it.toString() }
                     it.pairingTopic.value in uri.value
@@ -96,13 +96,13 @@ class DefaultWcProposalService(
     }
 
     override suspend fun get(
-        id: WcProposal.Id,
+        id: WcSessionProposal.Id,
         requestId: Long,
     ): Either<WcFailure, WcProposalAggregated> = either {
         requestId.let { notificationService.cancel(it) }
 
         val proposal = withTimeoutOrNull(10.seconds) {
-            wcRepo.proposals.flatMapConcat { it.asFlow() }
+            reownRepo.proposals.flatMapConcat { it.asFlow() }
                 .first { it.id == id }
         }
             ?: raise(WcFailure.ProposalNotFound())
@@ -111,10 +111,10 @@ class DefaultWcProposalService(
     }
 
     override suspend fun approve(
-        id: WcProposal.Id,
+        id: WcSessionProposal.Id,
         approvedAccounts: List<Address>,
         approvedChains: List<ChainId>,
-    ): Either<WcFailure, Unit> = wcRepo.approveSessionProposal(
+    ): Either<WcFailure, Unit> = reownRepo.approveProposal(
         id = id,
         approvedAccounts = approvedChains.flatMap { chainId ->
             approvedAccounts.map { account -> ChainAddress(chainId, account) }
@@ -122,35 +122,33 @@ class DefaultWcProposalService(
     )
 
     override fun reject(
-        id: WcProposal.Id,
+        id: WcSessionProposal.Id,
     ): Job = applicationScope.launch {
 
         recover({
-            wcRepo.rejectSessionProposal(id, "Rejected").bind()
+            reownRepo.rejectProposal(id).bind()
         }) {
             logger.logFailure(it)
         }
     }
 
-    private suspend fun Raise<WcFailure>.wcProposalAggregated(
-        proposal: WcProposal,
+    private fun Raise<WcFailure>.wcProposalAggregated(
+        proposal: WcSessionProposal,
     ): WcProposalAggregated {
         val networks = appStateProvider.optic(AppState.networks).value.values
 
-        val namespace = wcRepo.getNamespace(proposal.id).bind()
-
-        ensure(namespace.requiredChains.all { chainId -> networks.any { it.chainId == chainId } }) {
+        ensure(proposal.required.chains.all { chainId -> networks.any { it.chainId == chainId } }) {
             WcFailure.WcInvalidDapp.NoRequiredChains()
         }
 
         return WcProposalAggregated(
             proposal = proposal,
             networks = networks
-                .filter { it.chainId in namespace.requiredChains || it.chainId in namespace.optionalChains }
+                .filter { it.chainId in proposal.required.chains || it.chainId in proposal.optional.chains }
                 .map { it.id }
                 .toPersistentHashSet(),
             required = networks
-                .filter { it.chainId in namespace.requiredChains }
+                .filter { it.chainId in proposal.required.chains }
                 .map { it.id }
                 .toPersistentHashSet()
         )

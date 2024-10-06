@@ -38,9 +38,9 @@ kotlin {
             api(compose.materialIconsExtended)
             api(compose.components.uiToolingPreview)
 
-            api(projects.eth.abi)
             api(projects.presentation)
             api(projects.ui.resources)
+
             api(libs.image.loader)
             api(libs.material.kolor)
 

@@ -37,8 +37,8 @@ kotlin {
         commonMain.dependencies {
             api(compose.runtime)
 
-            implementation(projects.eth.abi)
-            implementation(projects.eth.proposals)
+            api(projects.eth.abi)
+            api(projects.eth.proposals)
 
             api(libs.kotlinx.io)
             api(libs.kotlinx.coroutines)

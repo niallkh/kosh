@@ -12,7 +12,7 @@ import kosh.domain.models.Hash
 import kosh.domain.models.wc.SessionTopic
 import kosh.domain.models.wc.WcRequest
 import kosh.domain.models.wc.WcSession
-import kosh.domain.repositories.WcRepo
+import kosh.domain.repositories.ReownRepo
 import kosh.domain.state.AppState
 import kosh.domain.state.AppStateProvider
 import kosh.domain.state.network
@@ -32,7 +32,7 @@ import kotlinx.coroutines.withTimeoutOrNull
 import kotlin.time.Duration.Companion.seconds
 
 class DefaultWcRequestService(
-    private val wcRepo: WcRepo,
+    private val reownRepo: ReownRepo,
     private val applicationScope: CoroutineScope,
     private val notificationService: NotificationService,
     private val networkService: NetworkService,
@@ -44,7 +44,7 @@ class DefaultWcRequestService(
     private val logger = Logger.withTag("WcRequestProcessor")
 
     override val requests: Flow<List<WcRequest>>
-        get() = wcRepo.requests
+        get() = reownRepo.requests
             .map { requests -> requests.mapNotNull { validate(it).getOrNull() } }
 
     override suspend fun get(
@@ -53,7 +53,7 @@ class DefaultWcRequestService(
         id?.value?.let { notificationService.cancel(id.value) }
 
         val request = withTimeoutOrNull(10.seconds) {
-            wcRepo.requests.flatMapConcat { it.asFlow() }
+            reownRepo.requests.flatMapConcat { it.asFlow() }
                 .first { id == null || id == it.id }
         }
             ?: raise(WcFailure.RequestNotFound())
@@ -68,7 +68,7 @@ class DefaultWcRequestService(
         data: ByteString,
     ) = applicationScope.launch {
         arrow.core.raise.recover({
-            wcRepo.approveSessionRequest(
+            reownRepo.approveSessionRequest(
                 id = id,
                 response = data.toString()
             ).bind()
@@ -82,7 +82,7 @@ class DefaultWcRequestService(
         data: ByteString,
     ) = applicationScope.launch {
         arrow.core.raise.recover({
-            wcRepo.approveSessionRequest(
+            reownRepo.approveSessionRequest(
                 id = id,
                 response = data.toString()
             ).bind()
@@ -96,7 +96,7 @@ class DefaultWcRequestService(
         hash: Hash,
     ) = applicationScope.launch {
         arrow.core.raise.recover({
-            wcRepo.approveSessionRequest(
+            reownRepo.approveSessionRequest(
                 id = id,
                 response = hash.toString()
             ).bind()
@@ -113,7 +113,7 @@ class DefaultWcRequestService(
         arrow.core.raise.recover({
             sessionService.addNetwork(WcSession.Id(sessionTopic), chainId).bind()
 
-            wcRepo.approveSessionRequest(id, "null").bind()
+            reownRepo.approveSessionRequest(id, "null").bind()
         }, {
             logger.logFailure(it)
         })
@@ -123,7 +123,7 @@ class DefaultWcRequestService(
         id: WcRequest.Id,
     ): Job = applicationScope.launch {
         arrow.core.raise.recover({
-            wcRepo.approveSessionRequest(id, "true").bind()
+            reownRepo.approveSessionRequest(id, "true").bind()
         }) {
             logger.logFailure(it)
         }
@@ -133,10 +133,7 @@ class DefaultWcRequestService(
         id: WcRequest.Id,
     ): Job = applicationScope.launch {
         arrow.core.raise.recover({
-            wcRepo.rejectSessionRequest(
-                id = id,
-                reason = "Rejected"
-            ).bind()
+            reownRepo.rejectSessionRequest(id).bind()
         }, {
             logger.logFailure(it)
         })

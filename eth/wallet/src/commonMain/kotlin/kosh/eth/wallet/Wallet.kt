@@ -57,6 +57,15 @@ public object Wallet {
         .substring(12, 32)
         .let(Value.Address::invoke)
 
+    public fun recoverPubKey(
+        signature: ByteString,
+        messageHash: ByteString,
+    ): ByteString = Secp256k1.recover(
+        signature = signature.substring(0, 64),
+        messageHash = messageHash,
+        recId = signature[64].toInt() - 27
+    )
+
     public fun personalSign(
         privateKey: PrivateKey,
         message: ByteString,

@@ -4,14 +4,14 @@ import androidx.compose.runtime.Composable
 import kosh.domain.failure.WcFailure
 import kosh.domain.models.Address
 import kosh.domain.models.ChainId
-import kosh.domain.models.wc.WcProposal
+import kosh.domain.models.wc.WcSessionProposal
 import kosh.domain.usecases.wc.WcProposalService
 import kosh.presentation.Perform
 import kosh.presentation.di.di
 
 @Composable
 fun rememberApproveProposal(
-    id: WcProposal.Id,
+    id: WcSessionProposal.Id,
     proposalService: WcProposalService = di { domain.wcProposalService },
 ): ApproveProposalState {
 

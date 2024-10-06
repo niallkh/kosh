@@ -4,7 +4,6 @@ plugins {
     alias(libs.plugins.kotlinMultiplatform)
     alias(libs.plugins.kotlinSerialization)
     alias(libs.plugins.androidLibrary)
-    id("maven-publish")
 }
 
 kotlin {
@@ -15,11 +14,12 @@ kotlin {
             jvmTarget = JvmTarget.JVM_11
         }
     }
-    jvm()
+
     iosX64()
     iosArm64()
     iosSimulatorArm64()
-    linuxX64()
+
+    jvm()
 
     sourceSets {
         all {

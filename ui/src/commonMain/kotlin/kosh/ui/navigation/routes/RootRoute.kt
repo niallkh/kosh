@@ -1,7 +1,7 @@
 package kosh.ui.navigation.routes
 
 import kosh.domain.models.wc.WcAuthentication
-import kosh.domain.models.wc.WcProposal
+import kosh.domain.models.wc.WcSessionProposal
 import kosh.domain.models.wc.WcRequest
 import kosh.ui.navigation.routes.wc.WcProposalRoute
 import kosh.ui.navigation.routes.wc.WcRequestRoute
@@ -63,7 +63,7 @@ sealed class RootRoute : Route {
     ) : RootRoute()
 }
 
-fun wcProposal(proposal: WcProposal): RootRoute {
+fun wcProposal(proposal: WcSessionProposal): RootRoute {
     return RootRoute.WcProposal(WcProposalRoute.Proposal(proposal.id, proposal.requestId))
 }
 

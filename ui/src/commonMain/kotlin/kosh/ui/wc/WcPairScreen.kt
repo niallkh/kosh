@@ -27,7 +27,7 @@ import arrow.core.toEitherNel
 import kosh.domain.failure.WcFailure
 import kosh.domain.models.wc.PairingUri
 import kosh.domain.models.wc.WcAuthentication
-import kosh.domain.models.wc.WcProposal
+import kosh.domain.models.wc.WcSessionProposal
 import kosh.presentation.component.textfield.TextFieldState
 import kosh.presentation.component.textfield.rememberTextField
 import kosh.presentation.wc.PairState
@@ -51,7 +51,7 @@ fun WcPairScreen(
     initial: PairingUri?,
     onCancel: () -> Unit,
     onNavigateUp: () -> Unit,
-    onProposal: (WcProposal) -> Unit,
+    onProposal: (WcSessionProposal) -> Unit,
     onAuthenticate: (WcAuthentication) -> Unit,
 ) {
     val pair = rememberPair(initial)

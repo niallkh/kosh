@@ -29,11 +29,8 @@ kotlin {
 
         commonMain.dependencies {
             api(projects.domain)
-            api(projects.eth.abi)
+            api(projects.libs.reown)
 
-            implementation(libs.arrow)
-            implementation(libs.arrow.fx)
-            implementation(libs.arrow.resilience)
             implementation(libs.kotlinx.serialization.json)
         }
 

@@ -184,13 +184,13 @@ class DefaultDomainComponent(
 
     override val wcConnectionService: WcConnectionService by provider {
         WcConnectionService(
-            wcRepo = wcRepo,
+            reownRepo = reownRepo,
         )
     }
 
     override val wcProposalService: WcProposalService by provider {
         DefaultWcProposalService(
-            wcRepo = wcRepo,
+            reownRepo = reownRepo,
             applicationScope = applicationScope,
             notificationService = notificationService,
             appStateProvider = appStateProvider
@@ -199,7 +199,7 @@ class DefaultDomainComponent(
 
     override val wcSessionService: WcSessionService by provider {
         WcSessionService(
-            wcRepo = wcRepo,
+            reownRepo = reownRepo,
             appStateProvider = appStateProvider,
             applicationScope = applicationScope,
         )
@@ -207,7 +207,7 @@ class DefaultDomainComponent(
 
     override val wcRequestService: WcRequestService by provider {
         DefaultWcRequestService(
-            wcRepo = wcRepo,
+            reownRepo = reownRepo,
             applicationScope = applicationScope,
             notificationService = notificationService,
             accountService = accountService,
@@ -219,7 +219,7 @@ class DefaultDomainComponent(
 
     override val wcAuthenticationService: WcAuthenticationService by provider {
         DefaultWcAuthenticationService(
-            wcRepo = wcRepo,
+            reownRepo = reownRepo,
             applicationScope = applicationScope,
             notificationService = notificationService,
             appStateProvider = appStateProvider,

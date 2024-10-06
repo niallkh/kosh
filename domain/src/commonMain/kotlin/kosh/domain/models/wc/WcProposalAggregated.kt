@@ -8,7 +8,7 @@ import kotlinx.serialization.Serializable
 @Serializable
 @Immutable
 data class WcProposalAggregated(
-    val proposal: WcProposal,
+    val proposal: WcSessionProposal,
     val networks: ImmutableSet<NetworkEntity.Id>,
     val required: ImmutableSet<NetworkEntity.Id>,
 )

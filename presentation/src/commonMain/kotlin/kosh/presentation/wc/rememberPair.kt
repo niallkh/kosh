@@ -12,7 +12,7 @@ import arrow.core.raise.recover
 import kosh.domain.failure.WcFailure
 import kosh.domain.models.wc.PairingUri
 import kosh.domain.models.wc.WcAuthentication
-import kosh.domain.models.wc.WcProposal
+import kosh.domain.models.wc.WcSessionProposal
 import kosh.domain.serializers.Either
 import kosh.domain.usecases.wc.WcProposalService
 import kosh.presentation.di.di
@@ -25,7 +25,7 @@ fun rememberPair(
 ): PairState {
     var pairingUri by rememberRetainable { mutableStateOf(initial) }
     var proposal by rememberRetainable {
-        mutableStateOf<Either<WcProposal, WcAuthentication>?>(null)
+        mutableStateOf<Either<WcSessionProposal, WcAuthentication>?>(null)
     }
     var loading by remember { mutableStateOf(false) }
     var failure by remember { mutableStateOf<WcFailure?>(null) }
@@ -61,7 +61,7 @@ fun rememberPair(
 
 @Immutable
 data class PairState(
-    val proposal: Either<WcProposal, WcAuthentication>?,
+    val proposal: Either<WcSessionProposal, WcAuthentication>?,
     val loading: Boolean,
     val failure: WcFailure?,
     val pair: (PairingUri) -> Unit,

@@ -25,8 +25,7 @@ material-kolor = "1.7.0"
 ktor = "2.3.12"
 uri = "0.0.18"
 ksp = "2.0.20-1.0.25"
-kable = "0.34.0"
-blue-falcon = "1.2.1"
+reown = "1.0.0"
 
 agp = "8.3.2"
 android-compileSdk = "34"
@@ -112,8 +111,6 @@ sqldelight-coroutines = { module = "app.cash.sqldelight:coroutines-extensions", 
 sqldelight-android = { module = "app.cash.sqldelight:android-driver", version.ref = "sqldelight" }
 sqldelight-native = { module = "app.cash.sqldelight:native-driver", version.ref = "sqldelight" }
 sqldelight-jvm = { module = "app.cash.sqldelight:sqlite-driver", version.ref = "sqldelight" }
-kable = { module = "com.juul.kable:kable-core", version.ref = "kable" }
-blue-falcon = { module = "dev.bluefalcon:blue-falcon", version.ref = "blue-falcon" }
 
 androidx-activity-compose = { module = "androidx.activity:activity-compose", version.ref = "androidx-activity" }
 androidx-startup = { module = "androidx.startup:startup-runtime", version.ref = "androidx-startup" }
@@ -127,6 +124,9 @@ wc2-android = { module = "com.walletconnect:android-core", version = "1.35.1" }
 wc2-android-sign = { module = "com.walletconnect:sign", version = "2.35.1" }
 wc2-android-auth = { module = "com.walletconnect:auth", version = "1.28.9" }
 wc2-android-web3wallet = { module = "com.walletconnect:web3wallet", version = "1.35.1" }
+reown-wallet-kit = { module = "com.reown:walletkit", version.ref = "reown" }
+reown-android-core = { module = "com.reown:android-core", version.ref = "reown" }
+reown-sign = { module = "com.reown:sign", version.ref = "reown" }
 
 usb4java = { module = "org.usb4java:usb4java", version.ref = "usb4java" }
 usb4java-javax = { module = "org.usb4java:usb4java-javax", version.ref = "usb4java" }

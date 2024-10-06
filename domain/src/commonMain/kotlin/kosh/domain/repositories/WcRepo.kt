@@ -9,27 +9,27 @@ import kosh.domain.models.wc.PairingUri
 import kosh.domain.models.wc.SessionTopic
 import kosh.domain.models.wc.WcAuthentication
 import kosh.domain.models.wc.WcEvent
-import kosh.domain.models.wc.WcNamespace
-import kosh.domain.models.wc.WcProposal
 import kosh.domain.models.wc.WcRequest
 import kosh.domain.models.wc.WcSession
+import kosh.domain.models.wc.WcSessionProposal
 import kosh.domain.models.web3.EthMessage
 import kosh.domain.models.web3.Signature
 import kotlinx.coroutines.flow.Flow
 
+@Deprecated("")
 interface WcRepo : Repository {
 
     val connected: Flow<Boolean>
 
     val sessions: Flow<List<WcSession>>
 
-    val proposals: Flow<List<WcProposal>>
+    val proposals: Flow<List<WcSessionProposal>>
 
     val requests: Flow<List<WcRequest>>
 
     val authentications: Flow<List<WcAuthentication>>
 
-    fun proposalQueue(): Flow<WcProposal>
+    fun proposalQueue(): Flow<WcSessionProposal>
 
     fun requestQueue(): Flow<WcRequest>
 
@@ -46,8 +46,8 @@ interface WcRepo : Repository {
     ): Either<WcFailure, Unit>
 
     suspend fun getProposal(
-        id: WcProposal.Id,
-    ): Either<WcFailure, WcProposal>
+        id: WcSessionProposal.Id,
+    ): Either<WcFailure, WcSessionProposal>
 
     suspend fun getRequest(
         id: WcRequest.Id?,
@@ -68,22 +68,13 @@ interface WcRepo : Repository {
         supportedChains: List<ChainId>,
     ): Either<WcFailure, EthMessage>
 
-    suspend fun getNamespace(
-        id: WcProposal.Id,
-    ): Either<WcFailure, WcNamespace>
-
-    suspend fun getNamespace(
-        id: WcSession.Id,
-    ): Either<WcFailure, WcNamespace>
-
-
     suspend fun approveSessionProposal(
-        id: WcProposal.Id,
+        id: WcSessionProposal.Id,
         approvedAccounts: List<ChainAddress>,
     ): Either<WcFailure, Unit>
 
     suspend fun rejectSessionProposal(
-        id: WcProposal.Id,
+        id: WcSessionProposal.Id,
         reason: String,
     ): Either<WcFailure, Unit>
 

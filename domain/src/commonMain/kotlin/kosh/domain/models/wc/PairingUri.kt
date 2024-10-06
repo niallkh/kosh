@@ -21,11 +21,6 @@ value class PairingUri private constructor(val value: String) {
             ensure(arrayOf("@2", "relay-protocol=irn", "symKey").all { it in uri }) {
                 WcFailure.PairingUriInvalid()
             }
-//            withError({
-//                WcFailure.PairingUriInvalid()
-//            }) {
-//                wcValidator(uri).bind()
-//            }
 
             PairingUri(uri)
         }

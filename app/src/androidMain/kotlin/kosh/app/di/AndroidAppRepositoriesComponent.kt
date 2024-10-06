@@ -1,17 +1,12 @@
 package kosh.app.di
 
-import kosh.app.BuildConfig
 import kosh.app.di.impl.DefaultAppRepositoriesComponent
 import kosh.data.DataComponent
 import kosh.data.trezor.LedgerComponent
 import kosh.data.trezor.TrezorComponent
-import kosh.data.wc2.AndroidWcListener
-import kosh.data.wc2.AndroidWcRepo
-import kosh.data.wc2.WcConnectionController
+import kosh.data.wc2.ReownComponent
 import kosh.data.web3.Web3Component
 import kosh.domain.AppRepositoriesComponent
-import kosh.domain.core.provider
-import kosh.domain.repositories.WcRepo
 
 class AndroidAppRepositoriesComponent(
     androidComponent: AndroidComponent,
@@ -23,6 +18,7 @@ class AndroidAppRepositoriesComponent(
     coroutinesComponent: CoroutinesComponent,
     filesComponent: FilesComponent,
     ledgerComponent: LedgerComponent,
+    reownComponent: ReownComponent,
 ) : AppRepositoriesComponent,
     DefaultAppRepositoriesComponent(
         dataComponent = dataComponent,
@@ -33,16 +29,6 @@ class AndroidAppRepositoriesComponent(
         coroutinesComponent = coroutinesComponent,
         filesComponent = filesComponent,
         ledgerComponent = ledgerComponent,
+        reownComponent = reownComponent,
     ),
-    AndroidComponent by androidComponent {
-
-    override val wcRepo: WcRepo by provider {
-        AndroidWcRepo(
-            context = context,
-            projectId = BuildConfig.WC_PROJECT,
-            wcListener = AndroidWcListener(),
-            wcConnectionController = WcConnectionController(),
-            json = serializationComponent.json,
-        )
-    }
-}
+    AndroidComponent by androidComponent

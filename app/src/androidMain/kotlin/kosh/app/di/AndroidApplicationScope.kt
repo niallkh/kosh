@@ -5,14 +5,16 @@ import kosh.app.AndroidPushNotifier
 import kosh.app.di.impl.AndroidDataComponent
 import kosh.app.di.impl.AndroidFileSystemComponent
 import kosh.app.di.impl.AndroidImageComponent
-import kosh.app.di.impl.DefaultLedgerComponent
 import kosh.app.di.impl.AndroidNetworkComponent
+import kosh.app.di.impl.AndroidReownComponent
 import kosh.app.di.impl.AndroidTransportComponent
-import kosh.app.di.impl.DefaultTrezorComponent
 import kosh.app.di.impl.DefaultApplicationScope
+import kosh.app.di.impl.DefaultLedgerComponent
+import kosh.app.di.impl.DefaultTrezorComponent
 import kosh.data.DataComponent
 import kosh.data.trezor.LedgerComponent
 import kosh.data.trezor.TrezorComponent
+import kosh.data.wc2.ReownComponent
 import kosh.domain.AppRepositoriesComponent
 import kosh.domain.core.provider
 
@@ -81,6 +83,13 @@ class AndroidApplicationScope(
         )
     }
 
+    override val reownComponent: ReownComponent by provider {
+        AndroidReownComponent(
+            coroutinesComponent = coroutinesComponent,
+            androidComponent = androidComponent,
+        )
+    }
+
     override val appRepositoriesComponent: AppRepositoriesComponent by provider {
         AndroidAppRepositoriesComponent(
             dataComponent = dataComponent,
@@ -92,6 +101,7 @@ class AndroidApplicationScope(
             coroutinesComponent = coroutinesComponent,
             filesComponent = filesComponent,
             ledgerComponent = ledgerComponent,
+            reownComponent = reownComponent,
         )
     }
 }
