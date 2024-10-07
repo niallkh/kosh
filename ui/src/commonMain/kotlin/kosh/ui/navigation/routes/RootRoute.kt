@@ -1,8 +1,8 @@
 package kosh.ui.navigation.routes
 
-import kosh.domain.models.wc.WcAuthentication
-import kosh.domain.models.wc.WcSessionProposal
-import kosh.domain.models.wc.WcRequest
+import kosh.domain.models.reown.WcAuthentication
+import kosh.domain.models.reown.WcSessionProposal
+import kosh.domain.models.reown.WcRequest
 import kosh.ui.navigation.routes.wc.WcProposalRoute
 import kosh.ui.navigation.routes.wc.WcRequestRoute
 import kosh.ui.navigation.routes.wc.WcSessionRoute

@@ -507,7 +507,7 @@ class AndroidReownAdapter(
                 }
 
                 is Wallet.Model.ConnectionState.Reason.ConnectionFailed -> {
-                    logger.e(it.throwable) { "Connection failed" }
+                    logger.w(it.throwable) { "Connection failed" }
                 }
             }
         }

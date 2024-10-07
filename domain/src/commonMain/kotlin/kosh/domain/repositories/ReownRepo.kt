@@ -4,11 +4,11 @@ import arrow.core.Either
 import kosh.domain.failure.WcFailure
 import kosh.domain.models.ChainAddress
 import kosh.domain.models.ChainId
-import kosh.domain.models.wc.PairingUri
-import kosh.domain.models.wc.WcAuthentication
-import kosh.domain.models.wc.WcRequest
-import kosh.domain.models.wc.WcSession
-import kosh.domain.models.wc.WcSessionProposal
+import kosh.domain.models.reown.PairingUri
+import kosh.domain.models.reown.WcAuthentication
+import kosh.domain.models.reown.WcRequest
+import kosh.domain.models.reown.WcSession
+import kosh.domain.models.reown.WcSessionProposal
 import kosh.domain.models.web3.EthMessage
 import kosh.domain.models.web3.Signature
 import kotlinx.collections.immutable.persistentListOf

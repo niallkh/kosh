@@ -6,9 +6,9 @@ import kosh.ui.analytics.LogScreen
 import kosh.ui.navigation.RouteResult
 import kosh.ui.navigation.routes.wc.WcProposalRoute
 import kosh.ui.navigation.stack.StackHost
-import kosh.ui.wc.WcAuthenticationScreen
-import kosh.ui.wc.WcPairScreen
-import kosh.ui.wc.WcProposalScreen
+import kosh.ui.reown.WcAuthenticationScreen
+import kosh.ui.reown.WcPairScreen
+import kosh.ui.reown.WcProposalScreen
 
 @Composable
 fun WcProposalHost(

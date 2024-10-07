@@ -95,6 +95,7 @@ datastore-okio = { module = "androidx.datastore:datastore-core-okio", version.re
 kermit = { module = "co.touchlab:kermit", version.ref = "kermit" }
 okio = { module = "com.squareup.okio:okio", version.ref = "okio" }
 okhttp = { module = "com.squareup.okhttp3:okhttp", version.ref = "okhttp" }
+okhttp-logging = { module = "com.squareup.okhttp3:logging-interceptor", version.ref = "okhttp" }
 arrow = { module = "io.arrow-kt:arrow-core", version.ref = "arrow" }
 arrow-serialization = { module = "io.arrow-kt:arrow-core-serialization", version.ref = "arrow" }
 arrow-fx = { module = "io.arrow-kt:arrow-fx-coroutines", version.ref = "arrow" }
@@ -120,10 +121,6 @@ androidx-biometric = { module = "androidx.biometric:biometric-ktx", version.ref 
 androidx-lifecycle-service = { module = "androidx.lifecycle:lifecycle-service", version.ref = "androidx-lifecycle-service" }
 androidx-test-junit = { group = "androidx.test.ext", name = "junit", version.ref = "androidx-test-junit" }
 androidx-test-runner = { group = "androidx.test", name = "runner", version = "1.6.2" }
-wc2-android = { module = "com.walletconnect:android-core", version = "1.35.1" }
-wc2-android-sign = { module = "com.walletconnect:sign", version = "2.35.1" }
-wc2-android-auth = { module = "com.walletconnect:auth", version = "1.28.9" }
-wc2-android-web3wallet = { module = "com.walletconnect:web3wallet", version = "1.35.1" }
 reown-wallet-kit = { module = "com.reown:walletkit", version.ref = "reown" }
 reown-android-core = { module = "com.reown:android-core", version.ref = "reown" }
 reown-sign = { module = "com.reown:sign", version.ref = "reown" }

@@ -7,13 +7,13 @@ import kosh.ui.navigation.RouteResult
 import kosh.ui.navigation.routes.wc.WcRequestRoute
 import kosh.ui.navigation.routes.wc.wcRequestRoute
 import kosh.ui.navigation.stack.StackHost
-import kosh.ui.wc.WcAddNetworkScreen
-import kosh.ui.wc.WcRequestScreen
-import kosh.ui.wc.WcSendTransactionScreen
-import kosh.ui.wc.WcSignPersonalScreen
-import kosh.ui.wc.WcSignTypedScreen
-import kosh.ui.wc.WcWatchNftScreen
-import kosh.ui.wc.WcWatchTokenScreen
+import kosh.ui.reown.WcAddNetworkScreen
+import kosh.ui.reown.WcRequestScreen
+import kosh.ui.reown.WcSendTransactionScreen
+import kosh.ui.reown.WcSignPersonalScreen
+import kosh.ui.reown.WcSignTypedScreen
+import kosh.ui.reown.WcWatchNftScreen
+import kosh.ui.reown.WcWatchTokenScreen
 
 @Composable
 fun WcRequestHost(

@@ -18,8 +18,8 @@ import kosh.app.KoshApplication.Companion.applicationScope
 import kosh.domain.repositories.NotificationRepo.Type
 import kosh.domain.repositories.ReownRepo
 import kosh.domain.usecases.notification.NotificationService
-import kosh.domain.usecases.wc.WcConnectionService
-import kosh.domain.usecases.wc.useConnection
+import kosh.domain.usecases.reown.WcConnectionService
+import kosh.domain.usecases.reown.useConnection
 import kosh.ui.navigation.deeplink
 import kosh.ui.navigation.routes.wcAuthentication
 import kosh.ui.navigation.routes.wcProposal
