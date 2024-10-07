@@ -46,7 +46,7 @@ import kosh.ui.navigation.stack.rememberStackRouter
 import kosh.ui.resources.icons.Networks
 import kosh.ui.token.AssetsScreen
 import kosh.ui.transaction.ActivityScreen
-import kosh.ui.wc.WcSessionsScreen
+import kosh.ui.reown.WcSessionsScreen
 
 @Composable
 fun HomeHost(

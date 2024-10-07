@@ -1,6 +1,6 @@
 package kosh.app.di.impl
 
-import kosh.data.wc2.ReownComponent
+import kosh.data.reown.ReownComponent
 import kosh.libs.reown.ReownAdapter
 
 class IosReownComponent(

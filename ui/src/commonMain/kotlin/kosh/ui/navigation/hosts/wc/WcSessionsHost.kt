@@ -5,7 +5,7 @@ import kosh.ui.analytics.LogScreen
 import kosh.ui.navigation.RouteResult
 import kosh.ui.navigation.routes.wc.WcSessionRoute
 import kosh.ui.navigation.stack.StackHost
-import kosh.ui.wc.WcSessionScreen
+import kosh.ui.reown.WcSessionScreen
 
 @Composable
 fun WcSessionsHost(

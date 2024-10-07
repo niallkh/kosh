@@ -1,8 +1,8 @@
 package kosh.ui.navigation
 
 import com.eygraber.uri.Uri
-import kosh.domain.models.wc.PairingUri
-import kosh.domain.models.wc.WcRequest
+import kosh.domain.models.reown.PairingUri
+import kosh.domain.models.reown.WcRequest
 import kosh.ui.navigation.routes.RootRoute
 import kosh.ui.navigation.routes.Route
 import kosh.ui.navigation.routes.wc.WcProposalRoute

@@ -1,8 +1,8 @@
 package kosh.ui.navigation.routes.wc
 
-import kosh.domain.models.wc.PairingUri
-import kosh.domain.models.wc.WcAuthentication
-import kosh.domain.models.wc.WcSessionProposal
+import kosh.domain.models.reown.PairingUri
+import kosh.domain.models.reown.WcAuthentication
+import kosh.domain.models.reown.WcSessionProposal
 import kosh.ui.navigation.Deeplink
 import kosh.ui.navigation.routes.Route
 import kotlinx.serialization.Serializable

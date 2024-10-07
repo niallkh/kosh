@@ -58,8 +58,9 @@ kotlin {
             implementation(libs.androidx.lifecycle.service)
             implementation(libs.decompose.android)
             implementation(libs.ktor.client.okhttp)
-            implementation(libs.wc2.android)
             implementation(libs.secp256k1.android)
+            implementation(libs.okhttp)
+            implementation(libs.okhttp.logging)
         }
 
         commonMain.dependencies {
@@ -75,8 +76,8 @@ kotlin {
             implementation(projects.data)
             implementation(projects.data.trezor)
             implementation(projects.data.ledger)
-            api(projects.data.web3)
-            api(projects.data.wc2)
+            implementation(projects.data.web3)
+            implementation(projects.data.reown)
             implementation(projects.datastore)
             implementation(projects.eth.wallet)
             implementation(projects.eth.abi)
@@ -134,8 +135,8 @@ android {
             )
             buildConfigField(
                 "String",
-                "WC_PROJECT",
-                "\"${getLocalProperty("wc.project")}\""
+                "REOWN_PROJECT",
+                "\"${getLocalProperty("reown.project")}\""
             )
 
             applicationIdSuffix = ".debug"
@@ -151,8 +152,8 @@ android {
             )
             buildConfigField(
                 "String",
-                "WC_PROJECT",
-                "\"${getLocalProperty("wc.project")}\""
+                "REOWN_PROJECT",
+                "\"${getLocalProperty("reown.project")}\""
             )
 
             isDebuggable = false

@@ -12,7 +12,7 @@ struct RootView: UIViewControllerRepresentable {
     func makeUIViewController(context: Context) -> UIViewController {
         RootViewControllerKt.rootViewController(
             root: root,
-            reownAdapter: IosReownAdapter(projectId: Bundle.main.object(forInfoDictionaryKey: "WC_PROJECT") as! String)
+            reownAdapter: IosReownAdapter(projectId: Bundle.main.object(forInfoDictionaryKey: "REOWN_PROJECT") as! String)
         )
     }
 

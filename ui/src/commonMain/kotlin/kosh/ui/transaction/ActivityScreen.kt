@@ -14,22 +14,22 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import kosh.domain.entities.TransactionEntity
-import kosh.domain.models.wc.WcAuthentication
-import kosh.domain.models.wc.WcSessionProposal
-import kosh.domain.models.wc.WcRequest
+import kosh.domain.models.reown.WcAuthentication
+import kosh.domain.models.reown.WcSessionProposal
+import kosh.domain.models.reown.WcRequest
 import kosh.domain.serializers.ImmutableList
 import kosh.presentation.transaction.rememberFinalizeTransactions
 import kosh.presentation.transaction.rememberTransactions
-import kosh.presentation.wc.rememberAuthentications
-import kosh.presentation.wc.rememberProposals
-import kosh.presentation.wc.rememberRequests
+import kosh.presentation.reown.rememberAuthentications
+import kosh.presentation.reown.rememberProposals
+import kosh.presentation.reown.rememberRequests
 import kosh.ui.component.illustration.Illustration
 import kosh.ui.component.text.Header
 import kosh.ui.failure.AppFailureMessage
 import kosh.ui.resources.illustrations.ActivityEmpty
-import kosh.ui.wc.WcAuthenticationItem
-import kosh.ui.wc.WcProposalItem
-import kosh.ui.wc.WcRequestItem
+import kosh.ui.reown.WcAuthenticationItem
+import kosh.ui.reown.WcProposalItem
+import kosh.ui.reown.WcRequestItem
 
 @Composable
 fun ActivityScreen(

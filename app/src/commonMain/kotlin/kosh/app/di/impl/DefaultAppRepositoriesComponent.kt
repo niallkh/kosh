@@ -17,8 +17,8 @@ import kosh.data.trezor.LedgerComponent
 import kosh.data.trezor.LedgerOffChain
 import kosh.data.trezor.TrezorComponent
 import kosh.data.trezor.TrezorOffChain
-import kosh.data.wc2.DefaultReownRepo
-import kosh.data.wc2.ReownComponent
+import kosh.data.reown.DefaultReownRepo
+import kosh.data.reown.ReownComponent
 import kosh.data.web3.DefaultFunctionSignatureRepo
 import kosh.data.web3.DefaultGasRepo
 import kosh.data.web3.DefaultNetworkRepo

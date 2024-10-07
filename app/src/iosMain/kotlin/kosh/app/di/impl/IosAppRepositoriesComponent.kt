@@ -7,7 +7,7 @@ import kosh.app.di.SerializationComponent
 import kosh.data.DataComponent
 import kosh.data.trezor.LedgerComponent
 import kosh.data.trezor.TrezorComponent
-import kosh.data.wc2.ReownComponent
+import kosh.data.reown.ReownComponent
 import kosh.data.web3.Web3Component
 import kosh.domain.AppRepositoriesComponent
 

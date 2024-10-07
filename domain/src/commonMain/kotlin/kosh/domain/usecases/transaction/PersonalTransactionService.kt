@@ -9,7 +9,7 @@ import kosh.domain.entities.AccountEntity
 import kosh.domain.entities.TransactionEntity
 import kosh.domain.failure.TransactionFailure
 import kosh.domain.models.ByteString
-import kosh.domain.models.wc.DappMetadata
+import kosh.domain.models.reown.DappMetadata
 import kosh.domain.models.web3.EthMessage
 import kosh.domain.models.web3.Signature
 import kosh.domain.repositories.AppStateRepo

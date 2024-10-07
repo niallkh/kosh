@@ -15,7 +15,7 @@ import kosh.domain.entities.receipt
 import kosh.domain.failure.TransactionFailure
 import kosh.domain.models.ByteString
 import kosh.domain.models.Hash
-import kosh.domain.models.wc.DappMetadata
+import kosh.domain.models.reown.DappMetadata
 import kosh.domain.models.web3.GasPrice
 import kosh.domain.models.web3.Log
 import kosh.domain.models.web3.Signature

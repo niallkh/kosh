@@ -14,7 +14,7 @@ import kosh.app.di.impl.DefaultTrezorComponent
 import kosh.data.DataComponent
 import kosh.data.trezor.LedgerComponent
 import kosh.data.trezor.TrezorComponent
-import kosh.data.wc2.ReownComponent
+import kosh.data.reown.ReownComponent
 import kosh.domain.AppRepositoriesComponent
 import kosh.domain.core.provider
 

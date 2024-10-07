@@ -40,14 +40,14 @@ import kosh.domain.usecases.trezor.TrezorAccountService
 import kosh.domain.usecases.trezor.TrezorPasskeysService
 import kosh.domain.usecases.trezor.TrezorPassphraseService
 import kosh.domain.usecases.trezor.TrezorService
-import kosh.domain.usecases.wc.DefaultWcAuthenticationService
-import kosh.domain.usecases.wc.DefaultWcProposalService
-import kosh.domain.usecases.wc.DefaultWcRequestService
-import kosh.domain.usecases.wc.WcAuthenticationService
-import kosh.domain.usecases.wc.WcConnectionService
-import kosh.domain.usecases.wc.WcProposalService
-import kosh.domain.usecases.wc.WcRequestService
-import kosh.domain.usecases.wc.WcSessionService
+import kosh.domain.usecases.reown.DefaultWcAuthenticationService
+import kosh.domain.usecases.reown.DefaultWcProposalService
+import kosh.domain.usecases.reown.DefaultWcRequestService
+import kosh.domain.usecases.reown.WcAuthenticationService
+import kosh.domain.usecases.reown.WcConnectionService
+import kosh.domain.usecases.reown.WcProposalService
+import kosh.domain.usecases.reown.WcRequestService
+import kosh.domain.usecases.reown.WcSessionService
 import kotlinx.coroutines.CoroutineScope
 
 class DefaultDomainComponent(

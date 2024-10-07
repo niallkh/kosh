@@ -2,8 +2,8 @@ package kosh.ui.navigation.routes.wc
 
 import kosh.domain.models.ChainAddress
 import kosh.domain.models.at
-import kosh.domain.models.wc.WcRequest
-import kosh.domain.models.wc.WcRequest.Call
+import kosh.domain.models.reown.WcRequest
+import kosh.domain.models.reown.WcRequest.Call
 import kosh.domain.serializers.BigInteger
 import kosh.ui.navigation.Deeplink
 import kosh.ui.navigation.routes.Route

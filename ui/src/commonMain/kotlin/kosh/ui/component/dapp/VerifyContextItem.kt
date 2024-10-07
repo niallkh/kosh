@@ -12,7 +12,7 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
-import kosh.domain.models.wc.WcVerifyContext
+import kosh.domain.models.reown.WcVerifyContext
 
 @Composable
 fun VerifyContextItem(

@@ -3,7 +3,7 @@ package kosh.presentation.models
 import androidx.compose.runtime.Immutable
 import kosh.domain.models.Address
 import kosh.domain.models.ChainId
-import kosh.domain.models.wc.DappMetadata
+import kosh.domain.models.reown.DappMetadata
 import kosh.domain.models.web3.EthMessage
 import kosh.domain.models.web3.JsonTypeData
 import kosh.domain.models.web3.Signature

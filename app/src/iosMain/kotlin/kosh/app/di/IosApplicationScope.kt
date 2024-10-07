@@ -11,7 +11,7 @@ import kosh.app.di.impl.IosNetworkComponent
 import kosh.app.di.impl.IosTransportComponent
 import kosh.app.di.impl.IosWindowRepositoriesComponent
 import kosh.data.DataComponent
-import kosh.data.wc2.ReownComponent
+import kosh.data.reown.ReownComponent
 import kosh.domain.AppRepositoriesComponent
 import kosh.domain.WindowRepositoriesComponent
 import kosh.domain.core.provider
