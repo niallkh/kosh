@@ -1,16 +1,27 @@
 package kosh.app
 
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.runtime.CompositionLocalProvider
+import androidx.compose.runtime.derivedStateOf
+import androidx.compose.runtime.getValue
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.hapticfeedback.HapticFeedbackType
+import androidx.compose.ui.platform.LocalHapticFeedback
+import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.ComposeUIViewController
+import androidx.lifecycle.viewmodel.initializer
+import androidx.lifecycle.viewmodel.viewModelFactory
 import co.touchlab.kermit.Logger
-import co.touchlab.kermit.NSLogWriter
 import co.touchlab.kermit.Severity
-import com.arkivanov.decompose.ComponentContext
-import com.arkivanov.decompose.router.stack.push
+import com.arkivanov.decompose.DefaultComponentContext
+import com.arkivanov.decompose.extensions.compose.stack.animation.predictiveback.PredictiveBackGestureOverlay
+import com.arkivanov.decompose.extensions.compose.subscribeAsState
+import com.arkivanov.decompose.router.stack.pushNew
+import com.arkivanov.decompose.router.stack.replaceAll
+import com.arkivanov.essenty.backhandler.BackDispatcher
 import com.seiko.imageloader.LocalImageLoader
-import kosh.app.di.IosApplicationScope
-import kosh.app.di.impl.IosReownComponent
-import kosh.libs.reown.ReownAdapter
+import kosh.app.di.ApplicationScope
+import kosh.app.di.IosWindowScope
 import kosh.presentation.core.defaultAppContext
 import kosh.presentation.di.DefaultRouteContext
 import kosh.presentation.di.LocalRouteContext
@@ -26,56 +37,90 @@ import kotlinx.serialization.serializer
 import platform.UIKit.UIViewController
 
 fun rootViewController(
-    root: ComponentContext,
-    reownAdapter: ReownAdapter,
+    applicationScope: ApplicationScope,
+) = rootViewController(applicationScope, RootRoute.Home())
+
+fun rootViewController(
+    applicationScope: ApplicationScope,
+    start: RootRoute,
 ): UIViewController {
 
-    val applicationScope = IosApplicationScope(
-        reownComponent = IosReownComponent(reownAdapter)
+    val windowScope = IosWindowScope(
+        applicationScope = applicationScope
     )
 
     Logger.setTag("[K]")
-
     Logger.d { "isDebug=${applicationScope.appComponent.debug}" }
-
     if (applicationScope.appComponent.debug) {
         Logger.setMinSeverity(Severity.Verbose)
-        Logger.setLogWriters(NSLogWriter())
+//        Logger.setLogWriters(NSLogWriter())
     } else {
         Logger.setMinSeverity(Severity.Verbose)
-        Logger.setLogWriters(NSLogWriter())
+//        Logger.setLogWriters(NSLogWriter())
     }
 
-    val routeContext = DefaultRouteContext(defaultAppContext(root))
+    val controllerDelegate = ComposeControllerDelegate()
+    val backDispatcher = BackDispatcher()
+
+    val routeContext = DefaultRouteContext(
+        defaultAppContext(
+            DefaultComponentContext(
+                lifecycle = controllerDelegate.registry,
+                backHandler = backDispatcher
+            )
+        )
+    )
 
     val rootRouter = DefaultStackRouter(
         routeContext = routeContext,
         serializer = serializer(),
-        start = RootRoute.Home() as RootRoute,
+        start = start,
         link = null,
         onResult = {
             when (it) {
-                is RouteResult.Canceled -> {}
-                is RouteResult.Finished -> {}
-                is RouteResult.Up -> {}
+                is RouteResult.Canceled -> reset()
+                is RouteResult.Finished -> reset()
+                is RouteResult.Up -> when (val route = it.route) {
+                    null -> replaceAll(start)
+                    else -> replaceAll(start, route)
+                }
             }
         },
     )
 
-    val rootNavigator = RootNavigator { rootRouter.push(it) }
+    val rootNavigator = RootNavigator { rootRouter.pushNew(it) }
     val pathResolver = PathResolver { applicationScope.appRepositoriesComponent.fileRepo.read(it) }
 
-    return ComposeUIViewController {
+    return ComposeUIViewController(
+        configure = {
+            delegate = controllerDelegate
+        }
+    ) {
+        viewModelFactory { initializer { controllerDelegate } }
+
         CompositionLocalProvider(
             LocalRouteContext provides routeContext,
-            LocalRouteScopeFactory provides applicationScope.routeScopeFactory,
+            LocalRouteScopeFactory provides windowScope.routeScopeFactory,
             LocalImageLoader provides applicationScope.imageComponent.imageLoader,
             LocalPathResolver provides pathResolver,
             LocalRootNavigator provides rootNavigator,
         ) {
-            App(
-                stackRouter = rootRouter,
-            )
+            val hapticFeedback = LocalHapticFeedback.current
+            val stack by rootRouter.stack.subscribeAsState()
+
+            PredictiveBackGestureOverlay(
+                modifier = Modifier.fillMaxSize(),
+                backDispatcher = backDispatcher,
+                backIcon = null,
+                endEdgeEnabled = false,
+                startEdgeEnabled = derivedStateOf { stack.backStack.isNotEmpty() }.value,
+                onClose = { hapticFeedback.performHapticFeedback(HapticFeedbackType.LongPress) },
+                activationOffsetThreshold = 8.dp
+            ) {
+                App(
+                    stackRouter = rootRouter,
+                )
+            }
         }
     }
 }

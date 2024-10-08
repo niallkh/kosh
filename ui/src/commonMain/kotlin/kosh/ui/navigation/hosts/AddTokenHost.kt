@@ -1,10 +1,9 @@
 package kosh.ui.navigation.hosts
 
 import androidx.compose.runtime.Composable
-import com.arkivanov.decompose.router.stack.push
+import com.arkivanov.decompose.router.stack.pushNew
 import kosh.ui.analytics.LogScreen
 import kosh.ui.navigation.RouteResult
-import kosh.ui.navigation.animation.stackAnimationSharedAxisX
 import kosh.ui.navigation.routes.AddTokenRoute
 import kosh.ui.navigation.stack.StackHost
 import kosh.ui.token.SearchNftScreen
@@ -19,14 +18,13 @@ fun AddTokenHost(
     StackHost(
         start = AddTokenRoute.Search(),
         link = link,
-        onResult = onResult,
-        animation = stackAnimationSharedAxisX(),
+        onResult = { onResult(it) },
     ) { route ->
         when (route) {
             is AddTokenRoute.Search -> SearchTokenScreen(
                 address = route.address,
                 onResult = { finish() },
-                onNft = { push(AddTokenRoute.NftSearch(it)) },
+                onNft = { pushNew(AddTokenRoute.NftSearch(it)) },
                 onNavigateUp = { navigateUp() },
             )
 

@@ -1,8 +1,6 @@
-package kosh.app.di.impl
+package kosh.app.di
 
 import arrow.core.memoize
-import kosh.app.di.AndroidComponent
-import kosh.app.di.FileSystemComponent
 import kotlinx.io.files.FileSystem
 import kotlinx.io.files.Path
 import kotlinx.io.files.SystemFileSystem

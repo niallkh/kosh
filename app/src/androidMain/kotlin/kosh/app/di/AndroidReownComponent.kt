@@ -1,8 +1,6 @@
-package kosh.app.di.impl
+package kosh.app.di
 
 import kosh.app.BuildConfig
-import kosh.app.di.AndroidComponent
-import kosh.app.di.CoroutinesComponent
 import kosh.data.reown.ReownComponent
 import kosh.domain.core.provider
 import kosh.libs.reown.AndroidReownAdapter

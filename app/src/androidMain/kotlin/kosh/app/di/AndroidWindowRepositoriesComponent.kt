@@ -1,4 +1,4 @@
-package kosh.app.di.impl
+package kosh.app.di
 
 import android.content.ContentResolver
 import androidx.activity.result.ActivityResultRegistry

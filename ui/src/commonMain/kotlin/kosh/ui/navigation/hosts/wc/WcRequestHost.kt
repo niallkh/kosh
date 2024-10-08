@@ -22,7 +22,7 @@ fun WcRequestHost(
 ) {
     StackHost(
         link = link,
-        onResult = onResult,
+        onResult = { onResult(it) },
     ) { route ->
         when (route) {
             is WcRequestRoute.Request -> WcRequestScreen(

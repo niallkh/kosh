@@ -27,6 +27,7 @@ kotlin {
                 optIn("androidx.compose.material3.ExperimentalMaterial3Api")
                 optIn("org.jetbrains.compose.resources.ExperimentalResourceApi")
                 optIn("kotlinx.serialization.ExperimentalSerializationApi")
+                optIn("com.arkivanov.decompose.ExperimentalDecomposeApi")
             }
         }
 

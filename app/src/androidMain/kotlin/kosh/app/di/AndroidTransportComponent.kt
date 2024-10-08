@@ -1,7 +1,5 @@
-package kosh.app.di.impl
+package kosh.app.di
 
-import kosh.app.di.AndroidComponent
-import kosh.app.di.TransportComponent
 import kosh.domain.core.provider
 import kosh.libs.ble.AndroidBle
 import kosh.libs.ble.Ble

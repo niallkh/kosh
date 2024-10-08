@@ -1,6 +1,5 @@
-package kosh.app.di.impl
+package kosh.app.di
 
-import kosh.app.di.AppComponent
 import kosh.domain.core.provider
 import platform.Foundation.NSUserDefaults
 

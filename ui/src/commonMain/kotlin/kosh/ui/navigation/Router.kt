@@ -1,7 +1,9 @@
 package kosh.ui.navigation
 
+import androidx.compose.runtime.Stable
 import kosh.ui.navigation.routes.Route
 
+@Stable
 interface Router<R : Route> {
 
     fun pop(result: RouteResult<R>)

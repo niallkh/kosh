@@ -31,6 +31,7 @@ kotlin {
                 optIn("kotlinx.coroutines.ExperimentalCoroutinesApi")
                 optIn("kotlinx.io.bytestring.unsafe.UnsafeByteStringApi")
                 optIn("kotlin.ExperimentalStdlibApi")
+                optIn("kotlinx.coroutines.FlowPreview")
             }
         }
 

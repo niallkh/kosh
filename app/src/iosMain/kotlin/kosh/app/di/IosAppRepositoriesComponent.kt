@@ -1,9 +1,6 @@
-package kosh.app.di.impl
+package kosh.app.di
 
-import kosh.app.di.CoroutinesComponent
-import kosh.app.di.FilesComponent
-import kosh.app.di.NetworkComponent
-import kosh.app.di.SerializationComponent
+import kosh.app.di.impl.DefaultAppRepositoriesComponent
 import kosh.data.DataComponent
 import kosh.data.trezor.LedgerComponent
 import kosh.data.trezor.TrezorComponent

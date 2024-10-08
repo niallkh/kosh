@@ -2,12 +2,6 @@ package kosh.app.di
 
 import android.content.Context
 import kosh.app.AndroidPushNotifier
-import kosh.app.di.impl.AndroidDataComponent
-import kosh.app.di.impl.AndroidFileSystemComponent
-import kosh.app.di.impl.AndroidImageComponent
-import kosh.app.di.impl.AndroidNetworkComponent
-import kosh.app.di.impl.AndroidReownComponent
-import kosh.app.di.impl.AndroidTransportComponent
 import kosh.app.di.impl.DefaultApplicationScope
 import kosh.app.di.impl.DefaultLedgerComponent
 import kosh.app.di.impl.DefaultTrezorComponent

@@ -100,7 +100,7 @@ inline fun <reified R : @Serializable Route> rememberListDetailRouter(
                     detail = link.takeIf { it != list() }
                 )
             },
-            onResult = onResult,
+            onResult = { onResult(it) },
         )
     }
 

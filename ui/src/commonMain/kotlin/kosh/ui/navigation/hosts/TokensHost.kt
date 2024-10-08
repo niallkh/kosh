@@ -4,7 +4,6 @@ import androidx.compose.runtime.Composable
 import com.arkivanov.decompose.router.stack.replaceCurrent
 import kosh.ui.analytics.LogScreen
 import kosh.ui.navigation.RouteResult
-import kosh.ui.navigation.animation.stackAnimationSharedAxisX
 import kosh.ui.navigation.routes.TokensRoute
 import kosh.ui.navigation.stack.StackHost
 import kosh.ui.token.DeleteTokenScreen
@@ -17,8 +16,7 @@ fun TokensHost(
 ) {
     StackHost(
         link = link,
-        onResult = onResult,
-        animation = stackAnimationSharedAxisX(),
+        onResult = { onResult(it) },
     ) { route ->
         when (route) {
             is TokensRoute.Details -> TokenScreen(

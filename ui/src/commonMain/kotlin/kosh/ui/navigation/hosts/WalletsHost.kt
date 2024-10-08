@@ -1,7 +1,7 @@
 package kosh.ui.navigation.hosts
 
 import androidx.compose.runtime.Composable
-import com.arkivanov.decompose.router.stack.push
+import com.arkivanov.decompose.router.stack.pushNew
 import com.arkivanov.decompose.router.stack.replaceCurrent
 import kosh.domain.models.hw.Ledger
 import kosh.domain.models.hw.Trezor
@@ -11,9 +11,6 @@ import kosh.ui.account.DiscoveryAccountTokensScreen
 import kosh.ui.analytics.LogScreen
 import kosh.ui.ledger.NewLedgerAccountScreen
 import kosh.ui.navigation.RouteResult
-import kosh.ui.navigation.animation.materialStackAnimation
-import kosh.ui.navigation.animation.sharedAxisX
-import kosh.ui.navigation.animation.sharedAxisY
 import kosh.ui.navigation.routes.WalletsRoute
 import kosh.ui.navigation.stack.StackHost
 import kosh.ui.trezor.NewTrezorAccountScreen
@@ -27,19 +24,13 @@ fun WalletsHost(
     StackHost(
         start = WalletsRoute.List,
         link = link,
-        onResult = onResult,
-        animation = materialStackAnimation {
-            when (it) {
-                is WalletsRoute.Account -> sharedAxisY()
-                else -> sharedAxisX()
-            }
-        },
+        onResult = { onResult(it) },
     ) { route ->
         when (route) {
             is WalletsRoute.List -> WalletsScreen(
                 onNavigateUp = { navigateUp() },
-                onOpen = { push(WalletsRoute.Account(it)) },
-                onAdd = { hw -> push(WalletsRoute.NewAccount(hw)) }
+                onOpen = { pushNew(WalletsRoute.Account(it)) },
+                onAdd = { hw -> pushNew(WalletsRoute.NewAccount(hw)) }
             )
 
             is WalletsRoute.Account -> AccountScreen(

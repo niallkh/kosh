@@ -1,7 +1,6 @@
-package kosh.app.di.impl
+package kosh.app.di
 
 import arrow.fx.coroutines.Resource
-import kosh.app.di.TransportComponent
 import kosh.domain.core.provider
 import kosh.libs.ble.Ble
 import kosh.libs.ble.IosBle

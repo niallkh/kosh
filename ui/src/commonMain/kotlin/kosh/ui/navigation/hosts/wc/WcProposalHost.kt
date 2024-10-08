@@ -17,7 +17,7 @@ fun WcProposalHost(
 ) {
     StackHost(
         link = link,
-        onResult = onResult,
+        onResult = { onResult(it) },
     ) { route ->
         when (route) {
 

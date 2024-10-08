@@ -1,4 +1,4 @@
-package kosh.app.di.impl
+package kosh.app.di
 
 import com.seiko.imageloader.ImageLoader
 import com.seiko.imageloader.component.setupDefaultComponents
@@ -8,12 +8,6 @@ import com.seiko.imageloader.intercept.painterMemoryCacheConfig
 import com.seiko.imageloader.model.ktorRequest
 import io.ktor.http.CacheControl
 import io.ktor.http.HttpHeaders
-import kosh.app.di.ComposeResourceFetcher
-import kosh.app.di.FilesComponent
-import kosh.app.di.ImageComponent
-import kosh.app.di.IpfsMapper
-import kosh.app.di.NetworkComponent
-import kosh.app.di.UriMapper
 import kosh.domain.core.provider
 import okio.Path.Companion.toPath
 
