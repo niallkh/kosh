@@ -1,6 +1,7 @@
 package kosh.ui.navigation.stack
 
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.DisallowComposableCalls
 import com.arkivanov.decompose.router.stack.ChildStack
 import com.arkivanov.decompose.router.stack.StackNavigation
 import com.arkivanov.decompose.router.stack.backStack
@@ -8,7 +9,6 @@ import com.arkivanov.decompose.router.stack.childStack
 import com.arkivanov.decompose.router.stack.pop
 import com.arkivanov.decompose.router.stack.replaceAll
 import com.arkivanov.decompose.value.Value
-import com.arkivanov.essenty.backhandler.BackCallback
 import kosh.presentation.core.RouteContext
 import kosh.presentation.di.DefaultRouteContext
 import kosh.presentation.di.rememberOnRoute
@@ -24,16 +24,8 @@ class DefaultStackRouter<R : Route>(
     serializer: KSerializer<R>,
     private val start: R?,
     link: R?,
-    private val onResult: (RouteResult<R>) -> Unit,
-) : StackRouter<R>, RouteContext by routeContext, StackNavigation<R> by StackNavigation() {
-
-    private val backCallback = BackCallback {
-        pop()
-    }
-
-    init {
-        backHandler.register(backCallback)
-    }
+    private val onResult: StackRouter<R>.(RouteResult<R>) -> Unit,
+) : StackRouter<R>, StackNavigation<R> by StackNavigation(), RouteContext by routeContext {
 
     override val stack: Value<ChildStack<R, RouteContext>> = childStack(
         source = this,
@@ -41,6 +33,7 @@ class DefaultStackRouter<R : Route>(
         initialStack = { listOfNotNull(start, link) },
         key = "StackRouter",
         childFactory = { _, ctx -> DefaultRouteContext(ctx) },
+        handleBackButton = true,
     )
 
     override fun pop(result: RouteResult<R>) {
@@ -83,7 +76,7 @@ inline fun <reified R : @Serializable Route> rememberStackRouter(
     start: R?,
     link: R? = null,
     serializer: KSerializer<R> = serializer(),
-    noinline onResult: (RouteResult<R>) -> Unit,
+    noinline onResult: @DisallowComposableCalls StackRouter<R>.(RouteResult<R>) -> Unit,
 ): StackRouter<R> {
     val stackRouter = rememberOnRoute<StackRouter<R>> {
         DefaultStackRouter(
@@ -91,7 +84,7 @@ inline fun <reified R : @Serializable Route> rememberStackRouter(
             serializer = serializer,
             start = start,
             link = link,
-            onResult = onResult,
+            onResult = { onResult(it) },
         )
     }
 

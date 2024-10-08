@@ -26,7 +26,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import com.arkivanov.decompose.extensions.compose.subscribeAsState
 import com.arkivanov.decompose.router.stack.StackNavigation
-import com.arkivanov.decompose.router.stack.pushToFront
+import com.arkivanov.decompose.router.stack.replaceAll
 import kosh.ui.analytics.LogScreen
 import kosh.ui.component.scaffold.KoshScaffold
 import kosh.ui.component.scaffold.ProvideSnackbarOffset
@@ -43,10 +43,10 @@ import kosh.ui.navigation.routes.wc.WcSessionRoute
 import kosh.ui.navigation.routes.wc.wcRequestRoute
 import kosh.ui.navigation.stack.StackHost
 import kosh.ui.navigation.stack.rememberStackRouter
+import kosh.ui.reown.WcSessionsScreen
 import kosh.ui.resources.icons.Networks
 import kosh.ui.token.AssetsScreen
 import kosh.ui.transaction.ActivityScreen
-import kosh.ui.reown.WcSessionsScreen
 
 @Composable
 fun HomeHost(
@@ -54,7 +54,8 @@ fun HomeHost(
     onOpen: (RootRoute) -> Unit,
     onResult: (RouteResult<HomeRoute>) -> Unit,
 ) {
-    val stackRouter = rememberStackRouter(HomeRoute.Assets, link) { onResult(it) }
+    val start = HomeRoute.Assets
+    val stackRouter = rememberStackRouter(start, link) { onResult(it) }
     val childStackState by stackRouter.stack.subscribeAsState()
     val activeRoute by derivedStateOf { childStackState.active.configuration }
 
@@ -87,6 +88,7 @@ fun HomeHost(
                 items = listOf(HomeRoute.Assets, HomeRoute.Activity, HomeRoute.WalletConnect),
                 navigation = stackRouter,
                 activeRoute = activeRoute,
+                start = start,
             )
         },
         floatingActionButton = {
@@ -162,8 +164,9 @@ fun HomeHost(
 
 @Composable
 private fun NavigationBar(
-    items: List<HomeRoute>,
+    start: HomeRoute,
     activeRoute: HomeRoute,
+    items: List<HomeRoute>,
     navigation: StackNavigation<HomeRoute>,
 ) {
     NavigationBar {
@@ -174,7 +177,13 @@ private fun NavigationBar(
                 icon = { Icon(item.icon, null) },
                 label = { Text(item.label) },
                 selected = selected,
-                onClick = { navigation.pushToFront(item) },
+                onClick = {
+                    when {
+                        selected -> Unit
+                        start == item -> navigation.replaceAll(start)
+                        else -> navigation.replaceAll(start, item)
+                    }
+                },
             )
         }
     }

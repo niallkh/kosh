@@ -1,4 +1,4 @@
-package kosh.app.di.impl
+package kosh.app.di
 
 import kosh.domain.WindowRepositoriesComponent
 

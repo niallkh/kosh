@@ -25,8 +25,6 @@ fun BackHandler(
 
     DisposableEffect(backHandler) {
         backHandler.register(backCallback)
-        onDispose {
-            backHandler.unregister(backCallback)
-        }
+        onDispose { backHandler.unregister(backCallback) }
     }
 }

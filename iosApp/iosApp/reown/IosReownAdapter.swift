@@ -7,6 +7,8 @@ import Combine
 
 enum ReownAdapterError: Error {
     case proposalNotFound
+    case authenticationNotFound
+    case requestNotFound
 }
 
 class IosReownAdapter: ReownAdapter {
@@ -21,6 +23,8 @@ class IosReownAdapter: ReownAdapter {
     }
     
     func initialize() async {
+        log { "initialize()" }
+        
         let metadata = AppMetadata(
             name: "Kosh",
             description: "Bridge the gap between your hardware wallet and dapps. Manage your crypto and interact with dapp from your mobile device.",
@@ -78,23 +82,21 @@ class IosReownAdapter: ReownAdapter {
     
     func getNewProposal(callback: @escaping (App.SessionProposal) -> Void) -> () -> Void {
         let sub = WalletKit.instance.sessionProposalPublisher
-            .receive(on: DispatchQueue.main)
-            .sink { (proposal, context) in
-                callback(mapProposal(proposal: proposal, context: context))
-            }
-        
+            .map(mapProposal)
+            .sink(receiveValue: callback)
+
         return { sub.cancel() }
     }
     
     
     func getProposals(callback: @escaping ([App.SessionProposal]) -> Void) -> () -> Void {
         let sub = WalletKit.instance.pendingProposalsPublisher
-            .receive(on: DispatchQueue.main)
-            .sink { (proposals) in
-                callback(proposals.map{ (proposal, context) in
+            .map { (proposals) in
+                proposals.map { (proposal, context) in
                     mapProposal(proposal: proposal, context: context)
-                })
+                }
             }
+            .sink(receiveValue: callback)
         
         return { sub.cancel() }
         
@@ -102,21 +104,16 @@ class IosReownAdapter: ReownAdapter {
     
     func getNewAuthentication(callback: @escaping (App.AuthenticationRequest) -> Void) -> () -> Void {
         let sub = WalletKit.instance.authenticateRequestPublisher
-            .receive(on: DispatchQueue.main)
-            .sink { (authenticate, context) in
-                callback(mapAuthentication(authentication: authenticate, context: context))
-            }
+            .map(mapAuthentication)
+            .sink(receiveValue: callback)
         
         return { sub.cancel() }
     }
     
     func getAuthentications(callback: @escaping ([App.AuthenticationRequest]) -> Void) -> () -> Void {
         let sub = authenticationsPublisher
-            .receive(on: DispatchQueue.main)
-            .sink { (authentications) in
-                callback(authentications)
-            }
-        
+            .sink(receiveValue: callback)
+
         self.updateAuthentications()
         
         return { sub.cancel() }
@@ -124,25 +121,21 @@ class IosReownAdapter: ReownAdapter {
     
     func getNewRequest(callback: @escaping (App.SessionRequest) -> Void) -> () -> Void {
         let sub = WalletKit.instance.sessionRequestPublisher
-            .receive(on: DispatchQueue.main)
-            .sink { (request, context) in
+            .compactMap { (request, context) in
                 guard let session = self.getSession(topic: request.topic) else {
-                    return
+                    return nil
                 }
                 
-                callback(mapRequest(request: request, session: session, context: context))
+                return mapRequest(request: request, session: session, context: context)
             }
-        
+            .sink(receiveValue: callback)
         
         return { sub.cancel() }
     }
     
     func getRequests(callback: @escaping ([App.SessionRequest]) -> Void) -> () -> Void {
         let sub = requestsPublisher
-            .receive(on: DispatchQueue.main)
-            .sink { (requests) in
-                callback(requests)
-            }
+            .sink(receiveValue: callback)
         
         self.updateRequests()
         
@@ -151,8 +144,8 @@ class IosReownAdapter: ReownAdapter {
     
     func getSessions(callback: @escaping ([App.Session]) -> Void) -> () -> Void {
         log { "getSessions()" }
+        
         let sub =  sessionsPublisher
-            .receive(on: DispatchQueue.main)
             .sink(receiveValue: callback)
         
         self.updateSessions()
@@ -236,7 +229,7 @@ class IosReownAdapter: ReownAdapter {
     ) async throws {
         let found = try WalletKit.instance.getPendingAuthRequests().first { (auth, ctx) in auth.id.integer == id }
         guard let auth = found?.0 else {
-            throw ReownAdapterError.proposalNotFound
+            throw ReownAdapterError.authenticationNotFound
         }
         
         let authPayload = try WalletKit.instance.buildAuthPayload(
@@ -267,7 +260,7 @@ class IosReownAdapter: ReownAdapter {
     ) async throws -> String {
         let found = try WalletKit.instance.getPendingAuthRequests().first { (auth, ctx) in auth.id.integer == id }
         guard let auth = found?.0 else {
-            throw ReownAdapterError.proposalNotFound
+            throw ReownAdapterError.authenticationNotFound
         }
         
         let authPayload = try WalletKit.instance.buildAuthPayload(
@@ -310,7 +303,7 @@ class IosReownAdapter: ReownAdapter {
     ) async throws {
         let found = WalletKit.instance.getPendingRequests().first { (req, ctx) in req.id.integer == id }
         guard let req = found?.0 else {
-            throw ReownAdapterError.proposalNotFound
+            throw ReownAdapterError.requestNotFound
         }
         
         try await WalletKit.instance.respond(
@@ -329,7 +322,7 @@ class IosReownAdapter: ReownAdapter {
     ) async throws {
         let found = WalletKit.instance.getPendingRequests().first { (req, ctx) in req.id.integer == id }
         guard let req = found?.0 else {
-            throw ReownAdapterError.proposalNotFound
+            throw ReownAdapterError.requestNotFound
         }
         
         try await WalletKit.instance.respond(

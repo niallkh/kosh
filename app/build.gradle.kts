@@ -47,6 +47,7 @@ kotlin {
                 optIn("kotlinx.cinterop.BetaInteropApi")
                 optIn("kotlinx.cinterop.ExperimentalForeignApi")
                 optIn("kotlinx.io.bytestring.unsafe.UnsafeByteStringApi")
+                optIn("com.arkivanov.decompose.ExperimentalDecomposeApi")
             }
         }
 
@@ -71,6 +72,7 @@ kotlin {
             implementation(compose.components.uiToolingPreview)
 
             api(projects.domain)
+            api(projects.libs.reown)
             implementation(projects.ui)
             implementation(projects.presentation)
             implementation(projects.data)

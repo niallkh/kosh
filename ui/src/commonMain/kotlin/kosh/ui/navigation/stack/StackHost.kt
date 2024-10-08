@@ -2,24 +2,28 @@ package kosh.ui.navigation.stack
 
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
+import androidx.compose.runtime.DisallowComposableCalls
 import com.arkivanov.decompose.extensions.compose.stack.Children
 import com.arkivanov.decompose.extensions.compose.stack.animation.StackAnimation
 import kosh.presentation.core.RouteContext
 import kosh.presentation.di.LocalRouteContext
 import kosh.ui.navigation.RouteResult
-import kosh.ui.navigation.animation.stackAnimationSharedAxisX
+import kosh.ui.navigation.animation.backAnimation
 import kosh.ui.navigation.routes.Route
 import kotlinx.serialization.serializer
 
 @Composable
 inline fun <R : Route> StackHost(
     stackRouter: StackRouter<R>,
-    animation: StackAnimation<R, RouteContext> = stackAnimationSharedAxisX(),
+    animation: StackAnimation<R, RouteContext>? = null,
     crossinline content: @Composable StackRouter<R>.(R) -> Unit,
 ) {
     Children(
         stack = stackRouter.stack,
-        animation = animation,
+        animation = animation ?: backAnimation(
+            backHandler = stackRouter.backHandler,
+            onBack = stackRouter::pop,
+        ),
     ) { child ->
         CompositionLocalProvider(LocalRouteContext provides child.instance) {
             stackRouter.content(child.configuration)
@@ -31,14 +35,14 @@ inline fun <R : Route> StackHost(
 inline fun <reified R : Route> StackHost(
     start: R,
     link: R?,
-    noinline onResult: (RouteResult<R>) -> Unit,
-    animation: StackAnimation<R, RouteContext> = stackAnimationSharedAxisX(),
+    noinline onResult: @DisallowComposableCalls StackRouter<R>.(RouteResult<R>) -> Unit,
+    animation: StackAnimation<R, RouteContext>? = null,
     crossinline content: @Composable StackRouter<R>.(R) -> Unit,
 ) {
     val stackRouter = rememberStackRouter<R>(
         start = start,
         link = link,
-        onResult = onResult,
+        onResult = { onResult(it) },
         serializer = serializer()
     )
 
@@ -52,14 +56,14 @@ inline fun <reified R : Route> StackHost(
 @Composable
 inline fun <reified R : Route> StackHost(
     link: R,
-    noinline onResult: (RouteResult<R>) -> Unit,
-    animation: StackAnimation<R, RouteContext> = stackAnimationSharedAxisX(),
+    noinline onResult: @DisallowComposableCalls StackRouter<R>.(RouteResult<R>) -> Unit,
+    animation: StackAnimation<R, RouteContext>? = null,
     crossinline content: @Composable StackRouter<R>.(R) -> Unit,
 ) {
     val stackRouter = rememberStackRouter<R>(
         start = null,
         link = link,
-        onResult = onResult,
+        onResult = { onResult(it) },
         serializer = serializer()
     )
 

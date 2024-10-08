@@ -2,17 +2,12 @@ import UIKit
 import SwiftUI
 import App
 
-class AppDelegate: NSObject, UIApplicationDelegate {
-    let root: ComponentContext = DefaultComponentContext(lifecycle: ApplicationLifecycle())
-}
-
 struct RootView: UIViewControllerRepresentable {
-    let root: ComponentContext
+    let scope: ApplicationScope
 
     func makeUIViewController(context: Context) -> UIViewController {
         RootViewControllerKt.rootViewController(
-            root: root,
-            reownAdapter: IosReownAdapter(projectId: Bundle.main.object(forInfoDictionaryKey: "REOWN_PROJECT") as! String)
+            applicationScope: scope
         )
     }
 

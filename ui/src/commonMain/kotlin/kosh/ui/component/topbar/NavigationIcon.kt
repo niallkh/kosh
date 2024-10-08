@@ -1,10 +1,9 @@
 package kosh.ui.component.topbar
 
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.runtime.Composable
+import androidx.compose.ui.graphics.vector.ImageVector
 import kosh.ui.component.single.single
 
 @Composable
@@ -14,7 +13,7 @@ fun NavigationIcon(
     when {
         onUp != null -> IconButton(onClick = onUp.single()) {
             Icon(
-                imageVector = Icons.AutoMirrored.Default.ArrowBack,
+                imageVector = NavigationIcon,
                 contentDescription = "Up navigation"
             )
         }
@@ -22,3 +21,5 @@ fun NavigationIcon(
         else -> Unit
     }
 }
+
+expect val NavigationIcon: ImageVector

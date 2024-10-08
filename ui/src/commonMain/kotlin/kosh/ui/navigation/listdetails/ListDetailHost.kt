@@ -19,7 +19,7 @@ inline fun <reified R : Route> ListDetailHost(
 ) {
     val listDetailRouter = rememberListDetailRouter(
         link = link,
-        onResult = onResult,
+        onResult = { onResult(it) },
         serializer = serializer()
     ) {
         list()

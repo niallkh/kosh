@@ -17,7 +17,7 @@ fun TransactionsHost(
 ) {
     StackHost(
         link = link,
-        onResult = onResult,
+        onResult = { onResult(it) },
     ) { route ->
         when (route) {
             is TransactionsRoute.Details -> TransactionScreen(

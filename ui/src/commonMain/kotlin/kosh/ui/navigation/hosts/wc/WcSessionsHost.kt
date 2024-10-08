@@ -14,7 +14,7 @@ fun WcSessionsHost(
 ) {
     StackHost(
         link = link,
-        onResult = onResult,
+        onResult = { onResult(it) },
     ) { route ->
         when (route) {
             is WcSessionRoute.Session -> WcSessionScreen(

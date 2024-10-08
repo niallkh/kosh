@@ -1,4 +1,4 @@
-package kosh.app.di.impl
+package kosh.app.di
 
 import co.touchlab.kermit.Logger
 import io.ktor.client.HttpClient
@@ -7,9 +7,6 @@ import io.ktor.client.plugins.HttpRequestRetry
 import io.ktor.client.plugins.HttpTimeout
 import io.ktor.client.plugins.compression.ContentEncoding
 import kosh.app.BuildConfig
-import kosh.app.di.FilesComponent
-import kosh.app.di.NetworkComponent
-import kosh.app.di.grovePlugin
 import kosh.domain.core.provider
 import kosh.libs.ipfs.IpfsPlugin
 import okhttp3.Cache

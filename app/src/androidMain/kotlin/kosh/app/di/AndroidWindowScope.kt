@@ -2,7 +2,6 @@ package kosh.app.di
 
 import android.content.ContentResolver
 import androidx.activity.result.ActivityResultRegistry
-import kosh.app.di.impl.AndroidWindowRepositoriesComponent
 import kosh.app.di.impl.DefaultRouteScopeFactory
 import kosh.domain.WindowRepositoriesComponent
 import kosh.domain.core.provider
@@ -12,7 +11,7 @@ class AndroidWindowScope(
     applicationScope: ApplicationScope,
     activityResultRegistry: ActivityResultRegistry,
     contentResolver: ContentResolver,
-) : WindowScope, ApplicationScope by applicationScope {
+) : WindowScope {
 
     override val windowRepositoriesComponent: WindowRepositoriesComponent by provider {
         AndroidWindowRepositoriesComponent(

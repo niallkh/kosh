@@ -1,11 +1,7 @@
 package kosh.ui.navigation.hosts
 
 import androidx.compose.runtime.Composable
-import com.arkivanov.decompose.router.stack.push
-import kosh.ui.navigation.animation.materialStackAnimation
-import kosh.ui.navigation.animation.sharedAxisX
-import kosh.ui.navigation.animation.sharedAxisY
-import kosh.ui.navigation.animation.sharedAxisZ
+import com.arkivanov.decompose.router.stack.pushNew
 import kosh.ui.navigation.hosts.wc.WcProposalHost
 import kosh.ui.navigation.hosts.wc.WcRequestHost
 import kosh.ui.navigation.hosts.wc.WcSessionsHost
@@ -20,20 +16,11 @@ fun RootHost(
 ) {
     StackHost(
         stackRouter = stackRouter,
-        animation = materialStackAnimation {
-            when (it) {
-                is RootRoute.Tokens -> if (it.isNft) sharedAxisZ() else sharedAxisY()
-                is RootRoute.Transactions -> sharedAxisY()
-                is RootRoute.AddToken -> sharedAxisY()
-                is RootRoute.WcSession -> sharedAxisY()
-                else -> sharedAxisX()
-            }
-        }
     ) { route ->
         when (route) {
             is RootRoute.Home -> HomeHost(
                 link = route.link,
-                onOpen = { push(it) },
+                onOpen = { pushNew(it) },
                 onResult = { pop(it, RootRoute::Home) },
             )
 
