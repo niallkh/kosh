@@ -9,14 +9,15 @@ import androidx.compose.animation.ExperimentalAnimationApi
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.derivedStateOf
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.input.pointer.pointerInput
+import androidx.compose.ui.platform.LocalDensity
+import androidx.compose.ui.unit.Density
 import com.arkivanov.decompose.Child
 import com.arkivanov.decompose.extensions.compose.stack.animation.StackAnimation
+import com.arkivanov.decompose.extensions.compose.stack.animation.predictiveback.predictiveBackAnimation
 import com.arkivanov.decompose.router.stack.ChildStack
+import com.arkivanov.essenty.backhandler.BackHandler
 
 class MaterialStackAnimation<C : Any, T : Any>(
     private val pushTransform: AnimatedContentTransitionScope<ChildStack<C, T>>.(C) -> ContentTransform,
@@ -42,11 +43,10 @@ class MaterialStackAnimation<C : Any, T : Any>(
             }) {
             Box(Modifier.fillMaxSize()) {
                 content(it.active)
-            }
 
-            val showOverlay by remember { derivedStateOf { transition.isRunning } }
-            if (showOverlay) {
-                Overlay(modifier)
+                if (transition.isRunning) {
+                    Overlay(Modifier.matchParentSize())
+                }
             }
         }
     }
@@ -73,4 +73,39 @@ class MaterialStackAnimation<C : Any, T : Any>(
 
     private operator fun <C : Any> Iterable<Child<C, *>>.contains(config: C): Boolean =
         any { it.configuration == config }
+}
+
+@Composable
+fun <C : Any, T : Any> materialStackAnimation(
+    backHandler: BackHandler,
+    onBack: () -> Unit,
+    animation: Density.(C) -> StackAnimationData,
+): StackAnimation<C, T> {
+    val density = LocalDensity.current
+
+    val stackAnimation = MaterialStackAnimation<C, T>(
+        pushTransform = {
+            ContentTransform(
+                targetContentEnter = animation(density, it).pushEnter,
+                initialContentExit = animation(density, it).pushExit,
+                targetContentZIndex = 1f
+            )
+        },
+        popTransform = {
+            ContentTransform(
+                targetContentEnter = animation(density, it).popEnter,
+                initialContentExit = animation(density, it).popExit,
+                targetContentZIndex = -1f
+            )
+        },
+    )
+
+    return predictiveBackAnimation(
+        backHandler = backHandler,
+        fallbackAnimation = stackAnimation,
+        selector = { initialBackEvent, exit, _ ->
+            animation(density, exit.configuration).predictiveBack(initialBackEvent)
+        },
+        onBack = onBack,
+    )
 }

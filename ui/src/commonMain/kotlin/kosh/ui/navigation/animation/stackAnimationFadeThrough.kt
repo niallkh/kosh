@@ -1,9 +1,12 @@
 package kosh.ui.navigation.animation
 
 import androidx.compose.animation.ContentTransform
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.remember
 import com.arkivanov.decompose.extensions.compose.stack.animation.StackAnimation
 
-fun <C : Any, T : Any> stackAnimationFadeThrough(): StackAnimation<C, T> =
+@Composable
+fun <C : Any, T : Any> stackAnimationFadeThrough(): StackAnimation<C, T> = remember {
     MaterialStackAnimation(
         pushTransform = {
             ContentTransform(
@@ -20,3 +23,4 @@ fun <C : Any, T : Any> stackAnimationFadeThrough(): StackAnimation<C, T> =
             )
         },
     )
+}

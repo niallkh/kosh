@@ -8,7 +8,7 @@ import com.arkivanov.decompose.extensions.compose.stack.animation.StackAnimation
 import kosh.presentation.core.RouteContext
 import kosh.presentation.di.LocalRouteContext
 import kosh.ui.navigation.RouteResult
-import kosh.ui.navigation.animation.backAnimation
+import kosh.ui.navigation.animation.backStackAnimation
 import kosh.ui.navigation.routes.Route
 import kotlinx.serialization.serializer
 
@@ -20,7 +20,7 @@ inline fun <R : Route> StackHost(
 ) {
     Children(
         stack = stackRouter.stack,
-        animation = animation ?: backAnimation(
+        animation = animation ?: backStackAnimation(
             backHandler = stackRouter.backHandler,
             onBack = stackRouter::pop,
         ),
