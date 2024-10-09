@@ -3,13 +3,16 @@ import SwiftUI
 import App
 
 struct RootView: UIViewControllerRepresentable {
-    let scope: ApplicationScope
+    let appScope: AppScope
+    let windowScope: WindowScope
 
-    func makeUIViewController(context: Context) -> UIViewController {
-        RootViewControllerKt.rootViewController(
-            applicationScope: scope
+    func makeUIViewController(context: Context) -> UIViewController {                
+        return RootViewControllerKt.rootViewController(
+            appScope: appScope,
+            windowScope: windowScope
         )
     }
 
-    func updateUIViewController(_ uiViewController: UIViewController, context: Context) {}
+    func updateUIViewController(_ uiViewController: UIViewController, context: Context) {
+    }
 }

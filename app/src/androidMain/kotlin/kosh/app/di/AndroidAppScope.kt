@@ -2,19 +2,19 @@ package kosh.app.di
 
 import android.content.Context
 import kosh.app.AndroidPushNotifier
-import kosh.app.di.impl.DefaultApplicationScope
+import kosh.app.di.impl.DefaultAppScope
 import kosh.app.di.impl.DefaultLedgerComponent
 import kosh.app.di.impl.DefaultTrezorComponent
 import kosh.data.DataComponent
+import kosh.data.reown.ReownComponent
 import kosh.data.trezor.LedgerComponent
 import kosh.data.trezor.TrezorComponent
-import kosh.data.reown.ReownComponent
 import kosh.domain.AppRepositoriesComponent
 import kosh.domain.core.provider
 
-class AndroidApplicationScope(
+class AndroidAppScope(
     override val context: Context,
-) : DefaultApplicationScope(), AndroidComponent {
+) : DefaultAppScope(), AndroidComponent {
 
     override val androidPushNotifier: AndroidPushNotifier by provider {
         AndroidPushNotifier(

@@ -14,7 +14,7 @@ import androidx.core.app.ServiceCompat
 import androidx.lifecycle.LifecycleService
 import androidx.lifecycle.lifecycleScope
 import co.touchlab.kermit.Logger
-import kosh.app.KoshApplication.Companion.applicationScope
+import kosh.app.KoshApplication.Companion.appScope
 import kosh.domain.repositories.NotificationRepo.Type
 import kosh.domain.repositories.ReownRepo
 import kosh.domain.usecases.notification.NotificationService
@@ -51,9 +51,9 @@ class KoshService : LifecycleService() {
         super.onCreate()
 
         notificationManager = NotificationManagerCompat.from(this)
-        wcConnectionService = applicationScope.domainComponent.wcConnectionService
-        notificationService = applicationScope.domainComponent.notificationService
-        reownRepo = applicationScope.appRepositoriesComponent.reownRepo
+        wcConnectionService = appScope.domainComponent.wcConnectionService
+        notificationService = appScope.domainComponent.notificationService
+        reownRepo = appScope.appRepositoriesComponent.reownRepo
 
         lifecycleScope.launch {
             ActivityCallbacks.background.collectLatest { background ->

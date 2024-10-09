@@ -1,15 +1,15 @@
 package kosh.app.di
 
 import kosh.data.DataComponent
+import kosh.data.reown.ReownComponent
 import kosh.data.trezor.LedgerComponent
 import kosh.data.trezor.TrezorComponent
-import kosh.data.reown.ReownComponent
 import kosh.data.web3.Web3Component
 import kosh.datastore.DataStoreComponent
 import kosh.domain.AppRepositoriesComponent
 import kosh.domain.DomainComponent
 
-interface ApplicationScope {
+interface AppScope {
     val appComponent: AppComponent
     val serializationComponent: SerializationComponent
     val appRepositoriesComponent: AppRepositoriesComponent

@@ -1,14 +1,14 @@
 package kosh.app.di
 
-import kosh.app.di.impl.DefaultApplicationScope
+import kosh.app.di.impl.DefaultAppScope
 import kosh.data.DataComponent
 import kosh.data.reown.ReownComponent
 import kosh.domain.AppRepositoriesComponent
 import kosh.domain.core.provider
 
-class IosApplicationScope(
+class IosAppScope(
     override val reownComponent: ReownComponent,
-) : DefaultApplicationScope() {
+) : DefaultAppScope() {
 
     override val appComponent: AppComponent by provider {
         IosAppComponent()

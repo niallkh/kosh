@@ -4,11 +4,7 @@
 <dict>
 	<key>com.apple.security.application-groups</key>
 	<array>
-		<string>group.eth.kosh.app</string>
-	</array>
-	<key>keychain-access-groups</key>
-	<array>
-		<string>$(AppIdentifierPrefix)group.eth.kosh.app</string>
+		<string>group.eth.kosh.app.debug</string>
 	</array>
 </dict>
 </plist>

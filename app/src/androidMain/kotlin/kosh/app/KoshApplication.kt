@@ -7,7 +7,7 @@ import android.os.Bundle
 import arrow.atomic.AtomicInt
 import co.touchlab.kermit.Logger
 import co.touchlab.kermit.Severity
-import kosh.app.di.AndroidApplicationScope
+import kosh.app.di.AndroidAppScope
 import kotlinx.coroutines.flow.MutableStateFlow
 
 
@@ -30,13 +30,13 @@ class KoshApplication : Application() {
 
         registerActivityLifecycleCallbacks(ActivityCallbacks)
 
-        applicationScope = AndroidApplicationScope(this)
-        applicationScope.androidPushNotifier.start()
+        appScope = AndroidAppScope(this)
+        appScope.androidPushNotifier.start()
     }
 
     companion object {
         @SuppressLint("StaticFieldLeak")
-        lateinit var applicationScope: AndroidApplicationScope
+        lateinit var appScope: AndroidAppScope
     }
 }
 

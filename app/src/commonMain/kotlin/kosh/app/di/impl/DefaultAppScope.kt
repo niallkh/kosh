@@ -1,6 +1,6 @@
 package kosh.app.di.impl
 
-import kosh.app.di.ApplicationScope
+import kosh.app.di.AppScope
 import kosh.app.di.CoroutinesComponent
 import kosh.app.di.FilesComponent
 import kosh.app.di.SerializationComponent
@@ -12,7 +12,7 @@ import kosh.domain.DomainComponent
 import kosh.domain.WindowRepositoriesComponent
 import kosh.domain.core.provider
 
-abstract class DefaultApplicationScope : ApplicationScope {
+abstract class DefaultAppScope : AppScope {
 
     override val filesComponent: FilesComponent by provider {
         DefaultFilesComponent(

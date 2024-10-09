@@ -1,6 +1,6 @@
 package kosh.app.di.impl
 
-import kosh.app.di.ApplicationScope
+import kosh.app.di.AppScope
 import kosh.app.di.SerializationComponent
 import kosh.app.di.WindowScope
 import kosh.domain.AppRepositoriesComponent
@@ -12,11 +12,11 @@ import kosh.presentation.di.RouteScopeFactory
 import kotlinx.serialization.cbor.Cbor
 
 class DefaultRouteScope(
-    applicationScope: ApplicationScope,
+    applicationScope: AppScope,
     windowScope: WindowScope,
 ) : RouteScope,
     WindowScope by windowScope,
-    ApplicationScope by applicationScope {
+    AppScope by applicationScope {
 
     override val cbor: Cbor by provider {
         serializationComponent.cbor
@@ -42,7 +42,7 @@ class DefaultRouteScope(
 }
 
 class DefaultRouteScopeFactory(
-    private val applicationScope: ApplicationScope,
+    private val applicationScope: AppScope,
     private val windowScope: WindowScope,
 ) : RouteScopeFactory {
     override fun invoke(): RouteScope = DefaultRouteScope(

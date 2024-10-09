@@ -79,6 +79,7 @@
                 <data android:scheme="https" />
 
                 <data android:host="kosh.eth.limo" />
+                <data android:pathPrefix="/app" />
             </intent-filter>
         </activity>
 

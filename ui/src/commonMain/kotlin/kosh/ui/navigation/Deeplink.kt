@@ -16,9 +16,9 @@ import okio.ByteString.Companion.toByteString
 @Serializable
 data object Deeplink : Route
 
-fun parseDeeplink(uri: Uri): RootRoute? {
-    val uriStr = uri.toString()
-    return when (uri.scheme) {
+fun parseDeeplink(uriStr: String): RootRoute? {
+    val uri = Uri.parseOrNull(uriStr)
+    return when (uri?.scheme) {
 
         "kosh" -> when {
             uri.host == "request" -> RootRoute.WcRequest(WcRequestRoute.Request(null, Deeplink))
