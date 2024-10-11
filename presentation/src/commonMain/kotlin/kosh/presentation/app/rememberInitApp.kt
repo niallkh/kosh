@@ -8,6 +8,8 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import kosh.domain.repositories.AppStateRepo
 import kosh.presentation.di.di
+import kotlinx.coroutines.delay
+import kotlin.time.Duration.Companion.seconds
 
 @Composable
 fun rememberInitApp(
@@ -16,6 +18,7 @@ fun rememberInitApp(
     var loaded by remember { mutableStateOf(false) }
 
     LaunchedEffect(Unit) {
+        delay(1.seconds)
         appStateRepo.init()
         loaded = true
     }

@@ -34,35 +34,35 @@ fun WcRequestHost(
             is WcRequestRoute.PersonalSign -> WcSignPersonalScreen(
                 id = route.id,
                 onCancel = { pop() },
-                onResult = { finish() },
+                onResult = { result() },
                 onNavigateUp = { navigateUp() }
             )
 
             is WcRequestRoute.SignTypedData -> WcSignTypedScreen(
                 id = route.id,
                 onCancel = { pop() },
-                onResult = { finish() },
+                onResult = { result() },
                 onNavigateUp = { navigateUp() }
             )
 
             is WcRequestRoute.SendTransaction -> WcSendTransactionScreen(
                 id = route.id,
                 onCancel = { pop() },
-                onResult = { finish() },
+                onResult = { result() },
                 onNavigateUp = { navigateUp() }
             )
 
             is WcRequestRoute.AddEthereumNetwork -> WcAddNetworkScreen(
                 id = route.id,
                 onCancel = { pop() },
-                onResult = { finish() },
+                onResult = { result() },
                 onNavigateUp = { navigateUp() }
             )
 
             is WcRequestRoute.WatchToken -> WcWatchTokenScreen(
                 id = route.id,
                 chainAddress = route.chainAddress,
-                onResult = { finish() },
+                onResult = { result() },
                 onNft = { replaceCurrent(WcRequestRoute.WatchNft(route.id, it, null)) },
                 onNavigateUp = { navigateUp() }
             )
@@ -71,7 +71,7 @@ fun WcRequestHost(
                 id = route.id,
                 chainAddress = route.chainAddress,
                 tokenId = route.tokenId,
-                onResult = { finish() },
+                onResult = { result() },
                 onNavigateUp = { navigateUp() }
             )
         }

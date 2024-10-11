@@ -1,6 +1,7 @@
 package kosh.ui.component.icon
 
 import androidx.compose.foundation.Image
+import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.remember
@@ -12,7 +13,6 @@ import com.seiko.imageloader.rememberImagePainter
 import kosh.domain.models.ChainId
 import kosh.domain.models.Uri
 import kosh.ui.component.colors.chainColor
-import kosh.ui.component.theme.LocalIsDark
 
 @Composable
 fun ChainIcon(
@@ -29,7 +29,7 @@ fun ChainIcon(
     }
 
     val symbolPainter = @Composable {
-        val colorScheme = chainColor(chainId, LocalIsDark.current)
+        val colorScheme = chainColor(chainId, isSystemInDarkTheme())
 
         rememberSymbolIconPainter(
             symbol = symbol.substringBefore(" ").uppercase(),

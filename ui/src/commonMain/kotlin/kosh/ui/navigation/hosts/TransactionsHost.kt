@@ -28,7 +28,7 @@ fun TransactionsHost(
 
             is TransactionsRoute.Delete -> DeleteTransactionScreen(
                 id = route.id,
-                onFinish = { finish() }
+                onFinish = { result() }
             )
         }
 

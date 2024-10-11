@@ -23,7 +23,7 @@ fun AddTokenHost(
         when (route) {
             is AddTokenRoute.Search -> SearchTokenScreen(
                 address = route.address,
-                onResult = { finish() },
+                onResult = { result() },
                 onNft = { pushNew(AddTokenRoute.NftSearch(it)) },
                 onNavigateUp = { navigateUp() },
             )
@@ -31,7 +31,7 @@ fun AddTokenHost(
             is AddTokenRoute.NftSearch -> SearchNftScreen(
                 chainAddress = route.chainAddress,
                 tokenId = route.tokenId,
-                onResult = { finish() },
+                onResult = { result() },
                 onNavigateUp = { navigateUp() }
             )
         }

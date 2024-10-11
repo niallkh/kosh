@@ -7,7 +7,7 @@ import kosh.libs.trezor.DefaultTrezorManager
 import kosh.libs.trezor.SessionsCache
 import kosh.libs.trezor.TrezorManager
 
-class DefaultTrezorComponent(
+internal class DefaultTrezorComponent(
     transportComponent: TransportComponent,
 ) : TrezorComponent, TransportComponent by transportComponent {
 

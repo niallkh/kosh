@@ -1,5 +1,6 @@
 package kosh.ui.component.icon
 
+import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
@@ -14,7 +15,6 @@ import androidx.compose.ui.graphics.vector.PathBuilder
 import androidx.compose.ui.unit.dp
 import kosh.domain.models.Address
 import kosh.ui.component.colors.addressColor
-import kosh.ui.component.theme.LocalIsDark
 import kotlinx.io.bytestring.ByteString
 
 @Composable
@@ -22,7 +22,7 @@ fun AccountIcon(
     address: Address,
     modifier: Modifier = Modifier,
 ) {
-    val colorScheme = addressColor(address, LocalIsDark.current)
+    val colorScheme = addressColor(address, isSystemInDarkTheme())
 
     Surface(
         modifier = modifier

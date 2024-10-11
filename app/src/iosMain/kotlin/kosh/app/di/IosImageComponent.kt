@@ -11,7 +11,7 @@ import io.ktor.http.HttpHeaders
 import kosh.domain.core.provider
 import okio.Path.Companion.toPath
 
-class IosImageComponent(
+internal class IosImageComponent(
     networkComponent: NetworkComponent,
     filesComponent: FilesComponent,
 ) : ImageComponent,

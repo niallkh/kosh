@@ -3,9 +3,9 @@ package kosh.app.di
 import kosh.libs.ble.Ble
 import kosh.libs.usb.Usb
 
-interface TransportComponent {
+public interface TransportComponent {
 
-    val usb: Usb
+    public val usb: Usb
 
-    val ble: Ble
+    public val ble: Ble
 }

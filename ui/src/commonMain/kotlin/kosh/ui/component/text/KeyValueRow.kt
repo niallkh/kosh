@@ -24,7 +24,7 @@ fun KeyValueRow(
         horizontalArrangement = Arrangement.SpaceBetween,
     ) {
         CompositionLocalProvider(
-            LocalTextStyle provides MaterialTheme.typography.titleSmall,
+            LocalTextStyle provides MaterialTheme.typography.bodyLarge,
             LocalContentColor provides MaterialTheme.colorScheme.onSurfaceVariant,
         ) {
             key()
@@ -33,7 +33,7 @@ fun KeyValueRow(
         Spacer(modifier = Modifier.width(8.dp))
 
         CompositionLocalProvider(
-            LocalTextStyle provides MaterialTheme.typography.bodyLarge
+            LocalTextStyle provides MaterialTheme.typography.bodyMedium
         ) {
             value()
         }

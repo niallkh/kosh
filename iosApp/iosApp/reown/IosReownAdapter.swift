@@ -32,8 +32,8 @@ class IosReownAdapter: ReownAdapter {
             icons: ["https://kosh.eth.limo/images/icon.webp"],
             redirect: try! AppMetadata.Redirect(
                 native: "kosh://request",
-                universal: "https://kosh.eth.limo/request",
-                linkMode: true
+                universal: "https://kosh.eth.limo",
+                linkMode: false
             )
         )
         

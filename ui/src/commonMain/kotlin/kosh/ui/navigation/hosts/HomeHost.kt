@@ -174,7 +174,7 @@ private fun NavigationBar(
             val selected = item == activeRoute
 
             NavigationBarItem(
-                icon = { Icon(item.icon, null) },
+                icon = { Icon(item.icon, item.label) },
                 label = { Text(item.label) },
                 selected = selected,
                 onClick = {

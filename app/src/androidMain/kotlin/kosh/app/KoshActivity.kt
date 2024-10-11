@@ -2,7 +2,6 @@ package kosh.app
 
 import android.Manifest
 import android.content.Intent
-import android.net.Uri
 import android.os.Build
 import android.os.Bundle
 import androidx.activity.compose.rememberLauncherForActivityResult
@@ -14,14 +13,13 @@ import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.LaunchedEffect
-import androidx.core.app.TaskStackBuilder
 import androidx.core.content.ContextCompat
-import androidx.core.os.bundleOf
 import androidx.core.splashscreen.SplashScreen
 import androidx.core.splashscreen.SplashScreen.Companion.installSplashScreen
 import androidx.fragment.app.FragmentActivity
 import co.touchlab.kermit.Logger
 import com.arkivanov.decompose.router.stack.pushNew
+import com.arkivanov.decompose.router.stack.replaceAll
 import com.arkivanov.essenty.lifecycle.asEssentyLifecycle
 import com.arkivanov.essenty.lifecycle.doOnStop
 import com.seiko.imageloader.LocalImageLoader
@@ -36,12 +34,12 @@ import kosh.ui.component.path.PathResolver
 import kosh.ui.navigation.LocalRootNavigator
 import kosh.ui.navigation.RootNavigator
 import kosh.ui.navigation.RouteResult
-import kosh.ui.navigation.deeplink
 import kosh.ui.navigation.parseDeeplink
 import kosh.ui.navigation.routes.RootRoute
 import kosh.ui.navigation.stack.DefaultStackRouter
 import kosh.ui.navigation.stack.StackRouter
 import kotlinx.serialization.serializer
+import java.net.URLDecoder
 
 class KoshActivity : FragmentActivity() {
 
@@ -57,8 +55,9 @@ class KoshActivity : FragmentActivity() {
         logger.d { "onCreate()" }
         splashScreen.setKeepOnScreenCondition { true }
 
-        val deeplink = handleDeepLink(intent) { it?.toString()?.let(::parseDeeplink) }
-        logger.v { "deeplink=${intent.data}" }
+        val deeplink = intent?.data?.toString()?.let(::parseDeeplink)
+
+        logger.v { "action=${intent.action}, deeplink=${intent.data}" }
 
         val appScope = KoshApplication.appScope
         windowScope = AndroidWindowScope(
@@ -66,18 +65,23 @@ class KoshActivity : FragmentActivity() {
             activity = this,
         )
 
+        URLDecoder.decode("", "UTF-8")
+
         val routeContext = DefaultRouteContext(windowScope.appContext)
 
+        val start = RootRoute.Home()
         val rootRouter = DefaultStackRouter(
             routeContext = routeContext,
             serializer = serializer(),
-            start = RootRoute.Home(),
+            start = start,
             link = deeplink,
             onResult = {
                 when (it) {
-                    is RouteResult.Canceled -> onCancel()
-                    is RouteResult.Finished -> onFinish()
-                    is RouteResult.Up -> onNavigateUp(it.route)
+                    is RouteResult.Result -> onResult()
+                    is RouteResult.Up -> when (val route = it.route) {
+                        null -> replaceAll(start)
+                        else -> replaceAll(start, route)
+                    }
                 }
             },
         )
@@ -85,9 +89,7 @@ class KoshActivity : FragmentActivity() {
 
         val rootNavigator = RootNavigator { rootRouter.pushNew(it) }
         val pathResolver = PathResolver { appScope.appRepositoriesComponent.fileRepo.read(it) }
-        windowScope.deeplinkHandler.subscribe {
-            parseDeeplink(it)?.let(rootRouter::handle)
-        }
+        windowScope.deeplinkHandler.subscribe { it?.let(::parseDeeplink).let(rootRouter::handle) }
 
         setContent {
             CompositionLocalProvider(
@@ -152,7 +154,7 @@ class KoshActivity : FragmentActivity() {
     override fun onNewIntent(intent: Intent) {
         super.onNewIntent(intent)
         logger.d { "onNewIntent()" }
-        logger.v { "deeplink=${intent.data}" }
+        logger.v { "action=${intent.action}, deeplink=${intent.data}" }
 
         intent.data?.toString()?.let {
             windowScope.deeplinkHandler.handle(it)
@@ -177,67 +179,19 @@ class KoshActivity : FragmentActivity() {
         }
     }
 
-    private fun onFinish() {
-        logger.i { "onFinish()" }
-        if (moveTaskToBack(false)) {
+    private fun onResult() {
+        logger.i { "onResult()" }
+        if (intent.action == Intent.ACTION_MAIN && moveTaskToBack(false)) {
             lifecycle.asEssentyLifecycle().doOnStop(isOneTime = true) {
-                rootRouter.reset()
+                windowScope.deeplinkHandler.handle(null)
             }
         } else {
             finish()
         }
-    }
-
-    private fun onCancel() {
-        logger.i { "onCancel()" }
-        if (moveTaskToBack(false)) {
-            lifecycle.asEssentyLifecycle().doOnStop(isOneTime = true) {
-                rootRouter.reset()
-            }
-        } else {
-            finish()
-        }
-    }
-
-    private fun onNavigateUp(rootRoute: RootRoute?) {
-        val intent = Intent(
-            this,
-            KoshActivity::class.java
-        ).apply {
-            data = Uri.parse(deeplink(rootRoute).toString())
-        }
-
-        TaskStackBuilder.create(this)
-            .addNextIntentWithParentStack(intent)
-            .startActivities()
-
-        finish()
-    }
-
-
-    private fun <T> handleDeepLink(
-        intent: Intent,
-        block: (Uri?) -> T,
-    ): T? {
-        val savedState: Bundle? =
-            savedStateRegistry.consumeRestoredStateForKey(key = KEY_SAVED_DEEP_LINK_STATE)
-        val isDeepLinkHandled = savedState?.getBoolean(KEY_DEEP_LINK_HANDLED) ?: false
-        val deepLink = intent.data.takeUnless { isDeepLinkHandled }
-
-        savedStateRegistry.registerSavedStateProvider(key = KEY_SAVED_DEEP_LINK_STATE) {
-            bundleOf(KEY_DEEP_LINK_HANDLED to (isDeepLinkHandled || (deepLink != null)))
-        }
-
-        return block(deepLink)
-    }
-
-    companion object {
-        private const val KEY_SAVED_DEEP_LINK_STATE = "SAVED_DEEP_LINK_STATE"
-        private const val KEY_DEEP_LINK_HANDLED = "DEEP_LINK_HANDLED"
     }
 
     override fun onDestroy() {
-        viewModelStore.clear()
+        logger.d { "onDestroy()" }
         super.onDestroy()
     }
 }

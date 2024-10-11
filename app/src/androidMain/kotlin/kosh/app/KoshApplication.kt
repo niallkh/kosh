@@ -11,7 +11,7 @@ import kosh.app.di.AndroidAppScope
 import kotlinx.coroutines.flow.MutableStateFlow
 
 
-class KoshApplication : Application() {
+internal class KoshApplication : Application() {
 
     override fun onCreate() {
         super.onCreate()
@@ -35,12 +35,13 @@ class KoshApplication : Application() {
     }
 
     companion object {
+
         @SuppressLint("StaticFieldLeak")
         lateinit var appScope: AndroidAppScope
     }
 }
 
-object ActivityCallbacks : Application.ActivityLifecycleCallbacks {
+internal object ActivityCallbacks : Application.ActivityLifecycleCallbacks {
 
     private val startedActivities = AtomicInt()
     private val createdActivities = AtomicInt()

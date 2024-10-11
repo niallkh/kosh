@@ -2,6 +2,7 @@ package kosh.app.di
 
 import com.arkivanov.decompose.DefaultComponentContext
 import com.arkivanov.essenty.lifecycle.Lifecycle
+import com.arkivanov.essenty.statekeeper.StateKeeper
 import kosh.app.di.impl.DefaultRouteScopeFactory
 import kosh.domain.WindowRepositoriesComponent
 import kosh.domain.core.provider
@@ -9,9 +10,10 @@ import kosh.presentation.core.AppContext
 import kosh.presentation.core.defaultAppContext
 import kosh.presentation.di.RouteScopeFactory
 
-class IosWindowScope(
+public class IosWindowScope(
     applicationScope: AppScope,
     lifecycle: Lifecycle,
+    stateKeeper: StateKeeper,
 ) : WindowScope {
 
     override val routeScopeFactory: RouteScopeFactory by provider {
@@ -29,6 +31,7 @@ class IosWindowScope(
         defaultAppContext(
             componentContext = DefaultComponentContext(
                 lifecycle = lifecycle,
+                stateKeeper = stateKeeper,
             )
         )
     }

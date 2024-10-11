@@ -21,7 +21,7 @@ fun WcSessionsHost(
                 id = route.id,
                 onCancel = { pop() },
                 onNavigateUp = { navigateUp() },
-                onFinish = { finish() }
+                onFinish = { result() }
             )
         }
 

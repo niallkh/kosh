@@ -18,6 +18,14 @@ import kosh.domain.usecases.network.DefaultNetworkService
 import kosh.domain.usecases.network.NetworkService
 import kosh.domain.usecases.notification.DefaultNotificationService
 import kosh.domain.usecases.notification.NotificationService
+import kosh.domain.usecases.reown.DefaultWcAuthenticationService
+import kosh.domain.usecases.reown.DefaultWcProposalService
+import kosh.domain.usecases.reown.DefaultWcRequestService
+import kosh.domain.usecases.reown.WcAuthenticationService
+import kosh.domain.usecases.reown.WcConnectionService
+import kosh.domain.usecases.reown.WcProposalService
+import kosh.domain.usecases.reown.WcRequestService
+import kosh.domain.usecases.reown.WcSessionService
 import kosh.domain.usecases.token.DefaultTokenBalanceService
 import kosh.domain.usecases.token.DefaultTokenDiscoveryService
 import kosh.domain.usecases.token.DefaultTokenService
@@ -40,17 +48,9 @@ import kosh.domain.usecases.trezor.TrezorAccountService
 import kosh.domain.usecases.trezor.TrezorPasskeysService
 import kosh.domain.usecases.trezor.TrezorPassphraseService
 import kosh.domain.usecases.trezor.TrezorService
-import kosh.domain.usecases.reown.DefaultWcAuthenticationService
-import kosh.domain.usecases.reown.DefaultWcProposalService
-import kosh.domain.usecases.reown.DefaultWcRequestService
-import kosh.domain.usecases.reown.WcAuthenticationService
-import kosh.domain.usecases.reown.WcConnectionService
-import kosh.domain.usecases.reown.WcProposalService
-import kosh.domain.usecases.reown.WcRequestService
-import kosh.domain.usecases.reown.WcSessionService
 import kotlinx.coroutines.CoroutineScope
 
-class DefaultDomainComponent(
+internal class DefaultDomainComponent(
     applicationScope: CoroutineScope,
     windowRepositoriesComponent: WindowRepositoriesComponent,
     appRepositoriesComponent: AppRepositoriesComponent,

@@ -6,7 +6,7 @@ import kosh.data.reown.ReownComponent
 import kosh.domain.AppRepositoriesComponent
 import kosh.domain.core.provider
 
-class IosAppScope(
+public class IosAppScope(
     override val reownComponent: ReownComponent,
 ) : DefaultAppScope() {
 

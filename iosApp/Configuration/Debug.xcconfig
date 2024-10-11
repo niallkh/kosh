@@ -1,4 +1,4 @@
 TEAM_ID=252673W2HQ
 BUNDLE_ID=eth.kosh.app.debug
-APP_NAME=Kosh
+APP_NAME=Kosh Debug
 DEBUG=true

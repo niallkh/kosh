@@ -18,7 +18,7 @@ import kosh.ui.navigation.routes.RootRoute
 import kosh.ui.navigation.stack.StackRouter
 
 @Composable
-fun App(
+internal fun App(
     stackRouter: StackRouter<RootRoute>,
 ) {
     KoshTheme {

@@ -10,6 +10,8 @@ import kosh.data.DefaultAppStateRepo
 import kosh.data.DefaultFilesRepo
 import kosh.data.DefaultKeyStoreRepo
 import kosh.data.DefaultNotificationRepo
+import kosh.data.reown.DefaultReownRepo
+import kosh.data.reown.ReownComponent
 import kosh.data.trezor.DefaultLedgerRepo
 import kosh.data.trezor.DefaultTrezorPasskeysRepo
 import kosh.data.trezor.DefaultTrezorRepo
@@ -17,8 +19,6 @@ import kosh.data.trezor.LedgerComponent
 import kosh.data.trezor.LedgerOffChain
 import kosh.data.trezor.TrezorComponent
 import kosh.data.trezor.TrezorOffChain
-import kosh.data.reown.DefaultReownRepo
-import kosh.data.reown.ReownComponent
 import kosh.data.web3.DefaultFunctionSignatureRepo
 import kosh.data.web3.DefaultGasRepo
 import kosh.data.web3.DefaultNetworkRepo
@@ -48,7 +48,7 @@ import kosh.domain.usecases.network.DefaultNetworkService
 import kosh.domain.usecases.network.getRpcProvidersUC
 import kosh.ui.resources.DefaultTokenListsRepo
 
-abstract class DefaultAppRepositoriesComponent(
+internal abstract class DefaultAppRepositoriesComponent(
     dataComponent: DataComponent,
     trezorComponent: TrezorComponent,
     web3Component: Web3Component,

@@ -1,10 +1,12 @@
 package kosh.app
 
+import androidx.compose.foundation.background
+import androidx.compose.foundation.isSystemInDarkTheme
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.hapticfeedback.HapticFeedbackType
-import androidx.compose.ui.platform.LocalHapticFeedback
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.ComposeUIViewController
 import co.touchlab.kermit.Logger
@@ -32,7 +34,7 @@ import kosh.ui.navigation.stack.DefaultStackRouter
 import kotlinx.serialization.serializer
 import platform.UIKit.UIViewController
 
-fun rootViewController(
+public fun rootViewController(
     appScope: AppScope,
     windowScope: WindowScope,
 ): UIViewController {
@@ -59,8 +61,7 @@ fun rootViewController(
         link = null,
         onResult = {
             when (it) {
-                is RouteResult.Canceled -> reset()
-                is RouteResult.Finished -> reset()
+                is RouteResult.Result -> handle(null)
                 is RouteResult.Up -> when (val route = it.route) {
                     null -> replaceAll(start)
                     else -> replaceAll(start, route)
@@ -69,12 +70,9 @@ fun rootViewController(
         },
     )
 
-    windowScope.deeplinkHandler.subscribe {
-        parseDeeplink(it)?.let(rootRouter::handle)
-    }
-
     val rootNavigator = RootNavigator { rootRouter.pushNew(it) }
     val pathResolver = PathResolver { appScope.appRepositoriesComponent.fileRepo.read(it) }
+    windowScope.deeplinkHandler.subscribe { it?.let(::parseDeeplink).let(rootRouter::handle) }
 
     return ComposeUIViewController {
         CompositionLocalProvider(
@@ -84,14 +82,12 @@ fun rootViewController(
             LocalPathResolver provides pathResolver,
             LocalRootNavigator provides rootNavigator,
         ) {
-            val hapticFeedback = LocalHapticFeedback.current
 
             PredictiveBackGestureOverlay(
                 modifier = Modifier.fillMaxSize(),
                 backDispatcher = windowScope.appContext.backHandler as BackDispatcher,
                 backIcon = null,
                 endEdgeEnabled = false,
-                onClose = { hapticFeedback.performHapticFeedback(HapticFeedbackType.LongPress) },
                 activationOffsetThreshold = 8.dp
             ) {
                 val (loaded) = rememberInitApp()
@@ -99,6 +95,15 @@ fun rootViewController(
                 if (loaded) {
                     App(
                         stackRouter = rootRouter,
+                    )
+                } else {
+                    Box(
+                        Modifier
+                            .fillMaxSize()
+                            .background(
+                                if (isSystemInDarkTheme()) Color(0xFF1C1C1E)
+                                else Color(0xFFF2F2F7)
+                            )
                     )
                 }
             }

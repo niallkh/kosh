@@ -1,10 +1,10 @@
-package kosh.app.crypto
+package kosh.app.utils
 
 import kosh.eth.abi.keccak256
 import kosh.eth.wallet.Wallet
 import platform.Foundation.NSData
 
-fun recoverPubKey(
+public fun recoverPubKey(
     signature: NSData,
     message: NSData,
 ): NSData = Wallet.recoverPubKey(

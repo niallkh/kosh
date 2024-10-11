@@ -2,7 +2,7 @@ package kosh.app.di
 
 import kotlinx.coroutines.CoroutineScope
 
-interface CoroutinesComponent {
+public interface CoroutinesComponent {
 
-    val applicationScope: CoroutineScope
+    public val applicationScope: CoroutineScope
 }

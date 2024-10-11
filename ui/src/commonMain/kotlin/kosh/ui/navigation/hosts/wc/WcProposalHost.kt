@@ -32,14 +32,14 @@ fun WcProposalHost(
             is WcProposalRoute.Proposal -> WcProposalScreen(
                 id = route.id,
                 requestId = route.requestId,
-                onResult = { finish() },
+                onResult = { result() },
                 onCancel = { pop() },
                 onNavigateUp = { navigateUp() }
             )
 
             is WcProposalRoute.Auth -> WcAuthenticationScreen(
                 id = route.id,
-                onResult = { finish() },
+                onResult = { result() },
                 onCancel = { pop() },
                 onNavigateUp = { navigateUp() }
             )

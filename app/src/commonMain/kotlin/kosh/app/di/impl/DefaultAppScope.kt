@@ -12,7 +12,7 @@ import kosh.domain.DomainComponent
 import kosh.domain.WindowRepositoriesComponent
 import kosh.domain.core.provider
 
-abstract class DefaultAppScope : AppScope {
+public abstract class DefaultAppScope : AppScope {
 
     override val filesComponent: FilesComponent by provider {
         DefaultFilesComponent(

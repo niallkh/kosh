@@ -32,6 +32,22 @@ inline fun AppStateRepo.modify(update: Copy<AppState>.() -> Unit) {
     }
 }
 
+fun stateTransaction(block: () -> Unit) {
+    takeMutableSnapshot().run {
+        try {
+            var applied = false
+
+            while (!applied) {
+                block()
+
+                applied = apply().succeeded
+            }
+        } finally {
+            dispose()
+        }
+    }
+}
+
 fun <T> MutableState<T>.compareAndSet(expect: T, update: T): Boolean {
     takeMutableSnapshot().run {
         try {

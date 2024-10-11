@@ -7,7 +7,7 @@ import kosh.domain.core.provider
 import kosh.eth.rpc.Web3ProviderFactory
 import kosh.eth.rpc.web3ProviderFactory
 
-class DefaultWeb3Component(
+internal class DefaultWeb3Component(
     networkComponent: NetworkComponent,
     serializationComponent: SerializationComponent,
 ) : Web3Component,

@@ -5,25 +5,25 @@ import kosh.domain.WindowRepositoriesComponent
 import kosh.presentation.core.AppContext
 import kosh.presentation.di.RouteScopeFactory
 
-interface WindowScope {
+public interface WindowScope {
 
-    val routeScopeFactory: RouteScopeFactory
+    public val routeScopeFactory: RouteScopeFactory
 
-    val windowRepositoriesComponent: WindowRepositoriesComponent
+    public val windowRepositoriesComponent: WindowRepositoriesComponent
 
-    val appContext: AppContext
+    public val appContext: AppContext
 
-    val deeplinkHandler: DeeplinkHandler
+    public val deeplinkHandler: DeeplinkHandler
 }
 
-class DeeplinkHandler {
+public class DeeplinkHandler {
 
     private val logger = Logger.withTag("[K]")
 
-    private var subscriber: ((String) -> Unit)? = null
+    private var subscriber: ((String?) -> Unit)? = null
     private var deeplink: String? = null
 
-    fun handle(url: String) {
+    public fun handle(url: String?) {
         logger.d { "handle(url: $url)" }
         if (subscriber != null) {
             subscriber?.invoke(url)
@@ -32,7 +32,7 @@ class DeeplinkHandler {
         }
     }
 
-    fun subscribe(subscriber: (String) -> Unit) {
+    public fun subscribe(subscriber: (String?) -> Unit) {
         require(this.subscriber == null) {
             "DeeplinkHandler is already subscribed"
         }

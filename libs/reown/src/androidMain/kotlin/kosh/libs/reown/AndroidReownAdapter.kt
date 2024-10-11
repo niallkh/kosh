@@ -95,8 +95,8 @@ class AndroidReownAdapter(
             url = "https://kosh.eth.limo",
             icons = persistentListOf("https://kosh.eth.limo/images/icon.webp"),
             redirect = "kosh://request",
-            appLink = "https://kosh.eth.limo/request",
-            linkMode = true,
+            appLink = "https://kosh.eth.limo",
+            linkMode = false,
         )
 
         CoreClient.initialize(

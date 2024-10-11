@@ -10,6 +10,8 @@ plugins {
 }
 
 kotlin {
+    explicitApiWarning()
+
     androidTarget {
         compilerOptions {
             jvmTarget = JvmTarget.JVM_11
@@ -105,6 +107,10 @@ kotlin {
             api(libs.essenty.back.handler)
         }
 
+        commonTest.dependencies {
+            implementation(kotlin("test"))
+        }
+
         iosMain.dependencies {
             implementation(libs.ktor.client.darwin)
         }
@@ -129,7 +135,6 @@ android {
 
     buildTypes {
         debug {
-
             buildConfigField(
                 "String",
                 "GROVE_KEY",

@@ -8,7 +8,7 @@ import kosh.domain.core.provider
 import kosh.libs.keystore.IosKeyStore
 import kosh.libs.keystore.KeyStore
 
-class IosDataComponent(
+internal class IosDataComponent(
     dataStoreComponent: DataStoreComponent,
 ) : DataComponent {
     override val appStateSource: AppStateSource by provider {

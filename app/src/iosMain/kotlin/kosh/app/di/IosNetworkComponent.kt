@@ -9,7 +9,7 @@ import kosh.domain.core.provider
 import kosh.libs.ipfs.IpfsPlugin
 import platform.Foundation.NSBundle
 
-class IosNetworkComponent(
+internal class IosNetworkComponent(
     filesComponent: FilesComponent,
 ) : NetworkComponent,
     FilesComponent by filesComponent {

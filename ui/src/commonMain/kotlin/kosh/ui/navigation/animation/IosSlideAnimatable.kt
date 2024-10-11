@@ -1,6 +1,7 @@
 package kosh.ui.navigation.animation
 
 import androidx.compose.animation.core.Animatable
+import androidx.compose.animation.core.LinearOutSlowInEasing
 import androidx.compose.animation.core.spring
 import androidx.compose.animation.core.tween
 import androidx.compose.ui.Modifier
@@ -39,7 +40,6 @@ class IosSlideAnimatable(
             }
 
     override suspend fun animate(event: BackEvent) {
-        logger.v { "animate: ${event.progress}" }
         progress.animateTo(
             targetValue = event.progress,
             animationSpec = spring(stiffness = 100f)
@@ -47,12 +47,16 @@ class IosSlideAnimatable(
     }
 
     override suspend fun finish() {
-        logger.v { "finish" }
-        progress.animateTo(targetValue = 1F, tween())
+        progress.animateTo(
+            targetValue = 1F,
+            tween(easing = LinearOutSlowInEasing)
+        )
     }
 
     override suspend fun cancel() {
-        logger.v { "cancel" }
-        progress.animateTo(targetValue = 0F, tween())
+        progress.animateTo(
+            targetValue = 0F,
+            tween(easing = LinearOutSlowInEasing)
+        )
     }
 }

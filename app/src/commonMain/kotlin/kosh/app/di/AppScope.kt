@@ -9,22 +9,22 @@ import kosh.datastore.DataStoreComponent
 import kosh.domain.AppRepositoriesComponent
 import kosh.domain.DomainComponent
 
-interface AppScope {
-    val appComponent: AppComponent
-    val serializationComponent: SerializationComponent
-    val appRepositoriesComponent: AppRepositoriesComponent
-    val coroutinesComponent: CoroutinesComponent
-    val fileSystemComponent: FileSystemComponent
-    val filesComponent: FilesComponent
-    val networkComponent: NetworkComponent
-    val dataComponent: DataComponent
-    val trezorComponent: TrezorComponent
-    val ledgerComponent: LedgerComponent
-    val dataStoreComponent: DataStoreComponent
-    val web3Component: Web3Component
-    val imageComponent: ImageComponent
-    val domainComponent: DomainComponent
-    val transportComponent: TransportComponent
-    val reownComponent: ReownComponent
+public interface AppScope {
+    public val appComponent: AppComponent
+    public val serializationComponent: SerializationComponent
+    public val appRepositoriesComponent: AppRepositoriesComponent
+    public val coroutinesComponent: CoroutinesComponent
+    public val fileSystemComponent: FileSystemComponent
+    public val filesComponent: FilesComponent
+    public val networkComponent: NetworkComponent
+    public val dataComponent: DataComponent
+    public val trezorComponent: TrezorComponent
+    public val ledgerComponent: LedgerComponent
+    public val dataStoreComponent: DataStoreComponent
+    public val web3Component: Web3Component
+    public val imageComponent: ImageComponent
+    public val domainComponent: DomainComponent
+    public val transportComponent: TransportComponent
+    public val reownComponent: ReownComponent
 }
 

@@ -6,7 +6,7 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.SupervisorJob
 
-class DefaultCoroutinesComponent : CoroutinesComponent {
+internal class DefaultCoroutinesComponent : CoroutinesComponent {
 
     override val applicationScope: CoroutineScope by provider {
         CoroutineScope(Dispatchers.Main + SupervisorJob())

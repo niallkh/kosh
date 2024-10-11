@@ -30,7 +30,13 @@ class DefaultStackRouter<R : Route>(
     override val stack: Value<ChildStack<R, RouteContext>> = childStack(
         source = this,
         serializer = serializer,
-        initialStack = { listOfNotNull(start, link) },
+        initialStack = {
+            if (link.isDeeplink()) {
+                listOfNotNull(link)
+            } else {
+                listOfNotNull(start, link)
+            }
+        },
         key = "StackRouter",
         childFactory = { _, ctx -> DefaultRouteContext(ctx) },
         handleBackButton = true,
@@ -41,32 +47,30 @@ class DefaultStackRouter<R : Route>(
     }
 
     override fun pop() {
-        pop(RouteResult.Canceled)
+        pop(RouteResult.Result)
     }
 
-    override fun finish() {
-        onResult(RouteResult.Finished)
+    override fun result() {
+        onResult(RouteResult.Result)
     }
 
     override fun navigateUp() {
-        if (stack.backStack.isNotEmpty() && start != null) {
-            replaceAll(start)
+        if (stack.backStack.isNotEmpty()) {
+            pop { onResult(RouteResult.Up(start)) }
         } else {
             onResult(RouteResult.Up(start))
         }
     }
 
-    override fun handle(link: R) {
-        if (link.isDeeplink() || start == null) {
-            replaceAll(link)
+    override fun handle(link: R?) {
+        if (link != null) {
+            if (link.isDeeplink() || start == null) {
+                replaceAll(link)
+            } else {
+                replaceAll(start, link)
+            }
         } else {
-            replaceAll(start, link)
-        }
-    }
-
-    override fun reset() {
-        if (start != null) {
-            replaceAll(start)
+            start?.let { replaceAll(start) }
         }
     }
 }
@@ -84,7 +88,7 @@ inline fun <reified R : @Serializable Route> rememberStackRouter(
             serializer = serializer,
             start = start,
             link = link,
-            onResult = { onResult(it) },
+            onResult = onResult,
         )
     }
 

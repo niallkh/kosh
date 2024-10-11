@@ -2,7 +2,7 @@ package kosh.app
 
 import co.touchlab.kermit.Logger
 
-object KtorLogger : io.ktor.client.plugins.logging.Logger {
+internal object KtorLogger : io.ktor.client.plugins.logging.Logger {
 
     private val logger = Logger.withTag("[K]Ktor")
 

@@ -5,12 +5,12 @@ import io.ktor.client.plugins.api.createClientPlugin
 import io.ktor.client.request.headers
 import io.ktor.http.HttpHeaders
 
-interface NetworkComponent {
+public interface NetworkComponent {
 
-    val httpClient: HttpClient
+    public val httpClient: HttpClient
 }
 
-fun grovePlugin(groveKey: String) = createClientPlugin("DRpcPlugin") {
+internal fun grovePlugin(groveKey: String) = createClientPlugin("DRpcPlugin") {
     onRequest { request, _ ->
         if (request.url.host.endsWith("rpc.grove.city")) {
             request.headers {

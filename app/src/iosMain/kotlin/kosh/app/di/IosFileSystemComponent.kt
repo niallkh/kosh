@@ -9,7 +9,7 @@ import platform.Foundation.NSDocumentDirectory
 import platform.Foundation.NSSearchPathForDirectoriesInDomains
 import platform.Foundation.NSUserDomainMask
 
-class IosFileSystemComponent : FileSystemComponent {
+internal class IosFileSystemComponent : FileSystemComponent {
     override val filesDir: () -> Path = {
         Path(
             NSSearchPathForDirectoriesInDomains(

@@ -1,6 +1,7 @@
 package kosh.ui.component.icon
 
 import androidx.compose.foundation.Image
+import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.remember
@@ -12,7 +13,6 @@ import com.seiko.imageloader.rememberImagePainter
 import kosh.domain.entities.TokenEntity
 import kosh.domain.models.Uri
 import kosh.ui.component.colors.symbolColor
-import kosh.ui.component.theme.LocalIsDark
 
 @Composable
 fun TokenIcon(
@@ -40,7 +40,7 @@ fun TokenIcon(
     }
 
     val symbolPainter = @Composable {
-        val colorScheme = symbolColor(symbol, LocalIsDark.current)
+        val colorScheme = symbolColor(symbol, isSystemInDarkTheme())
 
         rememberSymbolIconPainter(
             symbol = symbol,

@@ -1,6 +1,7 @@
 package kosh.ui.component.dapp
 
 import androidx.compose.foundation.Image
+import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.size
@@ -21,7 +22,6 @@ import kosh.ui.component.colors.uriColor
 import kosh.ui.component.icon.ChainBadge
 import kosh.ui.component.icon.IconPainter
 import kosh.ui.component.placeholder.placeholder
-import kosh.ui.component.theme.LocalIsDark
 import kosh.ui.resources.icons.DappUnknown
 
 @Composable
@@ -65,7 +65,7 @@ private fun DappIcon(
     }
 
     val dappPainter = @Composable {
-        val colorScheme = uriColor(dapp ?: Uri(), LocalIsDark.current)
+        val colorScheme = uriColor(dapp ?: Uri(), isSystemInDarkTheme())
 
         val painter = rememberVectorPainter(DappUnknown)
 

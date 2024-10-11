@@ -2,13 +2,13 @@ package kosh.app.di
 
 import kosh.app.di.impl.DefaultAppRepositoriesComponent
 import kosh.data.DataComponent
+import kosh.data.reown.ReownComponent
 import kosh.data.trezor.LedgerComponent
 import kosh.data.trezor.TrezorComponent
-import kosh.data.reown.ReownComponent
 import kosh.data.web3.Web3Component
 import kosh.domain.AppRepositoriesComponent
 
-class AndroidAppRepositoriesComponent(
+internal class AndroidAppRepositoriesComponent(
     androidComponent: AndroidComponent,
     dataComponent: DataComponent,
     trezorComponent: TrezorComponent,

@@ -1,6 +1,5 @@
 package kosh.ui.navigation
 
-import com.eygraber.uri.Uri
 import kosh.domain.models.reown.PairingUri
 import kosh.domain.models.reown.WcRequest
 import kosh.ui.navigation.routes.RootRoute
@@ -12,26 +11,51 @@ import kotlinx.serialization.builtins.nullable
 import kotlinx.serialization.cbor.Cbor
 import okio.ByteString.Companion.decodeBase64
 import okio.ByteString.Companion.toByteString
+import kotlin.LazyThreadSafetyMode.NONE
 
 @Serializable
 data object Deeplink : Route
 
 fun parseDeeplink(uriStr: String): RootRoute? {
-    val uri = Uri.parseOrNull(uriStr)
-    return when (uri?.scheme) {
 
-        "kosh" -> when {
-            uri.host == "request" -> RootRoute.WcRequest(WcRequestRoute.Request(null, Deeplink))
+    val path by lazy(NONE) {
+        uriStr.substringAfter(":", "")
+            .removePrefix("//")
+            .substringBefore("?")
+    }
+
+    val pairingUri by lazy(NONE) {
+        uriStr
+            .substringAfter("uri=", "")
+            .substringBefore("&")
+    }
+
+    val requestId by lazy(NONE) {
+        uriStr
+            .substringAfter("requestId=")
+            .substringBefore("&")
+            .toLongOrNull()
+    }
+
+    val scheme = uriStr.substringBefore(":")
+
+    return when (scheme) {
+        "kosh", "metamask" -> when (path) {
+            "wc" -> when {
+                pairingUri.isNotEmpty() -> wcPairRoute(UrlDecoder.decode(pairingUri))
+                else -> wcRequestRoute(requestId)
+            }
+
+            "request" -> wcRequestRoute(requestId)
             else -> null
         }
 
         "wc" -> when {
-            arrayOf("@2", "symKey").all { it in uriStr } -> wcPairRoute(uriStr)
-            arrayOf("@2").all { it in uriStr } -> wcRequestRoute(uriStr)
-            else -> null
+            arrayOf("requestId").all { it in uriStr } -> wcRequestRoute(requestId)
+            else -> wcPairRoute(uriStr)
         }
 
-        "route" -> appRoute(uri)
+        "route" -> appRoute(path)
 
         else -> null
     }
@@ -41,17 +65,11 @@ private fun wcPairRoute(uriStr: String): RootRoute? = PairingUri(uriStr).getOrNu
     RootRoute.WcProposal(WcProposalRoute.Pair(it, Deeplink))
 }
 
-private fun wcRequestRoute(uriStr: String) = RootRoute.WcRequest(
-    WcRequestRoute.Request(
-        id = uriStr.substringAfter("requestId=")
-            .substringBefore("&")
-            .toLongOrNull()
-            ?.let { WcRequest.Id(it) },
-        Deeplink,
-    )
+private fun wcRequestRoute(requestId: Long?) = RootRoute.WcRequest(
+    WcRequestRoute.Request(requestId?.let { WcRequest.Id(it) }, Deeplink)
 )
 
-private fun appRoute(uri: Uri): RootRoute? = uri.host?.decodeBase64()
+private fun appRoute(path: String): RootRoute? = path.decodeBase64()
     ?.let { Cbor.decodeFromByteArray(RootRoute.serializer().nullable, it.toByteArray()) }
 
 fun deeplink(route: RootRoute?): kosh.domain.models.Uri {

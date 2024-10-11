@@ -8,7 +8,7 @@ import kosh.datastore.DataStoreComponent
 import okio.FileSystem
 import okio.SYSTEM
 
-class DefaultDataStoreComponent(
+internal class DefaultDataStoreComponent(
     filesComponent: FilesComponent,
     serializationComponent: SerializationComponent,
     appComponent: AppComponent,

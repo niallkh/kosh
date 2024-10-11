@@ -3,10 +3,10 @@ package kosh.app.di
 import kotlinx.io.files.FileSystem
 import kotlinx.io.files.Path
 
-interface FileSystemComponent {
-    val filesDir: () -> Path
-    val cacheDir: () -> Path
-    val noBackupFilesDir: () -> Path
-    val fileSystem: FileSystem
+public interface FileSystemComponent {
+    public val filesDir: () -> Path
+    public val cacheDir: () -> Path
+    public val noBackupFilesDir: () -> Path
+    public val fileSystem: FileSystem
 }
 

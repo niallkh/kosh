@@ -11,7 +11,7 @@ import kosh.libs.usb.UsbConfig
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flowOf
 
-class IosTransportComponent : TransportComponent {
+internal class IosTransportComponent : TransportComponent {
 
     override val ble: Ble by provider {
         IosBle()

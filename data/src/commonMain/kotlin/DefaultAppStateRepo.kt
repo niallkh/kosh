@@ -9,7 +9,6 @@ import kosh.domain.utils.selectLatest
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.first
-import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 
 class DefaultAppStateRepo(
@@ -19,12 +18,12 @@ class DefaultAppStateRepo(
 
     private val init = AtomicBoolean(false)
 
-    private val initMemo = suspendLazy {
-        state.update { appStateSource.state.first() }
+    override val state = MutableStateFlow(AppState.Default)
+
+    private val initLazy = suspendLazy {
+        state.value = appStateSource.state.first()
         init.set(true)
     }
-
-    override val state = MutableStateFlow(AppState.Default)
 
     init {
         applicationScope.launch {
@@ -35,7 +34,7 @@ class DefaultAppStateRepo(
         }
     }
 
-    override suspend fun init() = initMemo()
+    override suspend fun init() = initLazy()
 
     override fun compareAndSet(expect: AppState, update: AppState): Boolean {
         require(init.value) { "AppState not initialized" }

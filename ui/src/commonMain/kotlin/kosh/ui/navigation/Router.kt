@@ -10,30 +10,24 @@ interface Router<R : Route> {
 
     fun pop()
 
-    fun finish()
+    fun result()
 
     fun navigateUp()
 
-    fun handle(link: R)
-
-    fun reset()
+    fun handle(link: R?)
 }
 
 sealed class RouteResult<out R : Route> {
-    data object Finished : RouteResult<Nothing>()
-    data object Canceled : RouteResult<Nothing>()
+    data object Result : RouteResult<Nothing>()
     data class Up<R : Route>(val route: R?) : RouteResult<R>()
 }
 
 inline fun <R1 : Route, R2 : Route> Router<R1>.pop(
     result: RouteResult<R2>,
     map: (R2) -> R1?,
-) {
-    val mappedResult = when (result) {
-        is RouteResult.Finished -> RouteResult.Finished
-        is RouteResult.Canceled -> result
+) = pop(
+    when (result) {
+        is RouteResult.Result -> RouteResult.Result
         is RouteResult.Up -> RouteResult.Up(result.route?.let(map))
     }
-
-    pop(mappedResult)
-}
+)

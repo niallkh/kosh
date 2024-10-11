@@ -5,7 +5,7 @@ import kosh.app.di.FileSystemComponent
 import kosh.app.di.FilesComponent
 import kotlinx.io.files.Path
 
-class DefaultFilesComponent(
+internal class DefaultFilesComponent(
     fileSystemComponent: FileSystemComponent,
 ) : FilesComponent,
     FileSystemComponent by fileSystemComponent {

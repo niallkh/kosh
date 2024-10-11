@@ -12,7 +12,7 @@ import kosh.data.trezor.TrezorComponent
 import kosh.domain.AppRepositoriesComponent
 import kosh.domain.core.provider
 
-class AndroidAppScope(
+internal class AndroidAppScope(
     override val context: Context,
 ) : DefaultAppScope(), AndroidComponent {
 

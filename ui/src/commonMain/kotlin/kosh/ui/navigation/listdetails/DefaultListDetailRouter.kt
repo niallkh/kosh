@@ -63,21 +63,18 @@ class DefaultListDetailRouter<R : Route>(
     }
 
     override fun pop() {
-        navigation.popOr { onResult(RouteResult.Canceled) }
+        navigation.popOr { onResult(RouteResult.Result) }
     }
 
-    override fun finish() {
-        onResult(RouteResult.Finished)
+    override fun result() {
+        onResult(RouteResult.Result)
     }
 
     override fun navigateUp() {
         onResult(RouteResult.Up(null))
     }
 
-    override fun handle(link: R) {
-    }
-
-    override fun reset() {
+    override fun handle(link: R?) {
     }
 }
 

@@ -6,5 +6,9 @@
 	<array>
 		<string>group.eth.kosh.app</string>
 	</array>
+    <key>keychain-access-groups</key>
+    <array>
+        <string>$(AppIdentifierPrefix).group.eth.kosh.app</string>
+    </array>
 </dict>
 </plist>

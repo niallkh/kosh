@@ -11,12 +11,12 @@ import kosh.domain.models.toLibUri
 import kosh.ui.resources.Res
 import okio.Buffer
 
-interface ImageComponent {
+public interface ImageComponent {
 
-    val imageLoader: ImageLoader
+    public val imageLoader: ImageLoader
 }
 
-class IpfsMapper : Mapper<Url> {
+internal class IpfsMapper : Mapper<Url> {
     override fun map(data: Any, options: Options): Url? {
         if (data !is String) return null
         if (!isApplicable(data)) return null
@@ -28,7 +28,7 @@ class IpfsMapper : Mapper<Url> {
     }
 }
 
-class UriMapper : Mapper<Url> {
+internal class UriMapper : Mapper<Url> {
     override fun map(data: Any, options: Options): Url? {
         if (data !is Uri) return null
         if (!isApplicable(data)) return null
@@ -40,7 +40,7 @@ class UriMapper : Mapper<Url> {
     }
 }
 
-class ComposeResourceFetcher private constructor(
+internal class ComposeResourceFetcher private constructor(
     private val uri: Uri,
 ) : Fetcher {
     override suspend fun fetch(): FetchResult {

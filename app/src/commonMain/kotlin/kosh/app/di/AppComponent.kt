@@ -1,6 +1,6 @@
 package kosh.app.di
 
-interface AppComponent {
+public interface AppComponent {
 
-    val debug: Boolean
+    public val debug: Boolean
 }

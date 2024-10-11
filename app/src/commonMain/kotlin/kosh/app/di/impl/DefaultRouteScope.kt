@@ -11,7 +11,7 @@ import kosh.presentation.di.RouteScope
 import kosh.presentation.di.RouteScopeFactory
 import kotlinx.serialization.cbor.Cbor
 
-class DefaultRouteScope(
+internal class DefaultRouteScope(
     applicationScope: AppScope,
     windowScope: WindowScope,
 ) : RouteScope,

@@ -9,7 +9,7 @@ import kotlinx.serialization.modules.SerializersModule
 import kotlinx.serialization.modules.SerializersModuleBuilder
 import kotlinx.serialization.modules.polymorphic
 
-class DefaultSerializationComponent : SerializationComponent {
+internal class DefaultSerializationComponent : SerializationComponent {
 
     override val json: Json by provider {
         Json {

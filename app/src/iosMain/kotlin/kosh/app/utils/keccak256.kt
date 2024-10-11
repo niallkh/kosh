@@ -1,4 +1,4 @@
-package kosh.app.crypto
+package kosh.app.utils
 
 import kosh.eth.abi.keccak256
 import kotlinx.cinterop.addressOf
@@ -11,7 +11,7 @@ import platform.Foundation.NSData
 import platform.Foundation.create
 import platform.posix.memcpy
 
-fun keccak256(data: NSData): NSData {
+public fun keccak256(data: NSData): NSData {
     val hash = data.toByteString().keccak256()
     lateinit var result: NSData
     UnsafeByteStringOperations.withByteArrayUnsafe(hash) {

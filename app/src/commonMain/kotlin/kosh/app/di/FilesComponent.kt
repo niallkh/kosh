@@ -4,11 +4,11 @@ import kotlinx.io.files.FileSystem
 import kotlinx.io.files.Path
 
 
-interface FilesComponent {
-    val appDataStorePath: () -> Path
-    val keyStorePath: () -> Path
-    val fileRepoPath: () -> Path
-    val httpPath: () -> Path
-    val imagePath: () -> Path
-    val fileSystem: FileSystem
+public interface FilesComponent {
+    public val appDataStorePath: () -> Path
+    public val keyStorePath: () -> Path
+    public val fileRepoPath: () -> Path
+    public val httpPath: () -> Path
+    public val imagePath: () -> Path
+    public val fileSystem: FileSystem
 }

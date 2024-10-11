@@ -6,7 +6,7 @@ import kosh.domain.core.provider
 import kosh.libs.ledger.DefaultLedgerManager
 import kosh.libs.ledger.LedgerManager
 
-class DefaultLedgerComponent(
+internal class DefaultLedgerComponent(
     transportComponent: TransportComponent,
 ) : LedgerComponent, TransportComponent by transportComponent {
 

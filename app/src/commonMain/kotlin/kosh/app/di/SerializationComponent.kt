@@ -3,9 +3,9 @@ package kosh.app.di
 import kotlinx.serialization.cbor.Cbor
 import kotlinx.serialization.json.Json
 
-interface SerializationComponent {
+public interface SerializationComponent {
 
-    val json: Json
+    public val json: Json
 
-    val cbor: Cbor
+    public val cbor: Cbor
 }
