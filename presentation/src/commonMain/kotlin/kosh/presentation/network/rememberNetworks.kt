@@ -12,7 +12,7 @@ import kosh.domain.state.AppStateProvider
 import kosh.domain.state.activeNetworksIds
 import kosh.domain.state.networks
 import kosh.domain.utils.optic
-import kosh.presentation.di.di
+import kosh.presentation.core.di
 
 @Composable
 fun rememberNetworks(

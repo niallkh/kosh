@@ -16,7 +16,7 @@ import kosh.domain.state.AppStateProvider
 import kosh.domain.state.activeTokens
 import kosh.domain.state.token
 import kosh.domain.utils.optic
-import kosh.presentation.di.di
+import kosh.presentation.core.di
 
 @Composable
 fun rememberNativeToken(

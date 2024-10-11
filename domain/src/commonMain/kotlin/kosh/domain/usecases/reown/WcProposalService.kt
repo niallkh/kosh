@@ -4,10 +4,11 @@ import arrow.core.Either
 import kosh.domain.failure.WcFailure
 import kosh.domain.models.Address
 import kosh.domain.models.ChainId
+import kosh.domain.models.Redirect
 import kosh.domain.models.reown.PairingUri
 import kosh.domain.models.reown.WcAuthentication
-import kosh.domain.models.reown.WcSessionProposal
 import kosh.domain.models.reown.WcProposalAggregated
+import kosh.domain.models.reown.WcSessionProposal
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.Flow
 
@@ -26,7 +27,7 @@ interface WcProposalService {
         id: WcSessionProposal.Id,
         approvedAccounts: List<Address>,
         approvedChains: List<ChainId>,
-    ): Either<WcFailure, Unit>
+    ): Either<WcFailure, Redirect?>
 
     fun reject(id: WcSessionProposal.Id): Job
 }

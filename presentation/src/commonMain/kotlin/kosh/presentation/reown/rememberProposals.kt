@@ -8,7 +8,7 @@ import androidx.compose.runtime.setValue
 import kosh.domain.models.reown.WcSessionProposal
 import kosh.domain.serializers.ImmutableList
 import kosh.domain.usecases.reown.WcProposalService
-import kosh.presentation.di.di
+import kosh.presentation.core.di
 import kosh.presentation.di.rememberLifecycleState
 import kosh.presentation.di.rememberRetainable
 import kotlinx.collections.immutable.persistentListOf

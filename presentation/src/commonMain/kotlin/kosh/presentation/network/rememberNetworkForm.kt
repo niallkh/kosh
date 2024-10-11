@@ -23,7 +23,7 @@ import kosh.domain.usecases.token.tokenNameValidator
 import kosh.domain.usecases.token.tokenSymbolValidator
 import kosh.presentation.component.textfield.TextFieldState
 import kosh.presentation.component.textfield.rememberTextField
-import kosh.presentation.di.di
+import kosh.presentation.core.di
 import kosh.presentation.token.rememberNativeToken
 
 @Composable

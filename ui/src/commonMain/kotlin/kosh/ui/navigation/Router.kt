@@ -10,7 +10,7 @@ interface Router<R : Route> {
 
     fun pop()
 
-    fun result()
+    fun result(redirect: String? = null)
 
     fun navigateUp()
 
@@ -18,8 +18,13 @@ interface Router<R : Route> {
 }
 
 sealed class RouteResult<out R : Route> {
-    data object Result : RouteResult<Nothing>()
-    data class Up<R : Route>(val route: R?) : RouteResult<R>()
+    data class Result(
+        val redirect: String? = null,
+    ) : RouteResult<Nothing>()
+
+    data class Up<R : Route>(
+        val route: R?,
+    ) : RouteResult<R>()
 }
 
 inline fun <R1 : Route, R2 : Route> Router<R1>.pop(
@@ -27,7 +32,7 @@ inline fun <R1 : Route, R2 : Route> Router<R1>.pop(
     map: (R2) -> R1?,
 ) = pop(
     when (result) {
-        is RouteResult.Result -> RouteResult.Result
+        is RouteResult.Result -> result
         is RouteResult.Up -> RouteResult.Up(result.route?.let(map))
     }
 )

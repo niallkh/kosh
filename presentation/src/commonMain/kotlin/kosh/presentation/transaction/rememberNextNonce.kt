@@ -6,13 +6,13 @@ import kosh.domain.models.Address
 import kosh.domain.models.ChainId
 import kosh.domain.repositories.TransactionRepo
 import kosh.presentation.Load
-import kosh.presentation.di.di
+import kosh.presentation.core.di
 
 @Composable
 fun rememberNextNonce(
     chainId: ChainId,
     account: Address,
-    transactionRepo: TransactionRepo = di { appRepositories.transactionRepo },
+    transactionRepo: TransactionRepo = di { appRepositoriesComponent.transactionRepo },
 ): NextNonceState {
     val nonce = Load(chainId, account) {
         transactionRepo.nextNonce(chainId, account).bind()

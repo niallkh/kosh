@@ -6,7 +6,7 @@ import kosh.domain.failure.AccountFailure
 import kosh.domain.models.web3.Signer
 import kosh.domain.usecases.account.AccountService
 import kosh.presentation.Perform
-import kosh.presentation.di.di
+import kosh.presentation.core.di
 
 @Composable
 fun rememberCreateAccount(

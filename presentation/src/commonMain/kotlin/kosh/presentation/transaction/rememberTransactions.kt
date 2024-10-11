@@ -10,7 +10,7 @@ import kosh.domain.state.AppState
 import kosh.domain.state.AppStateProvider
 import kosh.domain.state.activeTransactions
 import kosh.domain.utils.optic
-import kosh.presentation.di.di
+import kosh.presentation.core.di
 
 @Composable
 fun rememberTransactions(

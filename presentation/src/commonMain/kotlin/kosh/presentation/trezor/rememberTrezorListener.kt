@@ -17,7 +17,7 @@ import kosh.domain.repositories.KeyStoreListener
 import kosh.domain.repositories.TrezorListener
 import kosh.domain.repositories.TrezorListener.ButtonRequest
 import kosh.domain.usecases.trezor.TrezorPassphraseService
-import kosh.presentation.di.di
+import kosh.presentation.core.di
 import kotlinx.coroutines.CancellableContinuation
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.suspendCancellableCoroutine

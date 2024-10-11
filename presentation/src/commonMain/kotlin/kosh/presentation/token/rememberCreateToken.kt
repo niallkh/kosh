@@ -12,7 +12,7 @@ import kosh.domain.entities.TokenEntity
 import kosh.domain.failure.TokenFailure
 import kosh.domain.models.token.TokenMetadata
 import kosh.domain.usecases.token.TokenService
-import kosh.presentation.di.di
+import kosh.presentation.core.di
 
 @Composable
 fun rememberCreateToken(

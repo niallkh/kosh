@@ -27,7 +27,7 @@
         tools:targetApi="s" />
 
     <application
-        android:name=".KoshApplication"
+        android:name=".Kosh"
         android:allowBackup="true"
         android:dataExtractionRules="@xml/data_extraction_rules"
         android:enableOnBackInvokedCallback="true"
@@ -43,7 +43,6 @@
             android:configChanges="orientation|screenSize|screenLayout|keyboardHidden|mnc|colorMode|density|fontScale|fontWeightAdjustment|keyboard|layoutDirection|locale|mcc|navigation|smallestScreenSize|touchscreen|uiMode"
             android:exported="true"
             android:launchMode="singleTask"
-            android:autoRemoveFromRecents="true"
             android:theme="@style/Theme.Kosh.Starting"
             android:windowSoftInputMode="adjustResize">
 

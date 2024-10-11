@@ -15,7 +15,7 @@ import kosh.domain.models.reown.WcRequest
 import kosh.domain.models.reown.WcRequest.Call.AddNetwork
 import kosh.domain.usecases.network.NetworkService
 import kosh.domain.usecases.reown.WcRequestService
-import kosh.presentation.di.di
+import kosh.presentation.core.di
 import kosh.presentation.di.rememberSerializable
 
 @Composable

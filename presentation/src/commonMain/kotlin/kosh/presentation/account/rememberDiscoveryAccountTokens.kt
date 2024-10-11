@@ -6,7 +6,7 @@ import kosh.domain.entities.AccountEntity
 import kosh.domain.failure.Web3Failure
 import kosh.domain.usecases.account.AccountTokensDiscoveryService
 import kosh.presentation.Perform
-import kosh.presentation.di.di
+import kosh.presentation.core.di
 
 @Composable
 fun rememberDiscoveryAccountTokens(

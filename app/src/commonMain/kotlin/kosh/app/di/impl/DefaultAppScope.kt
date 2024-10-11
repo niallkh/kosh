@@ -9,7 +9,7 @@ import kosh.data.trezor.TrezorComponent
 import kosh.data.web3.Web3Component
 import kosh.datastore.DataStoreComponent
 import kosh.domain.DomainComponent
-import kosh.domain.WindowRepositoriesComponent
+import kosh.domain.UiRepositoriesComponent
 import kosh.domain.core.provider
 
 public abstract class DefaultAppScope : AppScope {
@@ -47,7 +47,7 @@ public abstract class DefaultAppScope : AppScope {
         DefaultDomainComponent(
             applicationScope = coroutinesComponent.applicationScope,
             appRepositoriesComponent = appRepositoriesComponent,
-            windowRepositoriesComponent = object : WindowRepositoriesComponent {},
+            uiRepositoriesComponent = object : UiRepositoriesComponent {},
         )
     }
 

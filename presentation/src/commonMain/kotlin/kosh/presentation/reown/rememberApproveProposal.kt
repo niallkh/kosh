@@ -4,10 +4,11 @@ import androidx.compose.runtime.Composable
 import kosh.domain.failure.WcFailure
 import kosh.domain.models.Address
 import kosh.domain.models.ChainId
+import kosh.domain.models.Redirect
 import kosh.domain.models.reown.WcSessionProposal
 import kosh.domain.usecases.reown.WcProposalService
 import kosh.presentation.Perform
-import kosh.presentation.di.di
+import kosh.presentation.core.di
 
 @Composable
 fun rememberApproveProposal(
@@ -21,6 +22,7 @@ fun rememberApproveProposal(
 
     return ApproveProposalState(
         approved = approve.performed,
+        redirect = approve.result,
         loading = approve.inProgress,
         failure = approve.failure,
         retry = { approve.retry() },
@@ -30,6 +32,7 @@ fun rememberApproveProposal(
 
 data class ApproveProposalState(
     val approved: Boolean,
+    val redirect: Redirect?,
     val loading: Boolean,
     val failure: WcFailure?,
     val retry: () -> Unit,

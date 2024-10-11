@@ -5,7 +5,7 @@ import kosh.domain.failure.AppFailure
 import kosh.domain.models.reown.WcSession
 import kosh.domain.usecases.reown.WcSessionService
 import kosh.presentation.Collect
-import kosh.presentation.di.di
+import kosh.presentation.core.di
 import kotlinx.collections.immutable.ImmutableList
 import kotlinx.collections.immutable.persistentListOf
 import kotlinx.collections.immutable.toPersistentList

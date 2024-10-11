@@ -13,7 +13,7 @@ import kosh.domain.state.AppStateProvider
 import kosh.domain.state.accountsByWallet
 import kosh.domain.state.activeAccountIds
 import kosh.domain.utils.optic
-import kosh.presentation.di.di
+import kosh.presentation.core.di
 import kotlinx.collections.immutable.PersistentList
 
 @Composable

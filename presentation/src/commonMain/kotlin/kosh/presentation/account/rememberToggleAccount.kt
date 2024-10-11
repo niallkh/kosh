@@ -5,7 +5,7 @@ import androidx.compose.runtime.Immutable
 import kosh.domain.entities.AccountEntity
 import kosh.domain.usecases.account.AccountService
 import kosh.presentation.Perform
-import kosh.presentation.di.di
+import kosh.presentation.core.di
 
 @Composable
 fun rememberToggleAccount(

@@ -13,7 +13,7 @@ import kosh.domain.failure.Web3Failure
 import kosh.domain.models.Uri
 import kosh.domain.models.token.NftExtendedMetadata
 import kosh.domain.usecases.token.TokenDiscoveryService
-import kosh.presentation.di.di
+import kosh.presentation.core.di
 import kosh.presentation.di.rememberSerializable
 
 @Composable

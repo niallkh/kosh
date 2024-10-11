@@ -9,7 +9,7 @@ import kosh.domain.models.web3.ContractCall
 import kosh.domain.serializers.BigInteger
 import kosh.domain.usecases.transaction.ContractCallService
 import kosh.presentation.Load
-import kosh.presentation.di.di
+import kosh.presentation.core.di
 
 @Composable
 fun rememberContractCall(

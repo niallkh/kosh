@@ -19,7 +19,7 @@ import kosh.domain.state.AppStateProvider
 import kosh.domain.state.activeTransactions
 import kosh.domain.usecases.transaction.Eip1559TransactionService
 import kosh.domain.utils.optic
-import kosh.presentation.di.di
+import kosh.presentation.core.di
 import kosh.presentation.di.rememberLifecycleState
 
 @Composable

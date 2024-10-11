@@ -2,7 +2,7 @@ package kosh.app.di.impl
 
 import kosh.domain.AppRepositoriesComponent
 import kosh.domain.DomainComponent
-import kosh.domain.WindowRepositoriesComponent
+import kosh.domain.UiRepositoriesComponent
 import kosh.domain.core.provider
 import kosh.domain.state.AppStateProvider
 import kosh.domain.state.DefaultAppStateProvider
@@ -52,10 +52,10 @@ import kotlinx.coroutines.CoroutineScope
 
 internal class DefaultDomainComponent(
     applicationScope: CoroutineScope,
-    windowRepositoriesComponent: WindowRepositoriesComponent,
+    uiRepositoriesComponent: UiRepositoriesComponent,
     appRepositoriesComponent: AppRepositoriesComponent,
 ) : DomainComponent,
-    WindowRepositoriesComponent by windowRepositoriesComponent,
+    UiRepositoriesComponent by uiRepositoriesComponent,
     AppRepositoriesComponent by appRepositoriesComponent {
 
     override val appStateProvider: AppStateProvider by provider {

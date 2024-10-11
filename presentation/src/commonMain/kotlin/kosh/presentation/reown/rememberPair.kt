@@ -15,7 +15,7 @@ import kosh.domain.models.reown.WcAuthentication
 import kosh.domain.models.reown.WcSessionProposal
 import kosh.domain.serializers.Either
 import kosh.domain.usecases.reown.WcProposalService
-import kosh.presentation.di.di
+import kosh.presentation.core.di
 import kosh.presentation.di.rememberRetainable
 
 @Composable

@@ -7,8 +7,7 @@ import com.arkivanov.decompose.router.children.SimpleNavigation
 import com.arkivanov.decompose.router.children.children
 import com.arkivanov.decompose.value.Value
 import com.arkivanov.essenty.backhandler.BackCallback
-import kosh.presentation.core.RouteContext
-import kosh.presentation.di.DefaultRouteContext
+import kosh.presentation.core.UiContext
 import kosh.presentation.di.rememberOnRoute
 import kosh.ui.navigation.RouteResult
 import kosh.ui.navigation.routes.Route
@@ -17,11 +16,11 @@ import kotlinx.serialization.Serializable
 import kotlinx.serialization.serializer
 
 class DefaultListDetailRouter<R : Route>(
-    routeContext: RouteContext,
+    uiContext: UiContext,
     serializer: KSerializer<R>,
     initial: () -> ListDetailState<R>,
     private val onResult: ListDetailRouter<R>.(RouteResult<R>) -> Unit,
-) : ListDetailRouter<R>, RouteContext by routeContext {
+) : ListDetailRouter<R>, UiContext by uiContext {
 
     private val navigation = SimpleNavigation<ListDetailEvent<R>>()
 
@@ -43,11 +42,11 @@ class DefaultListDetailRouter<R : Route>(
         stateMapper = { navState, children ->
             ListDetailRouter.Children(
                 multipane = navState.multipane,
-                list = children[0] as Child.Created<R, RouteContext>,
-                detail = children.getOrNull(1) as Child.Created<R, RouteContext>?,
+                list = children[0] as Child.Created<R, UiContext>,
+                detail = children.getOrNull(1) as Child.Created<R, UiContext>?,
             )
         },
-        childFactory = { _, ctx -> DefaultRouteContext(ctx) },
+        childFactory = { _, ctx -> ctx },
     )
 
     override fun multipane(multipane: Boolean) {
@@ -63,11 +62,11 @@ class DefaultListDetailRouter<R : Route>(
     }
 
     override fun pop() {
-        navigation.popOr { onResult(RouteResult.Result) }
+        navigation.popOr { onResult(RouteResult.Result()) }
     }
 
-    override fun result() {
-        onResult(RouteResult.Result)
+    override fun result(redirect: String?) {
+        onResult(RouteResult.Result())
     }
 
     override fun navigateUp() {
@@ -88,7 +87,7 @@ inline fun <reified R : @Serializable Route> rememberListDetailRouter(
 ): ListDetailRouter<R> {
     val stackRouter = rememberOnRoute<ListDetailRouter<R>> {
         DefaultListDetailRouter(
-            routeContext = this,
+            uiContext = this,
             serializer = serializer,
             initial = {
                 // TODO check if deeplink

@@ -6,7 +6,7 @@ import kosh.domain.models.reown.WcSessionProposal
 import kosh.domain.models.reown.WcProposalAggregated
 import kosh.domain.usecases.reown.WcProposalService
 import kosh.presentation.Load
-import kosh.presentation.di.di
+import kosh.presentation.core.di
 
 @Composable
 fun rememberProposal(

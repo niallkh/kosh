@@ -41,13 +41,13 @@ interface ReownAdapter {
         accounts: List<String>,
         methods: List<String>,
         events: List<String>,
-    )
+    ): String?
 
     @Throws(Exception::class)
     suspend fun rejectProposal(
         pairingTopic: String,
         reason: String,
-    )
+    ): String?
 
     @Throws(Exception::class)
     suspend fun getAuthentication(
@@ -61,7 +61,7 @@ interface ReownAdapter {
         supportedChains: List<String>,
         supportedMethods: List<String>,
         signature: String,
-    )
+    ): String?
 
     @Throws(Exception::class)
     suspend fun getAuthenticationMessage(
@@ -75,7 +75,7 @@ interface ReownAdapter {
     suspend fun rejectAuthentication(
         id: Long,
         reason: String,
-    )
+    ): String?
 
     @Throws(Exception::class)
     suspend fun getRequest(
@@ -86,14 +86,14 @@ interface ReownAdapter {
     suspend fun approveRequest(
         id: Long,
         message: String,
-    )
+    ): String?
 
     @Throws(Exception::class)
     suspend fun rejectRequest(
         id: Long,
         code: Int,
         message: String,
-    )
+    ): String?
 
     @Throws(Exception::class)
     suspend fun getSession(

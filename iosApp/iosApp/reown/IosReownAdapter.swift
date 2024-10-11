@@ -174,7 +174,7 @@ class IosReownAdapter: ReownAdapter {
         accounts: [String],
         methods: [String],
         events: [String]
-    ) async throws {
+    ) async throws -> String? {
         let found = WalletKit.instance.getPendingProposals().first { (prop, ctx) in prop.pairingTopic == pairingTopic }
         guard let proposal = found?.proposal else {
             throw ReownAdapterError.proposalNotFound
@@ -193,12 +193,14 @@ class IosReownAdapter: ReownAdapter {
         )
         
         self.updateSessions()
+        
+        return proposal.proposer.redirect?.native
     }
     
     func rejectProposal(
         pairingTopic: String,
         reason: String
-    ) async throws {
+    ) async throws -> String? {
         let found = WalletKit.instance.getPendingProposals().first { (prop, ctx) in prop.pairingTopic == pairingTopic }
         guard let proposal = found?.proposal else {
             throw ReownAdapterError.proposalNotFound
@@ -208,6 +210,8 @@ class IosReownAdapter: ReownAdapter {
             proposalId: proposal.id,
             reason: RejectionReason.userRejected
         )
+        
+        return proposal.proposer.redirect?.native
     }
     
     func getAuthentication(
@@ -226,7 +230,7 @@ class IosReownAdapter: ReownAdapter {
         supportedChains: [String],
         supportedMethods: [String],
         signature: String
-    ) async throws {
+    ) async throws -> String? {
         let found = try WalletKit.instance.getPendingAuthRequests().first { (auth, ctx) in auth.id.integer == id }
         guard let auth = found?.0 else {
             throw ReownAdapterError.authenticationNotFound
@@ -250,6 +254,8 @@ class IosReownAdapter: ReownAdapter {
         )
         
         self.updateAuthentications()
+        
+        return auth.requester.redirect?.native
     }
     
     func getAuthenticationMessage(
@@ -278,10 +284,17 @@ class IosReownAdapter: ReownAdapter {
     func rejectAuthentication(
         id: Int64,
         reason: String
-    ) async throws {
+    ) async throws -> String? {
+        let found = try WalletKit.instance.getPendingAuthRequests().first { (auth, ctx) in auth.id.integer == id }
+        guard let auth = found?.0 else {
+            throw ReownAdapterError.authenticationNotFound
+        }
+        
         try await WalletKit.instance.rejectSession(requestId: RPCID(id))
         
         self.updateAuthentications()
+        
+        return auth.requester.redirect?.native
     }
     
     func getRequest(
@@ -300,9 +313,12 @@ class IosReownAdapter: ReownAdapter {
     func approveRequest(
         id: Int64,
         message: String
-    ) async throws {
+    ) async throws -> String? {
         let found = WalletKit.instance.getPendingRequests().first { (req, ctx) in req.id.integer == id }
         guard let req = found?.0 else {
+            throw ReownAdapterError.requestNotFound
+        }
+        guard let session = self.getSession(topic: req.topic) else {
             throw ReownAdapterError.requestNotFound
         }
         
@@ -313,15 +329,20 @@ class IosReownAdapter: ReownAdapter {
         )
         
         self.updateRequests()
+        
+        return session.peer.redirect?.native
     }
     
     func rejectRequest(
         id: Int64,
         code: Int32,
         message: String
-    ) async throws {
+    ) async throws -> String? {
         let found = WalletKit.instance.getPendingRequests().first { (req, ctx) in req.id.integer == id }
         guard let req = found?.0 else {
+            throw ReownAdapterError.requestNotFound
+        }
+        guard let session = self.getSession(topic: req.topic) else {
             throw ReownAdapterError.requestNotFound
         }
         
@@ -332,6 +353,8 @@ class IosReownAdapter: ReownAdapter {
         )
         
         self.updateRequests()
+        
+        return session.peer.redirect?.native
     }
     
     func getSession(

@@ -32,7 +32,7 @@ fun WcProposalHost(
             is WcProposalRoute.Proposal -> WcProposalScreen(
                 id = route.id,
                 requestId = route.requestId,
-                onResult = { result() },
+                onResult = { result(it?.value) },
                 onCancel = { pop() },
                 onNavigateUp = { navigateUp() }
             )

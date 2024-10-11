@@ -9,8 +9,7 @@ import com.arkivanov.decompose.router.stack.childStack
 import com.arkivanov.decompose.router.stack.pop
 import com.arkivanov.decompose.router.stack.replaceAll
 import com.arkivanov.decompose.value.Value
-import kosh.presentation.core.RouteContext
-import kosh.presentation.di.DefaultRouteContext
+import kosh.presentation.core.UiContext
 import kosh.presentation.di.rememberOnRoute
 import kosh.ui.navigation.RouteResult
 import kosh.ui.navigation.isDeeplink
@@ -20,14 +19,14 @@ import kotlinx.serialization.Serializable
 import kotlinx.serialization.serializer
 
 class DefaultStackRouter<R : Route>(
-    routeContext: RouteContext,
+    uiContext: UiContext,
     serializer: KSerializer<R>,
     private val start: R?,
     link: R?,
     private val onResult: StackRouter<R>.(RouteResult<R>) -> Unit,
-) : StackRouter<R>, StackNavigation<R> by StackNavigation(), RouteContext by routeContext {
+) : StackRouter<R>, StackNavigation<R> by StackNavigation(), UiContext by uiContext {
 
-    override val stack: Value<ChildStack<R, RouteContext>> = childStack(
+    override val stack: Value<ChildStack<R, UiContext>> = childStack(
         source = this,
         serializer = serializer,
         initialStack = {
@@ -38,7 +37,7 @@ class DefaultStackRouter<R : Route>(
             }
         },
         key = "StackRouter",
-        childFactory = { _, ctx -> DefaultRouteContext(ctx) },
+        childFactory = { _, ctx -> ctx },
         handleBackButton = true,
     )
 
@@ -47,11 +46,11 @@ class DefaultStackRouter<R : Route>(
     }
 
     override fun pop() {
-        pop(RouteResult.Result)
+        pop(RouteResult.Result())
     }
 
-    override fun result() {
-        onResult(RouteResult.Result)
+    override fun result(redirect: String?) {
+        onResult(RouteResult.Result(redirect = redirect))
     }
 
     override fun navigateUp() {
@@ -84,7 +83,7 @@ inline fun <reified R : @Serializable Route> rememberStackRouter(
 ): StackRouter<R> {
     val stackRouter = rememberOnRoute<StackRouter<R>> {
         DefaultStackRouter(
-            routeContext = this,
+            uiContext = this,
             serializer = serializer,
             start = start,
             link = link,

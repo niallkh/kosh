@@ -6,31 +6,22 @@ import com.arkivanov.decompose.ComponentContextFactory
 import com.arkivanov.essenty.backhandler.BackHandlerOwner
 import com.arkivanov.essenty.instancekeeper.InstanceKeeperOwner
 import com.arkivanov.essenty.lifecycle.LifecycleOwner
-import com.arkivanov.essenty.lifecycle.doOnDestroy
 import com.arkivanov.essenty.statekeeper.StateKeeperOwner
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.SupervisorJob
-import kotlinx.coroutines.cancel
-import kotlin.coroutines.CoroutineContext
-import kotlin.coroutines.EmptyCoroutineContext
+import kosh.presentation.di.UiScope
+import kotlin.reflect.KType
 
-class DefaultAppContext(
+class DefaultUiContext(
     componentContext: ComponentContext,
-    coroutineScope: CoroutineScope,
     override val logger: Logger,
-) : AppContext,
+    override val uiScope: UiScope,
+    override val container: MutableMap<KType, Any>,
+) : UiContext,
     LifecycleOwner by componentContext,
     StateKeeperOwner by componentContext,
     InstanceKeeperOwner by componentContext,
-    BackHandlerOwner by componentContext,
-    CoroutineScope by coroutineScope {
+    BackHandlerOwner by componentContext {
 
-    init {
-        lifecycle.doOnDestroy { cancel() }
-    }
-
-    override val componentContextFactory: ComponentContextFactory<AppContext> =
+    override val componentContextFactory: ComponentContextFactory<UiContext> =
         ComponentContextFactory { lifecycle, stateKeeper, instanceKeeper, backHandler ->
             val ctx = componentContext.componentContextFactory(
                 lifecycle = lifecycle,
@@ -39,19 +30,21 @@ class DefaultAppContext(
                 backHandler = backHandler
             )
 
-            DefaultAppContext(
+            DefaultUiContext(
                 componentContext = ctx,
-                coroutineScope = CoroutineScope(coroutineContext + SupervisorJob()),
                 logger = logger,
+                uiScope = uiScope.create(),
+                container = mutableMapOf()
             )
         }
 }
 
-fun defaultAppContext(
+fun defaultUiContext(
     componentContext: ComponentContext,
-    coroutineContext: CoroutineContext = EmptyCoroutineContext,
-): AppContext = DefaultAppContext(
+    uiScope: UiScope,
+): UiContext = DefaultUiContext(
     componentContext = componentContext,
-    coroutineScope = CoroutineScope(coroutineContext + Dispatchers.Main.immediate + SupervisorJob()),
-    logger = Logger.withTag("[K]AppContext")
+    logger = Logger.withTag("[K]UiContext"),
+    uiScope = uiScope,
+    container = mutableMapOf()
 )

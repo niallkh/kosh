@@ -41,8 +41,12 @@ internal fun requestCall(
     when (method) {
         "personal_sign" -> {
             val decodeParams = json.decodeFromString<List<String>>(params)
-            val message =
+            val message = if (decodeParams[0].startsWith("0x")) {
                 decodeParams[0].removePrefix("0x").hexToByteString().decodeToString()
+            } else {
+                decodeParams[0]
+            }
+
             val address = parseAddress(decodeParams[1])
 
             WcRequest.Call.SignPersonal(
@@ -51,7 +55,7 @@ internal fun requestCall(
             )
         }
 
-        "eth_signTypedData_v4" -> {
+        "eth_signTypedData", "eth_signTypedData_v4" -> {
             val decodeParams = json.decodeFromString<List<JsonElement>>(params)
             val address = parseAddress(decodeParams[0].jsonPrimitive.content)
             val json = json.encodeToString(decodeParams[1].jsonObject)

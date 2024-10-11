@@ -12,7 +12,7 @@ import arrow.core.raise.recover
 import kosh.domain.failure.TransactionFailure
 import kosh.domain.models.web3.Signature
 import kosh.domain.usecases.transaction.PersonalTransactionService
-import kosh.presentation.di.di
+import kosh.presentation.core.di
 import kosh.presentation.di.rememberSerializable
 import kosh.presentation.models.SignRequest
 

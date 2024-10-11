@@ -7,6 +7,7 @@ import co.touchlab.kermit.Logger
 import kosh.domain.failure.WcFailure
 import kosh.domain.models.ChainAddress
 import kosh.domain.models.ChainId
+import kosh.domain.models.Redirect
 import kosh.domain.models.caip10
 import kosh.domain.models.caip2
 import kosh.domain.models.did
@@ -209,7 +210,7 @@ class DefaultReownRepo(
     override suspend fun approveProposal(
         id: WcSessionProposal.Id,
         approvedAccounts: List<ChainAddress>,
-    ): Either<WcFailure, Unit> = withContext(Dispatchers.Default) {
+    ): Either<WcFailure, Redirect?> = withContext(Dispatchers.Default) {
         Either.catch {
             logger.v { "approveProposal(${id.pairingTopic.value})" }
             init()
@@ -220,12 +221,15 @@ class DefaultReownRepo(
                 methods = supportedMethods,
                 events = supportedEvents,
             )
-        }.mapLeft { it.mapWcFailure() }
+        }
+            .map { it?.let(::Redirect) }
+            .mapLeft { it.mapWcFailure() }
+
     }
 
     override suspend fun rejectProposal(
         id: WcSessionProposal.Id,
-    ): Either<WcFailure, Unit> = withContext(Dispatchers.Default) {
+    ): Either<WcFailure, Redirect?> = withContext(Dispatchers.Default) {
         Either.catch {
             logger.v { "rejectProposal(${id.pairingTopic.value})" }
             init()
@@ -233,7 +237,9 @@ class DefaultReownRepo(
                 pairingTopic = id.pairingTopic.value,
                 reason = "User rejected"
             )
-        }.mapLeft { it.mapWcFailure() }
+        }
+            .map { it?.let(::Redirect) }
+            .mapLeft { it.mapWcFailure() }
     }
 
     override suspend fun getAuthentication(
@@ -254,7 +260,7 @@ class DefaultReownRepo(
         account: ChainAddress,
         supportedChains: List<ChainId>,
         signature: Signature,
-    ): Either<WcFailure, Unit> = withContext(Dispatchers.Default) {
+    ): Either<WcFailure, Redirect?> = withContext(Dispatchers.Default) {
         Either.catch {
             logger.v { "approveAuthentication(${id.value})" }
             init()
@@ -265,7 +271,9 @@ class DefaultReownRepo(
                 signature = signature.data.toString(),
                 supportedMethods = supportedMethods,
             )
-        }.mapLeft { it.mapWcFailure() }
+        }
+            .map { it?.let(::Redirect) }
+            .mapLeft { it.mapWcFailure() }
     }
 
     override suspend fun getAuthenticationMessage(
@@ -288,7 +296,7 @@ class DefaultReownRepo(
 
     override suspend fun rejectAuthentication(
         id: WcAuthentication.Id,
-    ): Either<WcFailure, Unit> = withContext(Dispatchers.Default) {
+    ): Either<WcFailure, Redirect?> = withContext(Dispatchers.Default) {
         Either.catch {
             logger.v { "rejectAuthentication(${id.value})" }
             init()
@@ -296,7 +304,9 @@ class DefaultReownRepo(
                 id = id.value,
                 reason = "User rejected"
             )
-        }.mapLeft { it.mapWcFailure() }
+        }
+            .map { it?.let(::Redirect) }
+            .mapLeft { it.mapWcFailure() }
     }
 
     override suspend fun getSessionRequest(
@@ -315,7 +325,7 @@ class DefaultReownRepo(
     override suspend fun approveSessionRequest(
         id: WcRequest.Id,
         response: String,
-    ): Either<WcFailure, Unit> = withContext(Dispatchers.Default) {
+    ): Either<WcFailure, Redirect?> = withContext(Dispatchers.Default) {
         Either.catch {
             logger.v { "approveSessionRequest(${id.value})" }
             init()
@@ -323,12 +333,14 @@ class DefaultReownRepo(
                 id = id.value,
                 message = response
             )
-        }.mapLeft { it.mapWcFailure() }
+        }
+            .map { it?.let(::Redirect) }
+            .mapLeft { it.mapWcFailure() }
     }
 
     override suspend fun rejectSessionRequest(
         id: WcRequest.Id,
-    ): Either<WcFailure, Unit> = withContext(Dispatchers.Default) {
+    ): Either<WcFailure, Redirect?> = withContext(Dispatchers.Default) {
         Either.catch {
             logger.v { "rejectSessionRequest(${id.value})" }
             init()
@@ -337,7 +349,9 @@ class DefaultReownRepo(
                 code = 5000,
                 message = "User rejected",
             )
-        }.mapLeft { it.mapWcFailure() }
+        }
+            .map { it?.let(::Redirect) }
+            .mapLeft { it.mapWcFailure() }
     }
 
     override suspend fun getSession(

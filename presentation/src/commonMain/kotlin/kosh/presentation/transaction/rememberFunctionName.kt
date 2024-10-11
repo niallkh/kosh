@@ -6,14 +6,14 @@ import kosh.domain.failure.Web3Failure
 import kosh.domain.models.FunSelector
 import kosh.domain.repositories.FunctionSignatureRepo
 import kosh.presentation.Load
-import kosh.presentation.di.di
+import kosh.presentation.core.di
 import kotlinx.serialization.Serializable
 import kotlin.jvm.JvmInline
 
 @Composable
 fun rememberFunctionName(
     funSelector: FunSelector,
-    functionSignatureRepo: FunctionSignatureRepo = di { appRepositories.functionSignatureRepo },
+    functionSignatureRepo: FunctionSignatureRepo = di { appRepositoriesComponent.functionSignatureRepo },
 ): FunctionNameState {
     val functionName = Load(funSelector) {
         functionSignatureRepo.get(funSelector).bind()

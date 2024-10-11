@@ -13,6 +13,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.snapshots.SnapshotMutableState
 import androidx.compose.runtime.structuralEqualityPolicy
 import com.arkivanov.essenty.statekeeper.StateKeeper
+import kosh.presentation.core.LocalUiContext
 import kotlinx.serialization.KSerializer
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.descriptors.SerialDescriptor
@@ -65,7 +66,7 @@ fun <T : Any> rememberSerializable(
     key: String = currentCompositeKeyHash.toString(36),
     init: @DisallowComposableCalls () -> T,
 ): T {
-    val stateKeeper = LocalRouteContext.current.stateKeeper
+    val stateKeeper = LocalUiContext.current.stateKeeper
 
     val holder = remember {
         val restored = stateKeeper.consume(key, serializer) ?: init()

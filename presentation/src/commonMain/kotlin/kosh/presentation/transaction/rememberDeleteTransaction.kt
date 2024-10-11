@@ -4,7 +4,7 @@ import androidx.compose.runtime.Composable
 import kosh.domain.entities.TransactionEntity
 import kosh.domain.usecases.transaction.TransactionService
 import kosh.presentation.Perform
-import kosh.presentation.di.di
+import kosh.presentation.core.di
 import kosh.presentation.invoke
 
 @Composable

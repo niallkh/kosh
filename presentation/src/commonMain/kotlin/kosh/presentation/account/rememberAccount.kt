@@ -13,7 +13,7 @@ import kosh.domain.state.AppStateProvider
 import kosh.domain.state.account
 import kosh.domain.state.activeAccounts
 import kosh.domain.utils.optic
-import kosh.presentation.di.di
+import kosh.presentation.core.di
 
 @Composable
 fun rememberAccount(

@@ -8,13 +8,14 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import com.arkivanov.essenty.lifecycle.Lifecycle
+import kosh.presentation.core.LocalUiContext
 
 @Composable
 fun rememberLifecycleState(atLeast: Lifecycle.State = Lifecycle.State.RESUMED): Boolean {
     var state by remember { mutableStateOf(Lifecycle.State.INITIALIZED) }
     val meet by remember { derivedStateOf { state >= atLeast } }
 
-    val lifecycle = LocalRouteContext.current.lifecycle
+    val lifecycle = LocalUiContext.current.lifecycle
 
     DisposableEffect(lifecycle) {
         val callbacks = object : Lifecycle.Callbacks {

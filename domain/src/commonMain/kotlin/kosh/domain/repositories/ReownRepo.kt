@@ -4,6 +4,7 @@ import arrow.core.Either
 import kosh.domain.failure.WcFailure
 import kosh.domain.models.ChainAddress
 import kosh.domain.models.ChainId
+import kosh.domain.models.Redirect
 import kosh.domain.models.reown.PairingUri
 import kosh.domain.models.reown.WcAuthentication
 import kosh.domain.models.reown.WcRequest
@@ -45,11 +46,11 @@ interface ReownRepo {
     suspend fun approveProposal(
         id: WcSessionProposal.Id,
         approvedAccounts: List<ChainAddress>,
-    ): Either<WcFailure, Unit>
+    ): Either<WcFailure, Redirect?>
 
     suspend fun rejectProposal(
         id: WcSessionProposal.Id,
-    ): Either<WcFailure, Unit>
+    ): Either<WcFailure, Redirect?>
 
     suspend fun getAuthentication(
         id: WcAuthentication.Id,
@@ -60,7 +61,7 @@ interface ReownRepo {
         account: ChainAddress,
         supportedChains: List<ChainId>,
         signature: Signature,
-    ): Either<WcFailure, Unit>
+    ): Either<WcFailure, Redirect?>
 
     suspend fun getAuthenticationMessage(
         id: WcAuthentication.Id,
@@ -70,7 +71,7 @@ interface ReownRepo {
 
     suspend fun rejectAuthentication(
         id: WcAuthentication.Id,
-    ): Either<WcFailure, Unit>
+    ): Either<WcFailure, Redirect?>
 
     suspend fun getSessionRequest(
         id: WcRequest.Id,
@@ -79,11 +80,11 @@ interface ReownRepo {
     suspend fun approveSessionRequest(
         id: WcRequest.Id,
         response: String,
-    ): Either<WcFailure, Unit>
+    ): Either<WcFailure, Redirect?>
 
     suspend fun rejectSessionRequest(
         id: WcRequest.Id,
-    ): Either<WcFailure, Unit>
+    ): Either<WcFailure, Redirect?>
 
     suspend fun getSession(
         id: WcSession.Id,
@@ -100,15 +101,16 @@ interface ReownRepo {
 
     companion object {
         val supportedMethods = persistentListOf(
+            "eth_sign",
             "personal_sign",
             "eth_signTypedData_v4",
+            "eth_signTypedData",
             "eth_sendTransaction",
             "wallet_addEthereumChain",
             "wallet_watchAsset",
         )
 
         val supportedEvents = persistentListOf(
-            "message",
             "chainChanged",
             "accountsChanged",
         )

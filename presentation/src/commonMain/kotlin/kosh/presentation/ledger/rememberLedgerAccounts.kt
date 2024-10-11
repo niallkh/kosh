@@ -16,7 +16,7 @@ import kosh.domain.models.hw.Ledger
 import kosh.domain.models.web3.Signer
 import kosh.domain.repositories.LedgerListener
 import kosh.domain.usecases.ledger.LedgerAccountService
-import kosh.presentation.di.di
+import kosh.presentation.core.di
 
 @Composable
 fun rememberLedgerAccounts(

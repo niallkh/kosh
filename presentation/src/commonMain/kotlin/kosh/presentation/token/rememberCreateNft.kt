@@ -15,7 +15,7 @@ import kosh.domain.models.token.TokenMetadata
 import kosh.domain.models.token.TokenMetadata.Type
 import kosh.domain.models.token.map
 import kosh.domain.usecases.token.TokenService
-import kosh.presentation.di.di
+import kosh.presentation.core.di
 
 @Composable
 fun rememberCreateNft(

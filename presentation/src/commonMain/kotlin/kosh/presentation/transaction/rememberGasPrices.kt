@@ -14,7 +14,7 @@ import kosh.domain.failure.Web3Failure
 import kosh.domain.models.ChainId
 import kosh.domain.models.web3.GasPrices
 import kosh.domain.repositories.GasRepo
-import kosh.presentation.di.di
+import kosh.presentation.core.di
 import kosh.presentation.di.rememberLifecycleState
 import kosh.presentation.di.rememberSerializable
 import kotlinx.coroutines.delay
@@ -30,7 +30,7 @@ fun rememberGasPrices(
 fun rememberGasPrices(
     networkId: NetworkEntity.Id,
     active: Boolean = true,
-    gasRepo: GasRepo = di { appRepositories.gasRepo },
+    gasRepo: GasRepo = di { appRepositoriesComponent.gasRepo },
 ): GasPricesState {
     var gasPrices by rememberSerializable { mutableStateOf<GasPrices?>(null) }
     var loading by remember { mutableStateOf(false) }

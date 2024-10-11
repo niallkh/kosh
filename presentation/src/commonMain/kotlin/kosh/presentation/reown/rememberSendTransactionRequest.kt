@@ -14,7 +14,7 @@ import kosh.domain.failure.WcFailure
 import kosh.domain.models.reown.WcRequest
 import kosh.domain.models.web3.Signature
 import kosh.domain.usecases.reown.WcRequestService
-import kosh.presentation.di.di
+import kosh.presentation.core.di
 import kosh.presentation.di.rememberSerializable
 import kosh.presentation.models.SignRequest
 

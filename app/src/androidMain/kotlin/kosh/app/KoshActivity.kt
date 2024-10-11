@@ -14,21 +14,18 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.LaunchedEffect
 import androidx.core.content.ContextCompat
+import androidx.core.net.toUri
 import androidx.core.splashscreen.SplashScreen
 import androidx.core.splashscreen.SplashScreen.Companion.installSplashScreen
 import androidx.fragment.app.FragmentActivity
 import co.touchlab.kermit.Logger
 import com.arkivanov.decompose.router.stack.pushNew
 import com.arkivanov.decompose.router.stack.replaceAll
-import com.arkivanov.essenty.lifecycle.asEssentyLifecycle
-import com.arkivanov.essenty.lifecycle.doOnStop
 import com.seiko.imageloader.LocalImageLoader
-import kosh.app.di.AndroidWindowScope
-import kosh.app.di.WindowScope
+import kosh.app.di.androidUiContext
 import kosh.presentation.app.rememberInitApp
-import kosh.presentation.di.DefaultRouteContext
-import kosh.presentation.di.LocalRouteContext
-import kosh.presentation.di.LocalRouteScopeFactory
+import kosh.presentation.core.LocalUiContext
+import kosh.presentation.core.UiContext
 import kosh.ui.component.path.LocalPathResolver
 import kosh.ui.component.path.PathResolver
 import kosh.ui.navigation.LocalRootNavigator
@@ -39,13 +36,12 @@ import kosh.ui.navigation.routes.RootRoute
 import kosh.ui.navigation.stack.DefaultStackRouter
 import kosh.ui.navigation.stack.StackRouter
 import kotlinx.serialization.serializer
-import java.net.URLDecoder
 
-class KoshActivity : FragmentActivity() {
+public class KoshActivity : FragmentActivity() {
 
     private val logger = Logger.withTag("[K]KoshActivity")
 
-    private lateinit var windowScope: WindowScope
+    private lateinit var uiContext: UiContext
     private lateinit var rootRouter: StackRouter<RootRoute>
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -59,25 +55,20 @@ class KoshActivity : FragmentActivity() {
 
         logger.v { "action=${intent.action}, deeplink=${intent.data}" }
 
-        val appScope = KoshApplication.appScope
-        windowScope = AndroidWindowScope(
-            applicationScope = appScope,
+        uiContext = androidUiContext(
+            applicationScope = Kosh.appScope,
             activity = this,
         )
 
-        URLDecoder.decode("", "UTF-8")
-
-        val routeContext = DefaultRouteContext(windowScope.appContext)
-
         val start = RootRoute.Home()
         val rootRouter = DefaultStackRouter(
-            routeContext = routeContext,
+            uiContext = uiContext,
             serializer = serializer(),
             start = start,
             link = deeplink,
             onResult = {
                 when (it) {
-                    is RouteResult.Result -> onResult()
+                    is RouteResult.Result -> onResult(it.redirect)
                     is RouteResult.Up -> when (val route = it.route) {
                         null -> replaceAll(start)
                         else -> replaceAll(start, route)
@@ -88,14 +79,17 @@ class KoshActivity : FragmentActivity() {
         this.rootRouter = rootRouter
 
         val rootNavigator = RootNavigator { rootRouter.pushNew(it) }
-        val pathResolver = PathResolver { appScope.appRepositoriesComponent.fileRepo.read(it) }
-        windowScope.deeplinkHandler.subscribe { it?.let(::parseDeeplink).let(rootRouter::handle) }
+        val pathResolver = PathResolver {
+            uiContext.uiScope.appRepositoriesComponent.fileRepo.read(it)
+        }
+        uiContext.uiScope.deeplinkHandler.subscribe {
+            it?.let(::parseDeeplink).let(rootRouter::handle)
+        }
 
         setContent {
             CompositionLocalProvider(
-                LocalRouteContext provides routeContext,
-                LocalRouteScopeFactory provides windowScope.routeScopeFactory,
-                LocalImageLoader provides appScope.imageComponent.imageLoader,
+                LocalUiContext provides uiContext,
+                LocalImageLoader provides Kosh.appScope.imageComponent.imageLoader,
                 LocalPathResolver provides pathResolver,
                 LocalRootNavigator provides rootNavigator,
             ) {
@@ -157,7 +151,7 @@ class KoshActivity : FragmentActivity() {
         logger.v { "action=${intent.action}, deeplink=${intent.data}" }
 
         intent.data?.toString()?.let {
-            windowScope.deeplinkHandler.handle(it)
+            uiContext.uiScope.deeplinkHandler.handle(it)
         }
     }
 
@@ -179,15 +173,14 @@ class KoshActivity : FragmentActivity() {
         }
     }
 
-    private fun onResult() {
-        logger.i { "onResult()" }
-        if (intent.action == Intent.ACTION_MAIN && moveTaskToBack(false)) {
-            lifecycle.asEssentyLifecycle().doOnStop(isOneTime = true) {
-                windowScope.deeplinkHandler.handle(null)
-            }
-        } else {
-            finish()
+    private fun onResult(redirect: String?) {
+        logger.i { "onResult(redirect=$redirect)" }
+
+        if (!redirect.isNullOrEmpty()) {
+            startActivity(Intent(Intent.ACTION_VIEW, redirect.toUri()))
         }
+
+        finish()
     }
 
     override fun onDestroy() {

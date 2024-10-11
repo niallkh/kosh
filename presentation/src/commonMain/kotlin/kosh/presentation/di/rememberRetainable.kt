@@ -8,6 +8,7 @@ import androidx.compose.runtime.currentCompositeKeyHash
 import androidx.compose.runtime.remember
 import com.arkivanov.essenty.instancekeeper.InstanceKeeper
 import com.arkivanov.essenty.instancekeeper.getOrCreate
+import kosh.presentation.core.LocalUiContext
 
 @Composable
 fun <T> rememberRetainable(
@@ -15,7 +16,7 @@ fun <T> rememberRetainable(
     key: String = currentCompositeKeyHash.toString(36),
     init: @DisallowComposableCalls () -> T,
 ): T {
-    val instanceKeeper = LocalRouteContext.current.instanceKeeper
+    val instanceKeeper = LocalUiContext.current.instanceKeeper
 
     val holder = remember {
         instanceKeeper.getOrCreate(key) {

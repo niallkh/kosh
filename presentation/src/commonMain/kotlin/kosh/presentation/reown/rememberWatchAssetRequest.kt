@@ -11,7 +11,7 @@ import arrow.core.raise.recover
 import kosh.domain.failure.WcFailure
 import kosh.domain.models.reown.WcRequest
 import kosh.domain.usecases.reown.WcRequestService
-import kosh.presentation.di.di
+import kosh.presentation.core.di
 import kosh.presentation.di.rememberRetainable
 
 @Composable

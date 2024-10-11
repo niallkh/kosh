@@ -13,7 +13,7 @@ import arrow.core.raise.recover
 import kosh.presentation.di.rememberRetainable
 
 @Stable
-class PerformState<P : Any, R : Any, E> {
+class PerformState<P : Any, R, E> {
     var inProgress: Boolean by mutableStateOf(false)
     var failure: E? by mutableStateOf(null)
     var retry: Int by mutableIntStateOf(0)
@@ -56,11 +56,11 @@ class PerformState<P : Any, R : Any, E> {
 operator fun PerformState<Unit, *, *>.invoke() = invoke(Unit)
 
 @Composable
-inline fun <reified P : Any, reified R : Any, reified E> rememberPerform(): PerformState<P, R, E> =
+inline fun <reified P : Any, reified R, reified E> rememberPerform(): PerformState<P, R, E> =
     rememberRetainable { PerformState() }
 
 @Composable
-inline fun <reified P : Any, reified R : Any, reified E> Perform(
+inline fun <reified P : Any, reified R, reified E> Perform(
     vararg keys: Any?,
     crossinline block: suspend Raise<E>.(P) -> R,
 ): PerformState<P, R, E> {

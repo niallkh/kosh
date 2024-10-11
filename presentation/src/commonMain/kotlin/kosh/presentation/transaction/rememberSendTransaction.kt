@@ -13,7 +13,7 @@ import kosh.domain.failure.TransactionFailure
 import kosh.domain.models.Hash
 import kosh.domain.models.web3.Signature
 import kosh.domain.usecases.transaction.Eip1559TransactionService
-import kosh.presentation.di.di
+import kosh.presentation.core.di
 import kosh.presentation.di.rememberSerializable
 import kosh.presentation.models.SignRequest
 

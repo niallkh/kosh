@@ -4,7 +4,7 @@ import androidx.compose.runtime.Composable
 import kosh.domain.models.reown.WcSession
 import kosh.domain.usecases.reown.WcSessionService
 import kosh.presentation.Perform
-import kosh.presentation.di.di
+import kosh.presentation.core.di
 import kosh.presentation.invoke
 
 @Composable

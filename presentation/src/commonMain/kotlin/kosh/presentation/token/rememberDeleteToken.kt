@@ -5,7 +5,7 @@ import androidx.compose.runtime.Immutable
 import kosh.domain.entities.TokenEntity
 import kosh.domain.usecases.token.TokenService
 import kosh.presentation.Perform
-import kosh.presentation.di.di
+import kosh.presentation.core.di
 
 @Composable
 fun rememberDeleteToken(

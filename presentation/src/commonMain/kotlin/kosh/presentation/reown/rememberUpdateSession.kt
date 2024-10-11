@@ -7,7 +7,7 @@ import kosh.domain.models.ChainId
 import kosh.domain.models.reown.WcSession
 import kosh.domain.usecases.reown.WcSessionService
 import kosh.presentation.Perform
-import kosh.presentation.di.di
+import kosh.presentation.core.di
 
 @Composable
 fun rememberUpdateSession(

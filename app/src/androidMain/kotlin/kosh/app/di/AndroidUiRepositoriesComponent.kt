@@ -3,15 +3,15 @@ package kosh.app.di
 import android.content.ContentResolver
 import androidx.activity.result.ActivityResultRegistry
 import kosh.data.AndroidShareRepo
-import kosh.domain.WindowRepositoriesComponent
+import kosh.domain.UiRepositoriesComponent
 import kosh.domain.core.provider
 import kosh.domain.repositories.ShareRepo
 
 
-class AndroidWindowRepositoriesComponent(
+internal class AndroidUiRepositoriesComponent(
     contentResolver: ContentResolver,
     activityResultRegistry: ActivityResultRegistry,
-) : WindowRepositoriesComponent {
+) : UiRepositoriesComponent {
 
     override val shareRepo: ShareRepo by provider {
         AndroidShareRepo(

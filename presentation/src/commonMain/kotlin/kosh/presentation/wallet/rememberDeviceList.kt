@@ -7,7 +7,7 @@ import kosh.domain.serializers.ImmutableList
 import kosh.domain.usecases.ledger.LedgerService
 import kosh.domain.usecases.trezor.TrezorService
 import kosh.presentation.Collect
-import kosh.presentation.di.di
+import kosh.presentation.core.di
 import kotlinx.collections.immutable.persistentListOf
 import kotlinx.collections.immutable.plus
 import kotlinx.collections.immutable.toPersistentList

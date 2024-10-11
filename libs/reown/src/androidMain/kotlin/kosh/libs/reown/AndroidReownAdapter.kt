@@ -240,54 +240,64 @@ class AndroidReownAdapter(
         accounts: List<String>,
         methods: List<String>,
         events: List<String>,
-    ) = suspendCancellableCoroutine { cont ->
-        val proposal = WalletKit.getSessionProposals().find { it.pairingTopic == pairingTopic }
-            ?: error("Session proposal not found")
+    ): String? {
+        val redirect = suspendCancellableCoroutine { cont ->
+            val proposal = WalletKit.getSessionProposals().find { it.pairingTopic == pairingTopic }
+                ?: error("Session proposal not found")
 
-        WalletKit.approveSession(
-            params = Wallet.Params.SessionApprove(
-                proposerPublicKey = proposal.proposerPublicKey,
-                namespaces = mapOf(
-                    EIP155 to Wallet.Model.Namespace.Session(
-                        chains = chains,
-                        accounts = accounts,
-                        events = events,
-                        methods = methods,
+            logger.v { proposal.toString() }
+
+            WalletKit.approveSession(
+                params = Wallet.Params.SessionApprove(
+                    proposerPublicKey = proposal.proposerPublicKey,
+                    namespaces = mapOf(
+                        EIP155 to Wallet.Model.Namespace.Session(
+                            chains = chains,
+                            accounts = accounts,
+                            events = events,
+                            methods = methods,
+                        )
                     )
-                )
-            ),
-            onSuccess = { cont.resume(Unit) },
-            onError = {
-                logger.w(it.throwable) { "Approve proposal failed" }
-                if (cont.isActive) {
-                    cont.resumeWithException(it.throwable)
-                }
-            },
-        )
-    }.also {
+                ),
+                onSuccess = { cont.resume(proposal.redirect) },
+                onError = {
+                    logger.w(it.throwable) { "Approve proposal failed" }
+                    if (cont.isActive) {
+                        cont.resumeWithException(it.throwable)
+                    }
+                },
+            )
+        }
+
         updateProposals()
         updateSessions()
+
+        return redirect
     }
 
     override suspend fun rejectProposal(
         pairingTopic: String,
         reason: String,
-    ) = suspendCancellableCoroutine { cont ->
-        val proposal = WalletKit.getSessionProposals().find { it.pairingTopic == pairingTopic }
-            ?: error("Session proposal not found")
+    ): String? {
+        val redirect = suspendCancellableCoroutine { cont ->
+            val proposal = WalletKit.getSessionProposals().find { it.pairingTopic == pairingTopic }
+                ?: error("Session proposal not found")
 
-        WalletKit.rejectSession(
-            params = Wallet.Params.SessionReject(proposal.proposerPublicKey, reason),
-            onSuccess = { cont.resume(Unit) },
-            onError = {
-                logger.w(it.throwable) { "Reject proposal failed" }
-                if (cont.isActive) {
-                    cont.resumeWithException(it.throwable)
-                }
-            },
-        )
-    }.also {
+            WalletKit.rejectSession(
+                params = Wallet.Params.SessionReject(proposal.proposerPublicKey, reason),
+                onSuccess = { cont.resume(proposal.redirect) },
+                onError = {
+                    logger.w(it.throwable) { "Reject proposal failed" }
+                    if (cont.isActive) {
+                        cont.resumeWithException(it.throwable)
+                    }
+                },
+            )
+        }
+
         updateProposals()
+
+        return redirect
     }
 
     override suspend fun getAuthentication(
@@ -303,38 +313,42 @@ class AndroidReownAdapter(
         supportedChains: List<String>,
         supportedMethods: List<String>,
         signature: String,
-    ) = suspendCancellableCoroutine { cont ->
-        val authenticate = SignClient.getPendingAuthenticateRequests().find { it.id == id }
-            ?.toWallet()
-            ?: error("Authentication not found")
+    ): String? {
+        val redirect = suspendCancellableCoroutine { cont ->
+            val authenticate = SignClient.getPendingAuthenticateRequests().find { it.id == id }
+                ?.toWallet()
+                ?: error("Authentication not found")
 
-        val payloadParams = WalletKit.generateAuthPayloadParams(
-            payloadParams = authenticate.payloadParams,
-            supportedChains = supportedChains,
-            supportedMethods = supportedMethods,
-        )
+            val payloadParams = WalletKit.generateAuthPayloadParams(
+                payloadParams = authenticate.payloadParams,
+                supportedChains = supportedChains,
+                supportedMethods = supportedMethods,
+            )
 
-        val authObject = WalletKit.generateAuthObject(
-            payloadParams = payloadParams,
-            issuer = issuer,
-            signature = Wallet.Model.Cacao.Signature("eip191", signature)
-        )
+            val authObject = WalletKit.generateAuthObject(
+                payloadParams = payloadParams,
+                issuer = issuer,
+                signature = Wallet.Model.Cacao.Signature("eip191", signature)
+            )
 
-        WalletKit.approveSessionAuthenticate(
-            params = Wallet.Params.ApproveSessionAuthenticate(
-                id = id,
-                auths = listOf(authObject)
-            ),
-            onSuccess = { cont.resume(Unit) },
-            onError = {
-                logger.w(it.throwable) { "Approve authentication failed" }
-                if (cont.isActive) {
-                    cont.resumeWithException(it.throwable)
-                }
-            },
-        )
-    }.also {
+            WalletKit.approveSessionAuthenticate(
+                params = Wallet.Params.ApproveSessionAuthenticate(
+                    id = id,
+                    auths = listOf(authObject)
+                ),
+                onSuccess = { cont.resume(authenticate.participant.metadata?.redirect) },
+                onError = {
+                    logger.w(it.throwable) { "Approve authentication failed" }
+                    if (cont.isActive) {
+                        cont.resumeWithException(it.throwable)
+                    }
+                },
+            )
+        }
+
         updateAuthentications()
+
+        return redirect
     }
 
     override suspend fun getAuthenticationMessage(
@@ -364,19 +378,27 @@ class AndroidReownAdapter(
     override suspend fun rejectAuthentication(
         id: Long,
         reason: String,
-    ) = suspendCancellableCoroutine { cont ->
-        WalletKit.rejectSessionAuthenticate(
-            params = Wallet.Params.RejectSessionAuthenticate(id, reason),
-            onSuccess = { cont.resume(Unit) },
-            onError = {
-                logger.w(it.throwable) { "Reject authentication failed" }
-                if (cont.isActive) {
-                    cont.resumeWithException(it.throwable)
-                }
-            },
-        )
-    }.also {
+    ): String? {
+        val redirect = suspendCancellableCoroutine { cont ->
+            val authenticate = SignClient.getPendingAuthenticateRequests().find { it.id == id }
+                ?.toWallet()
+                ?: error("Authentication not found")
+
+            WalletKit.rejectSessionAuthenticate(
+                params = Wallet.Params.RejectSessionAuthenticate(id, reason),
+                onSuccess = { cont.resume(authenticate.participant.metadata?.redirect) },
+                onError = {
+                    logger.w(it.throwable) { "Reject authentication failed" }
+                    if (cont.isActive) {
+                        cont.resumeWithException(it.throwable)
+                    }
+                },
+            )
+        }
+
         updateAuthentications()
+
+        return redirect
     }
 
     override suspend fun getRequest(
@@ -389,61 +411,69 @@ class AndroidReownAdapter(
     override suspend fun approveRequest(
         id: Long,
         message: String,
-    ) = suspendCancellableCoroutine { cont ->
-        val request = WalletKit.getListOfActiveSessions().asSequence()
-            .flatMap { WalletKit.getPendingListOfSessionRequests(it.topic) }
-            .find { it.request.id == id }
-            ?: error("Session request not found")
+    ): String? {
+        val redirect = suspendCancellableCoroutine { cont ->
+            val request = WalletKit.getListOfActiveSessions().asSequence()
+                .flatMap { WalletKit.getPendingListOfSessionRequests(it.topic) }
+                .find { it.request.id == id }
+                ?: error("Session request not found")
 
-        WalletKit.respondSessionRequest(
-            params = Wallet.Params.SessionRequestResponse(
-                sessionTopic = request.topic,
-                jsonRpcResponse = Wallet.Model.JsonRpcResponse.JsonRpcResult(
-                    id = id,
-                    result = message,
-                )
-            ),
-            onSuccess = { cont.resume(Unit) },
-            onError = {
-                logger.w(it.throwable) { "Approve request failed" }
-                if (cont.isActive) {
-                    cont.resumeWithException(it.throwable)
-                }
-            },
-        )
-    }.also {
+            WalletKit.respondSessionRequest(
+                params = Wallet.Params.SessionRequestResponse(
+                    sessionTopic = request.topic,
+                    jsonRpcResponse = Wallet.Model.JsonRpcResponse.JsonRpcResult(
+                        id = id,
+                        result = message,
+                    )
+                ),
+                onSuccess = { cont.resume(request.peerMetaData?.redirect) },
+                onError = {
+                    logger.w(it.throwable) { "Approve request failed" }
+                    if (cont.isActive) {
+                        cont.resumeWithException(it.throwable)
+                    }
+                },
+            )
+        }
+
         updateRequests()
+
+        return redirect
     }
 
     override suspend fun rejectRequest(
         id: Long,
         code: Int,
         message: String,
-    ) = suspendCancellableCoroutine { cont ->
-        val request = WalletKit.getListOfActiveSessions().asSequence()
-            .flatMap { WalletKit.getPendingListOfSessionRequests(it.topic) }
-            .find { it.request.id == id }
-            ?: error("Session request not found")
+    ): String? {
+        val redirect = suspendCancellableCoroutine { cont ->
+            val request = WalletKit.getListOfActiveSessions().asSequence()
+                .flatMap { WalletKit.getPendingListOfSessionRequests(it.topic) }
+                .find { it.request.id == id }
+                ?: error("Session request not found")
 
-        WalletKit.respondSessionRequest(
-            params = Wallet.Params.SessionRequestResponse(
-                sessionTopic = request.topic,
-                jsonRpcResponse = Wallet.Model.JsonRpcResponse.JsonRpcError(
-                    id = id,
-                    code = code,
-                    message = message,
-                )
-            ),
-            onSuccess = { cont.resume(Unit) },
-            onError = {
-                logger.w(it.throwable) { "Reject request failed" }
-                if (cont.isActive) {
-                    cont.resumeWithException(it.throwable)
-                }
-            },
-        )
-    }.also {
+            WalletKit.respondSessionRequest(
+                params = Wallet.Params.SessionRequestResponse(
+                    sessionTopic = request.topic,
+                    jsonRpcResponse = Wallet.Model.JsonRpcResponse.JsonRpcError(
+                        id = id,
+                        code = code,
+                        message = message,
+                    )
+                ),
+                onSuccess = { cont.resume(request.peerMetaData?.redirect) },
+                onError = {
+                    logger.w(it.throwable) { "Reject request failed" }
+                    if (cont.isActive) {
+                        cont.resumeWithException(it.throwable)
+                    }
+                },
+            )
+        }
+
         updateRequests()
+
+        return redirect
     }
 
     override suspend fun getSession(

@@ -6,7 +6,7 @@ import kosh.domain.models.reown.WcSession
 import kosh.domain.models.reown.WcSessionAggregated
 import kosh.domain.usecases.reown.WcSessionService
 import kosh.presentation.Load
-import kosh.presentation.di.di
+import kosh.presentation.core.di
 
 @Composable
 fun rememberSession(

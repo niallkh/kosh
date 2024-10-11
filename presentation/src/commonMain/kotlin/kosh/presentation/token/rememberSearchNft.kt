@@ -17,7 +17,7 @@ import kosh.domain.models.Uri
 import kosh.domain.models.token.NftMetadata
 import kosh.domain.models.token.TokenMetadata
 import kosh.domain.usecases.token.TokenDiscoveryService
-import kosh.presentation.di.di
+import kosh.presentation.core.di
 
 @Composable
 fun rememberSearchNft(

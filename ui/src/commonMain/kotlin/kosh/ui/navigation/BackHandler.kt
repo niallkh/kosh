@@ -6,13 +6,15 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberUpdatedState
 import com.arkivanov.essenty.backhandler.BackCallback
-import kosh.presentation.di.LocalRouteContext
+import kosh.presentation.core.LocalUiContext
 
 @Composable
 fun BackHandler(
     enabled: Boolean = true,
     onBack: () -> Unit,
 ) {
+    val backHandler = LocalUiContext.current.backHandler
+
     val currentOnBack by rememberUpdatedState(onBack)
 
     val backCallback = remember {
@@ -20,8 +22,6 @@ fun BackHandler(
             currentOnBack()
         }
     }
-
-    val backHandler = LocalRouteContext.current.backHandler
 
     DisposableEffect(backHandler) {
         backHandler.register(backCallback)

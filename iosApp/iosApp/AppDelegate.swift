@@ -5,9 +5,8 @@ import App
 
 class AppDelegate: NSObject, UIApplicationDelegate {
     var appScope: AppScope? = nil
-    var windowScope: WindowScope? = nil
+    var uiContext: PresentationUiContext? = nil
     var stateKeeper: StateKeeperDispatcher? = nil
-    
     
     func application(_ application: UIApplication, shouldRestoreSecureApplicationState coder: NSCoder) -> Bool {
         print("[K]shouldRestoreSecureApplicationState")
@@ -27,20 +26,20 @@ class AppDelegate: NSObject, UIApplicationDelegate {
         )
         
         self.stateKeeper = self.stateKeeper ?? StateKeeperDispatcherKt.StateKeeperDispatcher(savedState: nil)
-
-        windowScope = IosWindowScope(
-            applicationScope: appScope!,
+        
+        uiContext = IosUiContextKt.iosUiContext(
+            appScope: appScope!,
             lifecycle: ApplicationLifecycle(),
             stateKeeper: stateKeeper!
         )
-                
+        
         return true
     }
- 
+    
     func application(_ application: UIApplication, shouldSaveSecureApplicationState coder: NSCoder) -> Bool {
         print("[K]shouldSaveSecureApplicationState")
         StateKeeperKt.save(coder: coder, state: stateKeeper!.save())
         return true
     }
-    
 }
+

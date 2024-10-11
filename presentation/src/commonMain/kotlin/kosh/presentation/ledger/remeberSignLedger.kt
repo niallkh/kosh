@@ -13,7 +13,7 @@ import kosh.domain.failure.LedgerFailure
 import kosh.domain.models.hw.Ledger
 import kosh.domain.repositories.LedgerListener
 import kosh.domain.usecases.ledger.LedgerAccountService
-import kosh.presentation.di.di
+import kosh.presentation.core.di
 import kosh.presentation.models.SignRequest
 import kosh.presentation.models.SignedRequest
 

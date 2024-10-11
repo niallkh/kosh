@@ -4,6 +4,7 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -18,11 +19,9 @@ import com.arkivanov.decompose.router.stack.replaceAll
 import com.arkivanov.essenty.backhandler.BackDispatcher
 import com.seiko.imageloader.LocalImageLoader
 import kosh.app.di.AppScope
-import kosh.app.di.WindowScope
 import kosh.presentation.app.rememberInitApp
-import kosh.presentation.di.DefaultRouteContext
-import kosh.presentation.di.LocalRouteContext
-import kosh.presentation.di.LocalRouteScopeFactory
+import kosh.presentation.core.LocalUiContext
+import kosh.presentation.core.UiContext
 import kosh.ui.component.path.LocalPathResolver
 import kosh.ui.component.path.PathResolver
 import kosh.ui.navigation.LocalRootNavigator
@@ -32,11 +31,13 @@ import kosh.ui.navigation.parseDeeplink
 import kosh.ui.navigation.routes.RootRoute
 import kosh.ui.navigation.stack.DefaultStackRouter
 import kotlinx.serialization.serializer
+import platform.Foundation.NSURL.Companion.URLWithString
+import platform.UIKit.UIApplication
 import platform.UIKit.UIViewController
 
 public fun rootViewController(
     appScope: AppScope,
-    windowScope: WindowScope,
+    uiContext: UiContext,
 ): UIViewController {
     val start: RootRoute = RootRoute.Home()
 
@@ -49,19 +50,31 @@ public fun rootViewController(
         Logger.setLogWriters(NSLogWriter())
     }
 
-
     Logger.d { "isDebug=${appScope.appComponent.debug}" }
 
-    val routeContext = DefaultRouteContext(windowScope.appContext)
-
     val rootRouter = DefaultStackRouter(
-        routeContext = routeContext,
+        uiContext = uiContext,
         serializer = serializer(),
         start = start,
         link = null,
         onResult = {
             when (it) {
-                is RouteResult.Result -> handle(null)
+                is RouteResult.Result -> {
+                    if (it.redirect.isNullOrEmpty()) {
+                        handle(null)
+                    } else {
+                        UIApplication.sharedApplication.openURL(
+                            url = URLWithString(it.redirect!!)!!,
+                            options = emptyMap<Any?, Any>(),
+                            completionHandler = { redirected ->
+                                if (!redirected) {
+                                    handle(null)
+                                }
+                            }
+                        )
+                    }
+                }
+
                 is RouteResult.Up -> when (val route = it.route) {
                     null -> replaceAll(start)
                     else -> replaceAll(start, route)
@@ -72,12 +85,11 @@ public fun rootViewController(
 
     val rootNavigator = RootNavigator { rootRouter.pushNew(it) }
     val pathResolver = PathResolver { appScope.appRepositoriesComponent.fileRepo.read(it) }
-    windowScope.deeplinkHandler.subscribe { it?.let(::parseDeeplink).let(rootRouter::handle) }
+    uiContext.uiScope.deeplinkHandler.subscribe { it?.let(::parseDeeplink).let(rootRouter::handle) }
 
     return ComposeUIViewController {
         CompositionLocalProvider(
-            LocalRouteContext provides routeContext,
-            LocalRouteScopeFactory provides windowScope.routeScopeFactory,
+            LocalUiContext provides uiContext,
             LocalImageLoader provides appScope.imageComponent.imageLoader,
             LocalPathResolver provides pathResolver,
             LocalRootNavigator provides rootNavigator,
@@ -85,7 +97,7 @@ public fun rootViewController(
 
             PredictiveBackGestureOverlay(
                 modifier = Modifier.fillMaxSize(),
-                backDispatcher = windowScope.appContext.backHandler as BackDispatcher,
+                backDispatcher = uiContext.backHandler as BackDispatcher,
                 backIcon = null,
                 endEdgeEnabled = false,
                 activationOffsetThreshold = 8.dp
@@ -97,16 +109,21 @@ public fun rootViewController(
                         stackRouter = rootRouter,
                     )
                 } else {
-                    Box(
-                        Modifier
-                            .fillMaxSize()
-                            .background(
-                                if (isSystemInDarkTheme()) Color(0xFF1C1C1E)
-                                else Color(0xFFF2F2F7)
-                            )
-                    )
+                    SplashScreen()
                 }
             }
         }
     }
+}
+
+@Composable
+private fun SplashScreen() {
+    Box(
+        Modifier
+            .fillMaxSize()
+            .background(
+                if (isSystemInDarkTheme()) Color(0xFF1C1C1E)
+                else Color(0xFFF2F2F7)
+            )
+    )
 }

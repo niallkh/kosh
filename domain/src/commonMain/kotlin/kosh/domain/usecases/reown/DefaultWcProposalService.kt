@@ -13,6 +13,7 @@ import kosh.domain.failure.logFailure
 import kosh.domain.models.Address
 import kosh.domain.models.ChainAddress
 import kosh.domain.models.ChainId
+import kosh.domain.models.Redirect
 import kosh.domain.models.reown.PairingUri
 import kosh.domain.models.reown.WcAuthentication
 import kosh.domain.models.reown.WcProposalAggregated
@@ -114,7 +115,7 @@ class DefaultWcProposalService(
         id: WcSessionProposal.Id,
         approvedAccounts: List<Address>,
         approvedChains: List<ChainId>,
-    ): Either<WcFailure, Unit> = reownRepo.approveProposal(
+    ): Either<WcFailure, Redirect?> = reownRepo.approveProposal(
         id = id,
         approvedAccounts = approvedChains.flatMap { chainId ->
             approvedAccounts.map { account -> ChainAddress(chainId, account) }

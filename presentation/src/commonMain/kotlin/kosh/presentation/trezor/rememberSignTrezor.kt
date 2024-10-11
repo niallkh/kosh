@@ -13,7 +13,7 @@ import kosh.domain.failure.TrezorFailure
 import kosh.domain.models.hw.Trezor
 import kosh.domain.repositories.TrezorListener
 import kosh.domain.usecases.trezor.TrezorAccountService
-import kosh.presentation.di.di
+import kosh.presentation.core.di
 import kosh.presentation.models.SignRequest
 import kosh.presentation.models.SignedRequest
 

@@ -11,7 +11,7 @@ import kosh.app.di.AndroidAppScope
 import kotlinx.coroutines.flow.MutableStateFlow
 
 
-internal class KoshApplication : Application() {
+internal class Kosh : Application() {
 
     override fun onCreate() {
         super.onCreate()

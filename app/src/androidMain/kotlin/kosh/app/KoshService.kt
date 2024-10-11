@@ -14,7 +14,7 @@ import androidx.core.app.ServiceCompat
 import androidx.lifecycle.LifecycleService
 import androidx.lifecycle.lifecycleScope
 import co.touchlab.kermit.Logger
-import kosh.app.KoshApplication.Companion.appScope
+import kosh.app.Kosh.Companion.appScope
 import kosh.domain.repositories.NotificationRepo.Type
 import kosh.domain.repositories.ReownRepo
 import kosh.domain.usecases.notification.NotificationService

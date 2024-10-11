@@ -16,6 +16,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import arrow.core.raise.nullable
 import arrow.optics.Getter
+import kosh.domain.models.Redirect
 import kosh.domain.models.reown.WcSessionProposal
 import kosh.domain.state.AppState
 import kosh.domain.state.accounts
@@ -52,7 +53,7 @@ import org.jetbrains.compose.resources.stringResource
 fun WcProposalScreen(
     id: WcSessionProposal.Id,
     requestId: Long,
-    onResult: () -> Unit,
+    onResult: (Redirect?) -> Unit,
     onCancel: () -> Unit,
     onNavigateUp: () -> Unit,
 ) {
@@ -83,7 +84,7 @@ fun WcProposalScreen(
 
     LaunchedEffect(approve.approved) {
         if (approve.approved) {
-            onResult()
+            onResult(approve.redirect)
         }
     }
 

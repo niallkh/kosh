@@ -22,7 +22,7 @@ import kosh.domain.state.balancesKey
 import kosh.domain.usecases.token.TokenBalanceService
 import kosh.domain.utils.optic
 import kosh.presentation.component.selector.selector
-import kosh.presentation.di.di
+import kosh.presentation.core.di
 import kosh.presentation.di.rememberLifecycleState
 import kosh.presentation.ticker.rememberTimer
 import kotlin.time.Duration.Companion.minutes
