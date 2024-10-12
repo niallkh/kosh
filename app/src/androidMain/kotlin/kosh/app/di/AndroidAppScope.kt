@@ -100,7 +100,7 @@ internal class AndroidAppScope(
     }
 }
 
-interface AndroidComponent {
-    val context: Context
-    val androidPushNotifier: AndroidPushNotifier
+public interface AndroidComponent {
+    public val context: Context
+    public val androidPushNotifier: AndroidPushNotifier
 }

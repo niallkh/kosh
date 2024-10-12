@@ -50,6 +50,7 @@ kotlin {
                 optIn("kotlinx.cinterop.ExperimentalForeignApi")
                 optIn("kotlinx.io.bytestring.unsafe.UnsafeByteStringApi")
                 optIn("com.arkivanov.decompose.ExperimentalDecomposeApi")
+                optIn("kotlinx.coroutines.ExperimentalCoroutinesApi")
             }
         }
 
@@ -58,7 +59,9 @@ kotlin {
 
             implementation(libs.androidx.startup)
             implementation(libs.androidx.splash)
+            implementation(libs.androidx.work)
             implementation(libs.androidx.lifecycle.service)
+            implementation(libs.androidx.lifecycle.process)
             implementation(libs.decompose.android)
             implementation(libs.ktor.client.okhttp)
             implementation(libs.secp256k1.android)

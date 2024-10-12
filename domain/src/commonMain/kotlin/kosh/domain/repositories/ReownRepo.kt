@@ -13,7 +13,10 @@ import kosh.domain.models.reown.WcSessionProposal
 import kosh.domain.models.web3.EthMessage
 import kosh.domain.models.web3.Signature
 import kotlinx.collections.immutable.persistentListOf
+import kotlinx.coroutines.NonCancellable
+import kotlinx.coroutines.awaitCancellation
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.withContext
 
 interface ReownRepo {
 
@@ -114,5 +117,16 @@ interface ReownRepo {
             "chainChanged",
             "accountsChanged",
         )
+    }
+}
+
+suspend fun ReownRepo.useConnection(): Nothing {
+    connect()
+    try {
+        awaitCancellation()
+    } finally {
+        withContext(NonCancellable) {
+            disconnect()
+        }
     }
 }

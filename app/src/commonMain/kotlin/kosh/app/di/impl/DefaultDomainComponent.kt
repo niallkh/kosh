@@ -22,7 +22,6 @@ import kosh.domain.usecases.reown.DefaultWcAuthenticationService
 import kosh.domain.usecases.reown.DefaultWcProposalService
 import kosh.domain.usecases.reown.DefaultWcRequestService
 import kosh.domain.usecases.reown.WcAuthenticationService
-import kosh.domain.usecases.reown.WcConnectionService
 import kosh.domain.usecases.reown.WcProposalService
 import kosh.domain.usecases.reown.WcRequestService
 import kosh.domain.usecases.reown.WcSessionService
@@ -179,12 +178,6 @@ internal class DefaultDomainComponent(
         DefaultLedgerAccountService(
             ledgerRepo = ledgerRepo,
             appStateRepo = appStateRepo
-        )
-    }
-
-    override val wcConnectionService: WcConnectionService by provider {
-        WcConnectionService(
-            reownRepo = reownRepo,
         )
     }
 

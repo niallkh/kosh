@@ -539,10 +539,10 @@ class AndroidReownAdapter(
                 }
 
                 is Wallet.Model.ConnectionState.Reason.ConnectionFailed -> {
-                    logger.w(it.throwable) { "Connection failed" }
+                    logger.i(it.throwable) { "Connection failed" }
                 }
             }
-        }
+        } ?: logger.i { "Connection connected" }
     }
 
     override fun onSessionProposal(

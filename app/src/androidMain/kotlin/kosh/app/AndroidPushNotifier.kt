@@ -27,7 +27,7 @@ import kosh.domain.repositories.Notification as AppNotification
 private const val WC_CH_ID = "WC_CH_ID"
 private const val OTHER_CH_ID = "OTHER_CH_ID"
 
-class AndroidPushNotifier(
+public class AndroidPushNotifier(
     private val context: Context,
     private val notificationService: NotificationService,
     private val applicationScope: CoroutineScope,
@@ -35,9 +35,9 @@ class AndroidPushNotifier(
     private val logger = Logger.withTag("[K]AndroidPushNotifier")
     private val notificationManager = NotificationManagerCompat.from(context)
 
-    fun start() {
+    internal fun start() {
         applicationScope.launch {
-            ActivityCallbacks.background
+            BackgroundState.background
                 .map { notificationManager.areNotificationsEnabled() }
                 .distinctUntilChanged()
                 .filter { it }

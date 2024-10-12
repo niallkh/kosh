@@ -13,7 +13,6 @@ import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.LaunchedEffect
-import androidx.core.content.ContextCompat
 import androidx.core.net.toUri
 import androidx.core.splashscreen.SplashScreen
 import androidx.core.splashscreen.SplashScreen.Companion.installSplashScreen
@@ -56,7 +55,7 @@ public class KoshActivity : FragmentActivity() {
         logger.v { "action=${intent.action}, deeplink=${intent.data}" }
 
         uiContext = androidUiContext(
-            applicationScope = Kosh.appScope,
+            applicationScope = KoshApp.appScope,
             activity = this,
         )
 
@@ -89,7 +88,7 @@ public class KoshActivity : FragmentActivity() {
         setContent {
             CompositionLocalProvider(
                 LocalUiContext provides uiContext,
-                LocalImageLoader provides Kosh.appScope.imageComponent.imageLoader,
+                LocalImageLoader provides KoshApp.appScope.imageComponent.imageLoader,
                 LocalPathResolver provides pathResolver,
                 LocalRootNavigator provides rootNavigator,
             ) {
@@ -136,13 +135,6 @@ public class KoshActivity : FragmentActivity() {
                 )
             }
         }
-    }
-
-    override fun onStart() {
-        super.onStart()
-
-        val intent = Intent(this, KoshService::class.java)
-        ContextCompat.startForegroundService(this, intent)
     }
 
     override fun onNewIntent(intent: Intent) {

@@ -7,6 +7,10 @@ import kosh.domain.usecases.ledger.LedgerAccountService
 import kosh.domain.usecases.ledger.LedgerService
 import kosh.domain.usecases.network.NetworkService
 import kosh.domain.usecases.notification.NotificationService
+import kosh.domain.usecases.reown.WcAuthenticationService
+import kosh.domain.usecases.reown.WcProposalService
+import kosh.domain.usecases.reown.WcRequestService
+import kosh.domain.usecases.reown.WcSessionService
 import kosh.domain.usecases.token.TokenBalanceService
 import kosh.domain.usecases.token.TokenDiscoveryService
 import kosh.domain.usecases.token.TokenService
@@ -19,11 +23,6 @@ import kosh.domain.usecases.trezor.TrezorAccountService
 import kosh.domain.usecases.trezor.TrezorPasskeysService
 import kosh.domain.usecases.trezor.TrezorPassphraseService
 import kosh.domain.usecases.trezor.TrezorService
-import kosh.domain.usecases.reown.WcAuthenticationService
-import kosh.domain.usecases.reown.WcConnectionService
-import kosh.domain.usecases.reown.WcProposalService
-import kosh.domain.usecases.reown.WcRequestService
-import kosh.domain.usecases.reown.WcSessionService
 
 interface DomainComponent {
     val appStateProvider: AppStateProvider
@@ -49,7 +48,6 @@ interface DomainComponent {
     val ledgerService: LedgerService
     val ledgerAccountService: LedgerAccountService
 
-    val wcConnectionService: WcConnectionService
     val wcSessionService: WcSessionService
     val wcProposalService: WcProposalService
     val wcRequestService: WcRequestService
