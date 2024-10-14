@@ -13,6 +13,11 @@ sealed interface WcFailure : AppFailure {
             get() = "No connection"
     }
 
+    class ResponseTimeout : WcFailure {
+        override val message: String
+            get() = "Timeout, no response"
+    }
+
     class PairingUriInvalid : WcFailure {
         override val message: String
             get() = "Invalid pairing uri, try again"
@@ -23,44 +28,14 @@ sealed interface WcFailure : AppFailure {
             get() = "Already paired, try again"
     }
 
-    class PairingUriExpired : WcFailure {
+    class Expired : WcFailure {
         override val message: String
-            get() = "Pairing uri expired, try again"
+            get() = "Expired, please try a new one"
     }
 
-    class TopicInvalid : WcFailure {
+    class InvalidNamespace : WcFailure {
         override val message: String
-            get() = "Invalid topic, try again"
-    }
-
-    class SessionNotFound : WcFailure {
-        override val message: String
-            get() = "Session not found"
-    }
-
-    class ProposalNotFound : WcFailure {
-        override val message: String
-            get() = "Proposal not found"
-    }
-
-    class RequestNotFound : WcFailure {
-        override val message: String
-            get() = "Request not found"
-    }
-
-    class RequestExpired : WcFailure {
-        override val message: String
-            get() = "Request expired"
-    }
-
-    class AuthenticationNotFound : WcFailure {
-        override val message: String
-            get() = "Authentication not found"
-    }
-
-    class VerifyContextNotFound : WcFailure {
-        override val message: String
-            get() = "Verify Context not found"
+            get() = "Invalid namespace"
     }
 
     class Other(override val message: String) : WcFailure

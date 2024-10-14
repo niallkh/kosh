@@ -39,7 +39,7 @@ fun Illustration(
             Alignment.Center
         ) {
             CompositionLocalProvider(
-                LocalTextStyle provides MaterialTheme.typography.titleMedium,
+                LocalTextStyle provides MaterialTheme.typography.bodyLarge,
                 LocalContentColor provides MaterialTheme.colorScheme.onBackground,
             ) {
                 message()

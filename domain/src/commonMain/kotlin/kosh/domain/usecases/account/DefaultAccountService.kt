@@ -15,8 +15,6 @@ import kosh.domain.models.account.DerivationPath
 import kosh.domain.models.account.ethereumAddressIndex
 import kosh.domain.models.account.ledgerAddressIndex
 import kosh.domain.repositories.AppStateRepo
-import kosh.domain.repositories.modify
-import kosh.domain.repositories.optic
 import kosh.domain.repositories.state
 import kosh.domain.state.AppState
 import kosh.domain.state.account
@@ -30,27 +28,16 @@ import kosh.domain.utils.phmap
 import kosh.domain.utils.phset
 import kosh.domain.utils.pmap
 import kotlinx.collections.immutable.toPersistentMap
-import kotlinx.coroutines.flow.Flow
 
 class DefaultAccountService(
     private val appStateRepo: AppStateRepo,
 ) : AccountService {
 
-    override fun getEnabled(): Flow<Set<AccountEntity.Id>> =
-        appStateRepo.optic(AppState.enabledAccountIds)
-
     override suspend fun isActive(address: Address): Boolean {
         return AccountEntity.Id(address) in appStateRepo.state().enabledAccountIds
     }
 
-    override fun get(address: Address): Flow<AccountEntity?> =
-        get(id = AccountEntity.Id(address))
-
-    override fun get(
-        id: AccountEntity.Id,
-    ): Flow<AccountEntity?> = appStateRepo.optic(AppState.account(id))
-
-    override fun create(
+    override suspend fun create(
         location: WalletEntity.Location,
         derivationPath: DerivationPath,
         address: Address,
@@ -90,7 +77,7 @@ class DefaultAccountService(
         account.id
     }
 
-    override fun update(id: AccountEntity.Id, name: String) = either {
+    override suspend fun update(id: AccountEntity.Id, name: String) = either {
         appStateRepo.modify {
             ensure(id in AppState.accounts.get()) {
                 AccountFailure.NotFound()
@@ -102,13 +89,13 @@ class DefaultAccountService(
         }
     }
 
-    override fun toggle(id: AccountEntity.Id, enabled: Boolean) {
+    override suspend fun toggle(id: AccountEntity.Id, enabled: Boolean) {
         appStateRepo.modify {
             AppState.enabledAccountIds.at(At.phset(), id) set enabled
         }
     }
 
-    override fun delete(id: AccountEntity.Id) {
+    override suspend fun delete(id: AccountEntity.Id) {
         appStateRepo.modify {
             val account = AppState.account(id).get()
 

@@ -2,6 +2,8 @@ package kosh.libs.reown
 
 import kotlinx.serialization.Serializable
 
+data class StringWrapper(val value: String)
+
 @Serializable
 data class AddEthereumNetwork(
     val chainId: String,

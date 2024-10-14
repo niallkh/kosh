@@ -7,8 +7,8 @@ import kosh.libs.usb.AndroidUsb
 import kosh.libs.usb.Usb
 
 class AndroidTransportComponent(
-    androidComponent: AndroidComponent,
-) : TransportComponent, AndroidComponent by androidComponent {
+    androidComponent: AndroidAppComponent,
+) : TransportComponent, AndroidAppComponent by androidComponent {
 
     override val usb: Usb by provider {
         AndroidUsb(context = context)

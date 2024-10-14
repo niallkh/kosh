@@ -12,7 +12,6 @@ import kosh.domain.models.token.Balance
 import kosh.domain.models.token.TokenMetadata
 import kosh.domain.repositories.AppStateRepo
 import kosh.domain.repositories.TokenBalanceRepo
-import kosh.domain.repositories.modify
 import kosh.domain.serializers.Nel
 import kosh.domain.state.AppState
 import kosh.domain.state.activeAccounts

@@ -18,7 +18,7 @@ import kotlinx.coroutines.awaitCancellation
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.withContext
 
-interface ReownRepo {
+interface WcRepo {
 
     val newProposal: Flow<WcSessionProposal>
 
@@ -77,7 +77,7 @@ interface ReownRepo {
     ): Either<WcFailure, Redirect?>
 
     suspend fun getSessionRequest(
-        id: WcRequest.Id,
+        id: WcRequest.Id?,
     ): Either<WcFailure, WcRequest>
 
     suspend fun approveSessionRequest(
@@ -120,7 +120,7 @@ interface ReownRepo {
     }
 }
 
-suspend fun ReownRepo.useConnection(): Nothing {
+suspend fun WcRepo.useConnection(): Nothing {
     connect()
     try {
         awaitCancellation()

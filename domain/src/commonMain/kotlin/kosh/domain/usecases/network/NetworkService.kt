@@ -39,7 +39,7 @@ interface NetworkService {
         tokenIcon: Uri?,
     ): Either<NetworkFailure, Unit>
 
-    fun toggle(id: NetworkEntity.Id, enabled: Boolean)
+    suspend fun toggle(id: NetworkEntity.Id, enabled: Boolean)
 
-    fun delete(id: NetworkEntity.Id)
+    suspend fun delete(id: NetworkEntity.Id)
 }

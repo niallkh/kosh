@@ -8,6 +8,7 @@ import kosh.domain.usecases.ledger.LedgerService
 import kosh.domain.usecases.network.NetworkService
 import kosh.domain.usecases.notification.NotificationService
 import kosh.domain.usecases.reown.WcAuthenticationService
+import kosh.domain.usecases.reown.WcNotificationsService
 import kosh.domain.usecases.reown.WcProposalService
 import kosh.domain.usecases.reown.WcRequestService
 import kosh.domain.usecases.reown.WcSessionService
@@ -52,5 +53,6 @@ interface DomainComponent {
     val wcProposalService: WcProposalService
     val wcRequestService: WcRequestService
     val wcAuthenticationService: WcAuthenticationService
+    val wcNotificationsService: WcNotificationsService
 }
 

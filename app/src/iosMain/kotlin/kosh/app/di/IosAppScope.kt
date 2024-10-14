@@ -1,17 +1,27 @@
 package kosh.app.di
 
+import kosh.app.IosPushNotifier
 import kosh.app.di.impl.DefaultAppScope
 import kosh.data.DataComponent
 import kosh.data.reown.ReownComponent
 import kosh.domain.AppRepositoriesComponent
 import kosh.domain.core.provider
+import kotlinx.coroutines.launch
+import platform.Foundation.NSBundle
 
 public class IosAppScope(
     override val reownComponent: ReownComponent,
-) : DefaultAppScope() {
+) : DefaultAppScope(), IosAppComponent {
 
-    override val appComponent: AppComponent by provider {
-        IosAppComponent()
+    override val appComponent: AppComponent
+        get() = this
+
+    override val debug: Boolean by provider {
+        NSBundle.mainBundle.objectForInfoDictionaryKey("DEBUG") == "true"
+    }
+
+    override val iosPushNotifier: IosPushNotifier by provider {
+        IosPushNotifier(domain.notificationService)
     }
 
     override val fileSystemComponent: FileSystemComponent by provider {
@@ -26,13 +36,11 @@ public class IosAppScope(
         IosImageComponent(networkComponent, filesComponent)
     }
 
-    override val dataComponent: DataComponent by provider {
-        IosDataComponent(dataStoreComponent)
-    }
-
     override val transportComponent: TransportComponent by provider {
         IosTransportComponent()
     }
+
+    override val dataComponent: DataComponent = IosDataComponent(dataStoreComponent)
 
     override val appRepositoriesComponent: AppRepositoriesComponent by provider {
         IosAppRepositoriesComponent(
@@ -47,5 +55,10 @@ public class IosAppScope(
             reownComponent = reownComponent,
         )
     }
-}
 
+    init {
+        coroutinesComponent.applicationScope.launch {
+            iosPushNotifier.start()
+        }
+    }
+}

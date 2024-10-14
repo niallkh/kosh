@@ -4,6 +4,8 @@ import androidx.compose.runtime.Immutable
 import kosh.domain.models.Uri
 import kosh.domain.repositories.NotificationRepo.Type
 import kotlinx.coroutines.flow.Flow
+import kotlinx.datetime.Clock
+import kotlinx.datetime.Instant
 import kotlinx.serialization.Serializable
 
 interface NotificationRepo : Repository {
@@ -12,7 +14,7 @@ interface NotificationRepo : Repository {
 
     val cancelled: Flow<Set<Long>>
 
-    fun send(notification: Notification)
+    suspend fun send(notification: Notification)
 
     fun cancel(id: Long)
 
@@ -29,4 +31,5 @@ data class Notification(
     val body: String?,
     val uri: Uri,
     val type: Type,
+    val time: Instant = Clock.System.now(),
 )

@@ -19,7 +19,6 @@ import kosh.domain.models.ChainId
 import kosh.domain.models.Uri
 import kosh.domain.repositories.AppStateRepo
 import kosh.domain.repositories.NetworkRepo
-import kosh.domain.repositories.modify
 import kosh.domain.repositories.state
 import kosh.domain.state.AppState
 import kosh.domain.state.enabledNetworkIds
@@ -159,7 +158,7 @@ class DefaultNetworkService(
         }
     }
 
-    override fun toggle(id: NetworkEntity.Id, enabled: Boolean) {
+    override suspend fun toggle(id: NetworkEntity.Id, enabled: Boolean) {
         appStateRepo.modify {
             if (enabled) {
                 AppState.enabledNetworkIds.at(At.phset(), id) set true
@@ -169,7 +168,7 @@ class DefaultNetworkService(
         }
     }
 
-    override fun delete(id: NetworkEntity.Id) {
+    override suspend fun delete(id: NetworkEntity.Id) {
         appStateRepo.modify {
 
             AppState.network(id) set null

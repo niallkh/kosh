@@ -6,7 +6,7 @@ import kotlinx.io.files.Path
 import kotlinx.io.files.SystemFileSystem
 
 class AndroidFileSystemComponent(
-    private val androidComponent: AndroidComponent,
+    private val androidComponent: AndroidAppComponent,
 ) : FileSystemComponent {
 
     override val filesDir: () -> Path = {

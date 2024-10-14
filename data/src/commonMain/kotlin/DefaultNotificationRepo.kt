@@ -9,7 +9,6 @@ import kotlinx.coroutines.channels.BufferOverflow
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.filter
 import kotlinx.coroutines.flow.getAndUpdate
 import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.flow.update
@@ -20,6 +19,7 @@ class DefaultNotificationRepo : NotificationRepo {
 
     private val notificationChannel =
         Channel<Notification>(Channel.BUFFERED, BufferOverflow.DROP_OLDEST)
+
     private val sentIds = MutableStateFlow(persistentHashSetOf<Long>())
     private val cancelledIds = MutableStateFlow(persistentHashSetOf<Long>())
 
@@ -28,20 +28,20 @@ class DefaultNotificationRepo : NotificationRepo {
 
     override val notifications: Flow<Notification>
         get() = notificationChannel.receiveAsFlow()
-            .filter { it.id !in cancelledIds.value }
 
-    override fun send(notification: Notification) {
-        val sent = sentIds.getAndUpdate { it + notification.id }
-        val cancelled = cancelledIds.value
+    override suspend fun send(notification: Notification) {
+        val alreadySent = notification.id in sentIds.getAndUpdate { it + notification.id }
+        if (alreadySent) return
 
-        if (notification.id !in sent && notification.id !in cancelled) {
-            logger.d { "send(id=${notification.id})" }
-            notificationChannel.trySend(notification)
-        }
+        val alreadyCancelled = notification.id in cancelledIds.value
+        if (alreadyCancelled) return
+
+        logger.v { "send(id=${notification.id})" }
+        notificationChannel.send(notification)
     }
 
     override fun cancel(id: Long) {
-        logger.d { "cancel(id=$id)" }
+        logger.v { "cancel(id=$id)" }
         cancelledIds.update { it + id }
     }
 }

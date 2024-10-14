@@ -7,7 +7,6 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
-import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import arrow.core.raise.recover
 import kosh.domain.failure.TransactionFailure
@@ -48,7 +47,7 @@ fun rememberSignTypedRequest(
         recover({
             request = requestService.get(id).bind().also {
                 call = it.call as? WcRequest.Call.SignTyped
-                    ?: raise(WcFailure.RequestNotFound())
+                    ?: error("Request is not a SignTyped")
             }
 
             loading = false

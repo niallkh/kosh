@@ -22,6 +22,7 @@ import kosh.domain.usecases.reown.DefaultWcAuthenticationService
 import kosh.domain.usecases.reown.DefaultWcProposalService
 import kosh.domain.usecases.reown.DefaultWcRequestService
 import kosh.domain.usecases.reown.WcAuthenticationService
+import kosh.domain.usecases.reown.WcNotificationsService
 import kosh.domain.usecases.reown.WcProposalService
 import kosh.domain.usecases.reown.WcRequestService
 import kosh.domain.usecases.reown.WcSessionService
@@ -183,7 +184,7 @@ internal class DefaultDomainComponent(
 
     override val wcProposalService: WcProposalService by provider {
         DefaultWcProposalService(
-            reownRepo = reownRepo,
+            reownRepo = wcRepo,
             applicationScope = applicationScope,
             notificationService = notificationService,
             appStateProvider = appStateProvider
@@ -192,7 +193,7 @@ internal class DefaultDomainComponent(
 
     override val wcSessionService: WcSessionService by provider {
         WcSessionService(
-            reownRepo = reownRepo,
+            reownRepo = wcRepo,
             appStateProvider = appStateProvider,
             applicationScope = applicationScope,
         )
@@ -200,7 +201,7 @@ internal class DefaultDomainComponent(
 
     override val wcRequestService: WcRequestService by provider {
         DefaultWcRequestService(
-            reownRepo = reownRepo,
+            reownRepo = wcRepo,
             applicationScope = applicationScope,
             notificationService = notificationService,
             accountService = accountService,
@@ -212,10 +213,18 @@ internal class DefaultDomainComponent(
 
     override val wcAuthenticationService: WcAuthenticationService by provider {
         DefaultWcAuthenticationService(
-            reownRepo = reownRepo,
+            reownRepo = wcRepo,
             applicationScope = applicationScope,
             notificationService = notificationService,
             appStateProvider = appStateProvider,
+        )
+    }
+
+    override val wcNotificationsService: WcNotificationsService by provider {
+        WcNotificationsService(
+            wcRepo = wcRepo,
+            notificationService = notificationService,
+            deeplinkRepo = deeplinkRepo,
         )
     }
 

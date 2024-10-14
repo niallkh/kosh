@@ -23,7 +23,7 @@ public interface AppScope {
     public val dataStoreComponent: DataStoreComponent
     public val web3Component: Web3Component
     public val imageComponent: ImageComponent
-    public val domainComponent: DomainComponent
+    public val domain: DomainComponent
     public val transportComponent: TransportComponent
     public val reownComponent: ReownComponent
 }

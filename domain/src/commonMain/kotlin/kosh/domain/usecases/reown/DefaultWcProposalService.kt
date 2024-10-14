@@ -18,7 +18,7 @@ import kosh.domain.models.reown.PairingUri
 import kosh.domain.models.reown.WcAuthentication
 import kosh.domain.models.reown.WcProposalAggregated
 import kosh.domain.models.reown.WcSessionProposal
-import kosh.domain.repositories.ReownRepo
+import kosh.domain.repositories.WcRepo
 import kosh.domain.state.AppState
 import kosh.domain.state.AppStateProvider
 import kosh.domain.state.networks
@@ -36,16 +36,15 @@ import kotlinx.coroutines.flow.flatMapConcat
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.selects.onTimeout
 import kotlinx.coroutines.selects.select
-import kotlinx.coroutines.withTimeoutOrNull
 import kotlin.time.Duration.Companion.seconds
 
 class DefaultWcProposalService(
-    private val reownRepo: ReownRepo,
+    private val reownRepo: WcRepo,
     private val appStateProvider: AppStateProvider,
     private val notificationService: NotificationService,
     private val applicationScope: CoroutineScope,
 ) : WcProposalService {
-    private val logger = Logger.withTag("WcSessionProposal")
+    private val logger = Logger.withTag("[K]WcProposalService")
 
     override val proposals: Flow<List<WcSessionProposal>>
         get() = reownRepo.proposals
@@ -53,9 +52,8 @@ class DefaultWcProposalService(
     override suspend fun pair(
         uri: PairingUri,
     ): Either<WcFailure, Either<WcSessionProposal, WcAuthentication>> = either {
-        withTimeoutOrNull(10.seconds) {
-            reownRepo.pair(uri = uri).bind()
-        } ?: raise(WcFailure.PairingUriInvalid())
+
+        reownRepo.pair(uri = uri).bind()
 
         getNextProposalOrAuthentication(uri).bind()
     }
@@ -71,10 +69,7 @@ class DefaultWcProposalService(
 
         val asyncAuthentication = async {
             reownRepo.authentications.flatMapConcat { it.asFlow() }
-                .first {
-                    logger.w { it.toString() }
-                    it.pairingTopic.value in uri.value
-                }
+                .first { it.pairingTopic.value in uri.value }
         }
 
         select {
@@ -91,7 +86,7 @@ class DefaultWcProposalService(
             onTimeout(10.seconds) {
                 asyncAuthentication.cancel()
                 asyncProposal.cancel()
-                WcFailure.NoConnection().left()
+                WcFailure.ResponseTimeout().left()
             }
         }
     }
@@ -102,11 +97,7 @@ class DefaultWcProposalService(
     ): Either<WcFailure, WcProposalAggregated> = either {
         requestId.let { notificationService.cancel(it) }
 
-        val proposal = withTimeoutOrNull(10.seconds) {
-            reownRepo.proposals.flatMapConcat { it.asFlow() }
-                .first { it.id == id }
-        }
-            ?: raise(WcFailure.ProposalNotFound())
+        val proposal = reownRepo.getProposal(id).bind()
 
         wcProposalAggregated(proposal)
     }

@@ -23,7 +23,6 @@ import kosh.domain.models.web3.TransactionData
 import kosh.domain.repositories.AppStateRepo
 import kosh.domain.repositories.FilesRepo
 import kosh.domain.repositories.TransactionRepo
-import kosh.domain.repositories.modify
 import kosh.domain.repositories.optic
 import kosh.domain.serializers.Either
 import kosh.domain.state.AppState
@@ -54,6 +53,8 @@ class Eip1559TransactionService(
             transactionRepo.send(transaction.tx.chainId, signature).bind()
         }
 
+        val data = fileRepo.write(transaction.tx.input)
+
         appStateRepo.modify {
             val network = AppState.network(transaction.tx.chainId).get()
                 ?: raise(TransactionFailure.InvalidTransaction())
@@ -68,7 +69,7 @@ class Eip1559TransactionService(
                 hash = hash,
                 value = transaction.tx.value,
                 nonce = transaction.nonce,
-                data = fileRepo.write(transaction.tx.input),
+                data = data,
                 gasPrice = transaction.gasPrice,
                 gasLimit = transaction.gasLimit,
                 dapp = TransactionEntity.Dapp(

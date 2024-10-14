@@ -55,7 +55,7 @@ class DefaultStackRouter<R : Route>(
 
     override fun navigateUp() {
         if (stack.backStack.isNotEmpty()) {
-            pop { onResult(RouteResult.Up(start)) }
+            pop { if (!it) onResult(RouteResult.Up(start)) }
         } else {
             onResult(RouteResult.Up(start))
         }

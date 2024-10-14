@@ -88,4 +88,3 @@ fun wcRequestRoute(request: WcRequest): WcRequestRoute = when (val call = reques
         else -> WcRequestRoute.WatchNft(request.id, call.chainId.at(call.address), tokenId)
     }
 }
-

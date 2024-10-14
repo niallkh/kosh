@@ -11,7 +11,7 @@ import kosh.domain.models.ChainAddress
 import kosh.domain.models.ChainId
 import kosh.domain.models.reown.WcSession
 import kosh.domain.models.reown.WcSessionAggregated
-import kosh.domain.repositories.ReownRepo
+import kosh.domain.repositories.WcRepo
 import kosh.domain.serializers.ImmutableList
 import kosh.domain.state.AppState
 import kosh.domain.state.AppStateProvider
@@ -27,7 +27,7 @@ import kotlinx.coroutines.launch
 
 class WcSessionService(
     private val applicationScope: CoroutineScope,
-    private val reownRepo: ReownRepo,
+    private val reownRepo: WcRepo,
     private val appStateProvider: AppStateProvider,
 ) {
     private val logger = Logger.withTag("[K]WcSessionService")
@@ -38,7 +38,10 @@ class WcSessionService(
     suspend fun get(
         id: WcSession.Id,
     ): Either<WcFailure, WcSessionAggregated> = either {
-        wcSessionAggregated(reownRepo.getSession(id).bind())
+
+        val session = reownRepo.getSession(id).bind()
+
+        wcSessionAggregated(session)
     }
 
     suspend fun update(

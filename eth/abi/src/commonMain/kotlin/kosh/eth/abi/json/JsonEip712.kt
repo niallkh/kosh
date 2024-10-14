@@ -43,9 +43,7 @@ public data class JsonEip712(
     )
 
     public companion object {
-        public fun from(
-            text: String,
-        ): JsonEip712 = json.decodeFromString<JsonEip712>(text)
+        public fun from(text: String): JsonEip712 = json.decodeFromString<JsonEip712>(text)
     }
 }
 

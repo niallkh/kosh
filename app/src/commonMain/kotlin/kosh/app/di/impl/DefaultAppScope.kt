@@ -11,6 +11,7 @@ import kosh.datastore.DataStoreComponent
 import kosh.domain.DomainComponent
 import kosh.domain.UiRepositoriesComponent
 import kosh.domain.core.provider
+import kotlinx.coroutines.launch
 
 public abstract class DefaultAppScope : AppScope {
 
@@ -35,7 +36,7 @@ public abstract class DefaultAppScope : AppScope {
         )
     }
 
-    override val coroutinesComponent: CoroutinesComponent by provider {
+    final override val coroutinesComponent: CoroutinesComponent by provider {
         DefaultCoroutinesComponent()
     }
 
@@ -43,7 +44,7 @@ public abstract class DefaultAppScope : AppScope {
         DefaultSerializationComponent()
     }
 
-    override val domainComponent: DomainComponent by provider {
+    override val domain: DomainComponent by provider {
         DefaultDomainComponent(
             applicationScope = coroutinesComponent.applicationScope,
             appRepositoriesComponent = appRepositoriesComponent,
@@ -61,5 +62,11 @@ public abstract class DefaultAppScope : AppScope {
         DefaultLedgerComponent(
             transportComponent = transportComponent
         )
+    }
+
+    init {
+        coroutinesComponent.applicationScope.launch {
+            domain.wcNotificationsService.start()
+        }
     }
 }

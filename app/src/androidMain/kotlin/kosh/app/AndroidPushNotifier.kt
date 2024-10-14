@@ -15,11 +15,8 @@ import androidx.core.app.NotificationManagerCompat
 import co.touchlab.kermit.Logger
 import kosh.domain.repositories.NotificationRepo
 import kosh.domain.usecases.notification.NotificationService
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.flow.collectLatest
-import kotlinx.coroutines.flow.distinctUntilChanged
-import kotlinx.coroutines.flow.filter
-import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.launch
 import kotlin.time.Duration.Companion.minutes
 import kosh.domain.repositories.Notification as AppNotification
@@ -30,51 +27,48 @@ private const val OTHER_CH_ID = "OTHER_CH_ID"
 public class AndroidPushNotifier(
     private val context: Context,
     private val notificationService: NotificationService,
-    private val applicationScope: CoroutineScope,
 ) {
     private val logger = Logger.withTag("[K]AndroidPushNotifier")
     private val notificationManager = NotificationManagerCompat.from(context)
 
-    internal fun start() {
-        applicationScope.launch {
-            BackgroundState.background
-                .map { notificationManager.areNotificationsEnabled() }
-                .distinctUntilChanged()
-                .filter { it }
-                .collectLatest { collectNotifications() }
-        }
+    public suspend fun start() {
+        coroutineScope {
+            launch(Dispatchers.Main) {
+                collectNotifications()
+            }
 
-        applicationScope.launch {
-            notificationService.cancelled.collectLatest { canceled ->
-                val active = notificationManager.activeNotifications.map { it.id }.toSet()
-                canceled.map { it.toInt() }.intersect(active).forEach {
-                    notificationManager.cancel(it)
-                }
+            launch(Dispatchers.Main) {
+                collectCancelledNotifications()
             }
         }
     }
 
     private suspend fun collectNotifications() {
         notificationService.notifications.collect { appNotification ->
-            logger.d { "notification()" }
-
             if (
-                ActivityCompat.checkSelfPermission(context, POST_NOTIFICATIONS) !=
+                ActivityCompat.checkSelfPermission(context, POST_NOTIFICATIONS) ==
                 PackageManager.PERMISSION_GRANTED
             ) {
-                error("No permission")
+                val chId = when (appNotification.type) {
+                    NotificationRepo.Type.Wc2 -> createWc2NotificationChannel()
+                }
+
+                val notification = createNotification(chId, appNotification)
+
+                notificationManager.notify(
+                    /* id = */ appNotification.id.toInt(),
+                    /* notification = */ notification,
+                )
             }
+        }
+    }
 
-            val chId = when (appNotification.type) {
-                NotificationRepo.Type.Wc2 -> createWc2NotificationChannel()
+    private suspend fun collectCancelledNotifications() {
+        notificationService.cancelled.collect { canceled ->
+            val active = notificationManager.activeNotifications.map { it.id }.toSet()
+            canceled.map { it.toInt() }.intersect(active).forEach {
+                notificationManager.cancel(it)
             }
-
-            val notification = createNotification(chId, appNotification)
-
-            notificationManager.notify(
-                /* id = */ appNotification.id.toInt(),
-                /* notification = */ notification,
-            )
         }
     }
 
@@ -99,6 +93,7 @@ public class AndroidPushNotifier(
                 setContentText(appNotification.body)
             }
             setPriority(NotificationCompat.PRIORITY_HIGH)
+            setWhen(appNotification.time.epochSeconds)
             setContentIntent(pendingIntent)
             setTimeoutAfter(5.minutes.inWholeMilliseconds)
             setAutoCancel(true)

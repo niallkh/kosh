@@ -45,6 +45,6 @@ interface TokenService {
         image: Uri?,
     ): Either<TokenFailure, Unit>
 
-    fun delete(id: TokenEntity.Id)
+    suspend fun delete(id: TokenEntity.Id)
 }
 

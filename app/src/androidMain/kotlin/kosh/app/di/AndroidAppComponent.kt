@@ -1,8 +1,9 @@
 package kosh.app.di
 
-import kosh.app.BuildConfig
+import android.content.Context
+import kosh.app.AndroidPushNotifier
 
-class AndroidAppComponent : AppComponent {
-    override val debug: Boolean
-        get() = BuildConfig.DEBUG
+public interface AndroidAppComponent : AppComponent {
+    public val context: Context
+    public val androidPushNotifier: AndroidPushNotifier
 }

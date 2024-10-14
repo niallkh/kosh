@@ -2,6 +2,7 @@ package kosh.app
 
 import android.Manifest
 import android.content.Intent
+import android.content.res.Configuration
 import android.os.Build
 import android.os.Bundle
 import androidx.activity.compose.rememberLauncherForActivityResult
@@ -9,12 +10,10 @@ import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.activity.result.contract.ActivityResultContracts.RequestPermission
-import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.LaunchedEffect
 import androidx.core.net.toUri
-import androidx.core.splashscreen.SplashScreen
 import androidx.core.splashscreen.SplashScreen.Companion.installSplashScreen
 import androidx.fragment.app.FragmentActivity
 import co.touchlab.kermit.Logger
@@ -22,7 +21,6 @@ import com.arkivanov.decompose.router.stack.pushNew
 import com.arkivanov.decompose.router.stack.replaceAll
 import com.seiko.imageloader.LocalImageLoader
 import kosh.app.di.androidUiContext
-import kosh.presentation.app.rememberInitApp
 import kosh.presentation.core.LocalUiContext
 import kosh.presentation.core.UiContext
 import kosh.ui.component.path.LocalPathResolver
@@ -46,9 +44,11 @@ public class KoshActivity : FragmentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         val splashScreen = installSplashScreen()
         super.onCreate(savedInstanceState)
-
+        enableEdgeToEdge()
         logger.d { "onCreate()" }
-        splashScreen.setKeepOnScreenCondition { true }
+
+        val appStateProvider = KoshApp.appScope.domain.appStateProvider
+        splashScreen.setKeepOnScreenCondition { !appStateProvider.init.value }
 
         val deeplink = intent?.data?.toString()?.let(::parseDeeplink)
 
@@ -98,8 +98,6 @@ public class KoshActivity : FragmentActivity() {
 
                 NotificationPermission()
                 BluetoothPermission()
-                HideSplashScreen(splashScreen)
-                EdgeToEdge()
             }
         }
     }
@@ -137,6 +135,11 @@ public class KoshActivity : FragmentActivity() {
         }
     }
 
+    override fun onConfigurationChanged(newConfig: Configuration) {
+        super.onConfigurationChanged(newConfig)
+        enableEdgeToEdge()
+    }
+
     override fun onNewIntent(intent: Intent) {
         super.onNewIntent(intent)
         logger.d { "onNewIntent()" }
@@ -144,24 +147,6 @@ public class KoshActivity : FragmentActivity() {
 
         intent.data?.toString()?.let {
             uiContext.uiScope.deeplinkHandler.handle(it)
-        }
-    }
-
-    @Composable
-    private fun HideSplashScreen(splashScreen: SplashScreen) {
-        val (loaded) = rememberInitApp()
-
-        LaunchedEffect(loaded) {
-            splashScreen.setKeepOnScreenCondition { !loaded }
-        }
-    }
-
-    @Composable
-    private fun EdgeToEdge() {
-        val darkTheme = isSystemInDarkTheme()
-
-        LaunchedEffect(darkTheme) {
-            enableEdgeToEdge()
         }
     }
 

@@ -209,22 +209,28 @@ class AndroidReownAdapter(
         return { job.cancel() }
     }
 
-    override suspend fun pair(uri: String): Unit = suspendCancellableCoroutine { cont ->
-        WalletKit.pair(
-            params = Wallet.Params.Pair(uri),
-            onSuccess = { cont.resume(Unit) },
-            onError = {
-                logger.w(it.throwable) { "Pair failed" }
-                if (cont.isActive) {
-                    cont.resumeWithException(it.throwable)
-                }
-            },
-        )
-    }
+    override suspend fun pair(uri: String): ReownResult<Unit> =
+        suspendCancellableCoroutine { cont ->
+            WalletKit.pair(
+                params = Wallet.Params.Pair(uri),
+                onSuccess = {
+                    if (cont.isActive) {
+                        cont.resume(ReownResult.Success())
+
+                    }
+                },
+                onError = {
+                    logger.w(it.throwable) { "Pair failed" }
+                    if (cont.isActive) {
+                        cont.resume(ReownResult.Failure(it.throwable.toReownResult()))
+                    }
+                },
+            )
+        }
 
     override suspend fun getProposal(
         pairingTopic: String,
-    ): SessionProposal? = WalletKit.getSessionProposals()
+    ): ReownResult<SessionProposal> = WalletKit.getSessionProposals()
         .find { it.pairingTopic == pairingTopic }
         ?.let { proposal ->
             val requestIds = proposalRequestIds.get()
@@ -232,7 +238,9 @@ class AndroidReownAdapter(
                 proposal = proposal,
                 context = requestIds[pairingTopic]?.let(WalletKit::getVerifyContext)
             )
+                .let { ReownResult.Success(it) }
         }
+        ?: ReownResult.Failure(ReownFailure.NotFound("Proposal not found for topic: $pairingTopic"))
 
     override suspend fun approveProposal(
         pairingTopic: String,
@@ -240,8 +248,8 @@ class AndroidReownAdapter(
         accounts: List<String>,
         methods: List<String>,
         events: List<String>,
-    ): String? {
-        val redirect = suspendCancellableCoroutine { cont ->
+    ): ReownResult<StringWrapper> {
+        val redirect: ReownResult<StringWrapper> = suspendCancellableCoroutine { cont ->
             val proposal = WalletKit.getSessionProposals().find { it.pairingTopic == pairingTopic }
                 ?: error("Session proposal not found")
 
@@ -259,18 +267,21 @@ class AndroidReownAdapter(
                         )
                     )
                 ),
-                onSuccess = { cont.resume(proposal.redirect) },
+                onSuccess = {
+                    if (cont.isActive) {
+                        cont.resume(ReownResult.Success(StringWrapper(proposal.redirect)))
+                    }
+                },
                 onError = {
                     logger.w(it.throwable) { "Approve proposal failed" }
                     if (cont.isActive) {
-                        cont.resumeWithException(it.throwable)
+                        cont.resume(ReownResult.Failure(it.throwable.toReownResult()))
                     }
                 },
             )
         }
 
         updateProposals()
-        updateSessions()
 
         return redirect
     }
@@ -278,18 +289,23 @@ class AndroidReownAdapter(
     override suspend fun rejectProposal(
         pairingTopic: String,
         reason: String,
-    ): String? {
-        val redirect = suspendCancellableCoroutine { cont ->
-            val proposal = WalletKit.getSessionProposals().find { it.pairingTopic == pairingTopic }
-                ?: error("Session proposal not found")
+    ): ReownResult<StringWrapper> {
+        val proposal = WalletKit.getSessionProposals().find { it.pairingTopic == pairingTopic }
+            ?: return ReownResult.Failure(ReownFailure.NotFound("Proposal not found for topic: $pairingTopic"))
+
+        val redirect: ReownResult<StringWrapper> = suspendCancellableCoroutine { cont ->
 
             WalletKit.rejectSession(
                 params = Wallet.Params.SessionReject(proposal.proposerPublicKey, reason),
-                onSuccess = { cont.resume(proposal.redirect) },
+                onSuccess = {
+                    if (cont.isActive) {
+                        cont.resume(ReownResult.Success(StringWrapper(proposal.redirect)))
+                    }
+                },
                 onError = {
                     logger.w(it.throwable) { "Reject proposal failed" }
                     if (cont.isActive) {
-                        cont.resumeWithException(it.throwable)
+                        cont.resume(ReownResult.Failure(it.throwable.toReownResult()))
                     }
                 },
             )
@@ -302,10 +318,12 @@ class AndroidReownAdapter(
 
     override suspend fun getAuthentication(
         id: Long,
-    ): AuthenticationRequest? = SignClient.getPendingAuthenticateRequests()
+    ): ReownResult<AuthenticationRequest> = SignClient.getPendingAuthenticateRequests()
         .find { it.id == id }
         ?.toWallet()
         ?.let { mapAuth(it, WalletKit.getVerifyContext(id)) }
+        ?.let { ReownResult.Success(it) }
+        ?: ReownResult.Failure(ReownFailure.NotFound("Authentication not found for id: $id"))
 
     override suspend fun approveAuthentication(
         id: Long,
@@ -313,12 +331,12 @@ class AndroidReownAdapter(
         supportedChains: List<String>,
         supportedMethods: List<String>,
         signature: String,
-    ): String? {
-        val redirect = suspendCancellableCoroutine { cont ->
-            val authenticate = SignClient.getPendingAuthenticateRequests().find { it.id == id }
-                ?.toWallet()
-                ?: error("Authentication not found")
+    ): ReownResult<StringWrapper> {
+        val authenticate = SignClient.getPendingAuthenticateRequests().find { it.id == id }
+            ?.toWallet()
+            ?: return ReownResult.Failure(ReownFailure.NotFound("Authentication not found for id: $id"))
 
+        val redirect: ReownResult<StringWrapper> = suspendCancellableCoroutine { cont ->
             val payloadParams = WalletKit.generateAuthPayloadParams(
                 payloadParams = authenticate.payloadParams,
                 supportedChains = supportedChains,
@@ -336,11 +354,18 @@ class AndroidReownAdapter(
                     id = id,
                     auths = listOf(authObject)
                 ),
-                onSuccess = { cont.resume(authenticate.participant.metadata?.redirect) },
+                onSuccess = {
+                    if (cont.isActive) {
+                        cont.resume(
+                            (authenticate.participant.metadata?.redirect ?: "")
+                                .let { ReownResult.Success(StringWrapper(it)) }
+                        )
+                    }
+                },
                 onError = {
                     logger.w(it.throwable) { "Approve authentication failed" }
                     if (cont.isActive) {
-                        cont.resumeWithException(it.throwable)
+                        cont.resume(ReownResult.Failure(it.throwable.toReownResult()))
                     }
                 },
             )
@@ -356,10 +381,10 @@ class AndroidReownAdapter(
         issuer: String,
         supportedChains: List<String>,
         supportedMethods: List<String>,
-    ): String {
+    ): ReownResult<StringWrapper> {
         val authenticate = SignClient.getPendingAuthenticateRequests().find { it.id == id }
             ?.toWallet()
-            ?: error("Authentication not found")
+            ?: return ReownResult.Failure(ReownFailure.NotFound("Authentication not found for id: $id"))
 
         val payloadParams = WalletKit.generateAuthPayloadParams(
             payloadParams = authenticate.payloadParams,
@@ -373,24 +398,32 @@ class AndroidReownAdapter(
                 issuer = issuer,
             )
         )
+            .let { ReownResult.Success(StringWrapper(it)) }
     }
 
     override suspend fun rejectAuthentication(
         id: Long,
         reason: String,
-    ): String? {
-        val redirect = suspendCancellableCoroutine { cont ->
-            val authenticate = SignClient.getPendingAuthenticateRequests().find { it.id == id }
-                ?.toWallet()
-                ?: error("Authentication not found")
+    ): ReownResult<StringWrapper> {
+        val authenticate = SignClient.getPendingAuthenticateRequests().find { it.id == id }
+            ?.toWallet()
+            ?: return ReownResult.Failure(ReownFailure.NotFound("Authentication not found for id: $id"))
 
+        val redirect: ReownResult<StringWrapper> = suspendCancellableCoroutine { cont ->
             WalletKit.rejectSessionAuthenticate(
                 params = Wallet.Params.RejectSessionAuthenticate(id, reason),
-                onSuccess = { cont.resume(authenticate.participant.metadata?.redirect) },
+                onSuccess = {
+                    if (cont.isActive) {
+                        cont.resume(
+                            (authenticate.participant.metadata?.redirect ?: "")
+                                .let { ReownResult.Success(StringWrapper(it)) }
+                        )
+                    }
+                },
                 onError = {
                     logger.w(it.throwable) { "Reject authentication failed" }
                     if (cont.isActive) {
-                        cont.resumeWithException(it.throwable)
+                        cont.resume(ReownResult.Failure(it.throwable.toReownResult()))
                     }
                 },
             )
@@ -403,21 +436,23 @@ class AndroidReownAdapter(
 
     override suspend fun getRequest(
         id: Long,
-    ): SessionRequest? = WalletKit.getListOfActiveSessions().asSequence()
+    ): ReownResult<SessionRequest> = WalletKit.getListOfActiveSessions().asSequence()
         .flatMap { WalletKit.getPendingListOfSessionRequests(it.topic) }
         .find { it.request.id == id }
         ?.let { mapRequest(it, WalletKit.getVerifyContext(id)) }
+        ?.let { ReownResult.Success(it) }
+        ?: ReownResult.Failure(ReownFailure.NotFound("Request not found for id: $id"))
 
     override suspend fun approveRequest(
         id: Long,
         message: String,
-    ): String? {
-        val redirect = suspendCancellableCoroutine { cont ->
-            val request = WalletKit.getListOfActiveSessions().asSequence()
-                .flatMap { WalletKit.getPendingListOfSessionRequests(it.topic) }
-                .find { it.request.id == id }
-                ?: error("Session request not found")
+    ): ReownResult<StringWrapper> {
+        val request = WalletKit.getListOfActiveSessions().asSequence()
+            .flatMap { WalletKit.getPendingListOfSessionRequests(it.topic) }
+            .find { it.request.id == id }
+            ?: return ReownResult.Failure(ReownFailure.NotFound("Request not found for id: $id"))
 
+        val redirect: ReownResult<StringWrapper> = suspendCancellableCoroutine { cont ->
             WalletKit.respondSessionRequest(
                 params = Wallet.Params.SessionRequestResponse(
                     sessionTopic = request.topic,
@@ -426,11 +461,18 @@ class AndroidReownAdapter(
                         result = message,
                     )
                 ),
-                onSuccess = { cont.resume(request.peerMetaData?.redirect) },
+                onSuccess = {
+                    if (cont.isActive) {
+                        cont.resume(
+                            (request.peerMetaData?.redirect ?: "")
+                                .let { ReownResult.Success(StringWrapper(it)) }
+                        )
+                    }
+                },
                 onError = {
                     logger.w(it.throwable) { "Approve request failed" }
                     if (cont.isActive) {
-                        cont.resumeWithException(it.throwable)
+                        cont.resume(ReownResult.Failure(it.throwable.toReownResult()))
                     }
                 },
             )
@@ -445,13 +487,13 @@ class AndroidReownAdapter(
         id: Long,
         code: Int,
         message: String,
-    ): String? {
-        val redirect = suspendCancellableCoroutine { cont ->
-            val request = WalletKit.getListOfActiveSessions().asSequence()
-                .flatMap { WalletKit.getPendingListOfSessionRequests(it.topic) }
-                .find { it.request.id == id }
-                ?: error("Session request not found")
+    ): ReownResult<StringWrapper> {
+        val request = WalletKit.getListOfActiveSessions().asSequence()
+            .flatMap { WalletKit.getPendingListOfSessionRequests(it.topic) }
+            .find { it.request.id == id }
+            ?: return ReownResult.Failure(ReownFailure.NotFound("Request not found for id: $id"))
 
+        val redirect: ReownResult<StringWrapper> = suspendCancellableCoroutine { cont ->
             WalletKit.respondSessionRequest(
                 params = Wallet.Params.SessionRequestResponse(
                     sessionTopic = request.topic,
@@ -461,11 +503,18 @@ class AndroidReownAdapter(
                         message = message,
                     )
                 ),
-                onSuccess = { cont.resume(request.peerMetaData?.redirect) },
+                onSuccess = {
+                    if (cont.isActive) {
+                        cont.resume(
+                            (request.peerMetaData?.redirect ?: "")
+                                .let { ReownResult.Success(StringWrapper(it)) }
+                        )
+                    }
+                },
                 onError = {
                     logger.w(it.throwable) { "Reject request failed" }
                     if (cont.isActive) {
-                        cont.resumeWithException(it.throwable)
+                        cont.resume(ReownResult.Failure(it.throwable.toReownResult()))
                     }
                 },
             )
@@ -478,9 +527,11 @@ class AndroidReownAdapter(
 
     override suspend fun getSession(
         sessionTopic: String,
-    ): Session? = WalletKit.getListOfActiveSessions()
+    ): ReownResult<Session> = WalletKit.getListOfActiveSessions()
         .find { it.topic == sessionTopic }
         ?.let { mapSession(it) }
+        ?.let { ReownResult.Success(it) }
+        ?: ReownResult.Failure(ReownFailure.NotFound("Session not found for topic: $sessionTopic"))
 
     override suspend fun updateSession(
         sessionTopic: String,
@@ -488,7 +539,7 @@ class AndroidReownAdapter(
         accounts: List<String>,
         methods: List<String>,
         events: List<String>,
-    ) = suspendCancellableCoroutine { cont ->
+    ): ReownResult<Unit> = suspendCancellableCoroutine { cont ->
         WalletKit.updateSession(
             params = Wallet.Params.SessionUpdate(
                 sessionTopic = sessionTopic,
@@ -501,11 +552,15 @@ class AndroidReownAdapter(
                     )
                 ),
             ),
-            onSuccess = { cont.resume(Unit) },
+            onSuccess = {
+                if (cont.isActive) {
+                    cont.resume(ReownResult.Success())
+                }
+            },
             onError = {
                 logger.w(it.throwable) { "Update session failed" }
                 if (cont.isActive) {
-                    cont.resumeWithException(it.throwable)
+                    cont.resume(ReownResult.Failure(it.throwable.toReownResult()))
                 }
             },
         )
@@ -513,21 +568,29 @@ class AndroidReownAdapter(
 
     override suspend fun disconnectSession(
         sessionTopic: String,
-    ) = suspendCancellableCoroutine { cont ->
-        WalletKit.disconnectSession(
-            params = Wallet.Params.SessionDisconnect(
-                sessionTopic = sessionTopic,
-            ),
-            onSuccess = { cont.resume(Unit) },
-            onError = {
-                logger.w(it.throwable) { "Disconnect session failed" }
-                if (cont.isActive) {
-                    cont.resumeWithException(it.throwable)
-                }
-            },
-        )
-    }.also {
+    ): ReownResult<Unit> {
+        val result: ReownResult<Unit> = suspendCancellableCoroutine { cont ->
+            WalletKit.disconnectSession(
+                params = Wallet.Params.SessionDisconnect(
+                    sessionTopic = sessionTopic,
+                ),
+                onSuccess = {
+                    if (cont.isActive) {
+                        cont.resume(ReownResult.Success())
+                    }
+                },
+                onError = {
+                    logger.w(it.throwable) { "Disconnect session failed" }
+                    if (cont.isActive) {
+                        cont.resume(ReownResult.Failure(it.throwable.toReownResult()))
+                    }
+                },
+            )
+        }
+
         updateSessions()
+
+        return result
     }
 
     override fun onConnectionStateChange(state: Wallet.Model.ConnectionState) {

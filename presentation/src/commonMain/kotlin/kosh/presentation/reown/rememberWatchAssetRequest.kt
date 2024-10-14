@@ -30,7 +30,7 @@ fun rememberWatchAssetRequest(
         recover({
             request = requestService.get(id).bind().also {
                 call = it.call as? WcRequest.Call.WatchAsset
-                    ?: raise(WcFailure.RequestNotFound())
+                    ?: error("Request is not a WatchAsset")
             }
 
             loading = false

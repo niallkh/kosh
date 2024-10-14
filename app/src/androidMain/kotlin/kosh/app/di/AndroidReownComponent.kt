@@ -6,11 +6,11 @@ import kosh.domain.core.provider
 import kosh.libs.reown.AndroidReownAdapter
 import kosh.libs.reown.ReownAdapter
 
-class AndroidReownComponent(
+internal class AndroidReownComponent(
     coroutinesComponent: CoroutinesComponent,
-    androidComponent: AndroidComponent,
+    androidComponent: AndroidAppComponent,
 ) : ReownComponent,
-    AndroidComponent by androidComponent,
+    AndroidAppComponent by androidComponent,
     CoroutinesComponent by coroutinesComponent {
 
     override val reownAdapter: ReownAdapter by provider {

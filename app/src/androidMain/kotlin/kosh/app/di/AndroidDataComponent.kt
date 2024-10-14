@@ -8,8 +8,8 @@ import kosh.domain.core.provider
 import kosh.libs.keystore.AndroidRsaKeyStore
 import kosh.libs.keystore.KeyStore
 
-class AndroidDataComponent(
-    androidComponent: AndroidComponent,
+internal class AndroidDataComponent(
+    androidComponent: AndroidAppComponent,
     dataStoreComponent: DataStoreComponent,
     filesComponent: FilesComponent,
 ) : DataComponent {

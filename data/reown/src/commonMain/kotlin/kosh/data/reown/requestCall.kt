@@ -25,7 +25,6 @@ import kotlinx.io.bytestring.hexToByteString
 import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.Json
 import kotlinx.serialization.json.JsonElement
-import kotlinx.serialization.json.jsonObject
 import kotlinx.serialization.json.jsonPrimitive
 
 private val json = Json {
@@ -58,7 +57,7 @@ internal fun requestCall(
         "eth_signTypedData", "eth_signTypedData_v4" -> {
             val decodeParams = json.decodeFromString<List<JsonElement>>(params)
             val address = parseAddress(decodeParams[0].jsonPrimitive.content)
-            val json = json.encodeToString(decodeParams[1].jsonObject)
+            val json = json.encodeToString(decodeParams[1])
             val domain = JsonEip712.from(json).domain
 
             WcRequest.Call.SignTyped(

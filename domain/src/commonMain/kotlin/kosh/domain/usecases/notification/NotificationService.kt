@@ -9,7 +9,7 @@ interface NotificationService {
 
     val cancelled: Flow<Set<Long>>
 
-    fun send(notification: Notification)
+    suspend fun send(notification: Notification)
 
     fun cancel(id: Long)
 }

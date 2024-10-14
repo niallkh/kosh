@@ -4,7 +4,6 @@ import kosh.domain.entities.TransactionEntity
 import kosh.domain.entities.path
 import kosh.domain.repositories.AppStateRepo
 import kosh.domain.repositories.FilesRepo
-import kosh.domain.repositories.modify
 import kosh.domain.repositories.optic
 import kosh.domain.state.AppState
 import kosh.domain.state.transaction
@@ -17,7 +16,7 @@ class TransactionService(
     private val applicationScope: CoroutineScope,
 ) {
 
-    fun delete(
+    suspend fun delete(
         id: TransactionEntity.Id,
     ) {
         val transaction = appStateRepo.optic(AppState.transaction(id)).value

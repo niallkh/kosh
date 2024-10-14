@@ -3,7 +3,6 @@ package kosh.presentation
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.Stable
-import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
@@ -19,11 +18,12 @@ class PerformState<P : Any, R, E> {
     var retry: Int by mutableIntStateOf(0)
     var params: P? by mutableStateOf(null)
     var result: R? by mutableStateOf(null)
-    val performed: Boolean by derivedStateOf { this.result != null }
+    var performed: Boolean by mutableStateOf(false)
 
     operator fun invoke(params: P) {
         this.params = params
         result = null
+        performed = false
     }
 
     fun retry() {
@@ -38,6 +38,7 @@ class PerformState<P : Any, R, E> {
         LaunchedEffect(*keys, params, retry) {
             val p = params ?: return@LaunchedEffect
             result = null
+            performed = false
             inProgress = true
 
             recover({
@@ -45,6 +46,7 @@ class PerformState<P : Any, R, E> {
                 params = null
                 inProgress = false
                 failure = null
+                performed = true
             }) {
                 failure = it
                 inProgress = false

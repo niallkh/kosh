@@ -12,6 +12,7 @@ internal class KoshApp : Application() {
 
     override fun onCreate() {
         super.onCreate()
+        ProcessLifecycleOwner.get().lifecycle.addObserver(BackgroundState)
 
         Logger.setTag("[K]")
 
@@ -26,9 +27,6 @@ internal class KoshApp : Application() {
         }
 
         appScope = AndroidAppScope(this)
-        appScope.androidPushNotifier.start()
-
-        ProcessLifecycleOwner.get().lifecycle.addObserver(BackgroundState)
     }
 
     companion object {

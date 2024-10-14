@@ -9,7 +9,7 @@ import kosh.data.web3.Web3Component
 import kosh.domain.AppRepositoriesComponent
 
 internal class AndroidAppRepositoriesComponent(
-    androidComponent: AndroidComponent,
+    androidComponent: AndroidAppComponent,
     dataComponent: DataComponent,
     trezorComponent: TrezorComponent,
     web3Component: Web3Component,
@@ -31,4 +31,4 @@ internal class AndroidAppRepositoriesComponent(
         ledgerComponent = ledgerComponent,
         reownComponent = reownComponent,
     ),
-    AndroidComponent by androidComponent
+    AndroidAppComponent by androidComponent

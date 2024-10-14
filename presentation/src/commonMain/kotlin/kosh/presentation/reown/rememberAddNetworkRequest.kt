@@ -43,7 +43,7 @@ fun rememberAddNetworkRequest(
         recover({
             request = requestService.get(id).bind().also { wcRequest ->
                 val addNetwork = wcRequest.call as? AddNetwork
-                    ?: raise(WcFailure.RequestNotFound())
+                    ?: error("Request is not an AddNetwork")
 
                 call = addNetwork
             }

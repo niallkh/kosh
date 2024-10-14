@@ -3,6 +3,7 @@ package kosh.domain.usecases.reown
 import arrow.core.Either
 import arrow.core.raise.either
 import arrow.core.raise.ensure
+import arrow.core.raise.recover
 import co.touchlab.kermit.Logger
 import kosh.domain.failure.WcFailure
 import kosh.domain.failure.logFailure
@@ -12,7 +13,7 @@ import kosh.domain.models.Hash
 import kosh.domain.models.reown.SessionTopic
 import kosh.domain.models.reown.WcRequest
 import kosh.domain.models.reown.WcSession
-import kosh.domain.repositories.ReownRepo
+import kosh.domain.repositories.WcRepo
 import kosh.domain.state.AppState
 import kosh.domain.state.AppStateProvider
 import kosh.domain.state.network
@@ -23,16 +24,11 @@ import kosh.domain.utils.optic
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.asFlow
-import kotlinx.coroutines.flow.first
-import kotlinx.coroutines.flow.flatMapConcat
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.launch
-import kotlinx.coroutines.withTimeoutOrNull
-import kotlin.time.Duration.Companion.seconds
 
 class DefaultWcRequestService(
-    private val reownRepo: ReownRepo,
+    private val reownRepo: WcRepo,
     private val applicationScope: CoroutineScope,
     private val notificationService: NotificationService,
     private val networkService: NetworkService,
@@ -52,11 +48,7 @@ class DefaultWcRequestService(
     ): Either<WcFailure, WcRequest> = either {
         id?.value?.let { notificationService.cancel(id.value) }
 
-        val request = withTimeoutOrNull(10.seconds) {
-            reownRepo.requests.flatMapConcat { it.asFlow() }
-                .first { id == null || id == it.id }
-        }
-            ?: raise(WcFailure.RequestNotFound())
+        val request = reownRepo.getSessionRequest(id).bind()
 
         notificationService.cancel(request.id.value)
 
@@ -67,7 +59,7 @@ class DefaultWcRequestService(
         id: WcRequest.Id,
         data: ByteString,
     ) = applicationScope.launch {
-        arrow.core.raise.recover({
+        recover({
             reownRepo.approveSessionRequest(
                 id = id,
                 response = data.toString()
@@ -81,7 +73,7 @@ class DefaultWcRequestService(
         id: WcRequest.Id,
         data: ByteString,
     ) = applicationScope.launch {
-        arrow.core.raise.recover({
+        recover({
             reownRepo.approveSessionRequest(
                 id = id,
                 response = data.toString()
@@ -95,7 +87,7 @@ class DefaultWcRequestService(
         id: WcRequest.Id,
         hash: Hash,
     ) = applicationScope.launch {
-        arrow.core.raise.recover({
+        recover({
             reownRepo.approveSessionRequest(
                 id = id,
                 response = hash.toString()
@@ -110,7 +102,7 @@ class DefaultWcRequestService(
         sessionTopic: SessionTopic,
         chainId: ChainId,
     ): Job = applicationScope.launch {
-        arrow.core.raise.recover({
+        recover({
             sessionService.addNetwork(WcSession.Id(sessionTopic), chainId).bind()
 
             reownRepo.approveSessionRequest(id, "null").bind()
@@ -122,7 +114,7 @@ class DefaultWcRequestService(
     override fun onAssetWatched(
         id: WcRequest.Id,
     ): Job = applicationScope.launch {
-        arrow.core.raise.recover({
+        recover({
             reownRepo.approveSessionRequest(id, "true").bind()
         }) {
             logger.logFailure(it)
@@ -132,7 +124,7 @@ class DefaultWcRequestService(
     override fun reject(
         id: WcRequest.Id,
     ): Job = applicationScope.launch {
-        arrow.core.raise.recover({
+        recover({
             reownRepo.rejectSessionRequest(id).bind()
         }, {
             logger.logFailure(it)

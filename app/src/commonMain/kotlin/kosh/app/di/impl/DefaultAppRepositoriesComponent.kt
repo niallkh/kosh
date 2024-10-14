@@ -10,7 +10,7 @@ import kosh.data.DefaultAppStateRepo
 import kosh.data.DefaultFilesRepo
 import kosh.data.DefaultKeyStoreRepo
 import kosh.data.DefaultNotificationRepo
-import kosh.data.reown.DefaultReownRepo
+import kosh.data.reown.DefaultWcRepo
 import kosh.data.reown.ReownComponent
 import kosh.data.trezor.DefaultLedgerRepo
 import kosh.data.trezor.DefaultTrezorPasskeysRepo
@@ -30,6 +30,7 @@ import kosh.domain.AppRepositoriesComponent
 import kosh.domain.analytics.AnalyticsRepo
 import kosh.domain.core.provider
 import kosh.domain.repositories.AppStateRepo
+import kosh.domain.repositories.DeeplinkRepo
 import kosh.domain.repositories.FilesRepo
 import kosh.domain.repositories.FunctionSignatureRepo
 import kosh.domain.repositories.GasRepo
@@ -37,15 +38,16 @@ import kosh.domain.repositories.KeyStoreRepo
 import kosh.domain.repositories.LedgerRepo
 import kosh.domain.repositories.NetworkRepo
 import kosh.domain.repositories.NotificationRepo
-import kosh.domain.repositories.ReownRepo
 import kosh.domain.repositories.TokenBalanceRepo
 import kosh.domain.repositories.TokenListsRepo
 import kosh.domain.repositories.TokenRepo
 import kosh.domain.repositories.TransactionRepo
 import kosh.domain.repositories.TrezorPasskeysRepo
 import kosh.domain.repositories.TrezorRepo
+import kosh.domain.repositories.WcRepo
 import kosh.domain.usecases.network.DefaultNetworkService
 import kosh.domain.usecases.network.getRpcProvidersUC
+import kosh.ui.navigation.DefaultDeeplinkRepo
 import kosh.ui.resources.DefaultTokenListsRepo
 
 internal abstract class DefaultAppRepositoriesComponent(
@@ -169,9 +171,13 @@ internal abstract class DefaultAppRepositoriesComponent(
     override val analyticsRepo: AnalyticsRepo
         get() = DefaultAnalyticsRepo
 
-    override val reownRepo: ReownRepo by provider {
-        DefaultReownRepo(
+    override val wcRepo: WcRepo by provider {
+        DefaultWcRepo(
             adapter = reownAdapter,
         )
+    }
+
+    override val deeplinkRepo: DeeplinkRepo by provider {
+        DefaultDeeplinkRepo()
     }
 }

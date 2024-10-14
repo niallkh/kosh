@@ -45,7 +45,7 @@ fun rememberSendTransactionRequest(
         recover({
             request = requestService.get(id).bind().also {
                 call = it.call as? WcRequest.Call.SendTransaction
-                    ?: raise(WcFailure.RequestNotFound())
+                    ?: error("Request is not a SendTransaction")
             }
 
             loading = false

@@ -16,7 +16,7 @@ internal object ReownConnectionManager {
 
     private val state = MutableStateFlow(0)
     private val coroutineScope = KoshApp.appScope.coroutinesComponent.applicationScope
-    private val reownRepo by lazy { KoshApp.appScope.appRepositoriesComponent.reownRepo }
+    private val reownRepo by lazy { KoshApp.appScope.appRepositoriesComponent.wcRepo }
 
     init {
         coroutineScope.launch {

@@ -24,93 +24,79 @@ interface ReownAdapter {
 
     fun getSessions(callback: (List<Session>) -> Unit): () -> Unit
 
-    @Throws(Exception::class)
     suspend fun pair(
         uri: String,
-    )
+    ): ReownResult<Unit>
 
-    @Throws(Exception::class)
     suspend fun getProposal(
         pairingTopic: String,
-    ): SessionProposal?
+    ): ReownResult<SessionProposal>
 
-    @Throws(Exception::class)
     suspend fun approveProposal(
         pairingTopic: String,
         chains: List<String>,
         accounts: List<String>,
         methods: List<String>,
         events: List<String>,
-    ): String?
+    ): ReownResult<StringWrapper>
 
-    @Throws(Exception::class)
     suspend fun rejectProposal(
         pairingTopic: String,
         reason: String,
-    ): String?
+    ): ReownResult<StringWrapper>
 
-    @Throws(Exception::class)
     suspend fun getAuthentication(
         id: Long,
-    ): AuthenticationRequest?
+    ): ReownResult<AuthenticationRequest>
 
-    @Throws(Exception::class)
     suspend fun approveAuthentication(
         id: Long,
         issuer: String,
         supportedChains: List<String>,
         supportedMethods: List<String>,
         signature: String,
-    ): String?
+    ): ReownResult<StringWrapper>
 
-    @Throws(Exception::class)
     suspend fun getAuthenticationMessage(
         id: Long,
         issuer: String,
         supportedChains: List<String>,
         supportedMethods: List<String>,
-    ): String
+    ): ReownResult<StringWrapper>
 
-    @Throws(Exception::class)
     suspend fun rejectAuthentication(
         id: Long,
         reason: String,
-    ): String?
+    ): ReownResult<StringWrapper>
 
-    @Throws(Exception::class)
     suspend fun getRequest(
         id: Long,
-    ): SessionRequest?
+    ): ReownResult<SessionRequest>
 
-    @Throws(Exception::class)
     suspend fun approveRequest(
         id: Long,
         message: String,
-    ): String?
+    ): ReownResult<StringWrapper>
 
-    @Throws(Exception::class)
     suspend fun rejectRequest(
         id: Long,
         code: Int,
         message: String,
-    ): String?
+    ): ReownResult<StringWrapper>
 
-    @Throws(Exception::class)
     suspend fun getSession(
         sessionTopic: String,
-    ): Session?
+    ): ReownResult<Session>
 
-    @Throws(Exception::class)
     suspend fun updateSession(
         sessionTopic: String,
         chains: List<String>,
         accounts: List<String>,
         methods: List<String>,
         events: List<String>,
-    )
+    ): ReownResult<Unit>
 
-    @Throws(Exception::class)
     suspend fun disconnectSession(
         sessionTopic: String,
-    )
+    ): ReownResult<Unit>
 }

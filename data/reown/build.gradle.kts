@@ -24,6 +24,7 @@ kotlin {
             languageSettings {
                 optIn("kotlinx.io.bytestring.unsafe.UnsafeByteStringApi")
                 optIn("kotlin.ExperimentalStdlibApi")
+                optIn("kotlinx.coroutines.ExperimentalCoroutinesApi")
             }
         }
 

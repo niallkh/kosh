@@ -1,13 +1,13 @@
 package kosh.app
 
-import androidx.compose.foundation.background
-import androidx.compose.foundation.isSystemInDarkTheme
+import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.ComposeUIViewController
 import co.touchlab.kermit.Logger
@@ -19,7 +19,7 @@ import com.arkivanov.decompose.router.stack.replaceAll
 import com.arkivanov.essenty.backhandler.BackDispatcher
 import com.seiko.imageloader.LocalImageLoader
 import kosh.app.di.AppScope
-import kosh.presentation.app.rememberInitApp
+import kosh.app.di.IosAppScope
 import kosh.presentation.core.LocalUiContext
 import kosh.presentation.core.UiContext
 import kosh.ui.component.path.LocalPathResolver
@@ -27,6 +27,8 @@ import kosh.ui.component.path.PathResolver
 import kosh.ui.navigation.LocalRootNavigator
 import kosh.ui.navigation.RootNavigator
 import kosh.ui.navigation.RouteResult
+import kosh.ui.navigation.animation.fadeIn
+import kosh.ui.navigation.animation.fadeOut
 import kosh.ui.navigation.parseDeeplink
 import kosh.ui.navigation.routes.RootRoute
 import kosh.ui.navigation.stack.DefaultStackRouter
@@ -39,18 +41,17 @@ public fun rootViewController(
     appScope: AppScope,
     uiContext: UiContext,
 ): UIViewController {
-    val start: RootRoute = RootRoute.Home()
 
     Logger.setTag("[K]")
     if (appScope.appComponent.debug) {
         Logger.setMinSeverity(Severity.Verbose)
         Logger.setLogWriters(NSLogWriter())
     } else {
-        Logger.setMinSeverity(Severity.Verbose)
+        Logger.setMinSeverity(Severity.Info)
         Logger.setLogWriters(NSLogWriter())
     }
 
-    Logger.d { "isDebug=${appScope.appComponent.debug}" }
+    val start: RootRoute = RootRoute.Home()
 
     val rootRouter = DefaultStackRouter(
         uiContext = uiContext,
@@ -60,6 +61,7 @@ public fun rootViewController(
         onResult = {
             when (it) {
                 is RouteResult.Result -> {
+                    Logger.d { "RouteResult.Result: ${it.redirect}" }
                     if (it.redirect.isNullOrEmpty()) {
                         handle(null)
                     } else {
@@ -87,6 +89,10 @@ public fun rootViewController(
     val pathResolver = PathResolver { appScope.appRepositoriesComponent.fileRepo.read(it) }
     uiContext.uiScope.deeplinkHandler.subscribe { it?.let(::parseDeeplink).let(rootRouter::handle) }
 
+    requestNotificationPermission()
+
+    val pushNotifier = (appScope as IosAppScope).iosPushNotifier
+
     return ComposeUIViewController {
         CompositionLocalProvider(
             LocalUiContext provides uiContext,
@@ -102,28 +108,28 @@ public fun rootViewController(
                 endEdgeEnabled = false,
                 activationOffsetThreshold = 8.dp
             ) {
-                val (loaded) = rememberInitApp()
-
-                if (loaded) {
+                Box {
                     App(
                         stackRouter = rootRouter,
                     )
-                } else {
-                    SplashScreen()
+
+                    val init by appScope.domain.appStateProvider.init.collectAsState()
+
+                    AnimatedVisibility(
+                        visible = !init,
+                        exit = fadeOut(),
+                        enter = fadeIn(),
+                    ) {
+                        SplashScreen(Modifier.fillMaxSize())
+                    }
+
+                    LaunchedEffect(Unit) {
+                        for (uri in pushNotifier.uris) {
+                            parseDeeplink(uri)?.let(rootRouter::handle)
+                        }
+                    }
                 }
             }
         }
     }
-}
-
-@Composable
-private fun SplashScreen() {
-    Box(
-        Modifier
-            .fillMaxSize()
-            .background(
-                if (isSystemInDarkTheme()) Color(0xFF1C1C1E)
-                else Color(0xFFF2F2F7)
-            )
-    )
 }

@@ -14,7 +14,6 @@ import kosh.domain.models.web3.EthMessage
 import kosh.domain.models.web3.Signature
 import kosh.domain.repositories.AppStateRepo
 import kosh.domain.repositories.FilesRepo
-import kosh.domain.repositories.modify
 import kosh.domain.serializers.Nel
 import kosh.domain.state.AppState
 import kosh.domain.state.transactions

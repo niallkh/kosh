@@ -20,7 +20,6 @@ import kosh.domain.models.Address
 import kosh.domain.models.ChainId
 import kosh.domain.models.Uri
 import kosh.domain.repositories.AppStateRepo
-import kosh.domain.repositories.modify
 import kosh.domain.repositories.optic
 import kosh.domain.serializers.BigInteger
 import kosh.domain.serializers.Either
@@ -117,7 +116,7 @@ class DefaultTokenService(
         }
     }
 
-    override fun delete(id: TokenEntity.Id) {
+    override suspend fun delete(id: TokenEntity.Id) {
         appStateRepo.modify {
             AppState.token(id) set null
         }

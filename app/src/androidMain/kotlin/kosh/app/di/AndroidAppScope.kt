@@ -2,6 +2,7 @@ package kosh.app.di
 
 import android.content.Context
 import kosh.app.AndroidPushNotifier
+import kosh.app.BuildConfig
 import kosh.app.di.impl.DefaultAppScope
 import kosh.app.di.impl.DefaultLedgerComponent
 import kosh.app.di.impl.DefaultTrezorComponent
@@ -11,35 +12,34 @@ import kosh.data.trezor.LedgerComponent
 import kosh.data.trezor.TrezorComponent
 import kosh.domain.AppRepositoriesComponent
 import kosh.domain.core.provider
+import kotlinx.coroutines.launch
 
 internal class AndroidAppScope(
     override val context: Context,
-) : DefaultAppScope(), AndroidComponent {
+) : DefaultAppScope(), AndroidAppComponent {
 
     override val androidPushNotifier: AndroidPushNotifier by provider {
         AndroidPushNotifier(
             context = context,
-            notificationService = domainComponent.notificationService,
-            applicationScope = coroutinesComponent.applicationScope,
+            notificationService = domain.notificationService,
         )
     }
 
-    private val androidComponent: AndroidComponent
+    override val appComponent: AppComponent
         get() = this
 
-    override val appComponent: AppComponent by provider {
-        AndroidAppComponent()
-    }
+    override val debug: Boolean
+        get() = BuildConfig.DEBUG
 
     override val fileSystemComponent: FileSystemComponent by provider {
         AndroidFileSystemComponent(
-            androidComponent = androidComponent,
+            androidComponent = this,
         )
     }
 
     override val transportComponent: TransportComponent by provider {
         AndroidTransportComponent(
-            androidComponent = androidComponent
+            androidComponent = this
         )
     }
 
@@ -61,18 +61,10 @@ internal class AndroidAppScope(
         )
     }
 
-    override val dataComponent: DataComponent by provider {
-        AndroidDataComponent(
-            androidComponent = androidComponent,
-            dataStoreComponent = dataStoreComponent,
-            filesComponent = filesComponent,
-        )
-    }
-
     override val imageComponent: ImageComponent by provider {
         AndroidImageComponent(
             networkComponent = networkComponent,
-            androidComponent = androidComponent,
+            androidComponent = this,
             filesComponent = filesComponent,
         )
     }
@@ -80,16 +72,22 @@ internal class AndroidAppScope(
     override val reownComponent: ReownComponent by provider {
         AndroidReownComponent(
             coroutinesComponent = coroutinesComponent,
-            androidComponent = androidComponent,
+            androidComponent = this,
         )
     }
+
+    override val dataComponent: DataComponent = AndroidDataComponent(
+        androidComponent = this,
+        dataStoreComponent = dataStoreComponent,
+        filesComponent = filesComponent,
+    )
 
     override val appRepositoriesComponent: AppRepositoriesComponent by provider {
         AndroidAppRepositoriesComponent(
             dataComponent = dataComponent,
             trezorComponent = trezorComponent,
             web3Component = web3Component,
-            androidComponent = androidComponent,
+            androidComponent = this,
             networkComponent = networkComponent,
             serializationComponent = serializationComponent,
             coroutinesComponent = coroutinesComponent,
@@ -98,9 +96,11 @@ internal class AndroidAppScope(
             reownComponent = reownComponent,
         )
     }
+
+    init {
+        coroutinesComponent.applicationScope.launch {
+            androidPushNotifier.start()
+        }
+    }
 }
 
-public interface AndroidComponent {
-    public val context: Context
-    public val androidPushNotifier: AndroidPushNotifier
-}

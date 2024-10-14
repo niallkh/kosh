@@ -1,8 +1,5 @@
 package kosh.ui.navigation.routes
 
-import kosh.domain.models.reown.WcAuthentication
-import kosh.domain.models.reown.WcSessionProposal
-import kosh.domain.models.reown.WcRequest
 import kosh.ui.navigation.routes.wc.WcProposalRoute
 import kosh.ui.navigation.routes.wc.WcRequestRoute
 import kosh.ui.navigation.routes.wc.WcSessionRoute
@@ -61,16 +58,4 @@ sealed class RootRoute : Route {
     data class WcRequest(
         override val link: WcRequestRoute,
     ) : RootRoute()
-}
-
-fun wcProposal(proposal: WcSessionProposal): RootRoute {
-    return RootRoute.WcProposal(WcProposalRoute.Proposal(proposal.id, proposal.requestId))
-}
-
-fun wcAuthentication(authentication: WcAuthentication): RootRoute {
-    return RootRoute.WcProposal(WcProposalRoute.Auth(authentication.id))
-}
-
-fun wcRequest(id: WcRequest.Id): RootRoute {
-    return RootRoute.WcRequest(WcRequestRoute.Request(id))
 }
