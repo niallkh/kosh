@@ -18,7 +18,6 @@ import kosh.domain.usecases.notification.NotificationService
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.launch
-import kotlin.time.Duration.Companion.minutes
 import kosh.domain.repositories.Notification as AppNotification
 
 private const val WC_CH_ID = "WC_CH_ID"
@@ -93,9 +92,8 @@ public class AndroidPushNotifier(
                 setContentText(appNotification.body)
             }
             setPriority(NotificationCompat.PRIORITY_HIGH)
-            setWhen(appNotification.time.epochSeconds)
+            setWhen(appNotification.time.toEpochMilliseconds())
             setContentIntent(pendingIntent)
-            setTimeoutAfter(5.minutes.inWholeMilliseconds)
             setAutoCancel(true)
             build()
         }

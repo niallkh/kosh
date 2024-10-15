@@ -15,6 +15,10 @@ class DefaultTrezorManager(
 
     private val logger = Logger.withTag("[K]TrezorManager")
 
+    init {
+        usb.register(trezorUsbConfig)
+    }
+
     override val devices: Flow<List<TrezorDevice>>
         get() = usb.devices(trezorUsbConfig)
             .map { it.map(::mapTrezorDevice) }

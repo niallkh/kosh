@@ -10,11 +10,11 @@ import androidx.activity.result.contract.ActivityResultContract
 import androidx.annotation.CallSuper
 import com.benasher44.uuid.uuid4
 import kosh.domain.repositories.ShareRepo
+import kotlinx.coroutines.suspendCancellableCoroutine
 import kotlinx.io.IOException
 import kotlin.coroutines.cancellation.CancellationException
 import kotlin.coroutines.resume
 import kotlin.coroutines.resumeWithException
-import kotlin.coroutines.suspendCoroutine
 
 class AndroidShareRepo(
     private val contentResolver: ContentResolver,
@@ -43,7 +43,7 @@ class AndroidShareRepo(
         } ?: error("Couldn't open file for reading")
     }
 
-    private suspend fun createJsonFile(name: String): Uri? = suspendCoroutine { cont ->
+    private suspend fun createJsonFile(name: String): Uri? = suspendCancellableCoroutine { cont ->
         activityResultRegistry.register(
             uuid4().toString(),
             CreateJsonDocument()
@@ -56,7 +56,7 @@ class AndroidShareRepo(
         }.launch(name)
     }
 
-    private suspend fun openJsonFile(): Uri? = suspendCoroutine { cont ->
+    private suspend fun openJsonFile(): Uri? = suspendCancellableCoroutine { cont ->
         activityResultRegistry.register(
             uuid4().toString(),
             OpenJsonDocument()

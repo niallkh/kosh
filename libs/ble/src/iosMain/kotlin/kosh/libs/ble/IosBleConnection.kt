@@ -4,6 +4,10 @@ package kosh.libs.ble
 
 import co.touchlab.kermit.Logger
 import kosh.libs.transport.Transport
+import kosh.libs.transport.TransportException.CommunicationFailedException
+import kosh.libs.transport.TransportException.ConnectionFailedException
+import kosh.libs.transport.TransportException.DeviceDisconnectedException
+import kosh.libs.transport.TransportException.ResponseTimeoutException
 import kotlinx.cinterop.ExperimentalForeignApi
 import kotlinx.cinterop.ObjCSignatureOverride
 import kotlinx.cinterop.addressOf
@@ -13,16 +17,20 @@ import kotlinx.cinterop.usePinned
 import kotlinx.coroutines.CompletableDeferred
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.delay
+import kotlinx.coroutines.suspendCancellableCoroutine
 import kotlinx.coroutines.sync.Mutex
 import kotlinx.coroutines.sync.withLock
 import kotlinx.coroutines.withContext
+import kotlinx.coroutines.withTimeoutOrNull
 import kotlinx.io.Buffer
 import kotlinx.io.bytestring.ByteString
 import kotlinx.io.bytestring.unsafe.UnsafeByteStringOperations
 import kotlinx.io.readByteString
 import platform.CoreBluetooth.CBCharacteristic
+import platform.CoreBluetooth.CBCharacteristicWriteWithResponse
 import platform.CoreBluetooth.CBPeripheral
 import platform.CoreBluetooth.CBPeripheralDelegateProtocol
+import platform.CoreBluetooth.CBPeripheralStateConnected
 import platform.CoreBluetooth.CBService
 import platform.Foundation.NSData
 import platform.Foundation.NSError
@@ -31,6 +39,11 @@ import platform.Foundation.NSUTF8StringEncoding
 import platform.Foundation.create
 import platform.darwin.NSObject
 import platform.posix.memcpy
+import kotlin.coroutines.Continuation
+import kotlin.coroutines.resume
+import kotlin.coroutines.resumeWithException
+import kotlin.math.min
+import kotlin.time.Duration.Companion.seconds
 import kotlin.uuid.Uuid
 
 class IosBleConnection(
@@ -47,7 +60,9 @@ class IosBleConnection(
     private val writeMutex = Mutex()
     private val readBuffer = Buffer()
 
-    override var mtu: Int = 23
+    private var writeCont: Continuation<Unit>? = null
+
+    override var writeMtu: Int = MTU_MIN
 
     private val callback = object : CBPeripheralDelegateProtocol, NSObject() {
         override fun peripheral(peripheral: CBPeripheral, didDiscoverServices: NSError?) {
@@ -67,12 +82,21 @@ class IosBleConnection(
 
             didDiscoverCharacteristicsForService.characteristics?.asSequence()
                 ?.map { it as CBCharacteristic }
-                ?.find { ch -> Uuid.parse(ch.UUID.UUIDString) in config.charWriteUuid }
-                ?.let { writeCharacteristic.complete(it) }
+                ?.find { ch -> Uuid.parse(ch.UUID.UUIDString) in config.charWriteUuids }
+                ?.let {
+                    writeMtu = min(
+                        peripheral
+                            .maximumWriteValueLengthForType(CBCharacteristicWriteWithResponse)
+                            .toInt(),
+                        config.maxWriteMtu - MTU_HEADER
+                    )
+                    logger.v { "mtu=$writeMtu" }
+                    writeCharacteristic.complete(it)
+                }
 
             didDiscoverCharacteristicsForService.characteristics?.asSequence()
                 ?.map { it as CBCharacteristic }
-                ?.find { ch -> Uuid.parse(ch.UUID.UUIDString) in config.charNotifyUuid }
+                ?.find { ch -> Uuid.parse(ch.UUID.UUIDString) in config.charNotifyUuids }
                 ?.let { peripheral.setNotifyValue(true, it) }
         }
 
@@ -88,24 +112,51 @@ class IosBleConnection(
                 readBuffer.write(it.toByteArray())
             }
         }
+
+        @ObjCSignatureOverride
+        override fun peripheral(
+            peripheral: CBPeripheral,
+            didWriteValueForCharacteristic: CBCharacteristic,
+            error: NSError?,
+        ) {
+            logger.v { "didWriteValueForCharacteristic: ${didWriteValueForCharacteristic.UUID.UUIDString}" }
+            if (error == null) {
+                writeCont?.resume(Unit)
+            } else {
+                writeCont?.resumeWithException(CommunicationFailedException(error.localizedDescription))
+            }
+            writeCont = null
+        }
     }
 
     suspend fun initialize() {
         logger.v { "initialize" }
         peripheral.delegate = callback
-        peripheral.discoverServices(config.serviceUuid.map { cbUuid(it) })
-        mtu = peripheral.maximumWriteValueLengthForType(1).toInt()
-        writeCharacteristic.await()
+        withTimeoutOrNull(10.seconds) {
+            peripheral.discoverServices(config.serviceUuids.map { cbUuid(it) })
+            writeCharacteristic.await()
+        } ?: throw ConnectionFailedException("Initialization failed")
     }
 
     override suspend fun write(data: ByteString) = withContext(dispatcher) {
         writeMutex.withLock {
-            logger.v { "write" }
+            logger.v { "write(${data.size})" }
+            if (peripheral.state != CBPeripheralStateConnected)
+                throw DeviceDisconnectedException()
+
             val characteristic = writeCharacteristic.await()
 
             UnsafeByteStringOperations.withByteArrayUnsafe(data) {
-                peripheral.writeValue(it.toData(), characteristic, 1)
+                peripheral.writeValue(
+                    data = it.toData(),
+                    forCharacteristic = characteristic,
+                    type = CBCharacteristicWriteWithResponse
+                )
             }
+
+            withTimeoutOrNull(10.seconds) {
+                suspendCancellableCoroutine<Unit> { cont -> writeCont = cont }
+            } ?: throw ResponseTimeoutException()
         }
     }
 
@@ -113,6 +164,9 @@ class IosBleConnection(
         readMutex.withLock {
             logger.v { "read" }
             while (readBuffer.size == 0L) {
+                if (peripheral.state != CBPeripheralStateConnected)
+                    throw DeviceDisconnectedException()
+
                 delay(10)
             }
 

@@ -48,8 +48,10 @@ interface TrezorManager {
 
             fun onButtonRequest(type: ButtonRequest.ButtonRequestType?)
 
-            class TrezorFailureException(val type: Failure.FailureType?, message: String?) :
-                RuntimeException(message)
+            class TrezorFailureException(
+                val type: Failure.FailureType?,
+                message: String?,
+            ) : RuntimeException(message)
         }
     }
 }

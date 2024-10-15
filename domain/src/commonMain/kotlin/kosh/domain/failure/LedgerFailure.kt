@@ -2,38 +2,47 @@ package kosh.domain.failure
 
 sealed interface LedgerFailure : AppFailure {
 
+    class Disabled : LedgerFailure {
+        override val message: String
+            get() = "Transport disabled. Please, enable device and try again."
+    }
+
     class PermissionNotGranted : LedgerFailure {
         override val message: String
-            get() = "Permission not granted"
+            get() = "Permission not granted. Please, grant permission."
     }
 
-    class UsbInterfaceNotClaimed : LedgerFailure {
+    class ConnectionFailed : LedgerFailure {
         override val message: String
-            get() = "Usb interface not claimed"
+            get() = "Couldn't connect to Ledger. Please, try again."
     }
 
-    class NotConnected : LedgerFailure {
+    class Disconnected : LedgerFailure {
         override val message: String
-            get() = "Ledger not connected"
+            get() = "Ledger disconnected. Please, connect device and try again."
     }
 
     class InvalidState : LedgerFailure {
         override val message: String
-            get() = "Ledger is in invalid state"
+            get() = "Ledger is in invalid state. Please, try again."
     }
 
-    class NotEthereumApp : LedgerFailure {
+    class NoEthereumApp : LedgerFailure {
         override val message: String
-            get() = "Ethereum app not opened"
+            get() = "Ethereum app not opened. Please, open Ethereum app."
     }
 
-    class RequestCanceled : LedgerFailure {
+    class ActionCanceled : LedgerFailure {
         override val message: String
-            get() = "Request canceled"
+            get() = "Action canceled."
     }
 
-    class Other : LedgerFailure {
+    class CommunicationFailed : LedgerFailure {
         override val message: String
-            get() = "Something went wrong"
+            get() = "Communication with Ledger failed. Please, try again."
     }
+
+    class Other(
+        override val message: String = "Something went wrong.",
+    ) : LedgerFailure
 }

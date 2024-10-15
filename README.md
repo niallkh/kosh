@@ -34,6 +34,7 @@ from your mobile device.
 - [x] EIP-191, EIP-712, EIP-1559
 - [ ] iOS
 - [ ] WalletConnect Inbox
+- [ ] EIP-7702
 - [ ] ENS
 - [ ] Keystone (USB)
 - [ ] Export/Import passkeys

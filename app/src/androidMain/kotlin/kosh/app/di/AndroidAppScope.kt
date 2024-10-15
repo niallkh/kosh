@@ -76,11 +76,13 @@ internal class AndroidAppScope(
         )
     }
 
-    override val dataComponent: DataComponent = AndroidDataComponent(
-        androidComponent = this,
-        dataStoreComponent = dataStoreComponent,
-        filesComponent = filesComponent,
-    )
+    override val dataComponent: DataComponent by provider {
+        AndroidDataComponent(
+            androidComponent = this,
+            dataStoreComponent = dataStoreComponent,
+            filesComponent = filesComponent,
+        )
+    }
 
     override val appRepositoriesComponent: AppRepositoriesComponent by provider {
         AndroidAppRepositoriesComponent(

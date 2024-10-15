@@ -19,6 +19,10 @@ internal class IosTransportComponent : TransportComponent {
 
     override val usb: Usb by provider {
         object : Usb {
+
+            override fun register(config: UsbConfig) {
+            }
+
             override fun devices(config: UsbConfig): Flow<List<Device>> {
                 return flowOf(listOf())
             }

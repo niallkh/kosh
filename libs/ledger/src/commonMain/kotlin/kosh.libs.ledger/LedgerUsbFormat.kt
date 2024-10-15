@@ -21,8 +21,8 @@ class LedgerUsbFormat(
 
     private val channel = Random.nextInt()
 
-    override val mtu: Int
-        get() = connection.mtu
+    override val writeMtu: Int
+        get() = connection.writeMtu
 
     override suspend fun write(data: ByteString) {
         logger.v { "write(${data.size})" }
@@ -37,7 +37,7 @@ class LedgerUsbFormat(
             buffer.writeShort(channel.toShort())
             buffer.writeByte(TAG.toByte())
             buffer.writeShort(counter.toShort())
-            buffer.write(source, min(mtu - 5L, source.size))
+            buffer.write(source, min(writeMtu - 5L, source.size))
             connection.write(buffer.readByteString())
             counter++
         }
@@ -59,7 +59,7 @@ class LedgerUsbFormat(
             require(chunk.readByte() == TAG.toByte())
             require(chunk.readShort() == counter.toShort())
 
-            buffer.write(chunk, min(msgSize - buffer.size, mtu - 5L))
+            buffer.write(chunk, min(msgSize - chunk.size, chunk.size))
 
             counter++
         }
@@ -90,7 +90,7 @@ class LedgerUsbFormat(
     }
 
     private fun decodeHeader(
-        source: Source,
+        source: Buffer,
         sink: Sink,
     ): Short {
         require(source.readShort() == channel.toShort())
@@ -99,11 +99,7 @@ class LedgerUsbFormat(
 
         val msgSize = source.readShort()
 
-        if (msgSize <= mtu - 7) {
-            sink.write(source, msgSize.toLong())
-        } else {
-            sink.transferFrom(source)
-        }
+        sink.write(source, min(msgSize.toLong(), source.size))
 
         return msgSize
     }

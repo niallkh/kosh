@@ -2,20 +2,26 @@ package kosh.libs.ble
 
 import android.annotation.SuppressLint
 import android.bluetooth.BluetoothGatt
+import android.bluetooth.BluetoothGatt.GATT_SUCCESS
 import android.bluetooth.BluetoothGattCallback
 import android.bluetooth.BluetoothGattCharacteristic
-import android.bluetooth.BluetoothGattCharacteristic.WRITE_TYPE_NO_RESPONSE
+import android.bluetooth.BluetoothGattCharacteristic.WRITE_TYPE_DEFAULT
 import android.bluetooth.BluetoothGattDescriptor
 import android.bluetooth.BluetoothGattDescriptor.ENABLE_NOTIFICATION_VALUE
 import android.bluetooth.BluetoothStatusCodes
 import android.os.Build
 import co.touchlab.kermit.Logger
 import kosh.libs.transport.Transport
+import kosh.libs.transport.TransportException.CommunicationFailedException
+import kosh.libs.transport.TransportException.ConnectionFailedException
+import kosh.libs.transport.TransportException.DeviceDisconnectedException
+import kosh.libs.transport.TransportException.ResponseTimeoutException
 import kotlinx.coroutines.CompletableDeferred
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.first
+import kotlinx.coroutines.suspendCancellableCoroutine
 import kotlinx.coroutines.sync.Mutex
 import kotlinx.coroutines.sync.withLock
 import kotlinx.coroutines.withContext
@@ -24,13 +30,13 @@ import kotlinx.io.Buffer
 import kotlinx.io.bytestring.ByteString
 import kotlinx.io.bytestring.unsafe.UnsafeByteStringOperations
 import kotlinx.io.readByteString
+import kotlin.coroutines.Continuation
+import kotlin.coroutines.resume
+import kotlin.coroutines.resumeWithException
+import kotlin.math.min
 import kotlin.time.Duration.Companion.seconds
 import kotlin.uuid.toJavaUuid
 import kotlin.uuid.toKotlinUuid
-
-private const val MTU_HEADER = 5
-private const val MTU_MIN = 23
-private const val MTU_MAX = 517
 
 class AndroidBleConnection(
     private val config: BleConfig,
@@ -48,32 +54,37 @@ class AndroidBleConnection(
     private val notificationDeferred = CompletableDeferred<Unit>()
     private val writeCharacteristic = CompletableDeferred<BluetoothGattCharacteristic>()
     private val readBuffer = Buffer()
+    private var writeCont: Continuation<Unit>? = null
 
-    override var mtu: Int = MTU_MIN - MTU_HEADER
+    override var writeMtu: Int = MTU_MIN
 
     @SuppressLint("MissingPermission")
     suspend fun initialize() {
         logger.d { "init()" }
         withTimeoutOrNull(10.seconds) {
             connected.first { it }
-        } ?: error("Failed to connect to Bluetooth Device")
-        check(gatt.discoverServices())
-        writeCharacteristic.await()
-        notificationDeferred.await()
-        check(gatt.requestMtu(MTU_MAX))
-        mtuDeferred.await()
+        } ?: throw ConnectionFailedException("Device not connected")
+
+        withTimeoutOrNull(10.seconds) {
+            check(gatt.discoverServices())
+            writeCharacteristic.await()
+            notificationDeferred.await()
+            check(gatt.requestMtu(MTU_MAX))
+            mtuDeferred.await()
+        } ?: throw ConnectionFailedException("Initialization failed")
     }
 
     @SuppressLint("MissingPermission")
     override suspend fun write(data: ByteString) = withContext(dispatcher) {
         writeMutex.withLock {
             logger.v { "write(${data.size})" }
-            require(connected.value) { "Bluetooth Device Disconnected" }
+            if (!connected.value)
+                throw DeviceDisconnectedException()
 
             val characteristic = writeCharacteristic.await()
 
             UnsafeByteStringOperations.withByteArrayUnsafe(data) {
-                val writeType = WRITE_TYPE_NO_RESPONSE
+                val writeType = WRITE_TYPE_DEFAULT
 
                 if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
                     check(
@@ -87,6 +98,10 @@ class AndroidBleConnection(
                     check(gatt.writeCharacteristic(characteristic))
                 }
             }
+
+            withTimeoutOrNull(10.seconds) {
+                suspendCancellableCoroutine<Unit> { cont -> writeCont = cont }
+            } ?: throw ResponseTimeoutException()
         }
     }
 
@@ -95,7 +110,8 @@ class AndroidBleConnection(
             logger.v { "read" }
 
             while (readBuffer.size == 0L) {
-                require(connected.value) { "Bluetooth Device Disconnected" }
+                if (!connected.value)
+                    throw DeviceDisconnectedException()
                 delay(10)
             }
 
@@ -117,10 +133,10 @@ class AndroidBleConnection(
         logger.v { "onMtuChanged($mtu, $status)" }
         this.gatt = gatt
         if (status == BluetoothStatusCodes.SUCCESS) {
-            this.mtu = mtu - MTU_HEADER
+            this.writeMtu = min(mtu, config.maxWriteMtu) - MTU_HEADER
             mtuDeferred.complete(Unit)
         } else {
-            mtuDeferred.completeExceptionally(IllegalStateException("Failed to set MTU"))
+            mtuDeferred.completeExceptionally(CommunicationFailedException("Failed to set MTU"))
         }
     }
 
@@ -129,22 +145,22 @@ class AndroidBleConnection(
         this.gatt = gatt
 
         if (status != BluetoothStatusCodes.SUCCESS) {
-            writeCharacteristic.completeExceptionally(IllegalStateException("Failed to discover services"))
+            writeCharacteristic.completeExceptionally(CommunicationFailedException("Failed to discover services"))
             return
         }
 
         gatt.services.asSequence()
-            .filter { it.uuid.toKotlinUuid() in config.serviceUuid }
+            .filter { it.uuid.toKotlinUuid() in config.serviceUuids }
             .flatMap { it.characteristics }
-            .firstOrNull { it.uuid.toKotlinUuid() in config.charNotifyUuid }
+            .firstOrNull { it.uuid.toKotlinUuid() in config.charNotifyUuids }
             ?.let { enableNotification(it) }
 
         gatt.services.asSequence()
-            .filter { it.uuid.toKotlinUuid() in config.serviceUuid }
+            .filter { it.uuid.toKotlinUuid() in config.serviceUuids }
             .flatMap { it.characteristics }
-            .firstOrNull { it.uuid.toKotlinUuid() in config.charWriteUuid }
+            .firstOrNull { it.uuid.toKotlinUuid() in config.charWriteUuids }
             ?.let { writeCharacteristic.complete(it) }
-            ?: writeCharacteristic.completeExceptionally(IllegalStateException("Failed to find write characteristic"))
+            ?: writeCharacteristic.completeExceptionally(CommunicationFailedException("Failed to find write characteristic"))
     }
 
     override fun onDescriptorWrite(
@@ -158,7 +174,7 @@ class AndroidBleConnection(
             if (status == BluetoothStatusCodes.SUCCESS) {
                 notificationDeferred.complete(Unit)
             } else {
-                notificationDeferred.completeExceptionally(IllegalStateException("Failed to enable notifications"))
+                notificationDeferred.completeExceptionally(CommunicationFailedException("Failed to enable notifications"))
             }
         }
     }
@@ -202,5 +218,19 @@ class AndroidBleConnection(
         logger.v { "onCharacteristicChanged(${characteristic.uuid})" }
         this.gatt = gatt
         readBuffer.write(value)
+    }
+
+    override fun onCharacteristicWrite(
+        gatt: BluetoothGatt,
+        characteristic: BluetoothGattCharacteristic,
+        status: Int,
+    ) {
+        logger.v { "onCharacteristicWrite(${characteristic.uuid}, $status)" }
+        if (status == GATT_SUCCESS) {
+            writeCont?.resume(Unit)
+        } else {
+            writeCont?.resumeWithException(CommunicationFailedException("Write failed: status=$status"))
+        }
+        writeCont = null
     }
 }

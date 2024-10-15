@@ -14,6 +14,7 @@ import android.hardware.usb.UsbInterface
 import android.hardware.usb.UsbManager
 import android.os.Build
 import arrow.core.continuations.AtomicRef
+import arrow.core.continuations.update
 import arrow.fx.coroutines.Resource
 import arrow.fx.coroutines.resource
 import arrow.resilience.Schedule
@@ -22,20 +23,30 @@ import arrow.resilience.retryOrElse
 import co.touchlab.kermit.Logger
 import kosh.libs.transport.Device
 import kosh.libs.transport.Transport
-import kotlinx.collections.immutable.PersistentList
+import kosh.libs.transport.TransportException.ConnectionFailedException
+import kosh.libs.transport.TransportException.DeviceDisconnectedException
+import kosh.libs.transport.TransportException.PermissionNotGrantedException
 import kotlinx.collections.immutable.minus
+import kotlinx.collections.immutable.persistentHashSetOf
+import kotlinx.collections.immutable.persistentListOf
 import kotlinx.collections.immutable.plus
-import kotlinx.collections.immutable.toPersistentList
+import kotlinx.collections.immutable.toPersistentHashSet
+import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.channels.awaitClose
+import kotlinx.coroutines.SupervisorJob
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.channelFlow
-import kotlinx.coroutines.flow.conflate
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.collectLatest
+import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.flow.update
+import kotlinx.coroutines.launch
 import kotlinx.coroutines.suspendCancellableCoroutine
 import kotlinx.coroutines.withContext
 import kotlin.coroutines.resume
 import kotlin.time.Duration.Companion.milliseconds
+import kotlin.time.Duration.Companion.seconds
 
 internal const val ACTION_USB_PERMISSION = "Kosh.USB_PERMISSION"
 
@@ -44,40 +55,100 @@ private val retrySchedule = Schedule.linear<Throwable>(300.milliseconds) and Sch
 class AndroidUsb(
     private val context: Context,
 ) : Usb {
-    private val logger = Logger.withTag("[K]Usb")
+    private val logger = Logger.withTag("[K]AndroidUsb")
 
-    override fun devices(config: UsbConfig): Flow<List<Device>> = listDevices(context)
-        .map { devices ->
-            devices
-                .filter {
-                    it.vendorId in config.vendorIds &&
-                            (it.productId in config.productIds || it.productId shr 8 in config.productIds)
+    private val dispatcher = Dispatchers.IO.limitedParallelism(1, "USB")
+    private val coroutineScope = CoroutineScope(dispatcher + SupervisorJob())
+
+    private val discoveredDevices = MutableStateFlow(persistentHashSetOf<WrappedDevice>())
+    private val configs = AtomicRef(persistentListOf<UsbConfig>())
+
+    private val receiver = object : BroadcastReceiver() {
+        override fun onReceive(context: Context, intent: Intent) {
+            Logger.v { "BroadcastReceiver1#onReceive(action = ${intent.action})" }
+            val device = intent.usbDevice?.mapDevice()
+
+            if (device != null) {
+                when (intent.action) {
+                    UsbManager.ACTION_USB_DEVICE_ATTACHED -> discoveredDevices.update { it + device }
+                    UsbManager.ACTION_USB_DEVICE_DETACHED -> discoveredDevices.update { it - device }
                 }
-                .map { it.mapDevice() }
-                .sortedBy { it.id }
+            }
         }
+    }
+
+    init {
+        coroutineScope.launch {
+            context.registerReceiver(receiver, IntentFilter(UsbManager.ACTION_USB_DEVICE_ATTACHED))
+            context.registerReceiver(receiver, IntentFilter(UsbManager.ACTION_USB_DEVICE_DETACHED))
+
+            discoveredDevices.subscriptionCount
+                .map { it > 0 }
+                .distinctUntilChanged()
+                .collectLatest { scan ->
+                    logger.v { "scan=$scan" }
+                    if (scan) {
+                        startScan()
+                    } else {
+                        stopScan()
+                    }
+                }
+        }
+    }
+
+    override fun register(config: UsbConfig) {
+        configs.update { it + config }
+    }
+
+    private fun startScan() {
+        logger.v { "startScan()" }
+        val initialDevices = context.usbManager.deviceList.values.toList()
+            .map { it.mapDevice() }
+            .toPersistentHashSet()
+
+        discoveredDevices.update { initialDevices }
+
+        context.registerReceiver(receiver, IntentFilter(UsbManager.ACTION_USB_DEVICE_ATTACHED))
+        context.registerReceiver(receiver, IntentFilter(UsbManager.ACTION_USB_DEVICE_DETACHED))
+    }
+
+    private suspend fun stopScan() {
+        logger.v { "stopScan()" }
+        context.unregisterReceiver(receiver)
+        delay(10.seconds)
+        discoveredDevices.update { persistentHashSetOf() }
+    }
+
+    override fun devices(config: UsbConfig): Flow<List<Device>> = discoveredDevices
+        .map { devices ->
+            devices.filter {
+                it.vendorId in config.vendorIds &&
+                        (it.productId in config.productIds || it.productId shr 8 in config.productIds)
+            }
+        }
+        .map { devices -> devices.map { it.device } }
+        .map { peripherals -> peripherals.sortedBy { it.id } }
 
     override suspend fun open(
         id: String,
         config: UsbConfig,
-    ): Resource<Transport.Connection> = withContext(Dispatchers.IO) {
-        logger.d { "open(id = ${id})" }
+    ): Resource<Transport.Connection> = withContext(dispatcher) {
+        logger.v { "open(id = ${id})" }
         val usbDevice = context.usbManager.requireDevice { it.deviceId.toString() == id }
 
         if (context.usbManager.hasPermission(usbDevice).not()) {
-            logger.i { "requestPermission(id = ${id})" }
+            logger.v { "requestPermission(id = ${id})" }
             val granted = requestPermission(context, usbDevice)
-            logger.i { "permission granted=$granted" }
-            if (granted.not()) {
-                throw PermissionNotGrantedException()
-            }
+            logger.v { "permission granted=$granted" }
+            if (granted.not())
+                throw PermissionNotGrantedException("Usb permission not granted")
         }
 
         resource {
             val connection = install(
                 acquire = {
                     context.usbManager.openDevice(usbDevice)
-                        ?: error("Couldn't open usb connection")
+                        ?: throw ConnectionFailedException("Couldn't open usb connection")
                 },
                 release = { it, _ -> it.close() }
             )
@@ -86,13 +157,10 @@ class AndroidUsb(
 
             install(
                 acquire = {
-                    if (connection.claimInterface(usbInterface).not()) {
-                        throw UsbInterfaceNotClaimedException()
-                    }
+                    if (connection.claimInterface(usbInterface).not())
+                        throw ConnectionFailedException("Usb interface not claimed")
                 },
-                release = { _, _ ->
-                    connection.releaseInterface(usbInterface)
-                }
+                release = { _, _ -> connection.releaseInterface(usbInterface) }
             )
 
             val writeEndpoint = usbEndpoint(
@@ -119,7 +187,7 @@ class AndroidUsb(
     private suspend fun UsbManager.requireDevice(predicate: (UsbDevice) -> Boolean): UsbDevice {
         return retrySchedule.retry {
             deviceList.values.find(predicate)
-                ?: error("Usb device not found")
+                ?: throw DeviceDisconnectedException()
         }
     }
 
@@ -143,46 +211,6 @@ class AndroidUsb(
         }
     )
 }
-
-private fun listDevices(context: Context): Flow<List<UsbDevice>> = channelFlow {
-    Logger.v { "listDevices()" }
-
-    val initialDevices = withContext(Dispatchers.IO) {
-        context.usbManager.deviceList.values.toList().toPersistentList()
-    }
-    val devices = AtomicRef(initialDevices)
-
-    fun update(block: (PersistentList<UsbDevice>) -> PersistentList<UsbDevice> = { it }) {
-        trySend(devices.updateAndGet(block))
-    }
-
-    val receiver = object : BroadcastReceiver() {
-        override fun onReceive(context: Context, intent: Intent) {
-            Logger.v { "BroadcastReceiver1#onReceive(action = ${intent.action})" }
-            when (intent.action) {
-                UsbManager.ACTION_USB_DEVICE_ATTACHED -> {
-                    update { it + checkNotNull(intent.usbDevice) }
-                }
-
-                UsbManager.ACTION_USB_DEVICE_DETACHED -> {
-                    update { it - checkNotNull(intent.usbDevice) }
-                }
-            }
-        }
-    }
-
-    fun register() {
-        context.registerReceiver(receiver, IntentFilter(UsbManager.ACTION_USB_DEVICE_ATTACHED))
-        context.registerReceiver(receiver, IntentFilter(UsbManager.ACTION_USB_DEVICE_DETACHED))
-    }
-
-    fun unregister() = context.unregisterReceiver(receiver)
-
-    update()
-    register()
-    awaitClose { unregister() }
-}
-    .conflate()
 
 private suspend fun requestPermission(
     context: Context,
@@ -254,7 +282,8 @@ private fun usbEndpoint(
         }
         .filter { it.type == UsbConstants.USB_ENDPOINT_XFER_INT }
         .filter { it.maxPacketSize == config.packetSize }
-        .firstOrNull() ?: error("Usb endpoint not found")
+        .firstOrNull()
+        ?: throw ConnectionFailedException("Usb endpoint not found, write=$write")
 }
 
 private val Context.usbManager: UsbManager
@@ -267,7 +296,11 @@ internal val Intent.usbDevice: UsbDevice?
         getParcelableExtra(UsbManager.EXTRA_DEVICE)
     }
 
-internal fun UsbDevice.mapDevice(): Device = Device(
-    id = deviceId.toString(),
-    name = productName,
+internal fun UsbDevice.mapDevice() = WrappedDevice(
+    device = Device(
+        id = deviceId.toString(),
+        name = productName,
+    ),
+    vendorId = vendorId,
+    productId = productId,
 )

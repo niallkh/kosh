@@ -35,9 +35,10 @@ fun rememberSignTrezor(
 
         recover({
             val request = signRequest ?: raise(null)
+
             val signature = when (request) {
                 is SignRequest.SignPersonal -> trezorAccountService.sign(
-                    trezor = trezor ?: raise(TrezorFailure.NotConnected()),
+                    trezor = trezor ?: raise(TrezorFailure.Disconnected()),
                     listener = trezorListener,
                     address = request.account,
                     message = request.message,
@@ -46,7 +47,7 @@ fun rememberSignTrezor(
 
                 is SignRequest.SignTyped -> trezorAccountService.sign(
                     listener = trezorListener,
-                    trezor = trezor ?: raise(TrezorFailure.NotConnected()),
+                    trezor = trezor ?: raise(TrezorFailure.Disconnected()),
                     address = request.account,
                     jsonTypeData = request.json,
                     refresh = refresh
@@ -54,7 +55,7 @@ fun rememberSignTrezor(
 
                 is SignRequest.SignTransaction -> trezorAccountService.sign(
                     listener = trezorListener,
-                    trezor = trezor ?: raise(TrezorFailure.NotConnected()),
+                    trezor = trezor ?: raise(TrezorFailure.Disconnected()),
                     transaction = request.data,
                     refresh = refresh,
                 )

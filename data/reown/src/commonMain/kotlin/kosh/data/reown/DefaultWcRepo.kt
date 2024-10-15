@@ -42,6 +42,7 @@ import kotlinx.coroutines.flow.callbackFlow
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.flatMapConcat
 import kotlinx.coroutines.flow.flowOn
+import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import kotlinx.coroutines.withTimeoutOrNull
 import kotlin.time.Duration
@@ -69,7 +70,7 @@ class DefaultWcRepo(
             val cancelable = adapter.getNewProposal { proposal ->
                 proposal.map().fold(
                     { logger.w { "Session proposal error: ${it.message}" } },
-                    { trySend(it) }
+                    { launch { send(it) } }
                 )
             }
 
@@ -89,7 +90,7 @@ class DefaultWcRepo(
                     )
                 }
                     .sortedWith(compareBy<WcSessionProposal> { it.dapp.name }.thenBy { it.id.pairingTopic.value })
-                    .let { trySend(it) }
+                    .let { launch { send(it) } }
             }
 
             awaitClose { cancelable() }
@@ -103,7 +104,7 @@ class DefaultWcRepo(
             val cancelable = adapter.getNewAuthentication { authentication ->
                 authentication.map().fold(
                     { logger.w { "Authentication request error: ${it.message}" } },
-                    { trySend(it) }
+                    { launch { send(it) } }
                 )
             }
 
@@ -123,7 +124,7 @@ class DefaultWcRepo(
                     )
                 }
                     .sortedWith(compareBy<WcAuthentication> { it.dapp.name }.thenBy { it.id.value })
-                    .let { trySend(it) }
+                    .let { launch { send(it) } }
             }
 
             awaitClose { cancelable() }
@@ -137,7 +138,7 @@ class DefaultWcRepo(
             val cancelable = adapter.getNewRequest { request ->
                 request.map().fold(
                     { logger.w { "Session request error: ${it.message}" } },
-                    { trySend(it) }
+                    { launch { send(it) } }
                 )
             }
 
@@ -157,7 +158,7 @@ class DefaultWcRepo(
                     )
                 }
                     .sortedWith(compareBy<WcRequest> { it.dapp.name }.thenBy { it.id.value })
-                    .let { trySend(it) }
+                    .let { launch { send(it) } }
             }
 
             awaitClose { cancelable() }
@@ -176,7 +177,7 @@ class DefaultWcRepo(
                     )
                 }
                     .sortedWith(compareBy<WcSession> { it.dapp.name }.thenBy { it.id.sessionTopic.value })
-                    .let { trySend(it) }
+                    .let { launch { send(it) } }
             }
 
             awaitClose { cancelable() }

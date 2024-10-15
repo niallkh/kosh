@@ -14,7 +14,7 @@ import okhttp3.logging.HttpLoggingInterceptor
 import okhttp3.logging.HttpLoggingInterceptor.Level
 import okio.Path.Companion.toPath
 
-class AndroidNetworkComponent(
+internal class AndroidNetworkComponent(
     filesComponent: FilesComponent,
 ) : NetworkComponent,
     FilesComponent by filesComponent {

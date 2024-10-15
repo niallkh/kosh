@@ -26,6 +26,11 @@ class DefaultLedgerManager(
                 .map { it.map(::mapLedgerDevice.partially2(true)) },
         ) { d1, d2 -> d1 + d2 }
 
+    init {
+        usb.register(ledgerUsbConfig)
+        ble.register(ledgerBleConfig)
+    }
+
     override suspend fun open(
         id: String,
         listener: LedgerManager.Listener,

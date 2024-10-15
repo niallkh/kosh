@@ -5,6 +5,8 @@ import android.hardware.usb.UsbEndpoint
 import android.hardware.usb.UsbRequest
 import co.touchlab.kermit.Logger
 import kosh.libs.transport.Transport
+import kosh.libs.transport.TransportException.CommunicationFailedException
+import kosh.libs.transport.TransportException.ConnectionFailedException
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.suspendCancellableCoroutine
 import kotlinx.coroutines.sync.Mutex
@@ -35,18 +37,17 @@ class AndroidUsbConnection(
     private val writeMutex = Mutex()
 
     private val writeRequest = UsbRequest().apply {
-        check(initialize(connection, writeEndpoint)) {
-            "error happened during initialization write usb request"
-        }
+        if (!initialize(connection, writeEndpoint))
+            throw ConnectionFailedException("Initialization write usb request failed")
     }
 
     private val readRequest = UsbRequest().apply {
-        check(initialize(connection, readEndpoint)) {
-            "error happened during initialization read usb request"
+        if (!initialize(connection, readEndpoint)) {
+            throw ConnectionFailedException("Initialization read usb request failed")
         }
     }
 
-    override val mtu: Int
+    override val writeMtu: Int
         get() = packetSize
 
     override suspend fun write(data: ByteString) = writeMutex.withLock {
@@ -55,7 +56,7 @@ class AndroidUsbConnection(
             writeBuffer.put(it)
         }
         writeBuffer.flip()
-        writeBuffer.limit(mtu)
+        writeBuffer.limit(writeMtu)
         logger.v { "write(size = ${writeBuffer.limit()})" }
         writeRequest.transfer(writeBuffer)
         Unit
@@ -63,11 +64,11 @@ class AndroidUsbConnection(
 
     override suspend fun read(): ByteString = readMutex.withLock {
         readBuffer.clear()
-        readBuffer.limit(mtu)
+        readBuffer.limit(writeMtu)
         logger.v { "read(size = ${writeBuffer.limit()})" }
         readRequest.transfer(readBuffer)
         readBuffer.rewind()
-        readBuffer.limit(mtu)
+        readBuffer.limit(writeMtu)
         Buffer().apply { write(readBuffer) }.readByteString()
     }
 
@@ -84,18 +85,18 @@ class AndroidUsbConnection(
         buffer: ByteBuffer,
     ): ByteBuffer = withContext(Dispatchers.IO) {
         suspendCancellableCoroutine { continuation ->
-            if (queue(buffer)) {
+            if (!queue(buffer)) {
+                continuation.resumeWithException(ConnectionFailedException("Queue buffer failed"))
+            } else {
                 clientData = { continuation.resume(buffer) }
                 continuation.invokeOnCancellation { this@transfer.cancel() }
                 val request = connection.requestWait()
-                if (request != null) {
+                if (request == null) {
+                    continuation.resumeWithException(CommunicationFailedException("Transfer buffer failed"))
+                } else {
                     @Suppress("UNCHECKED_CAST")
                     (request.clientData as () -> Unit).invoke()
-                } else {
-                    continuation.resumeWithException(Exception("Transfer buffer failed"))
                 }
-            } else {
-                continuation.resumeWithException(Exception("Queue buffer failed"))
             }
         }
     }

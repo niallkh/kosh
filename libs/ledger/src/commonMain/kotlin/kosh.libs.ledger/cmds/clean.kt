@@ -6,7 +6,7 @@ import kosh.libs.ledger.exchange
 import kosh.libs.ledger.ledgerAPDU
 
 suspend fun LedgerManager.Connection.clean() {
-    val ledgerAPDU = ledgerAPDU(0xe0, 0x50, 0x00, 0x00)
+    val ledgerAPDU = ledgerAPDU(0xe0, 0x50, 0x0, 0x0)
 
     exchange(ledgerAPDU) { sw ->
         sw.expectToBe(StatusWord.OK)

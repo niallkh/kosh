@@ -10,7 +10,6 @@ import arrow.core.right
 import co.touchlab.kermit.Logger
 import kosh.domain.entities.WalletEntity.Location
 import kosh.domain.failure.LedgerFailure
-import kosh.domain.failure.RequestCanceledException
 import kosh.domain.models.Address
 import kosh.domain.models.ByteString
 import kosh.domain.models.Hash
@@ -37,15 +36,12 @@ import kosh.libs.ledger.cmds.getAppAndVersion
 import kosh.libs.ledger.cmds.signPersonalMessage
 import kosh.libs.ledger.cmds.signTransaction
 import kosh.libs.ledger.cmds.signTypedMessage
-import kosh.libs.usb.PermissionNotGrantedException
-import kosh.libs.usb.UsbInterfaceNotClaimedException
 import kotlinx.collections.immutable.ImmutableList
 import kotlinx.collections.immutable.toImmutableList
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.async
 import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.flowOn
 import kotlinx.coroutines.flow.map
@@ -77,8 +73,8 @@ class DefaultLedgerRepo(
                 id = ledger.id.value,
             ).use { connection ->
 
-            ensure(connection.getAppAndVersion().name == "Ethereum") {
-                    LedgerFailure.NotEthereumApp()
+                ensure(connection.getAppAndVersion().name == "Ethereum") {
+                    LedgerFailure.NoEthereumApp()
                 }
 
                 val mainAddress = connection.ethereumAddress(
@@ -110,7 +106,7 @@ class DefaultLedgerRepo(
         }
             .onLeft { emit(it.left()) }
     }
-        .catchLedgerFailure()
+        .catchLedgerFailure(logger)
         .flowOn(Dispatchers.Default)
 
     override suspend fun signPersonalMessage(
@@ -121,10 +117,10 @@ class DefaultLedgerRepo(
     ): Either<LedgerFailure, Signature> = withContext(Dispatchers.Default) {
         either {
             catch({
-                doSignPersonalMessage(ledger, listener, message, derivationPath).right()
+                doSignPersonalMessage(ledger, listener, message, derivationPath)
             }) {
-                mapLedgerFailure(it).left()
-            }.bind()
+                raise(it.mapLedgerFailure(logger))
+            }
         }
     }
 
@@ -137,9 +133,8 @@ class DefaultLedgerRepo(
         id = ledger.id.value,
         listener = LedgerListenerAdapter(listener),
     ).use { connection ->
-
-    ensure(connection.getAppAndVersion().name == "Ethereum") {
-            LedgerFailure.NotEthereumApp()
+        ensure(connection.getAppAndVersion().name == "Ethereum") {
+            LedgerFailure.NoEthereumApp()
         }
 
         val bytes = message.encodeToByteString()
@@ -171,10 +166,10 @@ class DefaultLedgerRepo(
     ): Either<LedgerFailure, Signature> = withContext(Dispatchers.Default) {
         either {
             catch({
-                doSignTypedMessage(listener, ledger, typedMessage, derivationPath).right()
+                doSignTypedMessage(listener, ledger, typedMessage, derivationPath)
             }) {
-                mapLedgerFailure(it).left()
-            }.bind()
+                raise(it.mapLedgerFailure(logger))
+            }
         }
     }
 
@@ -192,8 +187,8 @@ class DefaultLedgerRepo(
             listener = LedgerListenerAdapter(listener),
         ).use { connection ->
 
-        ensure(connection.getAppAndVersion().name == "Ethereum") {
-                LedgerFailure.NotEthereumApp()
+            ensure(connection.getAppAndVersion().name == "Ethereum") {
+                LedgerFailure.NoEthereumApp()
             }
 
             val signature = connection.signTypedMessage(
@@ -225,10 +220,10 @@ class DefaultLedgerRepo(
     ): Either<LedgerFailure, Signature> = withContext(Dispatchers.Default) {
         either {
             catch({
-                doSignTransaction(listener, ledger, transaction, derivationPath).right()
+                doSignTransaction(listener, ledger, transaction, derivationPath)
             }) {
-                mapLedgerFailure(it).left()
-            }.bind()
+                raise(it.mapLedgerFailure(logger))
+            }
         }
     }
 
@@ -254,7 +249,7 @@ class DefaultLedgerRepo(
         ).use { connection ->
 
             ensure(connection.getAppAndVersion().name == "Ethereum") {
-                LedgerFailure.NotEthereumApp()
+                LedgerFailure.NoEthereumApp()
             }
 
             val type1559 = Type1559(
@@ -289,22 +284,6 @@ class DefaultLedgerRepo(
                 data = ByteString(encodedTransaction.data),
                 hash = Hash(ByteString(encodedTransaction.messageHash))
             )
-        }
-    }
-
-    private fun <T> Flow<Either<LedgerFailure, T>>.catchLedgerFailure() = catch {
-        emit(it.left().mapLedgerFailure())
-    }
-
-    private fun <T> Either<Throwable, T>.mapLedgerFailure() = mapLeft { mapLedgerFailure(it) }
-
-    private fun mapLedgerFailure(e: Throwable): LedgerFailure {
-        logger.w(e) { "Error happened" }
-        return when (e) {
-            is PermissionNotGrantedException -> LedgerFailure.PermissionNotGranted()
-            is UsbInterfaceNotClaimedException -> LedgerFailure.UsbInterfaceNotClaimed()
-            is RequestCanceledException -> LedgerFailure.RequestCanceled()
-            else -> LedgerFailure.Other()
         }
     }
 

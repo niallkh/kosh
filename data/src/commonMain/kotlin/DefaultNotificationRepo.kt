@@ -9,6 +9,7 @@ import kotlinx.coroutines.channels.BufferOverflow
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.filter
 import kotlinx.coroutines.flow.getAndUpdate
 import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.flow.update
@@ -28,6 +29,7 @@ class DefaultNotificationRepo : NotificationRepo {
 
     override val notifications: Flow<Notification>
         get() = notificationChannel.receiveAsFlow()
+            .filter { it.id !in cancelledIds.value }
 
     override suspend fun send(notification: Notification) {
         val alreadySent = notification.id in sentIds.getAndUpdate { it + notification.id }

@@ -40,7 +40,9 @@ public class IosAppScope(
         IosTransportComponent()
     }
 
-    override val dataComponent: DataComponent = IosDataComponent(dataStoreComponent)
+    override val dataComponent: DataComponent by provider {
+        IosDataComponent(dataStoreComponent)
+    }
 
     override val appRepositoriesComponent: AppRepositoriesComponent by provider {
         IosAppRepositoriesComponent(

@@ -18,8 +18,8 @@ class LedgerBleFormat(
 
     private val logger = Logger.withTag("[K]LedgerConnection")
 
-    override val mtu: Int
-        get() = connection.mtu
+    override val writeMtu: Int
+        get() = connection.writeMtu
 
     override suspend fun write(data: ByteString) {
         logger.v { "write(${data.size})" }
@@ -34,7 +34,7 @@ class LedgerBleFormat(
         while (source.exhausted().not()) {
             buffer.writeByte(TAG.toByte())
             buffer.writeShort(counter.toShort())
-            buffer.write(source, min(mtu - 3L, source.size))
+            buffer.write(source, min(writeMtu - 3L, source.size))
             connection.write(buffer.readByteString())
             counter++
         }
@@ -55,7 +55,7 @@ class LedgerBleFormat(
             require(chunk.readByte() == TAG.toByte())
             require(chunk.readShort() == counter.toShort())
 
-            buffer.write(chunk, min(msgSize - buffer.size, mtu - 3L))
+            buffer.write(chunk, min(msgSize - buffer.size, buffer.size))
 
             counter++
         }
@@ -85,7 +85,7 @@ class LedgerBleFormat(
     }
 
     private fun decodeHeader(
-        source: Source,
+        source: Buffer,
         sink: Sink,
     ): Short {
         require(source.readByte() == TAG.toByte())
@@ -93,11 +93,7 @@ class LedgerBleFormat(
 
         val msgSize = source.readShort()
 
-        if (msgSize <= mtu - 5) {
-            sink.write(source, msgSize.toLong())
-        } else {
-            sink.transferFrom(source)
-        }
+        sink.write(source, min(msgSize.toLong(), source.size))
 
         return msgSize
     }

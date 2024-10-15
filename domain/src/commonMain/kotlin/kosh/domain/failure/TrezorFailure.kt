@@ -1,40 +1,42 @@
 package kosh.domain.failure
 
 sealed interface TrezorFailure : AppFailure {
-    class NotConnected : TrezorFailure {
+    class Disabled : TrezorFailure {
         override val message: String
-            get() = "Trezor not connected"
+            get() = "Transport disabled. Please, enable device and try again."
+    }
+
+    class Disconnected : TrezorFailure {
+        override val message: String
+            get() = "Trezor disconnected. Please, connect device and try again."
     }
 
     class InvalidState : TrezorFailure {
         override val message: String
-            get() = "Trezor is in invalid state"
+            get() = "Trezor is in invalid state. Please, try again."
     }
 
     class PermissionNotGranted : TrezorFailure {
         override val message: String
-            get() = "Permission not granted"
+            get() = "Permission not granted. Please, grant permission."
     }
 
-    class UsbInterfaceNotClaimed : TrezorFailure {
+    class ConnectionFailed : TrezorFailure {
         override val message: String
-            get() = "Usb interface not claimed"
+            get() = "Couldn't connect to Trezor. Please, try again."
+    }
+
+    class CommunicationFailed : TrezorFailure {
+        override val message: String
+            get() = "Communication with Trezor failed. Please, try again."
     }
 
     class ActionCanceled : TrezorFailure {
         override val message: String
-            get() = "Action canceled"
+            get() = "Action canceled."
     }
 
-    class RequestCanceled : TrezorFailure {
-        override val message: String
-            get() = "Request canceled"
-    }
-
-    class Internal(override val message: String) : TrezorFailure
-
-    class Other : TrezorFailure {
-        override val message: String
-            get() = "Something went wrong"
-    }
+    class Other(
+        override val message: String = "Something went wrong.",
+    ) : TrezorFailure
 }

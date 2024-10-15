@@ -38,21 +38,21 @@ fun rememberSignLedger(
             val signature = when (request) {
                 is SignRequest.SignPersonal -> trezorAccountService.sign(
                     listener = trezorListener,
-                    ledger = ledger ?: raise(LedgerFailure.NotConnected()),
+                    ledger = ledger ?: raise(LedgerFailure.Disconnected()),
                     address = request.account,
                     message = request.message,
                 )
 
                 is SignRequest.SignTyped -> trezorAccountService.sign(
                     listener = trezorListener,
-                    ledger = ledger ?: raise(LedgerFailure.NotConnected()),
+                    ledger = ledger ?: raise(LedgerFailure.Disconnected()),
                     address = request.account,
                     jsonTypeData = request.json,
                 )
 
                 is SignRequest.SignTransaction -> trezorAccountService.sign(
                     listener = trezorListener,
-                    ledger = ledger ?: raise(LedgerFailure.NotConnected()),
+                    ledger = ledger ?: raise(LedgerFailure.Disconnected()),
                     transaction = request.data,
                 )
             }.bind()

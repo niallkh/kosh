@@ -24,6 +24,7 @@ kotlin {
         all {
             languageSettings {
                 optIn("kotlinx.io.bytestring.unsafe.UnsafeByteStringApi")
+                optIn("kotlin.uuid.ExperimentalUuidApi")
             }
         }
         commonMain.dependencies {

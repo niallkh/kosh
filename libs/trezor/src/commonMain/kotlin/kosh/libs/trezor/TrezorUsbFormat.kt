@@ -19,8 +19,8 @@ class TrezorUsbFormat(
 
     private val logger = Logger.withTag("[K]TrezorConnection")
 
-    override val mtu: Int
-        get() = connection.mtu
+    override val writeMtu: Int
+        get() = connection.writeMtu
 
     override suspend fun write(data: ByteString) {
         logger.v { "write(${data.size})" }
@@ -31,12 +31,12 @@ class TrezorUsbFormat(
         buffer.writeString("?##")
         buffer.writeShort(msgType)
         buffer.writeInt(message.size)
-        buffer.write(source, min(mtu - 9L, source.size))
+        buffer.write(source, min(writeMtu - 9L, source.size))
         connection.write(buffer.readByteString())
 
         while (source.exhausted().not()) {
             buffer.writeString("?")
-            buffer.write(source, min(mtu - 1L, source.size))
+            buffer.write(source, min(writeMtu - 1L, source.size))
             connection.write(buffer.readByteString())
         }
     }
@@ -60,7 +60,7 @@ class TrezorUsbFormat(
 
             require(chunk.readByte() == '?'.code.toByte())
 
-            buffer.write(chunk, min(msgSize - buffer.size, mtu - 1L))
+            buffer.write(chunk, min(msgSize - chunk.size, chunk.size))
         }
 
         return buffer.run {
@@ -95,7 +95,7 @@ class TrezorUsbFormat(
     }
 
     private fun decodeHeader(
-        source: Source,
+        source: Buffer,
         sink: Sink,
     ): Pair<Short, Int> {
         require(source.readByte() == '?'.code.toByte())
@@ -104,11 +104,7 @@ class TrezorUsbFormat(
         val msgType = source.readShort()
         val msgSize = source.readInt()
 
-        if (msgSize <= mtu - 9) {
-            sink.write(source, msgSize.toLong())
-        } else {
-            sink.transferFrom(source)
-        }
+        sink.write(source, min(msgSize.toLong(), source.size))
 
         return msgType to msgSize
     }
