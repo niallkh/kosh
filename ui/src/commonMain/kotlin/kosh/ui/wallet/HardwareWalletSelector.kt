@@ -9,6 +9,7 @@ import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.padding
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Bluetooth
 import androidx.compose.material.icons.filled.Usb
@@ -19,6 +20,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.key
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.unit.dp
 import kosh.domain.models.hw.HardwareWallet
 import kosh.domain.models.hw.HardwareWallet.Transport
 import kosh.domain.models.hw.Ledger
@@ -31,34 +33,31 @@ import kosh.ui.resources.icons.TrezorIcon
 
 @Composable
 fun HardwareWalletSelector(
-    visible: Boolean,
     onDismiss: () -> Unit,
     onSelected: (HardwareWallet) -> Unit,
 ) {
-    if (visible) {
-        KoshModalBottomSheet(
-            onDismissRequest = onDismiss,
-        ) { dismiss ->
-            val deviceList = rememberHardwareWallets()
+    KoshModalBottomSheet(
+        onDismissRequest = onDismiss,
+    ) { dismiss ->
+        val deviceList = rememberHardwareWallets()
 
-            val transition = updateTransition(deviceList.wallets)
+        val transition = updateTransition(deviceList.wallets)
 
-            transition.Crossfade(
-                contentKey = { it.isEmpty() }
-            ) {
-                if (it.isEmpty()) {
-                    Box(Modifier.fillMaxWidth()) {
-                        CircularProgressIndicator(Modifier.align(Alignment.Center))
-                    }
-                } else {
-                    Column {
-                        for (hw in it) {
-                            key(hw.id.value) {
-                                HardwareWallet(
-                                    hardwareWallet = hw,
-                                    onSelected = { dismiss { onSelected(it) } }
-                                )
-                            }
+        transition.Crossfade(
+            contentKey = { it.isEmpty() }
+        ) {
+            if (it.isEmpty()) {
+                Box(Modifier.fillMaxWidth()) {
+                    CircularProgressIndicator(Modifier.align(Alignment.Center).padding(8.dp))
+                }
+            } else {
+                Column {
+                    for (hw in it) {
+                        key(hw.id.value) {
+                            HardwareWallet(
+                                hardwareWallet = hw,
+                                onSelected = { dismiss { onSelected(it) } }
+                            )
                         }
                     }
                 }

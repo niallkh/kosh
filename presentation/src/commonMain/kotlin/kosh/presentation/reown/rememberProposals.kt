@@ -10,7 +10,7 @@ import kosh.domain.serializers.ImmutableList
 import kosh.domain.usecases.reown.WcProposalService
 import kosh.presentation.core.di
 import kosh.presentation.di.rememberLifecycleState
-import kosh.presentation.di.rememberRetainable
+import kosh.presentation.di.rememberRetained
 import kotlinx.collections.immutable.persistentListOf
 import kotlinx.collections.immutable.toPersistentList
 
@@ -18,7 +18,7 @@ import kotlinx.collections.immutable.toPersistentList
 fun rememberProposals(
     proposalService: WcProposalService = di { domain.wcProposalService },
 ): ProposalsState {
-    var proposals by rememberRetainable { mutableStateOf(persistentListOf<WcSessionProposal>()) }
+    var proposals by rememberRetained { mutableStateOf(persistentListOf<WcSessionProposal>()) }
 
     if (rememberLifecycleState()) {
         LaunchedEffect(Unit) {

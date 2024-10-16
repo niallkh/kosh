@@ -10,7 +10,7 @@ import kosh.domain.serializers.ImmutableList
 import kosh.domain.usecases.reown.WcAuthenticationService
 import kosh.presentation.core.di
 import kosh.presentation.di.rememberLifecycleState
-import kosh.presentation.di.rememberRetainable
+import kosh.presentation.di.rememberRetained
 import kotlinx.collections.immutable.persistentListOf
 import kotlinx.collections.immutable.toImmutableList
 import kotlinx.collections.immutable.toPersistentList
@@ -19,7 +19,7 @@ import kotlinx.collections.immutable.toPersistentList
 fun rememberAuthentications(
     authenticationService: WcAuthenticationService = di { domain.wcAuthenticationService },
 ): AuthenticationsState {
-    var authentications by rememberRetainable { mutableStateOf(persistentListOf<WcAuthentication>()) }
+    var authentications by rememberRetained { mutableStateOf(persistentListOf<WcAuthentication>()) }
 
     if (rememberLifecycleState()) {
         LaunchedEffect(Unit) {

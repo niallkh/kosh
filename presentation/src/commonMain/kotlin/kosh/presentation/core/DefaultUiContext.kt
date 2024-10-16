@@ -8,13 +8,12 @@ import com.arkivanov.essenty.instancekeeper.InstanceKeeperOwner
 import com.arkivanov.essenty.lifecycle.LifecycleOwner
 import com.arkivanov.essenty.statekeeper.StateKeeperOwner
 import kosh.presentation.di.UiScope
-import kotlin.reflect.KType
 
 class DefaultUiContext(
     componentContext: ComponentContext,
     override val logger: Logger,
     override val uiScope: UiScope,
-    override val container: MutableMap<KType, Any>,
+    override val container: MutableMap<String, Any>,
 ) : UiContext,
     LifecycleOwner by componentContext,
     StateKeeperOwner by componentContext,

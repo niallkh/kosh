@@ -19,8 +19,13 @@ interface Router<R : Route> {
 
 sealed class RouteResult<out R : Route> {
     data class Result(
-        val redirect: String? = null,
-    ) : RouteResult<Nothing>()
+        val redirect: String?,
+    ) : RouteResult<Nothing>() {
+        companion object {
+            private val empty = Result(null)
+            operator fun invoke() = empty
+        }
+    }
 
     data class Up<R : Route>(
         val route: R?,

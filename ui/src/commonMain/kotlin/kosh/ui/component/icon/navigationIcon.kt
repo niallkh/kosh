@@ -1,4 +1,4 @@
-package kosh.ui.navigation.animation
+package kosh.ui.component.icon
 
 import androidx.compose.animation.core.AnimationConstants.DefaultDurationMillis
 import androidx.compose.animation.core.animateFloat

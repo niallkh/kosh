@@ -6,7 +6,7 @@ kotlinx-serialization = "1.7.2"
 kotlinx-datetime = "0.6.0"
 kotlinx-collections-immutable = "0.3.8"
 kotlinx-io = "0.5.3"
-decompose = "3.2.0-beta02"
+decompose = "3.2.0-beta03"
 essenty = "2.2.0-beta01"
 image-loader = "1.8.1"
 arrow = "1.2.4"
@@ -72,7 +72,7 @@ kotlin-test = { module = "org.jetbrains.kotlin:kotlin-test", version.ref = "kotl
 kotlin-test-junit = { module = "org.jetbrains.kotlin:kotlin-test-junit", version.ref = "kotlin" }
 
 decompose = { module = "com.arkivanov.decompose:decompose", version.ref = "decompose" }
-decompose-compose = { module = "com.arkivanov.decompose:extensions-compose", version.ref = "decompose" }
+decompose-compose = { module = "com.arkivanov.decompose:extensions-compose-experimental", version.ref = "decompose" }
 decompose-android = { module = "com.arkivanov.decompose:extensions-android", version.ref = "decompose" }
 essenty-lifecycle = { module = "com.arkivanov.essenty:lifecycle", version.ref = "essenty" }
 essenty-state-keeper = { module = "com.arkivanov.essenty:state-keeper", version.ref = "essenty" }

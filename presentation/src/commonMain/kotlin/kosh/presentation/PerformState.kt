@@ -9,8 +9,9 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import arrow.core.raise.Raise
 import arrow.core.raise.recover
-import kosh.presentation.di.rememberRetainable
+import kosh.presentation.di.rememberRetained
 
+@Deprecated("")
 @Stable
 class PerformState<P : Any, R, E> {
     var inProgress: Boolean by mutableStateOf(false)
@@ -20,12 +21,14 @@ class PerformState<P : Any, R, E> {
     var result: R? by mutableStateOf(null)
     var performed: Boolean by mutableStateOf(false)
 
+    @Deprecated("")
     operator fun invoke(params: P) {
         this.params = params
         result = null
         performed = false
     }
 
+    @Deprecated("")
     fun retry() {
         retry++
     }
@@ -55,12 +58,15 @@ class PerformState<P : Any, R, E> {
     }
 }
 
+@Deprecated("")
 operator fun PerformState<Unit, *, *>.invoke() = invoke(Unit)
 
+@Deprecated("")
 @Composable
 inline fun <reified P : Any, reified R, reified E> rememberPerform(): PerformState<P, R, E> =
-    rememberRetainable { PerformState() }
+    rememberRetained { PerformState() }
 
+@Deprecated("")
 @Composable
 inline fun <reified P : Any, reified R, reified E> Perform(
     vararg keys: Any?,
@@ -75,6 +81,7 @@ inline fun <reified P : Any, reified R, reified E> Perform(
     return actionState
 }
 
+@Deprecated("")
 @Composable
 inline fun <reified R : Any, reified E> Perform(
     vararg keys: Any?,
@@ -89,6 +96,7 @@ inline fun <reified R : Any, reified E> Perform(
     return actionState
 }
 
+@Deprecated("")
 @Composable
 inline fun Perform(
     vararg keys: Any?,
@@ -102,6 +110,3 @@ inline fun Perform(
 
     return actionState
 }
-
-
-

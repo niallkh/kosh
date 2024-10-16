@@ -8,4 +8,4 @@ import com.arkivanov.essenty.backhandler.BackHandler
 actual fun <C : Any, T : Any> backStackAnimation(
     backHandler: BackHandler,
     onBack: () -> Unit,
-): StackAnimation<C, T> = stackAnimationSharedAxisX()
+): StackAnimation<C, T> = TODO()

@@ -1,4 +1,4 @@
-package kosh.ui.navigation.animation
+package kosh.ui.navigation.animation.transitions
 
 import androidx.compose.animation.EnterTransition
 import androidx.compose.animation.ExitTransition

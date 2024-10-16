@@ -23,17 +23,14 @@ import androidx.compose.material3.Switch
 import androidx.compose.material3.Text
 import androidx.compose.material3.VerticalDivider
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.getValue
 import androidx.compose.runtime.key
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.saveable.rememberSaveable
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import arrow.core.partially1
+import com.arkivanov.decompose.router.slot.dismiss
 import kosh.domain.entities.AccountEntity
 import kosh.domain.entities.WalletEntity
 import kosh.domain.models.hw.HardwareWallet
@@ -46,6 +43,8 @@ import kosh.ui.component.illustration.Illustration
 import kosh.ui.component.scaffold.KoshScaffold
 import kosh.ui.component.text.TextAddressShort
 import kosh.ui.component.text.TextLine
+import kosh.ui.navigation.slot.SlotHost
+import kosh.ui.navigation.slot.rememberSlotRouter
 import kosh.ui.resources.Res
 import kosh.ui.resources.icons.LedgerIcon
 import kosh.ui.resources.icons.TrezorIcon
@@ -90,16 +89,17 @@ fun WalletsContent(
         modifier = modifier,
         title = { Text(stringResource(Res.string.wallets_title)) },
         floatingActionButton = {
-            var selectorVisible by rememberSaveable { mutableStateOf(false) }
+            val slotRouter = rememberSlotRouter()
 
-            HardwareWalletSelector(
-                visible = selectorVisible,
-                onDismiss = { selectorVisible = false },
-                onSelected = onAdd
-            )
+            SlotHost(slotRouter) {
+                HardwareWalletSelector(
+                    onDismiss = slotRouter::dismiss,
+                    onSelected = onAdd
+                )
+            }
 
             FloatingActionButton(
-                onClick = { selectorVisible = true },
+                onClick = { slotRouter.activate() },
             ) {
                 Icon(Icons.Default.Add, contentDescription = "Add Wallet")
             }

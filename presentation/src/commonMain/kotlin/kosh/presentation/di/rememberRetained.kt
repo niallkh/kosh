@@ -6,28 +6,28 @@ import androidx.compose.runtime.RememberObserver
 import androidx.compose.runtime.SideEffect
 import androidx.compose.runtime.currentCompositeKeyHash
 import androidx.compose.runtime.remember
-import com.arkivanov.essenty.instancekeeper.InstanceKeeper
-import com.arkivanov.essenty.instancekeeper.getOrCreate
 import kosh.presentation.core.LocalUiContext
+import kosh.presentation.core.UiContext
+import kosh.presentation.core.getOrCreate
 
 @Composable
-fun <T> rememberRetainable(
+fun <T : Any> rememberRetained(
     vararg inputs: Any?,
     key: String = currentCompositeKeyHash.toString(36),
     init: @DisallowComposableCalls () -> T,
 ): T {
-    val instanceKeeper = LocalUiContext.current.instanceKeeper
+    val uiContext = LocalUiContext.current
 
     val holder = remember {
-        instanceKeeper.getOrCreate(key) {
-            InstanceHolder(inputs, init(), instanceKeeper, key)
+        uiContext.getOrCreate(key) {
+            InstanceHolder(inputs, init(), uiContext, key)
         }
     }
 
     val value = holder.getValueIfInputsDidntChange(inputs) ?: init()
 
     SideEffect {
-        holder.update(inputs, value, instanceKeeper, key)
+        holder.update(inputs, value, uiContext, key)
     }
 
     return value
@@ -36,19 +36,19 @@ fun <T> rememberRetainable(
 private class InstanceHolder<T>(
     private var inputs: Array<out Any?>,
     private var value: T,
-    private var instanceKeeper: InstanceKeeper,
+    private var uiContext: UiContext,
     private var key: String,
-) : InstanceKeeper.Instance, RememberObserver {
+) : RememberObserver {
 
     fun update(
         inputs: Array<out Any?>,
         value: T,
-        instanceKeeper: InstanceKeeper,
+        uiContext: UiContext,
         key: String,
     ) {
-        if (instanceKeeper != this.instanceKeeper || key == this.key) {
+        if (uiContext != this.uiContext || key == this.key) {
             remove()
-            this.instanceKeeper = instanceKeeper
+            this.uiContext = uiContext
             this.key = key
             put()
         }
@@ -68,23 +68,20 @@ private class InstanceHolder<T>(
     }
 
     private fun put() {
-        remove()
-        instanceKeeper.put(key, this)
+        uiContext.container[key] = this
     }
 
     private fun remove() {
-        if (instanceKeeper.get(key) != null) {
-            instanceKeeper.remove(key)
-        }
+        uiContext.container.remove(key)
     }
 
     override fun onRemembered() {
         put()
     }
 
-    override fun onForgotten() { // TODO
+    override fun onForgotten() {
     }
 
-    override fun onAbandoned() { // TODO
+    override fun onAbandoned() {
     }
 }

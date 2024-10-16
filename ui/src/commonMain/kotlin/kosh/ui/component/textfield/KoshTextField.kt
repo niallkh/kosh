@@ -28,8 +28,8 @@ import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.text.input.VisualTransformation
 import kosh.ui.component.modifier.optionalClickable
-import kosh.ui.navigation.animation.fadeIn
-import kosh.ui.navigation.animation.fadeOut
+import kosh.ui.navigation.animation.transitions.fadeIn
+import kosh.ui.navigation.animation.transitions.fadeOut
 
 @Composable
 fun KoshTextField(

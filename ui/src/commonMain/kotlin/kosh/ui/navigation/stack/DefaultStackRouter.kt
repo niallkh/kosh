@@ -9,8 +9,9 @@ import com.arkivanov.decompose.router.stack.childStack
 import com.arkivanov.decompose.router.stack.pop
 import com.arkivanov.decompose.router.stack.replaceAll
 import com.arkivanov.decompose.value.Value
+import kosh.presentation.core.LocalUiContext
 import kosh.presentation.core.UiContext
-import kosh.presentation.di.rememberOnRoute
+import kosh.presentation.di.rememberRetained
 import kosh.ui.navigation.RouteResult
 import kosh.ui.navigation.isDeeplink
 import kosh.ui.navigation.routes.Route
@@ -42,7 +43,7 @@ class DefaultStackRouter<R : Route>(
     )
 
     override fun pop(result: RouteResult<R>) {
-        pop { if (it.not()) onResult(result) }
+        pop { if (!it) onResult(result) }
     }
 
     override fun pop() {
@@ -81,15 +82,15 @@ inline fun <reified R : @Serializable Route> rememberStackRouter(
     serializer: KSerializer<R> = serializer(),
     noinline onResult: @DisallowComposableCalls StackRouter<R>.(RouteResult<R>) -> Unit,
 ): StackRouter<R> {
-    val stackRouter = rememberOnRoute<StackRouter<R>> {
+    val uiContext = LocalUiContext.current
+
+    return rememberRetained(key = "StackRouter") {
         DefaultStackRouter(
-            uiContext = this,
+            uiContext = uiContext,
             serializer = serializer,
             start = start,
             link = link,
             onResult = onResult,
         )
     }
-
-    return stackRouter
 }
