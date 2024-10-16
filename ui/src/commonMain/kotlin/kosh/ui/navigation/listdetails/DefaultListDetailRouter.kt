@@ -7,8 +7,9 @@ import com.arkivanov.decompose.router.children.SimpleNavigation
 import com.arkivanov.decompose.router.children.children
 import com.arkivanov.decompose.value.Value
 import com.arkivanov.essenty.backhandler.BackCallback
+import kosh.presentation.core.LocalUiContext
 import kosh.presentation.core.UiContext
-import kosh.presentation.di.rememberOnRoute
+import kosh.presentation.di.rememberRetained
 import kosh.ui.navigation.RouteResult
 import kosh.ui.navigation.routes.Route
 import kotlinx.serialization.KSerializer
@@ -85,9 +86,11 @@ inline fun <reified R : @Serializable Route> rememberListDetailRouter(
     serializer: KSerializer<R> = serializer(),
     noinline list: @DisallowComposableCalls () -> R,
 ): ListDetailRouter<R> {
-    val stackRouter = rememberOnRoute<ListDetailRouter<R>> {
+    val uiContext = LocalUiContext.current
+
+    val stackRouter = rememberRetained {
         DefaultListDetailRouter(
-            uiContext = this,
+            uiContext = uiContext,
             serializer = serializer,
             initial = {
                 // TODO check if deeplink

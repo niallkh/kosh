@@ -15,7 +15,7 @@ import kosh.domain.models.reown.WcRequest
 import kosh.domain.models.web3.Signature
 import kosh.domain.usecases.reown.WcRequestService
 import kosh.presentation.core.di
-import kosh.presentation.di.rememberRetainable
+import kosh.presentation.di.rememberRetained
 import kosh.presentation.models.SignRequest
 import kosh.presentation.transaction.rememberSignPersonal
 
@@ -24,8 +24,8 @@ fun rememberSignPersonalRequest(
     id: WcRequest.Id,
     requestService: WcRequestService = di { domain.wcRequestService },
 ): SignPersonalRequestState {
-    var request by rememberRetainable { mutableStateOf<WcRequest?>(null) }
-    var call by rememberRetainable { mutableStateOf<WcRequest.Call.SignPersonal?>(null) }
+    var request by rememberRetained { mutableStateOf<WcRequest?>(null) }
+    var call by rememberRetained { mutableStateOf<WcRequest.Call.SignPersonal?>(null) }
     var loading by remember { mutableStateOf(false) }
     var failure by remember { mutableStateOf<WcFailure?>(null) }
     var retry by remember { mutableIntStateOf(0) }

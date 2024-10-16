@@ -4,15 +4,22 @@ import androidx.compose.animation.EnterTransition
 import androidx.compose.animation.ExitTransition
 import androidx.compose.ui.unit.Density
 import androidx.compose.ui.unit.dp
-import com.arkivanov.decompose.extensions.compose.stack.animation.predictiveback.PredictiveBackAnimatable
-import com.arkivanov.essenty.backhandler.BackEvent
+import kosh.ui.navigation.animation.transitions.backSharedAxisXIn
+import kosh.ui.navigation.animation.transitions.backSharedAxisXOut
+import kosh.ui.navigation.animation.transitions.sharedAxisXIn
+import kosh.ui.navigation.animation.transitions.sharedAxisXOut
+import kosh.ui.navigation.animation.transitions.sharedAxisYIn
+import kosh.ui.navigation.animation.transitions.sharedAxisYOut
+import kosh.ui.navigation.animation.transitions.sharedAxisZIn
+import kosh.ui.navigation.animation.transitions.sharedAxisZOut
 
 data class StackAnimationData(
     val pushEnter: EnterTransition,
     val pushExit: ExitTransition,
     val popEnter: EnterTransition,
     val popExit: ExitTransition,
-    val predictiveBack: (BackEvent) -> PredictiveBackAnimatable,
+    val backEnter: EnterTransition? = null,
+    val backExit: ExitTransition? = null,
 )
 
 fun Density.sharedAxisX(
@@ -22,7 +29,8 @@ fun Density.sharedAxisX(
     pushExit = sharedAxisXOut(slide, pop = false),
     popEnter = sharedAxisXIn(slide, pop = true),
     popExit = sharedAxisXOut(slide, pop = true),
-    predictiveBack = { MaterialSharedAxisXAnimatable(it, slide) }
+    backEnter = backSharedAxisXIn(slide),
+    backExit = backSharedAxisXOut(slide),
 )
 
 fun Density.sharedAxisY(
@@ -32,7 +40,6 @@ fun Density.sharedAxisY(
     pushExit = sharedAxisYOut(slide, pop = false),
     popEnter = sharedAxisYIn(slide, pop = true),
     popExit = sharedAxisYOut(slide, pop = true),
-    predictiveBack = { MaterialSharedAxisYAnimatable(it, slide) }
 )
 
 fun sharedAxisZ(): StackAnimationData = StackAnimationData(
@@ -40,5 +47,4 @@ fun sharedAxisZ(): StackAnimationData = StackAnimationData(
     pushExit = sharedAxisZOut(1.1f),
     popEnter = sharedAxisZIn(1.1f),
     popExit = sharedAxisZOut(0.8f),
-    predictiveBack = { MaterialSharedAxisZAnimatable(it) }
 )

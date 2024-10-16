@@ -10,7 +10,7 @@ import kosh.domain.serializers.ImmutableList
 import kosh.domain.usecases.reown.WcRequestService
 import kosh.presentation.core.di
 import kosh.presentation.di.rememberLifecycleState
-import kosh.presentation.di.rememberRetainable
+import kosh.presentation.di.rememberRetained
 import kotlinx.collections.immutable.persistentListOf
 import kotlinx.collections.immutable.toPersistentList
 
@@ -18,7 +18,7 @@ import kotlinx.collections.immutable.toPersistentList
 fun rememberRequests(
     requestService: WcRequestService = di { domain.wcRequestService },
 ): RequestsState {
-    var requests by rememberRetainable { mutableStateOf(persistentListOf<WcRequest>()) }
+    var requests by rememberRetained { mutableStateOf(persistentListOf<WcRequest>()) }
 
     if (rememberLifecycleState()) {
         LaunchedEffect(Unit) {

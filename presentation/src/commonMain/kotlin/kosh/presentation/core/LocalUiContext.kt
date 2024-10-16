@@ -13,3 +13,15 @@ val LocalUiContext: ProvidableCompositionLocal<UiContext> = compositionLocalOf {
 inline fun <reified VM : Any> di(
     crossinline block: UiScope.() -> VM,
 ): VM = LocalUiContext.current.uiScope.block()
+
+inline fun <reified T : Any> UiContext.getOrCreate(
+    key: String,
+    factory: () -> T,
+): T {
+    var instance: T? = container[key] as T?
+    if (instance == null) {
+        instance = factory()
+        container[key] = instance
+    }
+    return instance
+}

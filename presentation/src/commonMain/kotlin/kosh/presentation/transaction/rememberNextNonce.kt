@@ -5,8 +5,8 @@ import kosh.domain.failure.Web3Failure
 import kosh.domain.models.Address
 import kosh.domain.models.ChainId
 import kosh.domain.repositories.TransactionRepo
-import kosh.presentation.Load
 import kosh.presentation.core.di
+import kosh.presentation.rememberLoad
 
 @Composable
 fun rememberNextNonce(
@@ -14,15 +14,15 @@ fun rememberNextNonce(
     account: Address,
     transactionRepo: TransactionRepo = di { appRepositoriesComponent.transactionRepo },
 ): NextNonceState {
-    val nonce = Load(chainId, account) {
-        transactionRepo.nextNonce(chainId, account).bind()
+    val nonce = rememberLoad(chainId, account) {
+        transactionRepo.nextNonce(chainId, account)
     }
 
     return NextNonceState(
-        nonce = nonce.content,
+        nonce = nonce.result?.getOrNull(),
         loading = nonce.loading,
-        failure = nonce.failure,
-        retry = { nonce.retry() }
+        failure = nonce.result?.leftOrNull(),
+        retry = { nonce() }
     )
 }
 

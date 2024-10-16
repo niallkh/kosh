@@ -1,4 +1,4 @@
-package kosh.ui.navigation.animation
+package kosh.ui.navigation.animation.transitions
 
 import androidx.compose.animation.EnterTransition
 import androidx.compose.animation.ExitTransition
@@ -7,7 +7,6 @@ import androidx.compose.animation.core.LinearOutSlowInEasing
 import androidx.compose.animation.core.tween
 import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
-import androidx.compose.animation.scaleIn
 
 fun fadeThroughIn(): EnterTransition = fadeIn(
     tween(
@@ -15,13 +14,6 @@ fun fadeThroughIn(): EnterTransition = fadeIn(
         durationMillis = 210,
         easing = LinearOutSlowInEasing
     ),
-) + scaleIn(
-    tween(
-        delayMillis = 90,
-        durationMillis = 210,
-        easing = LinearOutSlowInEasing
-    ),
-    initialScale = 0.92f
 )
 
 fun fadeThroughOut(): ExitTransition = fadeOut(

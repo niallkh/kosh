@@ -16,7 +16,7 @@ import kosh.domain.models.token.TokenMetadata
 import kosh.domain.serializers.ImmutableList
 import kosh.domain.usecases.token.TokenDiscoveryService
 import kosh.presentation.core.di
-import kosh.presentation.di.rememberRetainable
+import kosh.presentation.di.rememberRetained
 import kotlinx.collections.immutable.mutate
 import kotlinx.collections.immutable.persistentListOf
 import kotlinx.collections.immutable.toPersistentList
@@ -27,7 +27,7 @@ fun rememberSearchToken(
     icon: Pair<Address, Uri>? = null,
     tokenDiscoveryService: TokenDiscoveryService = di { domain.tokenDiscoveryService },
 ): SearchTokenState {
-    var tokens by rememberRetainable { mutableStateOf(persistentListOf<TokenMetadata>()) }
+    var tokens by rememberRetained { mutableStateOf(persistentListOf<TokenMetadata>()) }
     var loading by remember { mutableStateOf(false) }
     var failure by remember { mutableStateOf<Web3Failure?>(null) }
     var retry by remember { mutableIntStateOf(0) }

@@ -31,9 +31,9 @@ import kosh.ui.analytics.LogScreen
 import kosh.ui.component.scaffold.KoshScaffold
 import kosh.ui.component.scaffold.ProvideSnackbarOffset
 import kosh.ui.navigation.RouteResult
-import kosh.ui.navigation.animation.fadeThroughIn
-import kosh.ui.navigation.animation.fadeThroughOut
 import kosh.ui.navigation.animation.stackAnimationFadeThrough
+import kosh.ui.navigation.animation.transitions.fadeThroughIn
+import kosh.ui.navigation.animation.transitions.fadeThroughOut
 import kosh.ui.navigation.routes.HomeRoute
 import kosh.ui.navigation.routes.RootRoute
 import kosh.ui.navigation.routes.TokensRoute
