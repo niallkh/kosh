@@ -8,8 +8,6 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.ComposeUIViewController
 import co.touchlab.kermit.Logger
-import co.touchlab.kermit.NSLogWriter
-import co.touchlab.kermit.Severity
 import com.arkivanov.decompose.extensions.compose.stack.animation.predictiveback.PredictiveBackGestureOverlay
 import com.arkivanov.decompose.router.stack.pushNew
 import com.arkivanov.decompose.router.stack.replaceAll
@@ -37,15 +35,6 @@ public fun rootViewController(
     appScope: AppScope,
     uiContext: UiContext,
 ): UIViewController {
-
-    Logger.setTag("[K]")
-    if (appScope.appComponent.debug) {
-        Logger.setMinSeverity(Severity.Verbose)
-        Logger.setLogWriters(NSLogWriter())
-    } else {
-        Logger.setMinSeverity(Severity.Info)
-        Logger.setLogWriters(NSLogWriter())
-    }
 
     val start: RootRoute = RootRoute.Home()
 

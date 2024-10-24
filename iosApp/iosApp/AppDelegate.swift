@@ -1,7 +1,8 @@
 import UIKit
 import SwiftUI
 import App
-
+import Bugsnag
+import BugsnagPerformance
 
 class AppDelegate: NSObject, UIApplicationDelegate {
     var appScope: AppScope? = nil
@@ -19,10 +20,12 @@ class AppDelegate: NSObject, UIApplicationDelegate {
         didFinishLaunchingWithOptions launchOptions: [UIApplication.LaunchOptionsKey : Any]? = nil
     ) -> Bool {
         print("[K]didFinishLaunchingWithOptions")
+        
         appScope = IosAppScope(
             reownComponent: IosReownComponent(
                 reownAdapter: IosReownAdapter(projectId: Bundle.main.object(forInfoDictionaryKey: "REOWN_PROJECT") as! String)
-            )
+            ),
+            bugsnagConfiguration: BugsnagConfiguration.loadConfig()
         )
         
         self.stateKeeper = self.stateKeeper ?? StateKeeperDispatcherKt.StateKeeperDispatcher(savedState: nil)

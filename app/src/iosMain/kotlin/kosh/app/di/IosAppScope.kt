@@ -1,5 +1,11 @@
 package kosh.app.di
 
+import co.touchlab.crashkios.bugsnag.BugsnagConfiguration
+import co.touchlab.crashkios.bugsnag.startBugsnag
+import co.touchlab.kermit.Logger
+import co.touchlab.kermit.NSLogWriter
+import co.touchlab.kermit.Severity
+import co.touchlab.kermit.bugsnag.BugsnagLogWriter
 import kosh.app.IosPushNotifier
 import kosh.app.di.impl.DefaultAppScope
 import kosh.data.DataComponent
@@ -11,6 +17,7 @@ import platform.Foundation.NSBundle
 
 public class IosAppScope(
     override val reownComponent: ReownComponent,
+    bugsnagConfiguration: BugsnagConfiguration,
 ) : DefaultAppScope(), IosAppComponent {
 
     override val appComponent: AppComponent
@@ -56,6 +63,26 @@ public class IosAppScope(
             ledgerComponent = ledgerComponent,
             reownComponent = reownComponent,
         )
+    }
+
+    init {
+        startBugsnag(bugsnagConfiguration)
+
+        Logger.setTag("[K]")
+        if (appComponent.debug) {
+            Logger.setMinSeverity(Severity.Verbose)
+            Logger.setLogWriters(
+                NSLogWriter(),
+                BugsnagLogWriter(
+                    minCrashSeverity = Severity.Error,
+                )
+            )
+        } else {
+            Logger.setMinSeverity(Severity.Info)
+            Logger.setLogWriters(
+                BugsnagLogWriter()
+            )
+        }
     }
 
     init {

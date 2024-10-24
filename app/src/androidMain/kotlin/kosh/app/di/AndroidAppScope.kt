@@ -1,6 +1,12 @@
 package kosh.app.di
 
 import android.content.Context
+import android.os.StrictMode
+import co.touchlab.kermit.LogcatWriter
+import co.touchlab.kermit.Logger
+import co.touchlab.kermit.Severity
+import co.touchlab.kermit.bugsnag.BugsnagLogWriter
+import com.bugsnag.android.Bugsnag
 import kosh.app.AndroidPushNotifier
 import kosh.app.BuildConfig
 import kosh.app.di.impl.DefaultAppScope
@@ -100,9 +106,30 @@ internal class AndroidAppScope(
     }
 
     init {
+        Bugsnag.start(context)
+
+        Logger.setTag("[K]")
+
+        if (BuildConfig.DEBUG) {
+            StrictMode.enableDefaults()
+            Logger.setMinSeverity(Severity.Verbose)
+            Logger.setLogWriters(
+                LogcatWriter(),
+                BugsnagLogWriter(
+                    minCrashSeverity = Severity.Error,
+                )
+            )
+        } else {
+            Logger.setMinSeverity(Severity.Info)
+            Logger.setLogWriters(
+                BugsnagLogWriter()
+            )
+        }
+    }
+
+    init {
         coroutinesComponent.applicationScope.launch {
             androidPushNotifier.start()
         }
     }
 }
-

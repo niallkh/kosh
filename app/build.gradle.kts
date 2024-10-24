@@ -7,6 +7,7 @@ plugins {
     alias(libs.plugins.androidApplication)
     alias(libs.plugins.jetbrainsCompose)
     alias(libs.plugins.compose.compiler)
+    alias(libs.plugins.bugsnagAndroid)
 }
 
 kotlin {
@@ -37,6 +38,8 @@ kotlin {
             export(libs.essenty.state.keeper)
             export(libs.essenty.instance.keeper)
             export(libs.essenty.back.handler)
+            export(libs.bugsnag.crashkios)
+            export(libs.kermit.simple)
         }
     }
 
@@ -51,6 +54,7 @@ kotlin {
                 optIn("kotlinx.io.bytestring.unsafe.UnsafeByteStringApi")
                 optIn("com.arkivanov.decompose.ExperimentalDecomposeApi")
                 optIn("kotlinx.coroutines.ExperimentalCoroutinesApi")
+                optIn("co.touchlab.kermit.ExperimentalKermitApi")
             }
         }
 
@@ -62,6 +66,8 @@ kotlin {
             implementation(libs.androidx.work)
             implementation(libs.androidx.lifecycle.service)
             implementation(libs.androidx.lifecycle.process)
+            implementation(libs.bugsnag.android)
+            implementation(libs.bugsnag.android.perf)
             implementation(libs.decompose.android)
             implementation(libs.ktor.client.okhttp)
             implementation(libs.secp256k1.android)
@@ -100,6 +106,7 @@ kotlin {
             implementation(libs.ktor.client)
             implementation(libs.ktor.client.logging)
             implementation(libs.ktor.client.encoding)
+            implementation(libs.kermit.bugsnag)
 
             api(libs.arrow)
             api(libs.decompose)
@@ -108,6 +115,7 @@ kotlin {
             api(libs.essenty.state.keeper)
             api(libs.essenty.instance.keeper)
             api(libs.essenty.back.handler)
+            api(libs.bugsnag.crashkios)
         }
 
         commonTest.dependencies {
@@ -116,6 +124,7 @@ kotlin {
 
         iosMain.dependencies {
             implementation(libs.ktor.client.darwin)
+            api(libs.kermit.simple)
         }
     }
 }
@@ -132,12 +141,14 @@ android {
         applicationId = "eth.kosh.app"
         minSdk = libs.versions.android.minSdk.get().toInt()
         targetSdk = libs.versions.android.compileSdk.get().toInt()
-        versionCode = 7
-        versionName = "0.0.3"
+        versionCode = 8
+        versionName = "0.0.4"
+
+        manifestPlaceholders["BUGSNAG_KEY"] = getLocalProperty("bugsnag.key") as String
     }
 
     buildTypes {
-        debug {
+        all {
             buildConfigField(
                 "String",
                 "GROVE_KEY",
@@ -148,24 +159,15 @@ android {
                 "REOWN_PROJECT",
                 "\"${getLocalProperty("reown.project")}\""
             )
+        }
 
+        debug {
             applicationIdSuffix = ".debug"
             isDebuggable = true
             isMinifyEnabled = false
         }
 
         release {
-            buildConfigField(
-                "String",
-                "GROVE_KEY",
-                "\"${getLocalProperty("grove.key")}\""
-            )
-            buildConfigField(
-                "String",
-                "REOWN_PROJECT",
-                "\"${getLocalProperty("reown.project")}\""
-            )
-
             isDebuggable = false
             isMinifyEnabled = true
 

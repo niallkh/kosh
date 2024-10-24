@@ -19,9 +19,9 @@ interface AppStateRepo : Repository {
     suspend fun modify(update: Copy<AppState>.() -> Unit)
 }
 
-inline fun AppStateRepo.state() = state.value
+fun AppStateRepo.state() = state.value
 
-inline fun <T> AppStateRepo.optic(g: Getter<AppState, T>): StateFlow<T> = state.optic(g)
+fun <T> AppStateRepo.optic(g: Getter<AppState, T>): StateFlow<T> = state.optic(g)
 
 fun stateTransaction(block: () -> Unit) {
     takeMutableSnapshot().run {

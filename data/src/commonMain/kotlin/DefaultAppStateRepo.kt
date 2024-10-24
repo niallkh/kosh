@@ -12,12 +12,10 @@ import kosh.domain.utils.Copy
 import kosh.domain.utils.copy
 import kosh.domain.utils.selectLatest
 import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
-import kotlin.time.Duration.Companion.seconds
 
 class DefaultAppStateRepo(
     private val appStateSource: AppStateSource,
@@ -28,7 +26,6 @@ class DefaultAppStateRepo(
     override var init by mutableStateOf(false)
 
     private val initLazy = suspendLazy {
-        delay(10.seconds)
         state.value = appStateSource.state.first()
         init = true
     }

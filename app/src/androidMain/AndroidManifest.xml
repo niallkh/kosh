@@ -38,6 +38,15 @@
         android:theme="@style/Theme.Kosh.Starting"
         tools:replace="android:dataExtractionRules"
         tools:targetApi="34">
+
+        <meta-data
+            android:name="com.bugsnag.android.API_KEY"
+            android:value="${BUGSNAG_KEY}" />
+
+        <meta-data
+            android:name="com.bugsnag.performance.android.API_KEY"
+            android:value="${BUGSNAG_KEY}" />
+
         <activity
             android:name=".KoshActivity"
             android:configChanges="orientation|screenSize|screenLayout|keyboardHidden|mnc|colorMode|density|fontScale|fontWeightAdjustment|keyboard|layoutDirection|locale|mcc|navigation|smallestScreenSize|touchscreen|uiMode"

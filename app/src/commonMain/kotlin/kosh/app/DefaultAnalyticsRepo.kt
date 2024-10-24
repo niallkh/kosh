@@ -8,10 +8,10 @@ internal object DefaultAnalyticsRepo : AnalyticsRepo {
     private val logger = Logger.withTag("[K]AnalyticsRepo")
 
     override fun logScreen(name: String) {
-        logger.d { "logScreen(name=$name)" }
+        logger.i { "logScreen(name=$name)" }
     }
 
     override fun logEvent(name: String, params: Map<String, String>) {
-        logger.d { "logEvent(name=$name)" }
+        logger.i { "logEvent(name=$name, params=$params)" }
     }
 }

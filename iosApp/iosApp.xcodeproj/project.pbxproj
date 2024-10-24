@@ -15,6 +15,11 @@
 		EC900D9C2CAEA269004B5044 /* Starscream in Frameworks */ = {isa = PBXBuildFile; productRef = EC900D9B2CAEA269004B5044 /* Starscream */; };
 		EC9122FA2CB84E8000913E89 /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = EC9122F92CB84E8000913E89 /* AppDelegate.swift */; };
 		ECB0F1E62CAAFB6A00F1B561 /* ReownWalletKit in Frameworks */ = {isa = PBXBuildFile; productRef = ECB0F1E52CAAFB6A00F1B561 /* ReownWalletKit */; };
+		ECFE891E2CCA975500CE0454 /* Bugsnag in Frameworks */ = {isa = PBXBuildFile; productRef = ECFE891D2CCA975500CE0454 /* Bugsnag */; };
+		ECFE89202CCA975500CE0454 /* BugsnagNetworkRequestPlugin in Frameworks */ = {isa = PBXBuildFile; productRef = ECFE891F2CCA975500CE0454 /* BugsnagNetworkRequestPlugin */; };
+		ECFE89232CCA9A1500CE0454 /* BugsnagPerformance in Frameworks */ = {isa = PBXBuildFile; productRef = ECFE89222CCA9A1500CE0454 /* BugsnagPerformance */; };
+		ECFE89252CCA9A1500CE0454 /* BugsnagPerformanceSwift in Frameworks */ = {isa = PBXBuildFile; productRef = ECFE89242CCA9A1500CE0454 /* BugsnagPerformanceSwift */; };
+		ECFE89272CCA9A1500CE0454 /* BugsnagPerformanceSwiftUI in Frameworks */ = {isa = PBXBuildFile; productRef = ECFE89262CCA9A1500CE0454 /* BugsnagPerformanceSwiftUI */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -42,8 +47,13 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				ECFE89232CCA9A1500CE0454 /* BugsnagPerformance in Frameworks */,
+				ECFE89272CCA9A1500CE0454 /* BugsnagPerformanceSwiftUI in Frameworks */,
+				ECFE89202CCA975500CE0454 /* BugsnagNetworkRequestPlugin in Frameworks */,
+				ECFE891E2CCA975500CE0454 /* Bugsnag in Frameworks */,
 				ECB0F1E62CAAFB6A00F1B561 /* ReownWalletKit in Frameworks */,
 				EC900D9C2CAEA269004B5044 /* Starscream in Frameworks */,
+				ECFE89252CCA9A1500CE0454 /* BugsnagPerformanceSwift in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -133,6 +143,11 @@
 			packageProductDependencies = (
 				ECB0F1E52CAAFB6A00F1B561 /* ReownWalletKit */,
 				EC900D9B2CAEA269004B5044 /* Starscream */,
+				ECFE891D2CCA975500CE0454 /* Bugsnag */,
+				ECFE891F2CCA975500CE0454 /* BugsnagNetworkRequestPlugin */,
+				ECFE89222CCA9A1500CE0454 /* BugsnagPerformance */,
+				ECFE89242CCA9A1500CE0454 /* BugsnagPerformanceSwift */,
+				ECFE89262CCA9A1500CE0454 /* BugsnagPerformanceSwiftUI */,
 			);
 			productName = iosApp;
 			productReference = 7555FF7B242A565900829871 /* Kosh Debug.app */;
@@ -166,6 +181,8 @@
 			packageReferences = (
 				ECB0F1E22CAAE19B00F1B561 /* XCRemoteSwiftPackageReference "reown-swift" */,
 				EC900D9A2CAEA269004B5044 /* XCRemoteSwiftPackageReference "Starscream" */,
+				ECFE891C2CCA975500CE0454 /* XCRemoteSwiftPackageReference "bugsnag-cocoa" */,
+				ECFE89212CCA9A1500CE0454 /* XCRemoteSwiftPackageReference "bugsnag-cocoa-performance" */,
 			);
 			productRefGroup = 7555FF7C242A565900829871 /* Products */;
 			projectDirPath = "";
@@ -454,6 +471,22 @@
 				minimumVersion = 1.0.1;
 			};
 		};
+		ECFE891C2CCA975500CE0454 /* XCRemoteSwiftPackageReference "bugsnag-cocoa" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/bugsnag/bugsnag-cocoa";
+			requirement = {
+				kind = upToNextMajorVersion;
+				minimumVersion = 6.30.1;
+			};
+		};
+		ECFE89212CCA9A1500CE0454 /* XCRemoteSwiftPackageReference "bugsnag-cocoa-performance" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/bugsnag/bugsnag-cocoa-performance";
+			requirement = {
+				kind = upToNextMajorVersion;
+				minimumVersion = 1.10.0;
+			};
+		};
 /* End XCRemoteSwiftPackageReference section */
 
 /* Begin XCSwiftPackageProductDependency section */
@@ -466,6 +499,31 @@
 			isa = XCSwiftPackageProductDependency;
 			package = ECB0F1E22CAAE19B00F1B561 /* XCRemoteSwiftPackageReference "reown-swift" */;
 			productName = ReownWalletKit;
+		};
+		ECFE891D2CCA975500CE0454 /* Bugsnag */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = ECFE891C2CCA975500CE0454 /* XCRemoteSwiftPackageReference "bugsnag-cocoa" */;
+			productName = Bugsnag;
+		};
+		ECFE891F2CCA975500CE0454 /* BugsnagNetworkRequestPlugin */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = ECFE891C2CCA975500CE0454 /* XCRemoteSwiftPackageReference "bugsnag-cocoa" */;
+			productName = BugsnagNetworkRequestPlugin;
+		};
+		ECFE89222CCA9A1500CE0454 /* BugsnagPerformance */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = ECFE89212CCA9A1500CE0454 /* XCRemoteSwiftPackageReference "bugsnag-cocoa-performance" */;
+			productName = BugsnagPerformance;
+		};
+		ECFE89242CCA9A1500CE0454 /* BugsnagPerformanceSwift */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = ECFE89212CCA9A1500CE0454 /* XCRemoteSwiftPackageReference "bugsnag-cocoa-performance" */;
+			productName = BugsnagPerformanceSwift;
+		};
+		ECFE89262CCA9A1500CE0454 /* BugsnagPerformanceSwiftUI */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = ECFE89212CCA9A1500CE0454 /* XCRemoteSwiftPackageReference "bugsnag-cocoa-performance" */;
+			productName = BugsnagPerformanceSwiftUI;
 		};
 /* End XCSwiftPackageProductDependency section */
 	};
