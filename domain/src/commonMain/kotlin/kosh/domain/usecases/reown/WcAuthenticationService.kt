@@ -6,12 +6,13 @@ import kosh.domain.models.Address
 import kosh.domain.models.ChainId
 import kosh.domain.models.reown.WcAuthentication
 import kosh.domain.models.web3.Signature
+import kosh.domain.serializers.ImmutableList
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.Flow
 
 interface WcAuthenticationService {
 
-    val authentications: Flow<List<WcAuthentication>>
+    val authentications: Flow<ImmutableList<WcAuthentication>>
 
     suspend fun get(id: WcAuthentication.Id): Either<WcFailure, WcAuthentication>
 

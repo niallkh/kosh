@@ -132,7 +132,7 @@ fun KoshTextFieldReadOnly(
     supportingText: @Composable (() -> Unit)? = null,
 ) {
     OutlinedTextField(
-        modifier = modifier.optionalClickable(onClick),
+        modifier = modifier.optionalClickable(onClick = onClick),
         value = value,
         onValueChange = {},
         singleLine = singleLine,

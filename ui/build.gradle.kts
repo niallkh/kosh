@@ -1,4 +1,3 @@
-import org.jetbrains.compose.resources.ResourcesExtension
 import org.jetbrains.kotlin.gradle.dsl.JvmTarget
 
 plugins {
@@ -28,6 +27,7 @@ kotlin {
                 optIn("org.jetbrains.compose.resources.ExperimentalResourceApi")
                 optIn("kotlinx.serialization.ExperimentalSerializationApi")
                 optIn("com.arkivanov.decompose.ExperimentalDecomposeApi")
+                optIn("kotlin.uuid.ExperimentalUuidApi")
             }
         }
 
@@ -38,6 +38,7 @@ kotlin {
             api(compose.ui)
             api(compose.materialIconsExtended)
             api(compose.components.uiToolingPreview)
+            api(compose.components.resources)
 
             api(projects.presentation)
             api(projects.ui.resources)
@@ -63,10 +64,6 @@ kotlin {
             api(compose.desktop.currentOs)
         }
     }
-}
-
-compose.resources {
-    generateResClass = ResourcesExtension.ResourceClassGeneration.Never
 }
 
 android {

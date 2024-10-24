@@ -13,16 +13,16 @@ import kosh.presentation.di.rememberRetained
 @Composable
 inline fun <reified R> rememberLoad(
     vararg keys: Any?,
-    noinline flow: @DisallowComposableCalls suspend () -> R,
+    noinline load: @DisallowComposableCalls suspend () -> R,
 ): LoadState<R> {
-    val collectState = rememberRetained { LoadState<R>() }
+    val loadState = rememberRetained { LoadState<R>() }
 
-    collectState(
+    loadState(
         keys = keys,
-        load = flow,
+        load = load,
     )
 
-    return collectState
+    return loadState
 }
 
 @Stable

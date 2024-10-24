@@ -1,5 +1,6 @@
 package kosh.ui.component.token
 
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.size
@@ -17,7 +18,6 @@ import kosh.domain.models.token.TokenBalance
 import kosh.presentation.network.rememberNetwork
 import kosh.ui.component.icon.ChainBadge
 import kosh.ui.component.icon.TokenIcon
-import kosh.ui.component.modifier.optionalClickable
 import kosh.ui.component.single.single
 import kosh.ui.component.text.TextAmount
 import kosh.ui.component.text.TextLine
@@ -26,16 +26,16 @@ import kosh.ui.component.text.TextLine
 @Composable
 fun TokenBalanceItem(
     modifier: Modifier = Modifier,
-    tokenBalance: TokenBalance,
-    onClick: (() -> Unit)? = null,
+    tokenBalance: TokenBalance?,
+    onClick: () -> Unit,
 ) {
-    val network = rememberNetwork(tokenBalance.token.networkId)
+    val network = tokenBalance?.token?.networkId?.let { rememberNetwork(it) }
 
     TokenBalanceItem(
         modifier = modifier,
-        token = tokenBalance.token,
-        balance = tokenBalance.value.value,
-        network = network.entity,
+        token = tokenBalance?.token,
+        balance = tokenBalance?.value?.value,
+        network = network?.entity,
         onClick = onClick,
     )
 }
@@ -43,15 +43,14 @@ fun TokenBalanceItem(
 @Composable
 fun TokenBalanceItem(
     modifier: Modifier = Modifier,
-    token: TokenEntity,
-    balance: BigInteger,
+    token: TokenEntity?,
+    balance: BigInteger?,
     network: NetworkEntity?,
-    onClick: (() -> Unit)? = null,
-    overlineContent: @Composable (() -> Unit)? = null,
+    onClick: () -> Unit,
 ) {
     ListItem(
-        modifier = modifier.optionalClickable(onClick?.single()),
-        overlineContent = overlineContent,
+        modifier = modifier
+            .clickable(enabled = token != null, onClick = onClick.single()),
         leadingContent = {
             Box {
                 TokenIcon(
@@ -70,13 +69,13 @@ fun TokenBalanceItem(
             }
         },
         headlineContent = {
-            TextLine(token.name)
+            TextLine(token?.name)
         },
         trailingContent = {
             TextAmount(
                 amount = balance,
-                symbol = token.symbol,
-                decimals = token.decimals,
+                symbol = token?.symbol,
+                decimals = token?.decimals,
             )
         },
     )

@@ -30,10 +30,7 @@ fun WcRequestItem(
     ListItem(
         modifier = modifier.clickable(onClick = { onSelect(request) }.single()),
         leadingContent = {
-            DappIcon(
-                request.dapp.url,
-                request.dapp.icon,
-            )
+            DappIcon(request.dapp)
         },
         headlineContent = {
             TextLine(request.dapp.name)

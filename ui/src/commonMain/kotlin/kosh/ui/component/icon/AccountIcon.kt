@@ -3,7 +3,6 @@ package kosh.ui.component.icon
 import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.icons.materialPath
 import androidx.compose.material3.Icon
@@ -15,18 +14,19 @@ import androidx.compose.ui.graphics.vector.PathBuilder
 import androidx.compose.ui.unit.dp
 import kosh.domain.models.Address
 import kosh.ui.component.colors.addressColor
+import kosh.ui.component.placeholder.placeholder
 import kotlinx.io.bytestring.ByteString
 
 @Composable
 fun AccountIcon(
-    address: Address,
+    address: Address?,
     modifier: Modifier = Modifier,
 ) {
-    val colorScheme = addressColor(address, isSystemInDarkTheme())
+    val colorScheme = addressColor(address ?: Address(), isSystemInDarkTheme())
 
     Surface(
         modifier = modifier
-            .size(40.dp),
+            .placeholder(address == null),
         color = colorScheme.secondaryContainer,
         contentColor = colorScheme.primary,
         shape = CircleShape,
@@ -35,7 +35,7 @@ fun AccountIcon(
             modifier = Modifier
                 .padding(4.dp)
                 .fillMaxSize(), // TODO check
-            imageVector = walletVector(address.bytes()),
+            imageVector = walletVector((address ?: Address()).bytes()),
             contentDescription = "WalletIcon",
         )
     }

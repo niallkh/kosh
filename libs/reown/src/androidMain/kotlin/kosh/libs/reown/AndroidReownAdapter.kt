@@ -78,12 +78,6 @@ class AndroidReownAdapter(
         newRequestsFlow
             .onEach { updateRequests() }
             .launchIn(applicationScope)
-
-        sessionsState.subscriptionCount
-            .map { it > 0 }
-            .distinctUntilChanged()
-            .onEach { if (it) updateSessions() }
-            .launchIn(applicationScope)
     }
 
     override suspend fun initialize() {
@@ -201,6 +195,9 @@ class AndroidReownAdapter(
 
     override fun getSessions(callback: (List<Session>) -> Unit): () -> Unit {
         val job = applicationScope.launch {
+
+            updateSessions().join()
+
             sessionsState.collect {
                 callback(it)
             }
@@ -216,7 +213,6 @@ class AndroidReownAdapter(
                 onSuccess = {
                     if (cont.isActive) {
                         cont.resume(ReownResult.Success())
-
                     }
                 },
                 onError = {
@@ -717,13 +713,11 @@ class AndroidReownAdapter(
         }
     }
 
-    private fun updateSessions() {
-        applicationScope.launch {
-            val sessions = WalletKit.getListOfActiveSessions().map { session ->
-                mapSession(session)
-            }
-
-            sessionsState.emit(sessions)
+    private fun updateSessions() = applicationScope.launch {
+        val sessions = WalletKit.getListOfActiveSessions().map { session ->
+            mapSession(session)
         }
+
+        sessionsState.emit(sessions)
     }
 }

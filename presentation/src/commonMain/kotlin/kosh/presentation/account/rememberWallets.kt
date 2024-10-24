@@ -26,11 +26,13 @@ fun rememberWallets(
     return WalletState(
         wallets = accountsByWallet,
         enabled = enabled,
+        init = appStateProvider.init,
     )
 }
 
 @Immutable
-class WalletState(
+data class WalletState(
     val wallets: ImmutableList<Pair<WalletEntity, PersistentList<AccountEntity>>>,
     val enabled: ImmutableSet<AccountEntity.Id>,
+    val init: Boolean,
 )

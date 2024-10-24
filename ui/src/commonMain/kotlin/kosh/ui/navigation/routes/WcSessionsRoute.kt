@@ -1,22 +1,47 @@
-package kosh.ui.navigation.routes.wc
+package kosh.ui.navigation.routes
 
 import kosh.domain.models.ChainAddress
 import kosh.domain.models.at
+import kosh.domain.models.reown.PairingUri
+import kosh.domain.models.reown.WcAuthentication
 import kosh.domain.models.reown.WcRequest
 import kosh.domain.models.reown.WcRequest.Call
+import kosh.domain.models.reown.WcSession
+import kosh.domain.models.reown.WcSessionProposal
 import kosh.domain.serializers.BigInteger
 import kosh.ui.navigation.Deeplink
-import kosh.ui.navigation.routes.Route
 import kotlinx.serialization.Serializable
 
 @Serializable
-sealed class WcRequestRoute : Route {
+sealed class WcSessionsRoute : Route {
+
+    @Serializable
+    data class Session(val id: WcSession.Id) : WcSessionsRoute()
+
+    @Serializable
+    data class Pair(
+        val uri: PairingUri? = null,
+        override val link: Deeplink? = null,
+    ) : WcSessionsRoute()
+
+    @Serializable
+    data class Proposal(
+        val id: WcSessionProposal.Id,
+        val requestId: Long,
+        override val link: Deeplink? = null,
+    ) : WcSessionsRoute()
+
+    @Serializable
+    data class Auth(
+        val id: WcAuthentication.Id,
+        override val link: Deeplink? = null,
+    ) : WcSessionsRoute()
 
     @Serializable
     data class Request(
         val id: WcRequest.Id?,
         override val link: Deeplink? = null,
-    ) : WcRequestRoute() {
+    ) : WcSessionsRoute() {
 
         override fun equals(other: Any?): Boolean {
             if (this === other) return true
@@ -42,32 +67,32 @@ sealed class WcRequestRoute : Route {
     data class PersonalSign(
         val id: WcRequest.Id,
         override val link: Deeplink? = null,
-    ) : WcRequestRoute()
+    ) : WcSessionsRoute()
 
     @Serializable
     data class SignTypedData(
         val id: WcRequest.Id,
         override val link: Deeplink? = null,
-    ) : WcRequestRoute()
+    ) : WcSessionsRoute()
 
     @Serializable
     data class SendTransaction(
         val id: WcRequest.Id,
         override val link: Deeplink? = null,
-    ) : WcRequestRoute()
+    ) : WcSessionsRoute()
 
     @Serializable
     data class AddEthereumNetwork(
         val id: WcRequest.Id,
         override val link: Deeplink? = null,
-    ) : WcRequestRoute()
+    ) : WcSessionsRoute()
 
     @Serializable
     data class WatchToken(
         val id: WcRequest.Id,
         val chainAddress: ChainAddress,
         override val link: Deeplink? = null,
-    ) : WcRequestRoute()
+    ) : WcSessionsRoute()
 
     @Serializable
     data class WatchNft(
@@ -75,16 +100,16 @@ sealed class WcRequestRoute : Route {
         val chainAddress: ChainAddress,
         val tokenId: BigInteger?,
         override val link: Deeplink? = null,
-    ) : WcRequestRoute()
+    ) : WcSessionsRoute()
 }
 
-fun wcRequestRoute(request: WcRequest): WcRequestRoute = when (val call = request.call) {
-    is Call.SignPersonal -> WcRequestRoute.PersonalSign(request.id)
-    is Call.SignTyped -> WcRequestRoute.SignTypedData(request.id)
-    is Call.SendTransaction -> WcRequestRoute.SendTransaction(request.id)
-    is Call.AddNetwork -> WcRequestRoute.AddEthereumNetwork(request.id)
+fun wcRequestRoute(request: WcRequest): WcSessionsRoute = when (val call = request.call) {
+    is Call.SignPersonal -> WcSessionsRoute.PersonalSign(request.id)
+    is Call.SignTyped -> WcSessionsRoute.SignTypedData(request.id)
+    is Call.SendTransaction -> WcSessionsRoute.SendTransaction(request.id)
+    is Call.AddNetwork -> WcSessionsRoute.AddEthereumNetwork(request.id)
     is Call.WatchAsset -> when (val tokenId = call.tokenId) {
-        null -> WcRequestRoute.WatchToken(request.id, call.chainId.at(call.address))
-        else -> WcRequestRoute.WatchNft(request.id, call.chainId.at(call.address), tokenId)
+        null -> WcSessionsRoute.WatchToken(request.id, call.chainId.at(call.address))
+        else -> WcSessionsRoute.WatchNft(request.id, call.chainId.at(call.address), tokenId)
     }
 }

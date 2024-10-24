@@ -20,7 +20,7 @@ fun <T : Any> rememberRetained(
 
     val holder = remember {
         uiContext.getOrCreate(key) {
-            InstanceHolder(inputs, init(), uiContext, key)
+            Holder(inputs, init(), uiContext, key)
         }
     }
 
@@ -33,7 +33,7 @@ fun <T : Any> rememberRetained(
     return value
 }
 
-private class InstanceHolder<T>(
+private class Holder<T>(
     private var inputs: Array<out Any?>,
     private var value: T,
     private var uiContext: UiContext,

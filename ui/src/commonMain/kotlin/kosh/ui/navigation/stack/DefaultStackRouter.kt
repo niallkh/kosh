@@ -4,7 +4,6 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.DisallowComposableCalls
 import com.arkivanov.decompose.router.stack.ChildStack
 import com.arkivanov.decompose.router.stack.StackNavigation
-import com.arkivanov.decompose.router.stack.backStack
 import com.arkivanov.decompose.router.stack.childStack
 import com.arkivanov.decompose.router.stack.pop
 import com.arkivanov.decompose.router.stack.replaceAll
@@ -22,7 +21,7 @@ import kotlinx.serialization.serializer
 class DefaultStackRouter<R : Route>(
     uiContext: UiContext,
     serializer: KSerializer<R>,
-    private val start: R?,
+    private val start: (R?) -> R?,
     link: R?,
     private val onResult: StackRouter<R>.(RouteResult<R>) -> Unit,
 ) : StackRouter<R>, StackNavigation<R> by StackNavigation(), UiContext by uiContext {
@@ -34,7 +33,7 @@ class DefaultStackRouter<R : Route>(
             if (link.isDeeplink()) {
                 listOfNotNull(link)
             } else {
-                listOfNotNull(start, link)
+                listOfNotNull(start(link), link)
             }
         },
         key = "StackRouter",
@@ -55,22 +54,21 @@ class DefaultStackRouter<R : Route>(
     }
 
     override fun navigateUp() {
-        if (stack.backStack.isNotEmpty()) {
-            pop { if (!it) onResult(RouteResult.Up(start)) }
-        } else {
-            onResult(RouteResult.Up(start))
-        }
+        pop { if (!it) onResult(RouteResult.Up(start(null))) }
     }
 
     override fun handle(link: R?) {
         if (link != null) {
+            val start = start(link)
             if (link.isDeeplink() || start == null) {
                 replaceAll(link)
             } else {
                 replaceAll(start, link)
             }
         } else {
-            start?.let { replaceAll(start) }
+            start(link)?.let {
+                replaceAll(it)
+            }
         }
     }
 }
@@ -88,7 +86,7 @@ inline fun <reified R : @Serializable Route> rememberStackRouter(
         DefaultStackRouter(
             uiContext = uiContext,
             serializer = serializer,
-            start = start,
+            start = { start },
             link = link,
             onResult = onResult,
         )

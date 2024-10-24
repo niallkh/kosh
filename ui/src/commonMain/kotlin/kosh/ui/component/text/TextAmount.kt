@@ -9,12 +9,29 @@ import com.ionspin.kotlin.bignum.decimal.BigDecimal
 import com.ionspin.kotlin.bignum.decimal.RoundingMode
 import com.ionspin.kotlin.bignum.integer.BigInteger
 import kosh.eth.abi.Value
+import kosh.ui.component.placeholder.placeholder
 
 @Composable
 fun TextAmount(
-    amount: BigInteger,
+    amount: BigInteger?,
+    symbol: String?,
+    decimals: UByte?,
+    modifier: Modifier = Modifier,
+) {
+    TextAmountt(
+        amount = amount ?: BigInteger.TEN,
+        symbol = symbol ?: "Lorem",
+        decimals = decimals ?: 0u,
+        modifier = modifier
+            .placeholder(amount == null || symbol == null || decimals == null),
+    )
+}
+
+@Composable
+private fun TextAmountt(
     symbol: String,
-    decimals: UByte = 18u,
+    amount: BigInteger,
+    decimals: UByte,
     modifier: Modifier = Modifier,
 ) {
     val text = remember(amount, symbol, decimals) { // TODO improve this

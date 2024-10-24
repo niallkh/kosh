@@ -127,10 +127,7 @@ fun WcAuthenticationContent(
 
         actions = {
             if (authentication.failure == null) {
-                DappIcon(
-                    authentication.auth?.dapp?.url,
-                    authentication.auth?.dapp?.icon,
-                )
+                DappIcon(authentication.auth?.dapp)
             }
             Spacer(Modifier.width(8.dp))
         }

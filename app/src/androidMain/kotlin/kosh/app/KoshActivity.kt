@@ -3,6 +3,7 @@ package kosh.app
 import android.Manifest
 import android.content.Intent
 import android.content.res.Configuration
+import android.net.Uri
 import android.os.Build
 import android.os.Bundle
 import androidx.activity.compose.rememberLauncherForActivityResult
@@ -13,12 +14,12 @@ import androidx.activity.result.contract.ActivityResultContracts.RequestPermissi
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.LaunchedEffect
+import androidx.core.app.TaskStackBuilder
 import androidx.core.net.toUri
 import androidx.core.splashscreen.SplashScreen.Companion.installSplashScreen
 import androidx.fragment.app.FragmentActivity
 import co.touchlab.kermit.Logger
 import com.arkivanov.decompose.router.stack.pushNew
-import com.arkivanov.decompose.router.stack.replaceAll
 import com.seiko.imageloader.LocalImageLoader
 import kosh.app.di.androidUiContext
 import kosh.presentation.core.LocalUiContext
@@ -28,7 +29,9 @@ import kosh.ui.component.path.PathResolver
 import kosh.ui.navigation.LocalRootNavigator
 import kosh.ui.navigation.RootNavigator
 import kosh.ui.navigation.RouteResult
+import kosh.ui.navigation.deeplink
 import kosh.ui.navigation.parseDeeplink
+import kosh.ui.navigation.routes.HomeRoute
 import kosh.ui.navigation.routes.RootRoute
 import kosh.ui.navigation.stack.DefaultStackRouter
 import kosh.ui.navigation.stack.StackRouter
@@ -42,13 +45,10 @@ public class KoshActivity : FragmentActivity() {
     private lateinit var rootRouter: StackRouter<RootRoute>
 
     override fun onCreate(savedInstanceState: Bundle?) {
-        val splashScreen = installSplashScreen()
+        installSplashScreen()
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
         logger.d { "onCreate()" }
-
-        val appStateProvider = KoshApp.appScope.domain.appStateProvider
-        splashScreen.setKeepOnScreenCondition { !appStateProvider.init.value }
 
         val deeplink = intent?.data?.toString()?.let(::parseDeeplink)
 
@@ -63,15 +63,19 @@ public class KoshActivity : FragmentActivity() {
         val rootRouter = DefaultStackRouter(
             uiContext = uiContext,
             serializer = serializer(),
-            start = start,
+            start = { link ->
+                when (link) {
+                    is RootRoute.Tokens -> RootRoute.Home(HomeRoute.Assets)
+                    is RootRoute.Transactions -> RootRoute.Home(HomeRoute.Activity)
+                    is RootRoute.WcSessions -> RootRoute.Home(HomeRoute.WalletConnect)
+                    else -> start
+                }
+            },
             link = deeplink,
             onResult = {
                 when (it) {
                     is RouteResult.Result -> onResult(it.redirect)
-                    is RouteResult.Up -> when (val route = it.route) {
-                        null -> replaceAll(start)
-                        else -> replaceAll(start, route)
-                    }
+                    is RouteResult.Up -> onNavigateUp(it.route)
                 }
             },
         )
@@ -148,6 +152,21 @@ public class KoshActivity : FragmentActivity() {
         intent.data?.toString()?.let {
             uiContext.uiScope.deeplinkHandler.handle(it)
         }
+    }
+
+    private fun onNavigateUp(rootRoute: RootRoute?) {
+        val intent = Intent(
+            this,
+            KoshActivity::class.java
+        ).apply {
+            data = Uri.parse(deeplink(rootRoute).toString())
+        }
+
+        TaskStackBuilder.create(this)
+            .addNextIntentWithParentStack(intent)
+            .startActivities()
+
+        finish()
     }
 
     private fun onResult(redirect: String?) {

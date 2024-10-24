@@ -22,10 +22,7 @@ fun WcProposalItem(
     ListItem(
         modifier = modifier.clickable(onClick = { onSelect(proposal) }.single()),
         leadingContent = {
-            DappIcon(
-                proposal.dapp.url,
-                proposal.dapp.icon,
-            )
+            DappIcon(proposal.dapp)
         },
         headlineContent = {
             TextLine(proposal.dapp.name)

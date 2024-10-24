@@ -1,6 +1,7 @@
 package kosh.domain.repositories
 
 import androidx.compose.runtime.MutableState
+import androidx.compose.runtime.Stable
 import androidx.compose.runtime.snapshots.Snapshot.Companion.takeMutableSnapshot
 import arrow.optics.Getter
 import kosh.domain.state.AppState
@@ -8,11 +9,12 @@ import kosh.domain.utils.Copy
 import kosh.domain.utils.optic
 import kotlinx.coroutines.flow.StateFlow
 
+@Stable
 interface AppStateRepo : Repository {
 
     val state: StateFlow<AppState>
 
-    val init: StateFlow<Boolean>
+    val init: Boolean
 
     suspend fun modify(update: Copy<AppState>.() -> Unit)
 }

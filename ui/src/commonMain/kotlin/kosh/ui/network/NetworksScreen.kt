@@ -3,11 +3,12 @@ package kosh.ui.network
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.lazy.LazyListScope
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material3.FloatingActionButton
@@ -27,11 +28,13 @@ import kosh.presentation.network.rememberNetworks
 import kosh.presentation.network.rememberToggleNetwork
 import kosh.ui.component.illustration.Illustration
 import kosh.ui.component.network.NetworkItem
+import kosh.ui.component.placeholder.placeholder
 import kosh.ui.component.scaffold.KoshScaffold
 import kosh.ui.component.single.single
 import kosh.ui.resources.Res
 import kosh.ui.resources.illustrations.NetworksEmpty
 import kosh.ui.resources.networks_title
+import kotlinx.collections.immutable.toPersistentList
 import org.jetbrains.compose.resources.stringResource
 
 @Composable
@@ -44,6 +47,7 @@ fun NetworksScreen(
     val toggleNetwork = rememberToggleNetwork()
 
     NetworksContent(
+        init = networks.init,
         networks = networks.networks,
         enabled = networks.enabled,
         onSelect = { onOpen(it.id) },
@@ -55,6 +59,7 @@ fun NetworksScreen(
 
 @Composable
 fun NetworksContent(
+    init: Boolean,
     networks: ImmutableList<NetworkEntity>,
     enabled: ImmutableSet<NetworkEntity.Id>,
     onSelect: (NetworkEntity) -> Unit,
@@ -78,49 +83,28 @@ fun NetworksContent(
     ) { paddingValues ->
         LazyColumn(
             contentPadding = paddingValues,
+            modifier = Modifier.fillMaxSize(),
         ) {
 
-            if (networks.isEmpty()) {
-                item {
-                    Illustration(
-                        NetworksEmpty(),
-                        "NetworksEmpty",
-                        Modifier
-                            .fillMaxWidth()
-                            .padding(64.dp),
-                    ) {
-                        Text(
-                            "Get started by adding your first network",
-                            textAlign = TextAlign.Center
-                        )
+            when {
+                !init -> networks(
+                    networks = List(5) { null }.toPersistentList(),
+                    enabled = enabled,
+                    onSelect = onSelect,
+                    onToggle = onToggle
+                )
+
+                networks.isEmpty() -> {
+                    item {
+                        EmptyNetworksContent()
                     }
                 }
-            }
 
-            items(
-                items = networks,
-                key = { it.id.value.leastSignificantBits }
-            ) { network ->
-
-                NetworkItem(
-                    modifier = Modifier.animateItem(),
-                    network = network,
-                    onClick = { onSelect(network) },
-                    trailingContent = {
-                        Row(
-                            horizontalArrangement = Arrangement.spacedBy(20.dp),
-                            verticalAlignment = Alignment.CenterVertically,
-                        ) {
-                            VerticalDivider(
-                                modifier = Modifier.height(32.dp),
-                            )
-
-                            Switch(
-                                checked = network.id in enabled,
-                                onCheckedChange = { onToggle(network, it) },
-                            )
-                        }
-                    }
+                else -> networks(
+                    networks = networks,
+                    enabled = enabled,
+                    onSelect = onSelect,
+                    onToggle = onToggle
                 )
             }
 
@@ -128,5 +112,59 @@ fun NetworksContent(
                 Spacer(Modifier.height(64.dp))
             }
         }
+    }
+}
+
+private fun LazyListScope.networks(
+    networks: ImmutableList<NetworkEntity?>,
+    enabled: ImmutableSet<NetworkEntity.Id>,
+    onSelect: (NetworkEntity) -> Unit,
+    onToggle: (NetworkEntity, Boolean) -> Unit,
+) {
+    items(
+        count = networks.size,
+        key = { networks[it]?.id?.value?.leastSignificantBits ?: it }
+    ) { index ->
+        val network = networks[index]
+
+        NetworkItem(
+            modifier = Modifier.animateItem(),
+            network = network,
+            onClick = { network?.let { onSelect(it) } },
+            trailingContent = {
+                Row(
+                    horizontalArrangement = Arrangement.spacedBy(20.dp),
+                    verticalAlignment = Alignment.CenterVertically,
+                ) {
+                    VerticalDivider(
+                        modifier = Modifier
+                            .height(32.dp)
+                            .placeholder(network == null),
+                    )
+
+                    Switch(
+                        checked = network?.id in enabled,
+                        onCheckedChange = { checked -> network?.let { onToggle(it, checked) } },
+                        modifier = Modifier.placeholder(network == null),
+                    )
+                }
+            }
+        )
+    }
+}
+
+@Composable
+private fun EmptyNetworksContent() {
+    Illustration(
+        NetworksEmpty(),
+        "NetworksEmpty",
+        Modifier
+            .fillMaxWidth()
+            .padding(64.dp),
+    ) {
+        Text(
+            "Get started by adding your first network",
+            textAlign = TextAlign.Center
+        )
     }
 }

@@ -121,10 +121,7 @@ fun WcSessionContent(
         onNavigateUp = { onNavigateUp() },
         actions = {
             if (session.failure == null) {
-                DappIcon(
-                    session.session?.session?.dapp?.url,
-                    session.session?.session?.dapp?.icon,
-                )
+                DappIcon(session.session?.session?.dapp)
                 Spacer(Modifier.width(8.dp))
             }
         }

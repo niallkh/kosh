@@ -9,10 +9,11 @@ import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
+import kosh.ui.component.placeholder.placeholder
 
 @Composable
 fun TextLine(
-    text: String,
+    text: String?,
     modifier: Modifier = Modifier,
     style: TextStyle = LocalTextStyle.current,
     color: Color = Color.Unspecified,
@@ -20,8 +21,9 @@ fun TextLine(
     fontFamily: FontFamily? = null,
 ) {
     Text(
-        modifier = modifier,
-        text = text,
+        modifier = modifier
+            .placeholder(text == null),
+        text = text ?: "Lorem ipsum dolor sit amet, consectetur adipiscing elit.",
         maxLines = 1,
         overflow = TextOverflow.Ellipsis,
         fontWeight = fontWeight,

@@ -18,11 +18,11 @@ fun rememberSessions(
 
     return SessionsState(
         sessions = sessions.result,
-        loading = sessions.loading,
+        init = sessions.init,
     )
 }
 
 data class SessionsState(
     val sessions: ImmutableList<WcSession>,
-    val loading: Boolean,
+    val init: Boolean,
 )

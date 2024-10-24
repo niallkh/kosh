@@ -4,11 +4,11 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.graphics.vector.ImageVector
-import kosh.ui.resources.Res
+import kosh.ui.generated.resources.Res
+import kosh.ui.generated.resources.activity_title
+import kosh.ui.generated.resources.assets_title
+import kosh.ui.generated.resources.wc_title
 import kosh.ui.resources.icons.WcIcon
-import kosh.ui.resources.portfolio_title
-import kosh.ui.resources.transactions_title
-import kosh.ui.resources.wc_sessions_title
 import kotlinx.serialization.Serializable
 import org.jetbrains.compose.resources.stringResource
 
@@ -26,7 +26,7 @@ sealed interface HomeRoute : Route {
     @Serializable
     data object Assets : HomeRoute {
         override val title: String
-            @Composable get() = stringResource(Res.string.portfolio_title)
+            @Composable get() = stringResource(Res.string.assets_title)
         override val label: String
             @Composable get() = title
         override val icon: ImageVector
@@ -38,7 +38,7 @@ sealed interface HomeRoute : Route {
     @Serializable
     data object Activity : HomeRoute {
         override val title: String
-            @Composable get() = stringResource(Res.string.transactions_title)
+            @Composable get() = stringResource(Res.string.activity_title)
         override val label: String
             @Composable get() = title
         override val icon: ImageVector
@@ -50,7 +50,7 @@ sealed interface HomeRoute : Route {
     @Serializable
     data object WalletConnect : HomeRoute {
         override val title: String
-            @Composable get() = stringResource(Res.string.wc_sessions_title)
+            @Composable get() = stringResource(Res.string.wc_title)
         override val label: String
             @Composable get() = title
         override val icon: ImageVector

@@ -4,7 +4,6 @@ import androidx.compose.foundation.clickable
 import androidx.compose.material3.Icon
 import androidx.compose.material3.ListItem
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
 import kosh.domain.entities.TransactionEntity
 import kosh.eth.abi.json.JsonEip712
@@ -23,7 +22,7 @@ fun TypedMessageItem(
     onClick: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
-    val jsonEip712 by typedMessage.jsonTypeData.resolve {
+    val jsonEip712 = typedMessage.jsonTypeData.resolve {
         JsonEip712.from(it.bytes().decodeToString())
     }
 
@@ -40,8 +39,7 @@ fun TypedMessageItem(
         },
         leadingContent = {
             DappIcon(
-                typedMessage.dapp.url,
-                typedMessage.dapp.icon,
+                typedMessage.dapp,
                 networkId = typedMessage.networkId
             )
         },

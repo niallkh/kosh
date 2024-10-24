@@ -100,10 +100,7 @@ fun WcSignTypedContent(
 
         actions = {
             if (signTyped.failure == null) {
-                DappIcon(
-                    signTyped.request?.dapp?.url,
-                    signTyped.request?.dapp?.icon,
-                )
+                DappIcon(signTyped.request?.dapp)
             }
             Spacer(Modifier.width(8.dp))
         }

@@ -14,11 +14,11 @@ private typealias OnClick = () -> Unit
 fun interface SingleClick : OnClick
 
 private fun SingleClick(provider: State<OnClick>): SingleClick {
-    var lastEventTimeMs = TimeSource.Monotonic.markNow()
+    var lastEvent = TimeSource.Monotonic.markNow()
     return SingleClick {
-        if (lastEventTimeMs.elapsedNow() >= clickTimeout) {
+        if (lastEvent.elapsedNow() >= clickTimeout) {
             provider.value.invoke()
-            lastEventTimeMs = TimeSource.Monotonic.markNow()
+            lastEvent = TimeSource.Monotonic.markNow()
         }
     }
 }

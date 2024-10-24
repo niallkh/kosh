@@ -44,7 +44,6 @@ internal class IosNetworkComponent(
 
             install(IpfsPlugin)
 
-
             val groveKey = (NSBundle.mainBundle.objectForInfoDictionaryKey("GROVE_KEY") as? String
                 ?: error("GROVE_KEY not provided"))
             install(grovePlugin(groveKey))

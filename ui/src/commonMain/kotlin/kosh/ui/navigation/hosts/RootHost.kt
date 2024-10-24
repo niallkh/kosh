@@ -2,9 +2,6 @@ package kosh.ui.navigation.hosts
 
 import androidx.compose.runtime.Composable
 import com.arkivanov.decompose.router.stack.pushNew
-import kosh.ui.navigation.hosts.wc.WcProposalHost
-import kosh.ui.navigation.hosts.wc.WcRequestHost
-import kosh.ui.navigation.hosts.wc.WcSessionsHost
 import kosh.ui.navigation.pop
 import kosh.ui.navigation.routes.RootRoute
 import kosh.ui.navigation.stack.StackHost
@@ -44,19 +41,9 @@ fun RootHost(
                 onResult = { pop(it, RootRoute::TrezorPasskeys) }
             )
 
-            is RootRoute.WcSession -> WcSessionsHost(
+            is RootRoute.WcSessions -> WcSessionsHost(
                 link = route.link,
-                onResult = { pop(it, RootRoute::WcSession) },
-            )
-
-            is RootRoute.WcProposal -> WcProposalHost(
-                link = route.link,
-                onResult = { pop(it, RootRoute::WcProposal) }
-            )
-
-            is RootRoute.WcRequest -> WcRequestHost(
-                link = route.link,
-                onResult = { pop(it, RootRoute::WcRequest) },
+                onResult = { pop(it, RootRoute::WcSessions) },
             )
 
             is RootRoute.Transactions -> TransactionsHost(

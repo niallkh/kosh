@@ -97,10 +97,7 @@ fun WcSignPersonalContent(
 
         actions = {
             if (signPersonal.failure == null) {
-                DappIcon(
-                    signPersonal.request?.dapp?.url,
-                    signPersonal.request?.dapp?.icon,
-                )
+                DappIcon(signPersonal.request?.dapp)
             }
             Spacer(Modifier.width(8.dp))
         }

@@ -7,7 +7,6 @@ import androidx.compose.material.icons.outlined.Schedule
 import androidx.compose.material3.Icon
 import androidx.compose.material3.ListItem
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
 import arrow.core.raise.nullable
 import kosh.domain.entities.TransactionEntity
@@ -28,7 +27,7 @@ fun TransactionItem(
 ) {
     val network = rememberNetwork(transaction.networkId)
     val account = rememberAccount(transaction.sender)
-    val data by transaction.data.resolve { it }
+    val data = transaction.data.resolve { it }
 
     val parsed = nullable {
         rememberContractCall(
@@ -45,8 +44,7 @@ fun TransactionItem(
         overlineContent = { TextDate(transaction.receipt?.time ?: transaction.createdAt) },
         leadingContent = {
             DappIcon(
-                transaction.dapp.url,
-                transaction.dapp.icon,
+                transaction.dapp,
                 networkId = transaction.networkId
             )
         },

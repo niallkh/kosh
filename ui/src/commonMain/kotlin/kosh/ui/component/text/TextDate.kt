@@ -9,12 +9,12 @@ import kotlinx.datetime.Instant
 
 @Composable
 fun TextDate(
-    date: Instant,
+    date: Instant?,
     modifier: Modifier = Modifier,
     style: TextStyle = LocalTextStyle.current,
     color: Color = Color.Unspecified,
 ) {
-    TextLine(formatDateTime(date), modifier, style, color)
+    TextLine(date?.let { formatDateTime(it) }, modifier, style, color)
 }
 
 @Composable

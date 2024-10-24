@@ -5,12 +5,13 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.lazy.LazyListScope
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
@@ -29,7 +30,6 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
-import arrow.core.partially1
 import com.arkivanov.decompose.router.slot.dismiss
 import kosh.domain.entities.AccountEntity
 import kosh.domain.entities.WalletEntity
@@ -40,6 +40,7 @@ import kosh.presentation.account.rememberToggleAccount
 import kosh.presentation.account.rememberWallets
 import kosh.ui.component.icon.AccountIcon
 import kosh.ui.component.illustration.Illustration
+import kosh.ui.component.placeholder.placeholder
 import kosh.ui.component.scaffold.KoshScaffold
 import kosh.ui.component.text.TextAddressShort
 import kosh.ui.component.text.TextLine
@@ -51,6 +52,8 @@ import kosh.ui.resources.icons.TrezorIcon
 import kosh.ui.resources.illustrations.WalletsEmpty
 import kosh.ui.resources.wallets_title
 import kotlinx.collections.immutable.PersistentList
+import kotlinx.collections.immutable.persistentSetOf
+import kotlinx.collections.immutable.toPersistentList
 import org.jetbrains.compose.resources.stringResource
 
 @Composable
@@ -65,6 +68,7 @@ fun WalletsScreen(
     val toggleAccount = rememberToggleAccount()
 
     WalletsContent(
+        init = wallets.init,
         wallets = wallets.wallets,
         enabled = wallets.enabled,
         onAdd = onAdd,
@@ -77,6 +81,7 @@ fun WalletsScreen(
 
 @Composable
 fun WalletsContent(
+    init: Boolean,
     wallets: ImmutableList<Pair<WalletEntity, PersistentList<AccountEntity>>>,
     enabled: ImmutableSet<AccountEntity.Id>,
     onAdd: (HardwareWallet) -> Unit,
@@ -108,37 +113,31 @@ fun WalletsContent(
     ) { paddingValues ->
 
         LazyColumn(
-            modifier = Modifier.padding(horizontal = 16.dp),
+            modifier = Modifier
+                .padding(horizontal = 16.dp, vertical = 8.dp)
+                .fillMaxSize(),
             contentPadding = paddingValues,
             verticalArrangement = Arrangement.spacedBy(16.dp)
         ) {
 
-            if (wallets.isEmpty()) {
-                item {
-                    Illustration(
-                        WalletsEmpty(),
-                        "AccountsEmpty",
-                        Modifier
-                            .fillMaxWidth()
-                            .padding(64.dp),
-                    ) {
-                        Text(
-                            "Get started by adding your first wallet",
-                            textAlign = TextAlign.Center
-                        )
-                    }
-                }
-            }
+            when {
+                !init -> wallets(
+                    wallets = List(1) {
+                        null to List(3) { null }.toPersistentList()
+                    }.toPersistentList(),
+                    enabled = persistentSetOf(),
+                    onSelect = onSelect,
+                    onToggle = onToggle,
+                )
 
-            items(
-                items = wallets,
-                key = { it.first.id.value.leastSignificantBits }
-            ) { (wallet, accounts) ->
-                WalletAccountsItem(
-                    wallet = wallet,
-                    accounts = accounts,
+                wallets.isEmpty() -> item {
+                    EmptyWalletContent(Modifier.animateItem())
+                }
+
+                else -> wallets(
+                    wallets = wallets,
                     enabled = enabled,
-                    onSelect = { onSelect(it) },
+                    onSelect = onSelect,
                     onToggle = onToggle
                 )
             }
@@ -150,11 +149,52 @@ fun WalletsContent(
     }
 }
 
+private fun LazyListScope.wallets(
+    wallets: ImmutableList<Pair<WalletEntity?, ImmutableList<AccountEntity?>>>,
+    enabled: ImmutableSet<AccountEntity.Id>,
+    onSelect: (AccountEntity) -> Unit,
+    onToggle: (AccountEntity, Boolean) -> Unit,
+) {
+    items(
+        count = wallets.size,
+        key = { wallets[it].first?.id?.value?.leastSignificantBits ?: it }
+    ) { index ->
+        val (wallet, accounts) = wallets[index]
+
+        WalletAccountsItem(
+            modifier = Modifier.animateItem(),
+            wallet = wallet,
+            accounts = accounts,
+            enabled = enabled,
+            onSelect = { onSelect(it) },
+            onToggle = onToggle
+        )
+    }
+}
+
+@Composable
+private fun EmptyWalletContent(
+    modifier: Modifier = Modifier,
+) {
+    Illustration(
+        WalletsEmpty(),
+        "AccountsEmpty",
+        modifier
+            .fillMaxWidth()
+            .padding(64.dp),
+    ) {
+        Text(
+            "Get started by adding your first wallet",
+            textAlign = TextAlign.Center
+        )
+    }
+}
+
 @Composable
 private fun WalletAccountsItem(
     modifier: Modifier = Modifier,
-    wallet: WalletEntity,
-    accounts: ImmutableList<AccountEntity>,
+    wallet: WalletEntity?,
+    accounts: ImmutableList<AccountEntity?>,
     enabled: ImmutableSet<AccountEntity.Id>,
     onSelect: (AccountEntity) -> Unit,
     onToggle: (AccountEntity, Boolean) -> Unit,
@@ -164,25 +204,30 @@ private fun WalletAccountsItem(
     ) {
         WalletItem(wallet)
 
-        for (account in accounts) {
-            key(account.id.value.leastSignificantBits) {
+        for ((index, account) in accounts.withIndex()) {
+            key(account?.id?.value?.leastSignificantBits ?: index) {
                 HorizontalDivider()
 
                 AccountItem(
                     account = account,
-                    onClick = onSelect.partially1(account),
+                    onClick = { if (account != null) onSelect(account) },
                     trailingContent = {
                         Row(
                             horizontalArrangement = Arrangement.spacedBy(20.dp),
                             verticalAlignment = Alignment.CenterVertically,
                         ) {
                             VerticalDivider(
-                                modifier = Modifier.height(32.dp),
+                                modifier = Modifier
+                                    .height(32.dp)
+                                    .placeholder(account == null),
                             )
 
                             Switch(
-                                checked = account.id in enabled,
-                                onCheckedChange = { onToggle(account, it) },
+                                checked = account?.id in enabled,
+                                onCheckedChange = { checked ->
+                                    account?.let { onToggle(it, checked) }
+                                },
+                                modifier = Modifier.placeholder(account == null)
                             )
                         }
                     }
@@ -195,26 +240,22 @@ private fun WalletAccountsItem(
 @Composable
 private fun AccountItem(
     modifier: Modifier = Modifier,
-    account: AccountEntity,
+    account: AccountEntity?,
     onClick: () -> Unit,
     trailingContent: @Composable () -> Unit,
 ) {
     ListItem(
-        modifier = modifier.clickable(onClick = onClick),
+        modifier = modifier.clickable(enabled = account != null, onClick = onClick),
         leadingContent = {
             AccountIcon(
                 modifier = Modifier
                     .clip(CircleShape)
                     .size(40.dp),
-                address = account.address,
+                address = account?.address,
             )
         },
-        headlineContent = {
-            TextLine(account.name)
-        },
-        supportingContent = {
-            TextAddressShort(account.address)
-        },
+        headlineContent = { TextLine(account?.name) },
+        supportingContent = { TextAddressShort(account?.address) },
         trailingContent = trailingContent
     )
 
@@ -222,33 +263,36 @@ private fun AccountItem(
 
 @Composable
 private fun WalletItem(
-    wallet: WalletEntity,
+    wallet: WalletEntity?,
     modifier: Modifier = Modifier,
 ) {
     ListItem(
         modifier = modifier,
         leadingContent = {
             Box(
-                modifier = Modifier.size(40.dp),
+                modifier = Modifier
+                    .size(40.dp)
+                    .placeholder(wallet == null),
                 contentAlignment = Alignment.Center
             ) {
-                when (wallet.location) {
+                when (wallet?.location) {
                     is WalletEntity.Location.Trezor -> Icon(TrezorIcon, "Trezor")
                     is WalletEntity.Location.Ledger -> Icon(LedgerIcon, "Ledger")
+                    null -> Icon(TrezorIcon, "Trezor")
                 }
             }
         },
         supportingContent = {
-            when (val location = wallet.location) {
-                is WalletEntity.Location.Trezor -> TextLine(
-                    location.name ?: location.product ?: "Trezor"
-                )
-
-                is WalletEntity.Location.Ledger -> TextLine(location.product ?: "Ledger")
+            val text = when (val location = wallet?.location) {
+                is WalletEntity.Location.Trezor -> location.name ?: location.product ?: "Trezor"
+                is WalletEntity.Location.Ledger -> location.product ?: "Ledger"
+                null -> null
             }
+
+            TextLine(text)
         },
         headlineContent = {
-            TextLine(wallet.name)
+            TextLine(wallet?.name)
         },
     )
 }

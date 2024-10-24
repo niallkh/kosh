@@ -127,10 +127,7 @@ fun WcSessionProposalContent(
 
         actions = {
             if (proposal.failure == null) {
-                DappIcon(
-                    proposal.proposal?.proposal?.dapp?.url,
-                    proposal.proposal?.proposal?.dapp?.icon,
-                )
+                DappIcon(proposal.proposal?.proposal?.dapp)
                 Spacer(Modifier.width(8.dp))
             }
         },

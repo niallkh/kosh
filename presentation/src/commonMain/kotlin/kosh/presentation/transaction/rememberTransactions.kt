@@ -19,11 +19,13 @@ fun rememberTransactions(
     val transactions by appStateProvider.collectAsState().optic(AppState.activeTransactions())
 
     return TransactionsState(
-        txs = transactions,
+        transactions = transactions,
+        init = appStateProvider.init
     )
 }
 
 @Immutable
 data class TransactionsState(
-    val txs: ImmutableList<TransactionEntity>,
+    val transactions: ImmutableList<TransactionEntity>,
+    val init: Boolean,
 )

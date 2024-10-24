@@ -15,16 +15,17 @@ import androidx.compose.ui.text.style.TextOverflow
 import kosh.domain.models.Address
 import kosh.domain.models.eip55
 import kosh.ui.component.modifier.optionalClickable
+import kosh.ui.component.placeholder.placeholder
 
 @Composable
 fun TextAddressShort(
-    address: Address,
+    address: Address?,
     modifier: Modifier = Modifier,
     clickable: Boolean = false,
     style: TextStyle = LocalTextStyle.current,
 ) {
     TextAddressShort(
-        address = remember(address) { address.eip55() },
+        address = address?.toString(),
         modifier = modifier,
         clickable = clickable,
         style = style,
@@ -33,13 +34,15 @@ fun TextAddressShort(
 
 @Composable
 fun TextAddressShort(
-    address: String,
+    address: String?,
     modifier: Modifier = Modifier,
     clickable: Boolean = false,
     style: TextStyle = LocalTextStyle.current,
 ) {
     val text = remember(address) {
-        "${address.subSequence(0, 6)}...${address.subSequence(36, 42)}"
+        (address ?: Address().eip55()).let {
+            "${it.subSequence(0, 6)}...${it.subSequence(36, 42)}"
+        }
     }
 
     val clipboardManager = LocalClipboardManager.current
@@ -47,7 +50,12 @@ fun TextAddressShort(
     Text(
         modifier = modifier
             .clip(MaterialTheme.shapes.extraSmall)
-            .optionalClickable(clickable) { clipboardManager.setText(AnnotatedString(address)) },
+            .optionalClickable(clickable) {
+                if (address != null) {
+                    clipboardManager.setText(AnnotatedString(address))
+                }
+            }
+            .placeholder(address == null),
         text = text,
         maxLines = 1,
         overflow = TextOverflow.Ellipsis,

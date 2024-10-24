@@ -34,7 +34,7 @@ inline fun <reified R> rememberCollect(
 class CollectState<R>(
     private val initial: R,
 ) {
-    var loading by mutableStateOf(false)
+    var init by mutableStateOf(false)
     var retry by mutableIntStateOf(0)
 
     var result: R by mutableStateOf(initial)
@@ -50,14 +50,14 @@ class CollectState<R>(
         flow: suspend () -> Flow<R>,
     ) {
         LaunchedEffect(*keys, retry) {
-            loading = true
             try {
                 flow().collect {
+                    init = true
+
                     result = it
-                    loading = false
                 }
             } finally {
-                loading = false
+                init = true
             }
         }
     }

@@ -35,13 +35,11 @@ fun <T, A> StateFlow<T>.optic(g: Getter<T, A>): StateFlow<A> = object : StateFlo
         get() = this@optic.replayCache.map { g.get(it) }
 }
 
-fun <T, A> Getter<T, A?>?.orNull(): Getter<T, A?> = this ?: Getter { null }
-
 @Composable
 fun <T, A> State<T>.optic(
     g: Getter<T, A>,
     policy: SnapshotMutationPolicy<A> = structuralEqualityPolicy(),
-): State<A> = remember(this, g) {
+): State<A> = remember(this, g, policy) {
     object : State<A> {
         val derived = derivedStateOf(policy) { g.get(this@optic.value) }
         override val value: A
@@ -53,7 +51,7 @@ fun <T, A> State<T>.optic(
 fun <T, A> MutableState<T>.optic(
     lens: Lens<T, A>,
     policy: SnapshotMutationPolicy<A> = structuralEqualityPolicy(),
-): MutableState<A> = remember(this) {
+): MutableState<A> = remember(this, lens, policy) {
     object : MutableState<A> {
         val derived = derivedStateOf(policy) { lens.get(this@optic.value) }
 

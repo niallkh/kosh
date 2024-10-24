@@ -14,6 +14,7 @@ import kosh.domain.models.reown.SessionTopic
 import kosh.domain.models.reown.WcRequest
 import kosh.domain.models.reown.WcSession
 import kosh.domain.repositories.WcRepo
+import kosh.domain.serializers.ImmutableList
 import kosh.domain.state.AppState
 import kosh.domain.state.AppStateProvider
 import kosh.domain.state.network
@@ -21,6 +22,7 @@ import kosh.domain.usecases.account.AccountService
 import kosh.domain.usecases.network.NetworkService
 import kosh.domain.usecases.notification.NotificationService
 import kosh.domain.utils.optic
+import kotlinx.collections.immutable.toPersistentList
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.Flow
@@ -39,9 +41,10 @@ class DefaultWcRequestService(
 
     private val logger = Logger.withTag("WcRequestProcessor")
 
-    override val requests: Flow<List<WcRequest>>
+    override val requests: Flow<ImmutableList<WcRequest>>
         get() = reownRepo.requests
             .map { requests -> requests.mapNotNull { validate(it).getOrNull() } }
+            .map { it.toPersistentList() }
 
     override suspend fun get(
         id: WcRequest.Id?,

@@ -54,7 +54,7 @@ class DefaultTokenBalanceRepo(
             calls.map { call ->
                 val balance = call.result.getOrNull() ?: BigInteger.ZERO
 
-                Balance(balance, now)
+                Balance(balance)
             }
         }
     }
@@ -79,7 +79,7 @@ class DefaultTokenBalanceRepo(
             calls.map { call ->
                 val balance = call.result.getOrNull() ?: BigInteger.ZERO
 
-                Balance(balance, now)
+                Balance(balance)
             }
         }
     }

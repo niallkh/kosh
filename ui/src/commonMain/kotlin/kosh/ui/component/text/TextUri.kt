@@ -16,17 +16,18 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.Dp
 import kosh.domain.models.Uri
 import kosh.ui.component.modifier.optionalClickable
+import kosh.ui.component.placeholder.placeholder
 
 @Composable
 fun TextUri(
-    uri: Uri,
+    uri: Uri?,
     modifier: Modifier = Modifier,
     clickable: Boolean = false,
     style: TextStyle = LocalTextStyle.current,
     maxWidth: Dp = Dp.Unspecified,
 ) {
     val text = remember(uri) {
-        uri.toString()
+        uri?.toString() ?: "Lorem ipsum dolor sit amet, consectetur adipisicing elit."
     }
 
     val clipboardManager = LocalClipboardManager.current
@@ -35,7 +36,8 @@ fun TextUri(
         modifier = modifier
             .clip(MaterialTheme.shapes.extraSmall)
             .optionalClickable(clickable) { clipboardManager.setText(AnnotatedString(text)) }
-            .widthIn(max = maxWidth),
+            .widthIn(max = maxWidth)
+            .placeholder(uri == null),
         text = text,
         maxLines = 1,
         overflow = TextOverflow.Ellipsis,

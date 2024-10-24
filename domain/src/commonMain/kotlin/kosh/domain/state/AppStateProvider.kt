@@ -6,13 +6,13 @@ import kotlinx.coroutines.flow.StateFlow
 
 @Stable
 interface AppStateProvider : StateFlow<AppState> {
-    val init: StateFlow<Boolean>
+    val init: Boolean
 }
 
 class DefaultAppStateProvider(
     private val appStateRepo: AppStateRepo,
 ) : AppStateProvider, StateFlow<AppState> by appStateRepo.state {
 
-    override val init: StateFlow<Boolean>
+    override val init: Boolean
         get() = appStateRepo.init
 }

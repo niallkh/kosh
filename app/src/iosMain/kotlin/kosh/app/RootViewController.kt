@@ -1,12 +1,9 @@
 package kosh.app
 
-import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.collectAsState
-import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.ComposeUIViewController
@@ -27,9 +24,8 @@ import kosh.ui.component.path.PathResolver
 import kosh.ui.navigation.LocalRootNavigator
 import kosh.ui.navigation.RootNavigator
 import kosh.ui.navigation.RouteResult
-import kosh.ui.navigation.animation.fadeIn
-import kosh.ui.navigation.animation.fadeOut
 import kosh.ui.navigation.parseDeeplink
+import kosh.ui.navigation.routes.HomeRoute
 import kosh.ui.navigation.routes.RootRoute
 import kosh.ui.navigation.stack.DefaultStackRouter
 import kotlinx.serialization.serializer
@@ -55,8 +51,15 @@ public fun rootViewController(
 
     val rootRouter = DefaultStackRouter(
         uiContext = uiContext,
-        serializer = serializer(),
-        start = start,
+        serializer = serializer<RootRoute>(),
+        start = { link ->
+            when (link) {
+                is RootRoute.Tokens -> RootRoute.Home(HomeRoute.Assets)
+                is RootRoute.Transactions -> RootRoute.Home(HomeRoute.Activity)
+                is RootRoute.WcSessions -> RootRoute.Home(HomeRoute.WalletConnect)
+                else -> start
+            }
+        },
         link = null,
         onResult = {
             when (it) {
@@ -112,16 +115,6 @@ public fun rootViewController(
                     App(
                         stackRouter = rootRouter,
                     )
-
-                    val init by appScope.domain.appStateProvider.init.collectAsState()
-
-                    AnimatedVisibility(
-                        visible = !init,
-                        exit = fadeOut(),
-                        enter = fadeIn(),
-                    ) {
-                        SplashScreen(Modifier.fillMaxSize())
-                    }
 
                     LaunchedEffect(Unit) {
                         for (uri in pushNotifier.uris) {

@@ -7,12 +7,13 @@ import kosh.domain.models.ChainId
 import kosh.domain.models.Hash
 import kosh.domain.models.reown.SessionTopic
 import kosh.domain.models.reown.WcRequest
+import kosh.domain.serializers.ImmutableList
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.Flow
 
 interface WcRequestService {
 
-    val requests: Flow<List<WcRequest>>
+    val requests: Flow<ImmutableList<WcRequest>>
 
     suspend fun get(id: WcRequest.Id?): Either<WcFailure, WcRequest>
 

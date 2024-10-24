@@ -98,7 +98,8 @@ fun NetworkFeesCard(
                         value = {
                             TextAmount(
                                 gasPrice?.base.orZero(),
-                                token?.entity?.symbol.orEmpty()
+                                token?.entity?.symbol.orEmpty(),
+                                token?.entity?.decimals
                             )
                         }
                     )
@@ -109,7 +110,8 @@ fun NetworkFeesCard(
                         value = {
                             TextAmount(
                                 gasPrice?.priority.orZero(),
-                                token?.entity?.symbol.orEmpty()
+                                token?.entity?.symbol.orEmpty(),
+                                token?.entity?.decimals
                             )
                         }
                     )
@@ -178,7 +180,8 @@ fun NetworkFeesCard(
                             value = {
                                 TextAmount(
                                     transaction.receipt?.gasPrice?.base.orZero(),
-                                    token.entity?.symbol.orEmpty()
+                                    token.entity?.symbol.orEmpty(),
+                                    token.entity?.decimals
                                 )
                             }
                         )
@@ -189,7 +192,8 @@ fun NetworkFeesCard(
                         value = {
                             TextAmount(
                                 transaction.gasPrice.base.orZero(),
-                                token.entity?.symbol.orEmpty()
+                                token.entity?.symbol.orEmpty(),
+                                token.entity?.decimals
                             )
                         }
                     )
@@ -199,7 +203,8 @@ fun NetworkFeesCard(
                         value = {
                             TextAmount(
                                 transaction.gasPrice.priority.orZero(),
-                                token.entity?.symbol.orEmpty()
+                                token.entity?.symbol.orEmpty(),
+                                token.entity?.decimals
                             )
                         }
                     )

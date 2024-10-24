@@ -16,7 +16,6 @@ import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material3.Icon
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import arrow.core.raise.nullable
@@ -78,7 +77,7 @@ fun TransactionContent(
         onNavigateUp = onNavigateUp,
 
         actions = {
-            DappIcon(transaction?.dapp?.url, transaction?.dapp?.icon)
+            DappIcon(transaction?.dapp)
 
             AdaptiveMoreMenu { dismiss ->
                 if (transaction is TransactionEntity.Eip1559) {
@@ -140,7 +139,7 @@ fun PersonalMessageContent(
 
         AccountItem(account.entity)
 
-        val message by personalMessage.message.resolve { it.bytes().decodeToString() }
+        val message = personalMessage.message.resolve { it.bytes().decodeToString() }
 
         PersonalMessageCard(message)
 
@@ -162,7 +161,7 @@ fun PersonalMessageContent(
 fun TypedMessageContent(
     typedMessage: TransactionEntity.Eip712,
 ) {
-    val jsonText by typedMessage.jsonTypeData.resolve { it.bytes().decodeToString() }
+    val jsonText = typedMessage.jsonTypeData.resolve { it.bytes().decodeToString() }
 
     Column(
         modifier = Modifier.verticalScroll(rememberScrollState()),
@@ -208,7 +207,7 @@ fun TransactionContent(
 ) {
     val network = rememberNetwork(transaction.networkId)
     val account = rememberAccount(transaction.sender)
-    val data by transaction.data.resolve { it }
+    val data = transaction.data.resolve { it }
 
     val parsed = nullable {
         rememberContractCall(

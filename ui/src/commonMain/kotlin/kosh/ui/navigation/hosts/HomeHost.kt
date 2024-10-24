@@ -16,20 +16,26 @@ import androidx.compose.material.icons.outlined.AccountBalanceWallet
 import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
+import androidx.compose.material3.LargeTopAppBar
 import androidx.compose.material3.NavigationBar
 import androidx.compose.material3.NavigationBarItem
+import androidx.compose.material3.Scaffold
+import androidx.compose.material3.SnackbarHost
+import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Text
+import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import com.arkivanov.decompose.extensions.compose.subscribeAsState
 import com.arkivanov.decompose.router.stack.StackNavigation
-import com.arkivanov.decompose.router.stack.replaceAll
+import com.arkivanov.decompose.router.stack.pushToFront
 import kosh.ui.analytics.LogScreen
-import kosh.ui.component.scaffold.KoshScaffold
-import kosh.ui.component.scaffold.ProvideSnackbarOffset
+import kosh.ui.component.scaffold.LocalSnackbarHostState
 import kosh.ui.navigation.RouteResult
 import kosh.ui.navigation.animation.stackAnimationFadeThrough
 import kosh.ui.navigation.animation.transitions.fadeThroughIn
@@ -38,9 +44,8 @@ import kosh.ui.navigation.routes.HomeRoute
 import kosh.ui.navigation.routes.RootRoute
 import kosh.ui.navigation.routes.TokensRoute
 import kosh.ui.navigation.routes.TransactionsRoute
-import kosh.ui.navigation.routes.wc.WcProposalRoute
-import kosh.ui.navigation.routes.wc.WcSessionRoute
-import kosh.ui.navigation.routes.wc.wcRequestRoute
+import kosh.ui.navigation.routes.WcSessionsRoute
+import kosh.ui.navigation.routes.wcRequestRoute
 import kosh.ui.navigation.stack.StackHost
 import kosh.ui.navigation.stack.rememberStackRouter
 import kosh.ui.reown.WcSessionsScreen
@@ -58,37 +63,44 @@ fun HomeHost(
     val stackRouter = rememberStackRouter(start, link) { onResult(it) }
     val childStackState by stackRouter.stack.subscribeAsState()
     val activeRoute by derivedStateOf { childStackState.active.configuration }
+    val snackbarHostState = remember { SnackbarHostState() }
 
-    KoshScaffold(
-        title = {
-            AnimatedContent(
-                activeRoute.title,
-                transitionSpec = { fadeThroughIn() togetherWith fadeThroughOut() }
-            ) {
-                Box(Modifier.fillMaxWidth()) {
-                    Text(it)
+    val scrollBehavior = TopAppBarDefaults.exitUntilCollapsedScrollBehavior()
+
+    Scaffold(
+        topBar = {
+            LargeTopAppBar(
+                scrollBehavior = scrollBehavior,
+                title = {
+                    AnimatedContent(
+                        targetState = activeRoute.title,
+                        transitionSpec = { fadeThroughIn() togetherWith fadeThroughOut() }
+                    ) {
+                        Box(Modifier.fillMaxWidth()) {
+                            Text(it)
+                        }
+                    }
+                },
+                actions = {
+                    IconButton(onClick = {
+                        onOpen(RootRoute.Networks())
+                    }) {
+                        Icon(Networks, "Networks")
+                    }
+
+                    IconButton(onClick = {
+                        onOpen(RootRoute.Wallets())
+                    }) {
+                        Icon(Icons.Outlined.AccountBalanceWallet, "Accounts")
+                    }
                 }
-            }
-        },
-        actions = {
-            IconButton(onClick = {
-                onOpen(RootRoute.Networks())
-            }) {
-                Icon(Networks, "Networks")
-            }
-
-            IconButton(onClick = {
-                onOpen(RootRoute.Wallets())
-            }) {
-                Icon(Icons.Outlined.AccountBalanceWallet, "Accounts")
-            }
+            )
         },
         bottomBar = {
             NavigationBar(
                 items = listOf(HomeRoute.Assets, HomeRoute.Activity, HomeRoute.WalletConnect),
                 navigation = stackRouter,
                 activeRoute = activeRoute,
-                start = start,
             )
         },
         floatingActionButton = {
@@ -109,7 +121,7 @@ fun HomeHost(
                                 HomeRoute.Activity -> Unit
 
                                 HomeRoute.WalletConnect -> onOpen(
-                                    RootRoute.WcProposal(WcProposalRoute.Pair())
+                                    RootRoute.WcSessions(WcSessionsRoute.Pair())
                                 )
                             }
                         },
@@ -119,52 +131,65 @@ fun HomeHost(
                 } ?: Spacer(Modifier.size(56.dp))
             }
         },
-        onNavigateUp = null,
+        snackbarHost = { SnackbarHost(snackbarHostState) }
     ) { paddingValues ->
+        CompositionLocalProvider(LocalSnackbarHostState provides snackbarHostState) {
+            StackHost(
+                stackRouter = stackRouter,
+                animation = stackAnimationFadeThrough(),
+            ) { route ->
 
-        StackHost(
-            stackRouter = stackRouter,
-            animation = stackAnimationFadeThrough(),
-        ) { route ->
+                when (route) {
+                    HomeRoute.Assets -> AssetsScreen(
+                        paddingValues = paddingValues,
+                        scrollBehavior = scrollBehavior,
+                        onOpenToken = { token, isNft ->
+                            onOpen(RootRoute.Tokens(TokensRoute.Details(token), isNft))
+                        },
+                        onOpenNetworks = {
+                            onOpen(RootRoute.Networks())
+                        },
+                        onOpenWallets = {
+                            onOpen(RootRoute.Wallets())
+                        }
+                    )
 
-            when (route) {
-                HomeRoute.Assets -> AssetsScreen(
-                    paddingValues = paddingValues,
-                    open = { token, isNft ->
-                        onOpen(RootRoute.Tokens(TokensRoute.Details(token), isNft))
-                    },
-                )
+                    HomeRoute.Activity -> ActivityScreen(
+                        paddingValues = paddingValues,
+                        scrollBehavior = scrollBehavior,
+                        onOpenTransaction = {
+                            onOpen(RootRoute.Transactions(TransactionsRoute.Details(it)))
+                        },
+                        onOpenRequest = {
+                            onOpen(RootRoute.WcSessions(wcRequestRoute(it)))
+                        },
+                        onOpenAuth = {
+                            onOpen(RootRoute.WcSessions(WcSessionsRoute.Auth(it.id)))
+                        },
+                        onOpenProposal = {
+                            onOpen(
+                                RootRoute.WcSessions(
+                                    WcSessionsRoute.Proposal(it.id, it.requestId)
+                                )
+                            )
+                        }
+                    )
 
-                HomeRoute.Activity -> ActivityScreen(
-                    paddingValues = paddingValues,
-                    onOpenTransaction = {
-                        onOpen(RootRoute.Transactions(TransactionsRoute.Details(it)))
-                    },
-                    onOpenRequest = {
-                        onOpen(RootRoute.WcRequest(wcRequestRoute(it)))
-                    },
-                    onOpenAuth = {
-                        onOpen(RootRoute.WcProposal(WcProposalRoute.Auth(it.id)))
-                    },
-                    onOpenProposal = {
-                        onOpen(RootRoute.WcProposal(WcProposalRoute.Proposal(it.id, it.requestId)))
-                    }
-                )
+                    HomeRoute.WalletConnect -> WcSessionsScreen(
+                        paddingValues = paddingValues,
+                        scrollBehavior = scrollBehavior,
+                        onOpen = { onOpen(RootRoute.WcSessions(WcSessionsRoute.Session(it.id))) },
+                    )
+                }
 
-                HomeRoute.WalletConnect -> WcSessionsScreen(
-                    paddingValues = paddingValues,
-                    onOpen = { onOpen(RootRoute.WcSession(WcSessionRoute.Session(it.id))) },
-                )
+                LogScreen(route)
             }
-
-            LogScreen(route)
         }
     }
 }
 
 @Composable
 private fun NavigationBar(
-    start: HomeRoute,
     activeRoute: HomeRoute,
     items: List<HomeRoute>,
     navigation: StackNavigation<HomeRoute>,
@@ -180,13 +205,10 @@ private fun NavigationBar(
                 onClick = {
                     when {
                         selected -> Unit
-                        start == item -> navigation.replaceAll(start)
-                        else -> navigation.replaceAll(start, item)
+                        else -> navigation.pushToFront(item)
                     }
                 },
             )
         }
     }
-
-    ProvideSnackbarOffset(80.dp)
 }

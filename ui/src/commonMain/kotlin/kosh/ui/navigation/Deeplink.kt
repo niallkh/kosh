@@ -4,8 +4,7 @@ import kosh.domain.models.reown.PairingUri
 import kosh.domain.models.reown.WcRequest
 import kosh.ui.navigation.routes.RootRoute
 import kosh.ui.navigation.routes.Route
-import kosh.ui.navigation.routes.wc.WcProposalRoute
-import kosh.ui.navigation.routes.wc.WcRequestRoute
+import kosh.ui.navigation.routes.WcSessionsRoute
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.builtins.nullable
 import kotlinx.serialization.cbor.Cbor
@@ -62,11 +61,11 @@ fun parseDeeplink(uriStr: String): RootRoute? {
 }
 
 private fun wcPairRoute(uriStr: String): RootRoute? = PairingUri(uriStr).getOrNull()?.let {
-    RootRoute.WcProposal(WcProposalRoute.Pair(it, Deeplink))
+    RootRoute.WcSessions(WcSessionsRoute.Pair(it, Deeplink))
 }
 
-private fun wcRequestRoute(requestId: Long?) = RootRoute.WcRequest(
-    WcRequestRoute.Request(requestId?.let { WcRequest.Id(it) }, Deeplink)
+private fun wcRequestRoute(requestId: Long?) = RootRoute.WcSessions(
+    WcSessionsRoute.Request(requestId?.let { WcRequest.Id(it) }, Deeplink)
 )
 
 private fun appRoute(path: String): RootRoute? = path.decodeBase64()

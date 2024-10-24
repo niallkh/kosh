@@ -13,11 +13,12 @@ import androidx.compose.ui.layout.ContentScale
 import com.seiko.imageloader.model.ImageRequest
 import com.seiko.imageloader.rememberImagePainter
 import kosh.domain.models.Uri
+import kosh.ui.component.placeholder.placeholder
 import kosh.ui.resources.illustrations.NftEmpty
 
 @Composable
 fun NftImage(
-    image: Uri,
+    image: Uri?,
     modifier: Modifier = Modifier,
     maxSize: Int = 1024,
     shape: Shape = MaterialTheme.shapes.medium,
@@ -32,7 +33,8 @@ fun NftImage(
     Image(
         modifier = modifier
             .aspectRatio(1f)
-            .clip(shape),
+            .clip(shape)
+            .placeholder(image == null),
         painter = rememberImagePainter(
             request,
             errorPainter = { rememberVectorPainter(NftEmpty()) },

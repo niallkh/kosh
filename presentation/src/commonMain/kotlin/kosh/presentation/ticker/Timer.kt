@@ -69,5 +69,3 @@ class Timer(
 fun rememberTimer(period: Duration): Timer = rememberSaveable(period, saver = Timer.Saver) {
     Timer(period)
 }
-
-

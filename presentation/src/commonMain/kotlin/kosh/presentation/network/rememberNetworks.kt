@@ -24,6 +24,7 @@ fun rememberNetworks(
     return NetworksState(
         networks = networks,
         enabled = enabled,
+        init = appStateProvider.init,
     )
 }
 
@@ -31,4 +32,5 @@ fun rememberNetworks(
 data class NetworksState(
     val networks: ImmutableList<NetworkEntity>,
     val enabled: ImmutableSet<NetworkEntity.Id>,
+    val init: Boolean,
 )

@@ -12,13 +12,16 @@ import kosh.domain.models.at
 import kosh.domain.models.reown.WcAuthentication
 import kosh.domain.models.web3.Signature
 import kosh.domain.repositories.WcRepo
+import kosh.domain.serializers.ImmutableList
 import kosh.domain.state.AppState
 import kosh.domain.state.AppStateProvider
 import kosh.domain.state.networks
 import kosh.domain.usecases.notification.NotificationService
 import kosh.domain.utils.optic
+import kotlinx.collections.immutable.toPersistentList
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.launch
 
 class DefaultWcAuthenticationService(
@@ -30,8 +33,8 @@ class DefaultWcAuthenticationService(
 
     private val logger = Logger.withTag("[K]WcAuthenticationService")
 
-    override val authentications: Flow<List<WcAuthentication>>
-        get() = reownRepo.authentications
+    override val authentications: Flow<ImmutableList<WcAuthentication>>
+        get() = reownRepo.authentications.map { it.toPersistentList() }
 
     override suspend fun get(
         id: WcAuthentication.Id,

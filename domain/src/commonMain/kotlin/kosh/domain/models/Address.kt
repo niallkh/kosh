@@ -71,4 +71,5 @@ value class Address private constructor(
 
 fun Address.eip55() = value.value.eip55()
 
+@Deprecated("")
 fun Address?.orZero() = this ?: Address()

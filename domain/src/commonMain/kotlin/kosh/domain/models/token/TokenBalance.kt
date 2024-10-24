@@ -9,4 +9,4 @@ import kotlinx.serialization.Serializable
 data class TokenBalance(
     val token: TokenEntity,
     val value: Balance,
-)
+) 

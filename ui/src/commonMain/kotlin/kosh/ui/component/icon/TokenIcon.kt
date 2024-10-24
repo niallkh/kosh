@@ -13,16 +13,18 @@ import com.seiko.imageloader.rememberImagePainter
 import kosh.domain.entities.TokenEntity
 import kosh.domain.models.Uri
 import kosh.ui.component.colors.symbolColor
+import kosh.ui.component.placeholder.placeholder
 
 @Composable
 fun TokenIcon(
-    token: TokenEntity,
+    token: TokenEntity?,
     modifier: Modifier = Modifier,
 ) {
     TokenIcon(
-        symbol = token.symbol,
-        icon = token.icon,
-        modifier = modifier,
+        symbol = token?.symbol ?: "Lorem",
+        icon = token?.icon,
+        modifier = modifier
+            .placeholder(token == null),
     )
 }
 

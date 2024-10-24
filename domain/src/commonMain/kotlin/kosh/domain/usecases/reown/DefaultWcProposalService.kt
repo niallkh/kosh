@@ -19,12 +19,14 @@ import kosh.domain.models.reown.WcAuthentication
 import kosh.domain.models.reown.WcProposalAggregated
 import kosh.domain.models.reown.WcSessionProposal
 import kosh.domain.repositories.WcRepo
+import kosh.domain.serializers.ImmutableList
 import kosh.domain.state.AppState
 import kosh.domain.state.AppStateProvider
 import kosh.domain.state.networks
 import kosh.domain.usecases.notification.NotificationService
 import kosh.domain.utils.optic
 import kotlinx.collections.immutable.toPersistentHashSet
+import kotlinx.collections.immutable.toPersistentList
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.async
@@ -33,6 +35,7 @@ import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.asFlow
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.flatMapConcat
+import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.selects.onTimeout
 import kotlinx.coroutines.selects.select
@@ -46,8 +49,8 @@ class DefaultWcProposalService(
 ) : WcProposalService {
     private val logger = Logger.withTag("[K]WcProposalService")
 
-    override val proposals: Flow<List<WcSessionProposal>>
-        get() = reownRepo.proposals
+    override val proposals: Flow<ImmutableList<WcSessionProposal>>
+        get() = reownRepo.proposals.map { it.toPersistentList() }
 
     override suspend fun pair(
         uri: PairingUri,

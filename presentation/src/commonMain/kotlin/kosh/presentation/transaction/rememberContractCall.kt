@@ -8,8 +8,8 @@ import kosh.domain.models.ChainId
 import kosh.domain.models.web3.ContractCall
 import kosh.domain.serializers.BigInteger
 import kosh.domain.usecases.transaction.ContractCallService
-import kosh.presentation.Load
 import kosh.presentation.core.di
+import kosh.presentation.rememberLoad
 
 @Composable
 fun rememberContractCall(
@@ -21,15 +21,15 @@ fun rememberContractCall(
     callDataParserService: ContractCallService = di { domain.callDataParserService },
 ): ContractCallState {
 
-    val content = Load(chainId, from, to, data) {
-        callDataParserService.parse(chainId, from, to, value, data).bind()
+    val parsed = rememberLoad(chainId, from, to, data) {
+        callDataParserService.parse(chainId, from, to, value, data)
     }
 
     return ContractCallState(
-        contractCall = content.content,
-        loading = content.loading,
-        failure = content.failure,
-        retry = { content.retry() },
+        contractCall = parsed.result?.getOrNull(),
+        loading = parsed.loading,
+        failure = parsed.result?.leftOrNull(),
+        retry = { parsed() },
     )
 }
 

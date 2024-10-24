@@ -29,14 +29,14 @@ import kosh.domain.utils.orZero
 import kosh.presentation.account.rememberAccount
 import kosh.presentation.models.SignRequest
 import kosh.presentation.network.rememberNetwork
+import kosh.presentation.reown.SendTransactionRequestState
+import kosh.presentation.reown.rememberSendTransactionRequest
 import kosh.presentation.transaction.get
 import kosh.presentation.transaction.rememberContractCall
 import kosh.presentation.transaction.rememberEstimateGas
 import kosh.presentation.transaction.rememberGasPrices
 import kosh.presentation.transaction.rememberGasSpeed
 import kosh.presentation.transaction.rememberNextNonce
-import kosh.presentation.reown.SendTransactionRequestState
-import kosh.presentation.reown.rememberSendTransactionRequest
 import kosh.ui.component.LoadingIndicator
 import kosh.ui.component.button.LoadingButton
 import kosh.ui.component.button.PrimaryButtons
@@ -123,10 +123,7 @@ fun WcSendTransactionContent(
 
         actions = {
             if (sendTransaction.failure == null) {
-                DappIcon(
-                    sendTransaction.request?.dapp?.url,
-                    sendTransaction.request?.dapp?.icon,
-                )
+                DappIcon(sendTransaction.request?.dapp)
             }
             Spacer(Modifier.width(8.dp))
         }

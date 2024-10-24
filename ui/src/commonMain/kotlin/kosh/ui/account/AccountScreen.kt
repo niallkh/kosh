@@ -96,11 +96,10 @@ fun AccountContent(
         onNavigateUp = { onNavigateUp() },
         actions = {
             AccountIcon(
-                account?.address.orZero(),
+                account?.address,
                 Modifier
                     .clip(CircleShape)
-                    .size(40.dp)
-                    .placeholder(account == null),
+                    .size(40.dp),
             )
 
             AdaptiveMoreMenu { dismiss ->

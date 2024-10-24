@@ -2,6 +2,7 @@ package kosh.ui.transaction
 
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
@@ -9,105 +10,114 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyListScope
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material3.Text
+import androidx.compose.material3.TopAppBarScrollBehavior
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import kosh.domain.entities.TransactionEntity
 import kosh.domain.models.reown.WcAuthentication
-import kosh.domain.models.reown.WcSessionProposal
 import kosh.domain.models.reown.WcRequest
+import kosh.domain.models.reown.WcSessionProposal
 import kosh.domain.serializers.ImmutableList
-import kosh.presentation.transaction.rememberFinalizeTransactions
-import kosh.presentation.transaction.rememberTransactions
+import kosh.presentation.reown.AuthenticationsState
+import kosh.presentation.reown.ProposalsState
+import kosh.presentation.reown.RequestsState
 import kosh.presentation.reown.rememberAuthentications
 import kosh.presentation.reown.rememberProposals
 import kosh.presentation.reown.rememberRequests
+import kosh.presentation.transaction.TransactionsState
+import kosh.presentation.transaction.rememberFinalizeTransactions
+import kosh.presentation.transaction.rememberTransactions
+import kosh.ui.component.LoadingIndicator
 import kosh.ui.component.illustration.Illustration
+import kosh.ui.component.refresh.DragToRefreshBox
 import kosh.ui.component.text.Header
 import kosh.ui.failure.AppFailureMessage
-import kosh.ui.resources.illustrations.ActivityEmpty
 import kosh.ui.reown.WcAuthenticationItem
 import kosh.ui.reown.WcProposalItem
 import kosh.ui.reown.WcRequestItem
+import kosh.ui.resources.illustrations.ActivityEmpty
+import kotlinx.collections.immutable.toPersistentList
 
 @Composable
 fun ActivityScreen(
     paddingValues: PaddingValues,
+    scrollBehavior: TopAppBarScrollBehavior,
     onOpenTransaction: (TransactionEntity.Id) -> Unit,
     onOpenProposal: (WcSessionProposal) -> Unit,
     onOpenAuth: (WcAuthentication) -> Unit,
     onOpenRequest: (WcRequest) -> Unit,
 ) {
     val finalizeTransactions = rememberFinalizeTransactions()
-
-    AppFailureMessage(finalizeTransactions.failures, { false }, {})
-
     val transactions = rememberTransactions()
-    val proposals = rememberProposals()
-    val authentications = rememberAuthentications()
-    val requests = rememberRequests()
 
-    ActivityContent(
-        paddingValues = paddingValues,
-        transactions = transactions.txs,
-        proposals = proposals.proposals,
-        authentications = authentications.authentications,
-        requests = requests.requests,
-        onSelectTransaction = { onOpenTransaction(it.id) },
-        onSelectRequest = { onOpenRequest(it) },
-        onSelectProposal = { onOpenProposal(it) },
-        onSelectAuthentication = { onOpenAuth(it) },
+    AppFailureMessage(finalizeTransactions.failures)
+
+    DragToRefreshBox(
+        isRefreshing = finalizeTransactions.refreshing,
+        enabled = transactions.init,
+        onRefresh = { finalizeTransactions.refresh() },
+        scrollBehavior = scrollBehavior,
+        modifier = Modifier
+            .fillMaxSize()
+            .padding(paddingValues)
+    ) {
+        ActivityContent(
+            isRefreshing = finalizeTransactions.refreshing,
+            transactions = transactions,
+            onSelectTransaction = { onOpenTransaction(it.id) },
+            onSelectRequest = { onOpenRequest(it) },
+            onSelectProposal = { onOpenProposal(it) },
+            onSelectAuthentication = { onOpenAuth(it) },
+        )
+    }
+
+    LoadingIndicator(
+        finalizeTransactions.loading && !finalizeTransactions.refreshing,
+        Modifier.padding(paddingValues),
     )
 }
 
 @Composable
 fun ActivityContent(
-    paddingValues: PaddingValues,
-    transactions: ImmutableList<TransactionEntity>,
-    proposals: ImmutableList<WcSessionProposal>,
-    authentications: ImmutableList<WcAuthentication>,
-    requests: ImmutableList<WcRequest>,
+    isRefreshing: Boolean = false,
+    transactions: TransactionsState = rememberTransactions(),
+    proposals: ProposalsState = rememberProposals(),
+    authentications: AuthenticationsState = rememberAuthentications(),
+    requests: RequestsState = rememberRequests(),
     onSelectTransaction: (TransactionEntity) -> Unit,
     onSelectProposal: (WcSessionProposal) -> Unit,
     onSelectAuthentication: (WcAuthentication) -> Unit,
     onSelectRequest: (WcRequest) -> Unit,
 ) {
     LazyColumn(
-        contentPadding = paddingValues,
+        Modifier.fillMaxSize(),
+        userScrollEnabled = !isRefreshing
     ) {
 
-        if (transactions.isEmpty() &&
-            proposals.isEmpty() &&
-            authentications.isEmpty() &&
-            requests.isEmpty()
-        ) {
-            item {
-                Illustration(
-                    ActivityEmpty(),
-                    "ActivityEmpty",
-                    Modifier
-                        .fillMaxWidth()
-                        .padding(64.dp),
-                ) {
-                    Text(
-                        "Get started by sending your first transaction",
-                        textAlign = TextAlign.Center
-                    )
-                }
+        when {
+            !transactions.init -> {
+                transactions(List(7) { null }.toPersistentList(), onSelectTransaction)
+            }
+
+            transactions.transactions.isEmpty() &&
+                    proposals.proposals.isEmpty() &&
+                    authentications.authentications.isEmpty() &&
+                    requests.requests.isEmpty() -> item {
+                EmptyActivityContent(Modifier.animateItem())
+            }
+
+            else -> {
+                proposals(proposals.proposals, onSelectProposal)
+
+                authentications(authentications.authentications, onSelectAuthentication)
+
+                requests(requests.requests, onSelectRequest)
+
+                transactions(transactions.transactions, onSelectTransaction)
             }
         }
-
-        activity(
-            transactions = transactions,
-            proposals = proposals,
-            authentications = authentications,
-            requests = requests,
-            onSelectTransaction = onSelectTransaction,
-            onSelectProposal = onSelectProposal,
-            onSelectAuthentication = onSelectAuthentication,
-            onSelectRequest = onSelectRequest
-        )
 
         item {
             Spacer(Modifier.height(64.dp))
@@ -115,23 +125,22 @@ fun ActivityContent(
     }
 }
 
-private fun LazyListScope.activity(
-    transactions: ImmutableList<TransactionEntity>,
-    proposals: ImmutableList<WcSessionProposal>,
-    authentications: ImmutableList<WcAuthentication>,
-    requests: ImmutableList<WcRequest>,
-    onSelectTransaction: (TransactionEntity) -> Unit,
-    onSelectProposal: (WcSessionProposal) -> Unit,
-    onSelectAuthentication: (WcAuthentication) -> Unit,
-    onSelectRequest: (WcRequest) -> Unit,
+@Composable
+private fun EmptyActivityContent(
+    modifier: Modifier = Modifier,
 ) {
-    proposals(proposals, onSelectProposal)
-
-    authentications(authentications, onSelectAuthentication)
-
-    requests(requests, onSelectRequest)
-
-    transactions(transactions, onSelectTransaction)
+    Illustration(
+        ActivityEmpty(),
+        "ActivityEmpty",
+        modifier
+            .fillMaxWidth()
+            .padding(64.dp),
+    ) {
+        Text(
+            "Get started by sending your first transaction",
+            textAlign = TextAlign.Center
+        )
+    }
 }
 
 private fun LazyListScope.requests(
@@ -201,7 +210,7 @@ private fun LazyListScope.authentications(
 }
 
 private fun LazyListScope.transactions(
-    transactions: ImmutableList<TransactionEntity>,
+    transactions: ImmutableList<TransactionEntity?>,
     onSelect: (TransactionEntity) -> Unit,
 ) {
     if (transactions.isNotEmpty()) {
@@ -211,17 +220,18 @@ private fun LazyListScope.transactions(
     }
 
     items(
-        items = transactions,
-        key = { it.id.value.leastSignificantBits },
-        contentType = { transaction ->
-            when (transaction) {
+        count = transactions.size,
+        key = { transactions[it]?.id?.value?.leastSignificantBits ?: it },
+        contentType = {
+            when (transactions[it]) {
+                null -> 0
                 is TransactionEntity.Eip1559 -> 1
                 is TransactionEntity.Eip712 -> 2
                 is TransactionEntity.PersonalMessage -> 3
             }
         }
-    ) { transaction ->
-        when (transaction) {
+    ) {
+        when (val transaction = transactions[it]) {
             is TransactionEntity.Eip1559 -> TransactionItem(
                 modifier = Modifier.animateItem(),
                 transaction = transaction,
@@ -239,7 +249,12 @@ private fun LazyListScope.transactions(
                 personalMessage = transaction,
                 onClick = { onSelect(transaction) },
             )
+
+            null -> PersonalMessageItem(
+                modifier = Modifier.animateItem(),
+                personalMessage = transaction,
+                onClick = { },
+            )
         }
     }
 }
-

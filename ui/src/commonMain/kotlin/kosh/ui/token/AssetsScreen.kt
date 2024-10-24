@@ -2,126 +2,113 @@ package kosh.ui.token
 
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyListScope
-import androidx.compose.foundation.lazy.items
-import androidx.compose.material3.Text
-import androidx.compose.material3.TextButton
+import androidx.compose.material3.TopAppBarScrollBehavior
 import androidx.compose.runtime.Composable
-import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import kosh.domain.entities.TokenEntity
 import kosh.domain.entities.isNft
 import kosh.domain.models.token.TokenBalance
 import kosh.domain.serializers.ImmutableList
+import kosh.presentation.account.WalletState
 import kosh.presentation.account.rememberWallets
+import kosh.presentation.network.NetworksState
 import kosh.presentation.network.rememberNetworks
+import kosh.presentation.token.BalancesState
 import kosh.presentation.token.rememberBalances
+import kosh.presentation.token.rememberUpdateBalances
 import kosh.ui.component.LoadingIndicator
-import kosh.ui.component.illustration.Illustration
+import kosh.ui.component.refresh.DragToRefreshBox
 import kosh.ui.component.text.Header
 import kosh.ui.component.token.NftBalanceItem
 import kosh.ui.component.token.TokenBalanceItem
 import kosh.ui.failure.AppFailureMessage
-import kosh.ui.navigation.LocalRootNavigator
-import kosh.ui.navigation.routes.RootRoute
-import kosh.ui.resources.illustrations.AssetsEmpty
+import kotlinx.collections.immutable.toPersistentList
 
 @Composable
 fun AssetsScreen(
     paddingValues: PaddingValues,
-    open: (TokenEntity.Id, Boolean) -> Unit,
+    scrollBehavior: TopAppBarScrollBehavior,
+    onOpenToken: (TokenEntity.Id, Boolean) -> Unit,
+    onOpenWallets: () -> Unit,
+    onOpenNetworks: () -> Unit,
 ) {
+    val updateBalances = rememberUpdateBalances()
     val balances = rememberBalances()
 
-    AppFailureMessage(balances.failures) {
-        balances.retry()
+    AppFailureMessage(updateBalances.failures)
+
+    DragToRefreshBox(
+        isRefreshing = updateBalances.refreshing,
+        enabled = balances.init,
+        onRefresh = { updateBalances.refresh() },
+        scrollBehavior = scrollBehavior,
+        modifier = Modifier.padding(paddingValues),
+    ) {
+        AssetsContent(
+            isRefreshing = updateBalances.refreshing,
+            balances = balances,
+            onSelectToken = { onOpenToken(it.id, it.isNft) },
+            onOpenWallets = onOpenWallets,
+            onOpenNetworks = onOpenNetworks
+        )
     }
 
-    AssetsContent(
-        paddingValues = paddingValues,
-        balances = balances.balances,
-        onSelect = { open(it.id, it.isNft) },
-    )
-
     LoadingIndicator(
-        balances.loading,
+        updateBalances.loading && !updateBalances.refreshing,
         Modifier.padding(paddingValues),
     )
 }
 
 @Composable
 fun AssetsContent(
-    paddingValues: PaddingValues,
-    balances: ImmutableList<TokenBalance>,
-    onSelect: (TokenEntity) -> Unit,
+    isRefreshing: Boolean,
+    balances: BalancesState = rememberBalances(),
+    wallets: WalletState = rememberWallets(),
+    networks: NetworksState = rememberNetworks(),
+    onSelectToken: (TokenEntity) -> Unit,
+    onOpenWallets: () -> Unit,
+    onOpenNetworks: () -> Unit,
 ) {
-    val wallets = rememberWallets()
-    val networks = rememberNetworks()
-
-    val rootNavigator = LocalRootNavigator.current
-
     LazyColumn(
-        contentPadding = paddingValues,
+        userScrollEnabled = !isRefreshing,
+        modifier = Modifier.fillMaxSize(),
     ) {
-
         when {
-            wallets.enabled.isEmpty() -> item {
-                Illustration(
-                    AssetsEmpty(),
-                    "AssetsEmpty",
-                    Modifier
-                        .fillMaxWidth()
-                        .padding(64.dp),
-                ) {
-                    Column(horizontalAlignment = Alignment.CenterHorizontally) {
-                        Text(
-                            "Get started by adding your first wallet",
-                            textAlign = TextAlign.Center
-                        )
+            !balances.init -> {
+                balances(
+                    tokenBalances = List(5) { null }.toPersistentList(),
+                    nftBalances = List(1) { null }.toPersistentList(),
+                    onSelect = onSelectToken
+                )
+            }
 
-                        TextButton(onClick = {
-                            rootNavigator.open(RootRoute.Wallets())
-                        }) {
-                            Text("Add Wallet")
-                        }
-                    }
+            wallets.enabled.isEmpty() -> item {
+                EmptyAssetsContent(Modifier.animateItem()) {
+                    OpenWallets(onOpenWallets)
                 }
             }
 
             networks.enabled.isEmpty() -> item {
-                Illustration(
-                    AssetsEmpty(),
-                    "AssetsEmpty",
-                    Modifier
-                        .fillMaxWidth()
-                        .padding(64.dp),
-                ) {
-                    Column(horizontalAlignment = Alignment.CenterHorizontally) {
-                        Text(
-                            "Get started by adding your first network",
-                            textAlign = TextAlign.Center
-                        )
-
-                        TextButton(onClick = {
-                            rootNavigator.open(RootRoute.Networks())
-                        }) {
-                            Text("Add Network")
-                        }
-                    }
+                EmptyAssetsContent(Modifier.animateItem()) {
+                    OpenNetworks(onOpenNetworks)
                 }
             }
 
-            else -> balances(balances, onSelect)
+            else -> balances(
+                tokenBalances = balances.balances.toPersistentList().removeAll { it.token.isNft },
+                nftBalances = balances.balances.toPersistentList().removeAll { !it.token.isNft },
+                onSelect = onSelectToken
+            )
         }
 
         item { Spacer(Modifier.height(64.dp)) }
@@ -129,43 +116,50 @@ fun AssetsContent(
 }
 
 private fun LazyListScope.balances(
-    balances: ImmutableList<TokenBalance>,
+    tokenBalances: ImmutableList<TokenBalance?>,
+    nftBalances: ImmutableList<TokenBalance?>,
     onSelect: (TokenEntity) -> Unit,
 ) {
-    val (tokenBalances, nftBalances) = balances.partition { !it.token.isNft }
-
     if (tokenBalances.isNotEmpty()) {
         stickyHeader {
-            Header("Tokens")
+            Header(
+                "Tokens",
+                Modifier.animateItem(),
+            )
         }
     }
 
     items(
-        items = tokenBalances,
-        key = { it.token.id.value.toString() }
-    ) { tokenBalance ->
+        count = tokenBalances.size,
+        key = { tokenBalances[it]?.token?.id?.value?.leastSignificantBits ?: it }
+    ) { i ->
+        val tokenBalance = tokenBalances[i]
         TokenBalanceItem(
             modifier = Modifier.animateItem(),
             tokenBalance = tokenBalance,
-            onClick = { onSelect(tokenBalance.token) }
+            onClick = { tokenBalance?.let { onSelect(it.token) } }
         )
     }
 
     if (nftBalances.isNotEmpty()) {
         stickyHeader {
-            Header("NFTs")
+            Header(
+                "NFTs",
+                Modifier.animateItem()
+            )
         }
     }
 
-    items(
-        items = nftBalances.chunked(2),
-        key = {
-            it[0].token.id.value.leastSignificantBits xor
-                    (it.getOrNull(1)?.token?.id?.value?.leastSignificantBits
-                        ?: Long.MIN_VALUE)
+    val nfts = nftBalances.chunked(2)
 
+    items(
+        count = nfts.size,
+        key = {
+            (nfts[it][0]?.token?.id?.value?.leastSignificantBits ?: it.toLong()) xor
+                    (nfts[it].getOrNull(1)?.token?.id?.value?.leastSignificantBits ?: 0L)
         },
-    ) { nfts ->
+    ) { index ->
+
         Row(
             modifier = Modifier
                 .fillMaxWidth()
@@ -175,19 +169,21 @@ private fun LazyListScope.balances(
             Box(
                 modifier = Modifier
                     .weight(1f)
+                    .animateItem()
             ) {
-                val tokenBalance = nfts[0]
+                val tokenBalance = nfts[index][0]
                 NftBalanceItem(
                     tokenBalance = tokenBalance,
-                    onClick = { onSelect(tokenBalance.token) }
+                    onClick = { tokenBalance?.token?.let { onSelect(it) } }
                 )
             }
 
             Box(
                 modifier = Modifier
                     .weight(1f)
+                    .animateItem()
             ) {
-                nfts.getOrNull(1)?.let { tokenBalance ->
+                nfts[index].getOrNull(1)?.let { tokenBalance ->
                     NftBalanceItem(
                         tokenBalance = tokenBalance,
                         onClick = { onSelect(tokenBalance.token) }
@@ -195,9 +191,5 @@ private fun LazyListScope.balances(
                 }
             }
         }
-    }
-
-    item {
-        Spacer(Modifier.height(64.dp))
     }
 }

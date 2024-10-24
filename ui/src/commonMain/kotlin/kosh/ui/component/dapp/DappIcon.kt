@@ -16,7 +16,9 @@ import androidx.compose.ui.unit.dp
 import com.seiko.imageloader.model.ImageRequest
 import com.seiko.imageloader.rememberImagePainter
 import kosh.domain.entities.NetworkEntity
+import kosh.domain.entities.TransactionEntity.Dapp
 import kosh.domain.models.Uri
+import kosh.domain.models.reown.DappMetadata
 import kosh.presentation.network.rememberNetwork
 import kosh.ui.component.colors.uriColor
 import kosh.ui.component.icon.ChainBadge
@@ -26,6 +28,37 @@ import kosh.ui.resources.icons.DappUnknown
 
 @Composable
 fun DappIcon(
+    dapp: Dapp?,
+    modifier: Modifier = Modifier,
+    networkId: NetworkEntity.Id? = null,
+) {
+    DappIcon(
+        placeholder = dapp == null,
+        dapp = dapp?.url,
+        icon = dapp?.icon,
+        networkId = networkId,
+        modifier = modifier
+    )
+}
+
+@Composable
+fun DappIcon(
+    dapp: DappMetadata?,
+    modifier: Modifier = Modifier,
+    networkId: NetworkEntity.Id? = null,
+) {
+    DappIcon(
+        placeholder = dapp == null,
+        dapp = dapp?.url,
+        icon = dapp?.icon,
+        networkId = networkId,
+        modifier = modifier
+    )
+}
+
+@Composable
+private fun DappIcon(
+    placeholder: Boolean,
     dapp: Uri?,
     icon: Uri?,
     modifier: Modifier = Modifier,
@@ -33,9 +66,10 @@ fun DappIcon(
 ) {
     Box {
         DappIcon(
+            placeholder,
             dapp,
             icon,
-            modifier.placeholder(dapp == null)
+            modifier,
         )
 
         val network = networkId?.let { rememberNetwork(it) }
@@ -44,7 +78,8 @@ fun DappIcon(
             ChainBadge(
                 modifier = Modifier
                     .align(Alignment.BottomEnd)
-                    .offset(4.dp, 4.dp),
+                    .offset(4.dp, 4.dp)
+                    .placeholder(placeholder),
                 network = network.entity,
             )
         }
@@ -53,6 +88,7 @@ fun DappIcon(
 
 @Composable
 private fun DappIcon(
+    placeholder: Boolean,
     dapp: Uri?,
     icon: Uri?,
     modifier: Modifier = Modifier,
@@ -81,7 +117,8 @@ private fun DappIcon(
     Image(
         modifier = modifier
             .size(40.dp)
-            .clip(MaterialTheme.shapes.extraSmall),
+            .clip(MaterialTheme.shapes.extraSmall)
+            .placeholder(placeholder),
         painter = rememberImagePainter(
             request = request,
             errorPainter = dappPainter

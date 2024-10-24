@@ -10,10 +10,26 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.layout.ContentScale
 import com.seiko.imageloader.model.ImageRequest
 import com.seiko.imageloader.rememberImagePainter
+import kosh.domain.entities.NetworkEntity
 import kosh.domain.models.ChainId
 import kosh.domain.models.Uri
+import kosh.domain.models.zeroChain
 import kosh.ui.component.colors.chainColor
+import kosh.ui.component.placeholder.placeholder
 
+@Composable
+fun ChainIcon(
+    network: NetworkEntity?,
+    modifier: Modifier = Modifier,
+) {
+    ChainIcon(
+        modifier = modifier
+            .placeholder(visible = network == null),
+        chainId = network?.chainId ?: zeroChain,
+        symbol = network?.name ?: "Lorem",
+        icon = network?.icon
+    )
+}
 @Composable
 fun ChainIcon(
     chainId: ChainId,
