@@ -14,11 +14,11 @@ import okio.Path.Companion.toPath
 
 class AndroidImageComponent(
     networkComponent: NetworkComponent,
-    androidComponent: AndroidAppComponent,
+    androidComponent: AndroidComponent,
     filesComponent: FilesComponent,
 ) : ImageComponent,
     NetworkComponent by networkComponent,
-    AndroidAppComponent by androidComponent,
+    AndroidComponent by androidComponent,
     FilesComponent by filesComponent {
 
     override val imageLoader: ImageLoader by provider {

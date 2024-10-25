@@ -9,7 +9,7 @@ import kosh.libs.keystore.AndroidRsaKeyStore
 import kosh.libs.keystore.KeyStore
 
 internal class AndroidDataComponent(
-    androidComponent: AndroidAppComponent,
+    androidComponent: AndroidComponent,
     dataStoreComponent: DataStoreComponent,
     filesComponent: FilesComponent,
 ) : DataComponent {

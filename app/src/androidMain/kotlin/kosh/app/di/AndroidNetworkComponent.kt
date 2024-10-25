@@ -6,7 +6,6 @@ import io.ktor.client.engine.okhttp.OkHttp
 import io.ktor.client.plugins.HttpRequestRetry
 import io.ktor.client.plugins.HttpTimeout
 import io.ktor.client.plugins.compression.ContentEncoding
-import kosh.app.BuildConfig
 import kosh.domain.core.provider
 import kosh.libs.ipfs.IpfsPlugin
 import okhttp3.Cache
@@ -16,6 +15,7 @@ import okio.Path.Companion.toPath
 
 internal class AndroidNetworkComponent(
     filesComponent: FilesComponent,
+    appComponent: AppComponent,
 ) : NetworkComponent,
     FilesComponent by filesComponent {
 
@@ -58,7 +58,7 @@ internal class AndroidNetworkComponent(
 
             install(IpfsPlugin)
 
-            install(grovePlugin(BuildConfig.GROVE_KEY))
+            install(grovePlugin(appComponent.groveKey))
         }
     }
 }

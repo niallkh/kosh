@@ -4,9 +4,7 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.rememberScrollState
-import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
@@ -22,7 +20,6 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.clip
 import androidx.compose.ui.focus.onFocusChanged
 import androidx.compose.ui.unit.dp
 import kosh.domain.entities.AccountEntity
@@ -95,12 +92,7 @@ fun AccountContent(
         },
         onNavigateUp = { onNavigateUp() },
         actions = {
-            AccountIcon(
-                account?.address,
-                Modifier
-                    .clip(CircleShape)
-                    .size(40.dp),
-            )
+            AccountIcon(account?.address)
 
             AdaptiveMoreMenu { dismiss ->
                 val networkId = rememberNetworks().enabled.firstOrNull()

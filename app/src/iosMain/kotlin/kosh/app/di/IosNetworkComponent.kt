@@ -7,10 +7,10 @@ import io.ktor.client.plugins.HttpTimeout
 import io.ktor.client.plugins.compression.ContentEncoding
 import kosh.domain.core.provider
 import kosh.libs.ipfs.IpfsPlugin
-import platform.Foundation.NSBundle
 
 internal class IosNetworkComponent(
     filesComponent: FilesComponent,
+    appComponent: AppComponent,
 ) : NetworkComponent,
     FilesComponent by filesComponent {
 
@@ -44,9 +44,7 @@ internal class IosNetworkComponent(
 
             install(IpfsPlugin)
 
-            val groveKey = (NSBundle.mainBundle.objectForInfoDictionaryKey("GROVE_KEY") as? String
-                ?: error("GROVE_KEY not provided"))
-            install(grovePlugin(groveKey))
+            install(grovePlugin(appComponent.groveKey))
         }
     }
 }

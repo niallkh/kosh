@@ -47,6 +47,14 @@
             android:name="com.bugsnag.performance.android.API_KEY"
             android:value="${BUGSNAG_KEY}" />
 
+        <meta-data
+            android:name="eth.kosh.REOWN_PROJECT"
+            android:value="${REOWN_PROJECT}" />
+
+        <meta-data
+            android:name="eth.kosh.GROVE_KEY"
+            android:value="${GROVE_KEY}" />
+
         <activity
             android:name=".KoshActivity"
             android:configChanges="orientation|screenSize|screenLayout|keyboardHidden|mnc|colorMode|density|fontScale|fontWeightAdjustment|keyboard|layoutDirection|locale|mcc|navigation|smallestScreenSize|touchscreen|uiMode"

@@ -22,7 +22,7 @@ import kotlinx.coroutines.launch
 
 internal class AndroidAppScope(
     override val context: Context,
-) : DefaultAppScope(), AndroidAppComponent {
+) : DefaultAppScope(), AndroidComponent {
 
     override val androidPushNotifier: AndroidPushNotifier by provider {
         AndroidPushNotifier(
@@ -31,11 +31,9 @@ internal class AndroidAppScope(
         )
     }
 
-    override val appComponent: AppComponent
-        get() = this
-
-    override val debug: Boolean
-        get() = BuildConfig.DEBUG
+    override val appComponent: AppComponent by provider {
+        AndroidAppComponent(androidComponent = this)
+    }
 
     override val fileSystemComponent: FileSystemComponent by provider {
         AndroidFileSystemComponent(
@@ -64,6 +62,7 @@ internal class AndroidAppScope(
     override val networkComponent: NetworkComponent by provider {
         AndroidNetworkComponent(
             filesComponent = filesComponent,
+            appComponent = appComponent,
         )
     }
 
@@ -79,6 +78,7 @@ internal class AndroidAppScope(
         AndroidReownComponent(
             coroutinesComponent = coroutinesComponent,
             androidComponent = this,
+            appComponent = appComponent,
         )
     }
 

@@ -13,18 +13,14 @@ import kosh.data.reown.ReownComponent
 import kosh.domain.AppRepositoriesComponent
 import kosh.domain.core.provider
 import kotlinx.coroutines.launch
-import platform.Foundation.NSBundle
 
 public class IosAppScope(
     override val reownComponent: ReownComponent,
     bugsnagConfiguration: BugsnagConfiguration,
-) : DefaultAppScope(), IosAppComponent {
+) : DefaultAppScope(), IosComponent {
 
-    override val appComponent: AppComponent
-        get() = this
-
-    override val debug: Boolean by provider {
-        NSBundle.mainBundle.objectForInfoDictionaryKey("DEBUG") == "true"
+    override val appComponent: AppComponent by provider {
+        IosAppComponent()
     }
 
     override val iosPushNotifier: IosPushNotifier by provider {
@@ -36,11 +32,17 @@ public class IosAppScope(
     }
 
     override val networkComponent: NetworkComponent by provider {
-        IosNetworkComponent(filesComponent)
+        IosNetworkComponent(
+            filesComponent = filesComponent,
+            appComponent = appComponent,
+        )
     }
 
     override val imageComponent: ImageComponent by provider {
-        IosImageComponent(networkComponent, filesComponent)
+        IosImageComponent(
+            networkComponent = networkComponent,
+            filesComponent = filesComponent
+        )
     }
 
     override val transportComponent: TransportComponent by provider {
@@ -48,7 +50,7 @@ public class IosAppScope(
     }
 
     override val dataComponent: DataComponent by provider {
-        IosDataComponent(dataStoreComponent)
+        IosDataComponent(dataStoreComponent = dataStoreComponent)
     }
 
     override val appRepositoriesComponent: AppRepositoriesComponent by provider {

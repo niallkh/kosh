@@ -145,22 +145,11 @@ android {
         versionName = "0.0.4"
 
         manifestPlaceholders["BUGSNAG_KEY"] = getLocalProperty("bugsnag.key") as String
+        manifestPlaceholders["REOWN_PROJECT"] = getLocalProperty("reown.project") as String
+        manifestPlaceholders["GROVE_KEY"] = getLocalProperty("grove.key") as String
     }
 
     buildTypes {
-        all {
-            buildConfigField(
-                "String",
-                "GROVE_KEY",
-                "\"${getLocalProperty("grove.key")}\""
-            )
-            buildConfigField(
-                "String",
-                "REOWN_PROJECT",
-                "\"${getLocalProperty("reown.project")}\""
-            )
-        }
-
         debug {
             applicationIdSuffix = ".debug"
             isDebuggable = true

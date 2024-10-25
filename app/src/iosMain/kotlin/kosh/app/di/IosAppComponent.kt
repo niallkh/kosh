@@ -1,7 +1,28 @@
 package kosh.app.di
 
-import kosh.app.IosPushNotifier
+import kosh.domain.core.provider
+import platform.Foundation.NSBundle
 
-public interface IosAppComponent : AppComponent {
-    public val iosPushNotifier: IosPushNotifier
+internal class IosAppComponent : AppComponent {
+
+    override val debug: Boolean by provider {
+        getBundleValue("DEBUG") == "true"
+    }
+
+    override val bugsnagKey: String by provider {
+        getBundleValue("BUGSNAG_KEY")
+    }
+
+    override val reownProject: String by provider {
+        getBundleValue("REOWN_PROJECT")
+    }
+
+    override val groveKey: String by provider {
+        getBundleValue("GROVE_KEY")
+    }
+
+    private fun getBundleValue(
+        key: String,
+    ) = (NSBundle.mainBundle.objectForInfoDictionaryKey(key) as? String
+        ?: error("$key not provided"))
 }
