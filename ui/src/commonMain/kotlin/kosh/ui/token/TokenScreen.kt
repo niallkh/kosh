@@ -4,6 +4,8 @@ import androidx.compose.animation.animateContentSize
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.ColumnScope
+import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -11,7 +13,6 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.rememberScrollState
-import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.OpenInNew
@@ -21,14 +22,18 @@ import androidx.compose.material.icons.filled.Refresh
 import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.OutlinedCard
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.key
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.clip
 import androidx.compose.ui.platform.LocalUriHandler
+import androidx.compose.ui.text.TextStyle
+import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import arrow.core.raise.nullable
+import com.ionspin.kotlin.bignum.integer.BigInteger.Companion.ZERO
 import kosh.domain.entities.TokenEntity
 import kosh.domain.entities.TokenEntity.Type
 import kosh.domain.entities.isNft
@@ -37,9 +42,11 @@ import kosh.domain.models.orZero
 import kosh.domain.models.token.AccountBalance
 import kosh.domain.models.token.NftExtendedMetadata
 import kosh.domain.serializers.ImmutableList
-import kosh.domain.utils.orZero
 import kosh.presentation.network.rememberNetwork
 import kosh.presentation.network.rememberOpenExplorer
+import kosh.presentation.token.NftMetadataState
+import kosh.presentation.token.TokenBalancesState
+import kosh.presentation.token.TokenState
 import kosh.presentation.token.rememberNftMetadata
 import kosh.presentation.token.rememberOpenSea
 import kosh.presentation.token.rememberRefreshToken
@@ -47,18 +54,18 @@ import kosh.presentation.token.rememberToken
 import kosh.presentation.token.rememberTokenBalances
 import kosh.ui.component.LoadingIndicator
 import kosh.ui.component.icon.TokenIcon
+import kosh.ui.component.image.NftImage
+import kosh.ui.component.items.AccountBalanceItem
 import kosh.ui.component.menu.AdaptiveMoreMenu
 import kosh.ui.component.placeholder.placeholder
 import kosh.ui.component.scaffold.KoshScaffold
+import kosh.ui.component.single.single
 import kosh.ui.component.text.KeyValueRow
 import kosh.ui.component.text.TextAddressShort
-import kosh.ui.component.text.TextAmount
 import kosh.ui.component.text.TextHeader
 import kosh.ui.component.text.TextLine
 import kosh.ui.component.text.TextNumber
 import kosh.ui.component.text.TextUri
-import kosh.ui.component.token.NftItem
-import kosh.ui.component.wallet.AccountItem
 import kosh.ui.failure.AppFailureMessage
 import kosh.ui.resources.icons.OpenSea
 import kotlinx.collections.immutable.persistentListOf
@@ -72,9 +79,7 @@ fun TokenScreen(
 ) {
     val token = rememberToken(id)
 
-    val nftMetadata = token.entity?.uri?.let {
-        rememberNftMetadata(it)
-    }
+    val nftMetadata = token.entity?.uri?.let { rememberNftMetadata(it) }
 
     val refreshToken = rememberRefreshToken(id)
 
@@ -89,12 +94,9 @@ fun TokenScreen(
         onNavigateUp = onNavigateUp,
         actions = {
             TokenIcon(
-                symbol = token.entity?.symbol ?: "",
-                icon = token.entity?.icon,
+                token = token.entity,
                 modifier = Modifier
-                    .placeholder(token.entity == null)
                     .size(40.dp)
-                    .clip(CircleShape)
             )
 
             if (token.entity?.type != Type.Native) {
@@ -119,62 +121,76 @@ fun TokenScreen(
 
         AppFailureMessage(refreshToken.tokenFailure)
 
-        Column(
-            modifier = Modifier
-                .verticalScroll(rememberScrollState())
-                .padding(paddingValues)
-                .padding(vertical = 8.dp),
-            verticalArrangement = Arrangement.spacedBy(16.dp)
-        ) {
-
-            if (token.entity?.isNft == true) {
-                NftItem(
-                    modifier = Modifier
-                        .animateContentSize()
-                        .padding(horizontal = 16.dp),
-                    tokenNameStyle = MaterialTheme.typography.titleLarge,
-                    tokenName = token.entity?.tokenName ?: token.entity?.name.orEmpty(),
-                    image = token.entity?.image!!,
-                    networkIcon = null,
-                    chainId = null,
-                    networkName = null,
-                ) {
-
-                    Text(
-                        token.entity?.name.orEmpty(),
-                        style = MaterialTheme.typography.bodyLarge,
-                    )
-
-                    if (nftMetadata?.nft == null
-                        || nftMetadata.nft != null && nftMetadata.nft?.description != null
-                    ) {
-                        Text(
-                            nftMetadata?.nft?.description
-                                ?: "Nft description id loading. ".repeat(5),
-                            Modifier.placeholder(nftMetadata?.nft == null),
-                            style = MaterialTheme.typography.bodyMedium,
-                        )
-                    }
-                }
-            }
-
-            if (tokenBalances.balances.isNotEmpty()) {
-                BalancesSection(id, tokenBalances.balances)
-            }
-
-            if (nftMetadata?.nft?.attributes?.isNotEmpty() == true) {
-                AttributesSection(
-                    nftMetadata.nft?.attributes ?: persistentListOf()
-                )
-            }
-
-            InfoSection(id)
-        }
+        TokenContent(
+            paddingValues = paddingValues,
+            token = token,
+            nftMetadata = nftMetadata,
+            tokenBalances = tokenBalances,
+            id = id
+        )
 
         LoadingIndicator(
             refreshToken.loading || nftMetadata?.loading == true,
             Modifier.padding(paddingValues)
         )
+    }
+}
+
+@Composable
+fun TokenContent(
+    id: TokenEntity.Id,
+    token: TokenState,
+    nftMetadata: NftMetadataState?,
+    tokenBalances: TokenBalancesState,
+    paddingValues: PaddingValues,
+) {
+    Column(
+        modifier = Modifier
+            .verticalScroll(rememberScrollState())
+            .padding(paddingValues)
+            .padding(vertical = 8.dp),
+        verticalArrangement = Arrangement.spacedBy(16.dp)
+    ) {
+
+        if (token.entity?.isNft == true) {
+            NftItem(
+                modifier = Modifier
+                    .animateContentSize()
+                    .padding(horizontal = 16.dp),
+                tokenNameStyle = MaterialTheme.typography.titleLarge,
+                tokenName = token.entity?.tokenName ?: token.entity?.name.orEmpty(),
+                image = token.entity?.image!!,
+            ) {
+
+                Text(
+                    token.entity?.name.orEmpty(),
+                    style = MaterialTheme.typography.bodyLarge,
+                )
+
+                if (nftMetadata?.nft == null
+                    || nftMetadata.nft != null && nftMetadata.nft?.description != null
+                ) {
+                    Text(
+                        nftMetadata?.nft?.description
+                            ?: "Nft description id loading. ".repeat(5),
+                        Modifier.placeholder(nftMetadata?.nft == null),
+                        style = MaterialTheme.typography.bodyMedium,
+                    )
+                }
+            }
+        }
+
+        if (tokenBalances.balances.isNotEmpty()) {
+            BalancesSection(id, tokenBalances.balances)
+        }
+
+        if (nftMetadata?.nft?.attributes?.isNotEmpty() == true) {
+            AttributesSection(
+                nftMetadata.nft?.attributes ?: persistentListOf()
+            )
+        }
+
+        InfoSection(id)
     }
 }
 
@@ -326,7 +342,7 @@ private fun InfoSection(
                     Row {
                         Text("#")
                         TextNumber(
-                            token.entity?.tokenId.orZero(),
+                            token.entity?.tokenId ?: ZERO,
                             Modifier.placeholder(token.entity == null),
                             clickable = true,
                         )
@@ -419,17 +435,54 @@ private fun BalancesSection(
 
         for (balance in balances) {
             key(balance.account.id.value.leastSignificantBits) {
-                AccountItem(
+                AccountBalanceItem(
                     account = balance.account,
-                ) {
-                    TextAmount(
-                        balance.value.value,
-                        token.entity?.symbol.orEmpty(),
-                        token.entity?.decimals ?: 0u,
-                        Modifier.placeholder(token.entity == null)
-                    )
-                }
+                    token = token.entity,
+                    balance = balance.value,
+                )
             }
+        }
+    }
+}
+
+@Composable
+private fun NftItem(
+    modifier: Modifier = Modifier,
+    tokenName: String,
+    tokenNameStyle: TextStyle = MaterialTheme.typography.bodyLarge,
+    image: Uri,
+    onClick: () -> Unit = {},
+    content: @Composable ColumnScope.() -> Unit = {},
+) {
+    OutlinedCard(
+        modifier = modifier,
+        onClick = onClick.single()
+    ) {
+
+        NftImage(
+            image = image,
+            maxSize = 1024,
+        )
+
+
+        Column(
+            modifier = Modifier.padding(16.dp),
+            verticalArrangement = Arrangement.spacedBy(4.dp)
+        ) {
+
+            Row(
+                verticalAlignment = Alignment.CenterVertically,
+            ) {
+                Text(
+                    modifier = Modifier.weight(1f),
+                    text = tokenName,
+                    style = tokenNameStyle,
+                    maxLines = 1,
+                    overflow = TextOverflow.Ellipsis,
+                )
+            }
+
+            content()
         }
     }
 }

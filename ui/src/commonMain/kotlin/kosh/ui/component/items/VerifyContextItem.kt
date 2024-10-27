@@ -1,4 +1,4 @@
-package kosh.ui.component.dapp
+package kosh.ui.component.items
 
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.material.icons.Icons

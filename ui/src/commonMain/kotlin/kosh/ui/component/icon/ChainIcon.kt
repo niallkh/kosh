@@ -24,14 +24,16 @@ fun ChainIcon(
 ) {
     ChainIcon(
         modifier = modifier
-            .placeholder(visible = network == null),
+            .placeholder(visible = network == null)
+            .clip(MaterialTheme.shapes.small),
         chainId = network?.chainId ?: zeroChain,
         symbol = network?.name ?: "Lorem",
         icon = network?.icon
     )
 }
+
 @Composable
-fun ChainIcon(
+internal fun ChainIcon(
     chainId: ChainId,
     symbol: String,
     icon: Uri?,
@@ -55,8 +57,7 @@ fun ChainIcon(
     }
 
     Image(
-        modifier = modifier
-            .clip(MaterialTheme.shapes.extraSmall),
+        modifier = modifier,
         painter = rememberImagePainter(
             request = request,
             errorPainter = symbolPainter,

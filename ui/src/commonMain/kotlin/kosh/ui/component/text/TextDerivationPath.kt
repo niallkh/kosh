@@ -12,11 +12,13 @@ import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.style.TextOverflow
 import kosh.domain.models.account.DerivationPath
+import kosh.domain.models.account.ethereumDerivationPath
 import kosh.ui.component.modifier.optionalClickable
+import kosh.ui.component.placeholder.placeholder
 
 @Composable
 fun TextDerivationPath(
-    derivationPath: DerivationPath,
+    derivationPath: DerivationPath?,
     modifier: Modifier = Modifier,
     clickable: Boolean = false,
     style: TextStyle = LocalTextStyle.current,
@@ -28,8 +30,9 @@ fun TextDerivationPath(
             .clip(MaterialTheme.shapes.extraSmall)
             .optionalClickable(clickable) {
                 clipboardManager.setText(AnnotatedString(derivationPath.toString()))
-            },
-        text = derivationPath.toString(),
+            }
+            .placeholder(derivationPath == null),
+        text = (derivationPath ?: ethereumDerivationPath()).toString(),
         maxLines = 1,
         overflow = TextOverflow.Ellipsis,
         fontFamily = FontFamily.Monospace,

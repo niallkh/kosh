@@ -3,7 +3,6 @@ package kosh.ui.transaction.calls
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.AddCircle
 import androidx.compose.material.icons.outlined.Add
@@ -16,20 +15,16 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.clip
 import androidx.compose.ui.unit.dp
 import kosh.domain.entities.TokenEntity
 import kosh.domain.models.Address
 import kosh.domain.models.ChainId
-import kosh.domain.models.Uri
 import kosh.domain.models.at
 import kosh.domain.serializers.BigInteger
-import kosh.domain.utils.orZero
 import kosh.presentation.token.rememberToken
 import kosh.ui.component.icon.TokenIcon
 import kosh.ui.component.menu.AdaptiveMenu
 import kosh.ui.component.menu.AdaptiveMenuItem
-import kosh.ui.component.placeholder.placeholder
 import kosh.ui.component.text.TextAmount
 import kosh.ui.component.text.TextLine
 import kosh.ui.component.text.TextNumber
@@ -63,11 +58,8 @@ fun TokenAmountItem(
         leadingContent = {
             if (tokenEntity != null) {
                 TokenIcon(
-                    modifier = modifier
-                        .size(40.dp)
-                        .clip(CircleShape),
-                    symbol = tokenEntity.symbol,
-                    icon = tokenEntity.image ?: tokenEntity.icon,
+                    token = tokenEntity,
+                    modifier = modifier.size(40.dp),
                 )
             } else {
                 Icon(
@@ -83,9 +75,8 @@ fun TokenAmountItem(
         supportingContent = supportingText,
         trailingContent = {
             TextAmount(
-                amount,
-                tokenEntity?.symbol ?: "UNKWN",
-                tokenEntity?.decimals ?: 0u,
+                token = tokenEntity,
+                amount = amount
             )
         },
     )
@@ -133,26 +124,18 @@ fun TokenAmountItem(
         modifier = modifier,
         leadingContent = {
             TokenIcon(
+                token = tokenEntity,
                 modifier = modifier
-                    .size(40.dp)
-                    .clip(CircleShape)
-                    .placeholder(tokenEntity == null),
-                symbol = tokenEntity?.symbol.orEmpty(),
-                icon = tokenEntity?.image ?: tokenEntity?.icon ?: Uri(),
+                    .size(40.dp),
             )
         },
         headlineContent = {
-            TextLine(
-                tokenEntity?.name.orEmpty(),
-                Modifier.placeholder(tokenEntity == null),
-            )
+            TextLine(tokenEntity?.name)
         },
         trailingContent = {
             TextAmount(
-                amount.orZero(),
-                tokenEntity?.symbol.orEmpty(),
-                tokenEntity?.decimals ?: 0u,
-                Modifier.placeholder(tokenEntity == null),
+                token = tokenEntity,
+                amount = amount,
             )
         },
         overlineContent = overlineContent,

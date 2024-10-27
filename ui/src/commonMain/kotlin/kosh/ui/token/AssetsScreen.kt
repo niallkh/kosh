@@ -27,10 +27,10 @@ import kosh.presentation.token.BalancesState
 import kosh.presentation.token.rememberBalances
 import kosh.presentation.token.rememberUpdateBalances
 import kosh.ui.component.LoadingIndicator
+import kosh.ui.component.cards.NftBalanceCard
+import kosh.ui.component.items.TokenBalanceItem
 import kosh.ui.component.refresh.DragToRefreshBox
 import kosh.ui.component.text.Header
-import kosh.ui.component.token.NftBalanceItem
-import kosh.ui.component.token.TokenBalanceItem
 import kosh.ui.failure.AppFailureMessage
 import kotlinx.collections.immutable.toPersistentList
 
@@ -136,7 +136,8 @@ private fun LazyListScope.balances(
         val tokenBalance = tokenBalances[i]
         TokenBalanceItem(
             modifier = Modifier.animateItem(),
-            tokenBalance = tokenBalance,
+            token = tokenBalance?.token,
+            balance = tokenBalance?.value,
             onClick = { tokenBalance?.let { onSelect(it.token) } }
         )
     }
@@ -172,8 +173,9 @@ private fun LazyListScope.balances(
                     .animateItem()
             ) {
                 val tokenBalance = nfts[index][0]
-                NftBalanceItem(
-                    tokenBalance = tokenBalance,
+                NftBalanceCard(
+                    token = tokenBalance?.token,
+                    balance = tokenBalance?.value,
                     onClick = { tokenBalance?.token?.let { onSelect(it) } }
                 )
             }
@@ -184,8 +186,9 @@ private fun LazyListScope.balances(
                     .animateItem()
             ) {
                 nfts[index].getOrNull(1)?.let { tokenBalance ->
-                    NftBalanceItem(
-                        tokenBalance = tokenBalance,
+                    NftBalanceCard(
+                        token = tokenBalance.token,
+                        balance = tokenBalance.value,
                         onClick = { onSelect(tokenBalance.token) }
                     )
                 }

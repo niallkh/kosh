@@ -2,6 +2,7 @@ package kosh.ui.reown
 
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
@@ -42,13 +43,13 @@ import kosh.ui.component.button.LoadingButton
 import kosh.ui.component.button.PrimaryButtons
 import kosh.ui.component.dapp.DappIcon
 import kosh.ui.component.dapp.DappTitle
-import kosh.ui.component.dapp.VerifyContextItem
-import kosh.ui.component.network.NetworkItem
+import kosh.ui.component.items.AccountItem
+import kosh.ui.component.items.NetworkItem
+import kosh.ui.component.items.VerifyContextItem
 import kosh.ui.component.placeholder.placeholder
 import kosh.ui.component.scaffold.KoshScaffold
 import kosh.ui.component.single.single
 import kosh.ui.component.text.Header
-import kosh.ui.component.wallet.AccountItem
 import kosh.ui.failure.AppFailureItem
 import kosh.ui.failure.AppFailureMessage
 import kosh.ui.resources.Res
@@ -68,59 +69,14 @@ fun WcAuthenticationScreen(
 
     val networkSelector = rememberNetworkSelector()
 
-    val authenticationRequest = rememberAuthenticationRequest(
+    val authentication = rememberAuthenticationRequest(
         id, accountSelector.selected, networkSelector.selected
     )
 
-    val sign = SignContent(accountSelector.selected?.address)
-
-    LaunchedEffect(sign.signedRequest) {
-        sign.signedRequest?.let {
-            authenticationRequest.send(it.request as SignRequest.SignPersonal, it.signature)
-        }
-    }
-
-    LaunchedEffect(authenticationRequest.sent) {
-        if (authenticationRequest.sent) {
-            onResult()
-        }
-    }
-
-    AppFailureMessage(authenticationRequest.txFailure) {
-        authenticationRequest.retry()
-    }
-
-    WcAuthenticationContent(
-        authentication = authenticationRequest,
-        signing = sign.signing,
-        onSign = { sign.sign(it) },
-        onReject = {
-            authenticationRequest.reject()
-            onCancel()
-        },
-        onNavigateUp = onNavigateUp,
-        networkSelector = networkSelector,
-        accountSelector = accountSelector,
-    )
-}
-
-@Composable
-fun WcAuthenticationContent(
-    authentication: AuthenticationRequestState,
-    accountSelector: AccountSelectorState,
-    networkSelector: NetworkSelectorState,
-    signing: Boolean,
-    onNavigateUp: () -> Unit,
-    onSign: (SignRequest.SignPersonal) -> Unit,
-    onReject: () -> Unit,
-) {
     KoshScaffold(
         title = {
             if (authentication.failure == null) {
-                DappTitle(
-                    authentication.auth?.dapp?.name,
-                    authentication.auth?.dapp?.url,
-                )
+                DappTitle(authentication.auth?.dapp)
             }
         },
         onNavigateUp = { onNavigateUp() },
@@ -132,51 +88,37 @@ fun WcAuthenticationContent(
             Spacer(Modifier.width(8.dp))
         }
     ) { paddingValues ->
-        Column(
-            modifier = Modifier
-                .verticalScroll(rememberScrollState())
-                .padding(paddingValues),
-            verticalArrangement = Arrangement.spacedBy(16.dp)
-        ) {
-            authentication.failure?.let {
-                AppFailureItem(it) { authentication.retry() }
-            } ?: run {
-                authentication.auth?.let {
-                    VerifyContextItem(it.verifyContext)
-                }
 
-                NetworkSelector(networkSelector)
+        val sign = SignContent(accountSelector.selected?.address)
 
-                AccountSelector(accountSelector)
-
-                AuthenticationMessage(authentication.message)
-
-                PrimaryButtons(
-                    modifier = Modifier.padding(horizontal = 16.dp),
-                    cancel = {
-                        TextButton(onClick = onReject.single()) {
-                            Text(stringResource(Res.string.wc_authentication_reject_btn))
-                        }
-                    },
-                    confirm = {
-                        LoadingButton(signing, onClick = {
-                            nullable {
-                                onSign(
-                                    SignRequest.SignPersonal(
-                                        account = ensureNotNull(authentication.message).account,
-                                        message = ensureNotNull(authentication.message).msg,
-                                        chainId = ensureNotNull(authentication.message).chainId,
-                                        dapp = ensureNotNull(authentication.auth).dapp,
-                                    )
-                                )
-                            }
-                        }) {
-                            Text(stringResource(Res.string.wc_authentication_authenticate_btn))
-                        }
-                    },
-                )
+        LaunchedEffect(sign.signedRequest) {
+            sign.signedRequest?.let {
+                authentication.send(it.request as SignRequest.SignPersonal, it.signature)
             }
         }
+
+        LaunchedEffect(authentication.sent) {
+            if (authentication.sent) {
+                onResult()
+            }
+        }
+
+        AppFailureMessage(authentication.txFailure) {
+            authentication.retry()
+        }
+
+        WcAuthenticationContent(
+            authentication = authentication,
+            signing = sign.signing,
+            onSign = { sign.sign(it) },
+            onReject = {
+                authentication.reject()
+                onCancel()
+            },
+            networkSelector = networkSelector,
+            accountSelector = accountSelector,
+            contentPadding = paddingValues,
+        )
 
         LoadingIndicator(
             authentication.loading,
@@ -184,6 +126,64 @@ fun WcAuthenticationContent(
         )
     }
 }
+
+@Composable
+fun WcAuthenticationContent(
+    authentication: AuthenticationRequestState,
+    accountSelector: AccountSelectorState,
+    networkSelector: NetworkSelectorState,
+    signing: Boolean,
+    onSign: (SignRequest.SignPersonal) -> Unit,
+    onReject: () -> Unit,
+    contentPadding: PaddingValues = PaddingValues(),
+) {
+    Column(
+        modifier = Modifier
+            .verticalScroll(rememberScrollState())
+            .padding(contentPadding),
+        verticalArrangement = Arrangement.spacedBy(16.dp)
+    ) {
+        authentication.failure?.let {
+            AppFailureItem(it) { authentication.retry() }
+        } ?: run {
+            authentication.auth?.let {
+                VerifyContextItem(it.verifyContext)
+            }
+
+            NetworkSelector(networkSelector)
+
+            AccountSelector(accountSelector)
+
+            AuthenticationMessage(authentication.message)
+
+            PrimaryButtons(
+                modifier = Modifier.padding(horizontal = 16.dp),
+                cancel = {
+                    TextButton(onClick = onReject.single()) {
+                        Text(stringResource(Res.string.wc_authentication_reject_btn))
+                    }
+                },
+                confirm = {
+                    LoadingButton(signing, onClick = {
+                        nullable {
+                            onSign(
+                                SignRequest.SignPersonal(
+                                    account = ensureNotNull(authentication.message).account,
+                                    message = ensureNotNull(authentication.message).msg,
+                                    chainId = ensureNotNull(authentication.message).chainId,
+                                    dapp = ensureNotNull(authentication.auth).dapp,
+                                )
+                            )
+                        }
+                    }) {
+                        Text(stringResource(Res.string.wc_authentication_authenticate_btn))
+                    }
+                },
+            )
+        }
+    }
+}
+
 
 @Composable
 fun AccountSelector(

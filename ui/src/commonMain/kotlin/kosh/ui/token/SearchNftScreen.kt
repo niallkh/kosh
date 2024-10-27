@@ -10,11 +10,14 @@ import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material3.LocalAbsoluteTonalElevation
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
+import androidx.compose.material3.SnackbarHost
+import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.input.KeyboardType
@@ -31,9 +34,10 @@ import kosh.presentation.token.SearchNftState
 import kosh.presentation.token.rememberCreateNft
 import kosh.presentation.token.rememberSearchNft
 import kosh.ui.component.LoadingIndicator
+import kosh.ui.component.cards.NftCard
+import kosh.ui.component.scaffold.LocalSnackbarHostState
 import kosh.ui.component.search.SearchView
 import kosh.ui.component.textfield.PasteClearIcon
-import kosh.ui.component.token.NftItem
 import kosh.ui.failure.AppFailureItem
 import kosh.ui.failure.AppFailureMessage
 
@@ -46,8 +50,12 @@ fun SearchNftScreen(
     onNavigateUp: () -> Unit,
     onResult: (TokenEntity.Id) -> Unit,
 ) {
-    CompositionLocalProvider(LocalAbsoluteTonalElevation provides 3.dp) {
+    val snackbarHostState = remember { SnackbarHostState() }
 
+    CompositionLocalProvider(
+        LocalAbsoluteTonalElevation provides 3.dp,
+        LocalSnackbarHostState provides snackbarHostState,
+    ) {
         Scaffold(
             topBar = {
                 SearchView(
@@ -69,6 +77,7 @@ fun SearchNftScreen(
                 )
             },
             containerColor = MaterialTheme.colorScheme.surface,
+            snackbarHost = { SnackbarHost(snackbarHostState) },
         ) { innerPadding ->
             Box(
                 modifier = Modifier.padding(innerPadding)
@@ -116,14 +125,12 @@ private fun SearchNftContent(
     if (nft != null) {
         val network = token?.chainId?.let { rememberNetwork(it) }
 
-        NftItem(
+        NftCard(
             modifier = modifier,
-            tokenName = nft.name ?: token?.name ?: "",
-            tokenNameStyle = MaterialTheme.typography.bodyLarge,
-            image = nft.image,
-            networkIcon = network?.entity?.icon,
-            chainId = network?.entity?.chainId,
-            networkName = network?.entity?.name,
+            token = token,
+            nft = nft,
+            maxSize = 1024,
+            network = network?.entity,
             onClick = { onSelect(nft) },
         )
     } else {

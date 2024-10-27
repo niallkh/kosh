@@ -4,9 +4,8 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.Immutable
 import kosh.domain.entities.AccountEntity
 import kosh.domain.usecases.account.AccountService
-import kosh.presentation.Perform
 import kosh.presentation.core.di
-import kosh.presentation.invoke
+import kosh.presentation.rememberEffect
 
 @Composable
 fun rememberDeleteAccount(
@@ -14,12 +13,12 @@ fun rememberDeleteAccount(
     accountService: AccountService = di { domain.accountService },
 ): DeleteAccountState {
 
-    val delete = Perform {
+    val delete = rememberEffect(id) {
         accountService.delete(id)
     }
 
     return DeleteAccountState(
-        deleted = delete.performed,
+        deleted = delete.done,
         loading = delete.inProgress,
         delete = { delete() },
     )

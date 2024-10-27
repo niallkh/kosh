@@ -1,6 +1,7 @@
 package kosh.ui.reown
 
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.rememberScrollState
@@ -9,7 +10,6 @@ import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
-import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
@@ -18,7 +18,6 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.focus.onFocusChanged
-import androidx.compose.ui.input.nestedscroll.nestedScroll
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.input.TextFieldValue
@@ -60,82 +59,81 @@ fun WcPairScreen(
         PairingUri(it).toEitherNel()
     }
 
-    AppFailureMessage(pair.failure) {
-        pair.retry()
-    }
-
-    LaunchedEffect(pair.proposal) {
-        pair.proposal?.let { either ->
-            either.fold(
-                { onProposal(it) },
-                { onAuthenticate(it) }
-            )
-        }
-    }
-
-    WcPairContent(
+    KoshScaffold(
         modifier = modifier,
-        pair = pair,
-        textField = textField,
-        onNavigateUp = onNavigateUp,
-        onCancel = onCancel
-    )
+        title = { Text(stringResource(Res.string.wc_pair_title)) },
+        onNavigateUp = { onNavigateUp() }
+    ) { paddingValues ->
+
+        AppFailureMessage(pair.failure) {
+            pair.retry()
+        }
+
+        LaunchedEffect(pair.proposal) {
+            pair.proposal?.let { either ->
+                either.fold(
+                    { onProposal(it) },
+                    { onAuthenticate(it) }
+                )
+            }
+        }
+
+        WcPairContent(
+            modifier = modifier,
+            pair = pair,
+            textField = textField,
+            onCancel = onCancel,
+            contentPadding = paddingValues,
+        )
+    }
 }
 
 @Composable
 fun WcPairContent(
     pair: PairState,
     textField: TextFieldState<PairingUri, WcFailure>,
-    onNavigateUp: () -> Unit,
     onCancel: () -> Unit,
     modifier: Modifier = Modifier,
+    contentPadding: PaddingValues = PaddingValues(),
 ) {
-    val topAppBarScrollBehavior = TopAppBarDefaults.pinnedScrollBehavior()
+    Column(
+        modifier = modifier
+            .verticalScroll(rememberScrollState())
+            .padding(contentPadding)
+            .padding(16.dp),
+    ) {
 
-    KoshScaffold(
-        modifier = modifier.nestedScroll(topAppBarScrollBehavior.nestedScrollConnection),
-        title = { Text(stringResource(Res.string.wc_pair_title)) },
-        onNavigateUp = { onNavigateUp() }
-    ) { paddingValues ->
-        Column(
-            modifier = Modifier
-                .verticalScroll(rememberScrollState())
-                .padding(paddingValues)
-                .padding(16.dp),
-        ) {
+        PairingUriTextField(
+            modifier = Modifier.fillMaxWidth(),
+            value = textField.value,
+            error = textField.error?.firstOrNull(),
+            readOnly = textField.readOnly,
+            onChange = textField.onChange,
+            label = { Text(stringResource(Res.string.wc_pair_uri_label)) },
+            onDone = {
+                textField.validate().getOrNull()?.let {
+                    pair.pair(it)
+                }
+            },
+        )
 
-            PairingUriTextField(
-                modifier = Modifier.fillMaxWidth(),
-                value = textField.value,
-                error = textField.error?.firstOrNull(),
-                readOnly = textField.readOnly,
-                onChange = textField.onChange,
-                label = { Text(stringResource(Res.string.wc_pair_uri_label)) },
-                onDone = {
+        PrimaryButtons(
+            modifier = Modifier.padding(horizontal = 16.dp),
+            cancel = {
+                TextButton(onClick = onCancel.single()) {
+                    Text("Cancel")
+                }
+            },
+            confirm = {
+                LoadingButton(pair.loading, onClick = {
                     textField.validate().getOrNull()?.let {
                         pair.pair(it)
                     }
-                },
-            )
-
-            PrimaryButtons(
-                modifier = Modifier.padding(horizontal = 16.dp),
-                cancel = {
-                    TextButton(onClick = onCancel.single()) {
-                        Text("Cancel")
-                    }
-                },
-                confirm = {
-                    LoadingButton(pair.loading, onClick = {
-                        textField.validate().getOrNull()?.let {
-                            pair.pair(it)
-                        }
-                    }) {
-                        Text("Pair")
-                    }
+                }) {
+                    Text("Pair")
                 }
-            )
-        }
+            }
+        )
     }
 }
 

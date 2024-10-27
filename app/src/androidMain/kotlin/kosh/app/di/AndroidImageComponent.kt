@@ -12,7 +12,7 @@ import io.ktor.http.HttpHeaders
 import kosh.domain.core.provider
 import okio.Path.Companion.toPath
 
-class AndroidImageComponent(
+internal class AndroidImageComponent(
     networkComponent: NetworkComponent,
     androidComponent: AndroidComponent,
     filesComponent: FilesComponent,

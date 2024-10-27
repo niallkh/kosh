@@ -1,5 +1,6 @@
 package kosh.ui.reown
 
+import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
@@ -35,10 +36,10 @@ import kosh.ui.component.button.LoadingButton
 import kosh.ui.component.button.PrimaryButtons
 import kosh.ui.component.dapp.DappIcon
 import kosh.ui.component.dapp.DappTitle
-import kosh.ui.component.network.NetworkItem
+import kosh.ui.component.items.AccountItem
+import kosh.ui.component.items.NetworkItem
 import kosh.ui.component.scaffold.KoshScaffold
 import kosh.ui.component.text.Header
-import kosh.ui.component.wallet.AccountItem
 import kosh.ui.failure.AppFailureMessage
 import kosh.ui.resources.Res
 import kosh.ui.resources.wc_session_disconnect_btn
@@ -75,46 +76,10 @@ fun WcSessionScreen(
         )
     }
 
-    LaunchedEffect(update.updated) {
-        if (update.updated) {
-            onFinish()
-        }
-    }
-
-    LaunchedEffect(disconnect.disconnected) {
-        if (disconnect.disconnected) {
-            onCancel()
-        }
-    }
-
-    WcSessionContent(
-        session = session,
-        networkSelector = networkSelector,
-        accountSelector = accountSelector,
-        update = update,
-        onNavigateUp = onNavigateUp,
-        onDisconnect = { disconnect.disconnect() }
-    )
-}
-
-@Composable
-fun WcSessionContent(
-    session: SessionState,
-    networkSelector: NetworkMultiSelectorState?,
-    accountSelector: AccountMultiSelectorState?,
-    update: UpdateSessionState,
-    onNavigateUp: () -> Unit,
-    onDisconnect: () -> Unit,
-    modifier: Modifier = Modifier,
-) {
     KoshScaffold(
-        modifier = modifier,
         title = {
             if (session.failure == null) {
-                DappTitle(
-                    session.session?.session?.dapp?.name,
-                    session.session?.session?.dapp?.url,
-                )
+                DappTitle(session.session?.session?.dapp)
             }
         },
 
@@ -126,107 +91,137 @@ fun WcSessionContent(
             }
         }
     ) { paddingValues ->
-
-        AppFailureMessage(update.failure) {
-            update.retry()
+        LaunchedEffect(update.updated) {
+            if (update.updated) {
+                onFinish()
+            }
         }
 
-        LazyColumn(
+        LaunchedEffect(disconnect.disconnected) {
+            if (disconnect.disconnected) {
+                onCancel()
+            }
+        }
+
+        WcSessionContent(
+            session = session,
+            networkSelector = networkSelector,
+            accountSelector = accountSelector,
+            update = update,
+            onDisconnect = { disconnect.disconnect() },
             contentPadding = paddingValues,
-        ) {
-
-            stickyHeader {
-                session.session?.session?.dapp?.description?.let {
-                    Header("Description")
-                }
-            }
-
-            item {
-                session.session?.session?.dapp?.description?.let { description ->
-                    Text(
-                        modifier = Modifier.padding(horizontal = 16.dp),
-                        text = description,
-                        style = MaterialTheme.typography.bodyMedium,
-                    )
-                }
-            }
-
-            stickyHeader {
-                Header("Networks")
-            }
-
-            items(
-                items = networkSelector?.available.orEmpty(),
-                key = { it.id.value.leastSignificantBits }
-            ) { network ->
-                NetworkItem(
-                    network = network,
-                    onClick = { networkSelector?.select?.invoke(network.id) },
-                ) {
-                    Checkbox(
-                        checked = network.id in networkSelector?.selected.orEmpty(),
-                        onCheckedChange = { networkSelector?.select?.invoke(network.id) },
-                        enabled = network.id !in networkSelector?.required.orEmpty()
-                    )
-                }
-            }
-
-            stickyHeader {
-                Header("Accounts")
-            }
-
-            items(
-                items = accountSelector?.available.orEmpty(),
-                key = { it.id.value.leastSignificantBits }
-            ) { account ->
-                AccountItem(
-                    account = account,
-                    onClick = { accountSelector?.select?.invoke(account.id) },
-                ) {
-                    Checkbox(
-                        checked = account.id in accountSelector?.selected.orEmpty(),
-                        onCheckedChange = { accountSelector?.select?.invoke(account.id) }
-                    )
-                }
-            }
-
-            item {
-                PrimaryButtons(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(horizontal = 16.dp, vertical = 8.dp),
-                    cancel = {
-                        TextButton(onDisconnect) {
-                            Text(stringResource(Res.string.wc_session_disconnect_btn))
-                        }
-                    },
-                    confirm = {
-                        LoadingButton(update.loading, onClick = {
-                            nullable {
-                                update.update(
-                                    ensureNotNull(accountSelector).available
-                                        .filter { it.id in accountSelector.selected }
-                                        .map { it.address },
-                                    ensureNotNull(networkSelector).available
-                                        .filter { it.id in networkSelector.selected }
-                                        .map { it.chainId },
-                                )
-                            }
-                        }) {
-                            Text(stringResource(Res.string.wc_session_update_btn))
-                        }
-                    }
-                )
-            }
-
-            item {
-                Spacer(Modifier.height(64.dp))
-            }
-        }
+        )
 
         LoadingIndicator(
             session.loading,
             Modifier.padding(paddingValues),
         )
+    }
+}
+
+@Composable
+fun WcSessionContent(
+    session: SessionState,
+    networkSelector: NetworkMultiSelectorState?,
+    accountSelector: AccountMultiSelectorState?,
+    update: UpdateSessionState,
+    onDisconnect: () -> Unit,
+    contentPadding: PaddingValues = PaddingValues(),
+) {
+    AppFailureMessage(update.failure) {
+        update.retry()
+    }
+
+    LazyColumn(
+        contentPadding = contentPadding,
+    ) {
+
+        stickyHeader {
+            session.session?.session?.dapp?.description?.let {
+                Header("Description")
+            }
+        }
+
+        item {
+            session.session?.session?.dapp?.description?.let { description ->
+                Text(
+                    modifier = Modifier.padding(horizontal = 16.dp),
+                    text = description,
+                    style = MaterialTheme.typography.bodyMedium,
+                )
+            }
+        }
+
+        stickyHeader {
+            Header("Networks")
+        }
+
+        items(
+            items = networkSelector?.available.orEmpty(),
+            key = { it.id.value.leastSignificantBits }
+        ) { network ->
+            NetworkItem(
+                network = network,
+                onClick = { networkSelector?.select?.invoke(network.id) },
+            ) {
+                Checkbox(
+                    checked = network.id in networkSelector?.selected.orEmpty(),
+                    onCheckedChange = { networkSelector?.select?.invoke(network.id) },
+                    enabled = network.id !in networkSelector?.required.orEmpty()
+                )
+            }
+        }
+
+        stickyHeader {
+            Header("Accounts")
+        }
+
+        items(
+            items = accountSelector?.available.orEmpty(),
+            key = { it.id.value.leastSignificantBits }
+        ) { account ->
+            AccountItem(
+                account = account,
+                onClick = { accountSelector?.select?.invoke(account.id) },
+            ) {
+                Checkbox(
+                    checked = account.id in accountSelector?.selected.orEmpty(),
+                    onCheckedChange = { accountSelector?.select?.invoke(account.id) }
+                )
+            }
+        }
+
+        item {
+            PrimaryButtons(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(horizontal = 16.dp, vertical = 8.dp),
+                cancel = {
+                    TextButton(onDisconnect) {
+                        Text(stringResource(Res.string.wc_session_disconnect_btn))
+                    }
+                },
+                confirm = {
+                    LoadingButton(update.loading, onClick = {
+                        nullable {
+                            update.update(
+                                ensureNotNull(accountSelector).available
+                                    .filter { it.id in accountSelector.selected }
+                                    .map { it.address },
+                                ensureNotNull(networkSelector).available
+                                    .filter { it.id in networkSelector.selected }
+                                    .map { it.chainId },
+                            )
+                        }
+                    }) {
+                        Text(stringResource(Res.string.wc_session_update_btn))
+                    }
+                }
+            )
+        }
+
+        item {
+            Spacer(Modifier.height(64.dp))
+        }
     }
 }

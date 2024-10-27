@@ -4,8 +4,8 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.Immutable
 import kosh.domain.entities.NetworkEntity
 import kosh.domain.usecases.network.NetworkService
-import kosh.presentation.Perform
 import kosh.presentation.core.di
+import kosh.presentation.rememberEffect
 
 @Composable
 fun rememberDeleteNetwork(
@@ -13,14 +13,14 @@ fun rememberDeleteNetwork(
     networkService: NetworkService = di { domain.networkService },
 ): DeleteNetworkState {
 
-    val delete = Perform(id) {
+    val delete = rememberEffect(id) {
         networkService.delete(id)
     }
 
     return DeleteNetworkState(
-        deleted = delete.performed,
+        deleted = delete.done,
         deleting = delete.inProgress,
-        delete = { delete(Unit) }
+        delete = { delete() }
     )
 }
 

@@ -28,7 +28,7 @@ inline fun <reified R> rememberEffect(
 @Stable
 class EffectState<R> {
     var inProgress by mutableStateOf(false)
-    var finished by mutableStateOf(false)
+    var done by mutableStateOf(false)
     var retry by mutableIntStateOf(0)
 
     var result: R? by mutableStateOf(null)
@@ -36,7 +36,7 @@ class EffectState<R> {
     operator fun invoke() {
         retry++
         result = null
-        finished = false
+        done = false
     }
 
     @Composable
@@ -48,7 +48,7 @@ class EffectState<R> {
             inProgress = true
             try {
                 result = effect()
-                finished = true
+                done = true
                 inProgress = false
             } finally {
                 inProgress = false

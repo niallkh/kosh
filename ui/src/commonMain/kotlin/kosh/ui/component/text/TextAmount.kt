@@ -6,69 +6,93 @@ import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.style.TextOverflow
 import com.ionspin.kotlin.bignum.decimal.BigDecimal
-import com.ionspin.kotlin.bignum.decimal.RoundingMode
+import com.ionspin.kotlin.bignum.decimal.DecimalMode
+import com.ionspin.kotlin.bignum.decimal.RoundingMode.ROUND_HALF_AWAY_FROM_ZERO
 import com.ionspin.kotlin.bignum.integer.BigInteger
+import kosh.domain.entities.TokenEntity
+import kosh.domain.models.token.TokenMetadata
 import kosh.eth.abi.Value
 import kosh.ui.component.placeholder.placeholder
 
 @Composable
 fun TextAmount(
+    token: TokenEntity?,
     amount: BigInteger?,
-    symbol: String?,
-    decimals: UByte?,
     modifier: Modifier = Modifier,
 ) {
-    TextAmountt(
+    TextAmount(
         amount = amount ?: BigInteger.TEN,
-        symbol = symbol ?: "Lorem",
-        decimals = decimals ?: 0u,
-        modifier = modifier
-            .placeholder(amount == null || symbol == null || decimals == null),
+        symbol = token?.symbol ?: "Lorem",
+        decimals = token?.decimals ?: 0u,
+        placeholder = amount == null || token == null,
+        modifier = modifier,
     )
 }
 
 @Composable
-private fun TextAmountt(
+fun TextAmount(
+    token: TokenMetadata?,
+    amount: BigInteger?,
+    modifier: Modifier = Modifier,
+) {
+    TextAmount(
+        amount = amount ?: BigInteger.TEN,
+        symbol = token?.symbol ?: "Lorem",
+        decimals = token?.decimals ?: 0u,
+        placeholder = amount == null || token == null,
+        modifier = modifier,
+    )
+}
+
+@Composable
+private fun TextAmount(
     symbol: String,
     amount: BigInteger,
     decimals: UByte,
+    placeholder: Boolean = false,
     modifier: Modifier = Modifier,
 ) {
-    val text = remember(amount, symbol, decimals) { // TODO improve this
-        if (amount == Value.BigNumber.UINT256_MAX) {
-            "UNLIMITED $symbol"
-        } else {
-            var resultScale: Scale = Scale.Default
-            var text = amount.toString()
-
-            for (scale in Scale.entries.filter { decimals >= it.correction }) {
-                val decimal =
-                    BigInteger.ONE * BigInteger.TEN.pow((decimals - scale.correction).toInt())
-
-                text = BigDecimal.fromBigInteger(amount)
-                    .divide(BigDecimal.fromBigInteger(decimal))
-                    .roundToDigitPositionAfterDecimalPoint(6, RoundingMode.TOWARDS_ZERO)
-                    .toStringExpanded()
-
-                if (text != "0") {
-                    resultScale = scale
-                    break
-                }
-            }
-
-            "$text ${resultScale.prefix}$symbol"
-        }
+    val text = remember(amount, symbol, decimals) {
+        formatAmount(amount, decimals, symbol)
     }
 
     Text(
-        modifier = modifier,
+        modifier = modifier
+            .placeholder(placeholder),
         text = text,
         maxLines = 1,
         overflow = TextOverflow.Ellipsis,
     )
 }
 
-private enum class Scale(val correction: UByte, val prefix: String) {
-    Default(0u, ""),
-    Nano(9u, "n"),
+private fun formatAmount(
+    amount: BigInteger,
+    decimals: UByte,
+    symbol: String,
+): String {
+    if (amount == BigInteger.ZERO) return "0 $symbol"
+    if (amount == Value.BigNumber.UINT256_MAX) return "UNLIMITED $symbol"
+    if (amount > Value.BigNumber.UINT256_MAX) return "INVALID $symbol"
+
+    val decimalMode = DecimalMode(decimals.toLong(), ROUND_HALF_AWAY_FROM_ZERO, 5)
+
+    return Scale.entries.asSequence()
+        .filter { it.correction + decimals.toInt() >= 0 }
+        .mapNotNull { scale ->
+            val decimal = BigInteger.TEN.pow((decimals.toInt() + scale.correction))
+            val value = BigDecimal.fromBigInteger(amount)
+                .divide(BigDecimal.fromBigInteger(decimal))
+                .roundSignificand(decimalMode)
+
+            val txt = value.toStringExpanded()
+            if (txt == "0") return@mapNotNull null
+            "$txt ${scale.prefix}$symbol"
+        }
+        .firstOrNull()
+        ?: "0 $symbol"
+}
+
+private enum class Scale(val correction: Byte, val prefix: String) {
+    Default(0, ""),
+    Nano(-9, "n"),
 }

@@ -24,7 +24,7 @@ uuid = "0.8.4"
 material-kolor = "1.7.0"
 ktor = "2.3.12"
 uri = "0.0.18"
-ksp = "2.0.20-1.0.25"
+ksp = "2.0.21-1.0.26"
 reown = "1.0.0"
 bugsnag-crashkios = "0.8.6"
 

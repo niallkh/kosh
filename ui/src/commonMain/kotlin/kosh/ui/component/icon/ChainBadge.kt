@@ -29,7 +29,7 @@ fun ChainBadge(
 }
 
 @Composable
-fun ChainBadge(
+private fun ChainBadge(
     chainId: ChainId,
     symbol: String,
     icon: Uri?,

@@ -14,7 +14,7 @@ val dynamicColorMemo = ::calculateDynamicColor.memoize()
 fun dynamicColor(
     bytes: ByteString,
     isDark: Boolean,
-): ColorScheme = calculateDynamicColor(bytes, isDark)
+): ColorScheme = dynamicColorMemo(bytes, isDark)
 
 private fun calculateDynamicColor(
     bytes: ByteString,

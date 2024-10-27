@@ -2,6 +2,7 @@ package kosh.ui.reown
 
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
@@ -25,11 +26,11 @@ import kosh.ui.component.button.LoadingButton
 import kosh.ui.component.button.PrimaryButtons
 import kosh.ui.component.dapp.DappIcon
 import kosh.ui.component.dapp.DappTitle
-import kosh.ui.component.dapp.VerifyContextItem
-import kosh.ui.component.network.NetworkItem
+import kosh.ui.component.items.AccountItem
+import kosh.ui.component.items.NetworkItem
+import kosh.ui.component.items.VerifyContextItem
 import kosh.ui.component.scaffold.KoshScaffold
 import kosh.ui.component.single.single
-import kosh.ui.component.wallet.AccountItem
 import kosh.ui.failure.AppFailureItem
 import kosh.ui.failure.AppFailureMessage
 import kosh.ui.resources.Res
@@ -49,51 +50,10 @@ fun WcSignTypedScreen(
 ) {
     val signTyped = rememberSignTypedRequest(id)
 
-    val sign = SignContent(signTyped.call?.account)
-
-    LaunchedEffect(sign.signedRequest) {
-        sign.signedRequest?.let {
-            signTyped.send(it.request as SignRequest.SignTyped, it.signature)
-        }
-    }
-
-    LaunchedEffect(signTyped.sent) {
-        if (signTyped.sent) {
-            onResult()
-        }
-    }
-
-    AppFailureMessage(signTyped.txFailure) {
-        signTyped.retry()
-    }
-
-    WcSignTypedContent(
-        signTyped = signTyped,
-        signing = sign.signing,
-        onSign = { sign.sign(it) },
-        onReject = {
-            signTyped.reject()
-            onCancel()
-        },
-        onNavigateUp = onNavigateUp,
-    )
-}
-
-@Composable
-fun WcSignTypedContent(
-    signTyped: SignTypedRequestState,
-    signing: Boolean,
-    onNavigateUp: () -> Unit,
-    onSign: (SignRequest.SignTyped) -> Unit,
-    onReject: () -> Unit,
-) {
     KoshScaffold(
         title = {
             if (signTyped.failure == null) {
-                DappTitle(
-                    signTyped.request?.dapp?.name,
-                    signTyped.request?.dapp?.url,
-                )
+                DappTitle(signTyped.request?.dapp)
             }
         },
         onNavigateUp = onNavigateUp,
@@ -105,71 +65,110 @@ fun WcSignTypedContent(
             Spacer(Modifier.width(8.dp))
         }
     ) { innerPadding ->
-        signTyped.failure?.let {
-            AppFailureItem(it, Modifier.padding(innerPadding)) { signTyped.retry() }
-        } ?: run {
-            Column(
-                modifier = Modifier
-                    .verticalScroll(rememberScrollState())
-                    .padding(innerPadding),
-                verticalArrangement = Arrangement.spacedBy(16.dp)
-            ) {
 
-                signTyped.request?.let {
-                    VerifyContextItem(it.verifyContext)
-                }
+        val sign = SignContent(signTyped.call?.account)
 
-                Column {
-                    val network = signTyped.call?.chainId?.let { rememberNetwork(it) }
-
-                    if (signTyped.call == null || signTyped.call?.chainId != null) {
-                        NetworkItem(network?.entity)
-                    }
-
-                    val account = signTyped.call?.let { rememberAccount(it.account) }
-
-                    AccountItem(account?.entity)
-                }
-
-                TypedMessageDomainCard(
-                    jsonText = signTyped.call?.json?.json,
-                    modifier = Modifier.padding(horizontal = 16.dp)
-                )
-
-                TypedMessageCard(
-                    jsonText = signTyped.call?.json?.json,
-                    modifier = Modifier.padding(horizontal = 16.dp),
-                )
-
-                PrimaryButtons(
-                    modifier = Modifier.padding(horizontal = 16.dp),
-                    cancel = {
-                        TextButton(onClick = onReject.single()) {
-                            Text(stringResource(Res.string.wc_request_reject_btn))
-                        }
-                    },
-                    confirm = {
-                        LoadingButton(signing, onClick = {
-                            nullable {
-                                val request = SignRequest.SignTyped(
-                                    chainId = ensureNotNull(signTyped.call).chainId,
-                                    dapp = ensureNotNull(signTyped.request).dapp,
-                                    account = ensureNotNull(signTyped.call).account,
-                                    json = ensureNotNull(signTyped.call).json,
-                                )
-                                onSign(request)
-                            }
-                        }) {
-                            Text(stringResource(Res.string.wc_request_sign_btn))
-                        }
-                    }
-                )
+        LaunchedEffect(sign.signedRequest) {
+            sign.signedRequest?.let {
+                signTyped.send(it.request as SignRequest.SignTyped, it.signature)
             }
         }
+
+        LaunchedEffect(signTyped.sent) {
+            if (signTyped.sent) {
+                onResult()
+            }
+        }
+
+        AppFailureMessage(signTyped.txFailure) {
+            signTyped.retry()
+        }
+
+        WcSignTypedContent(
+            signTyped = signTyped,
+            signing = sign.signing,
+            onSign = { sign.sign(it) },
+            onReject = {
+                signTyped.reject()
+                onCancel()
+            },
+            contentPadding = innerPadding,
+        )
 
         LoadingIndicator(
             signTyped.loading,
             Modifier.padding(innerPadding),
         )
+    }
+}
+
+@Composable
+fun WcSignTypedContent(
+    signTyped: SignTypedRequestState,
+    signing: Boolean,
+    onSign: (SignRequest.SignTyped) -> Unit,
+    onReject: () -> Unit,
+    contentPadding: PaddingValues = PaddingValues(),
+) {
+    signTyped.failure?.let {
+        AppFailureItem(it, Modifier.padding(contentPadding)) { signTyped.retry() }
+    } ?: run {
+        Column(
+            modifier = Modifier
+                .verticalScroll(rememberScrollState())
+                .padding(contentPadding),
+            verticalArrangement = Arrangement.spacedBy(16.dp)
+        ) {
+
+            signTyped.request?.let {
+                VerifyContextItem(it.verifyContext)
+            }
+
+            Column {
+                val network = signTyped.call?.chainId?.let { rememberNetwork(it) }
+
+                if (signTyped.call == null || signTyped.call?.chainId != null) {
+                    NetworkItem(network?.entity)
+                }
+
+                val account = signTyped.call?.let { rememberAccount(it.account) }
+
+                AccountItem(account?.entity)
+            }
+
+            TypedMessageDomainCard(
+                jsonText = signTyped.call?.json?.json,
+                modifier = Modifier.padding(horizontal = 16.dp)
+            )
+
+            TypedMessageCard(
+                jsonText = signTyped.call?.json?.json,
+                modifier = Modifier.padding(horizontal = 16.dp),
+            )
+
+            PrimaryButtons(
+                modifier = Modifier.padding(horizontal = 16.dp),
+                cancel = {
+                    TextButton(onClick = onReject.single()) {
+                        Text(stringResource(Res.string.wc_request_reject_btn))
+                    }
+                },
+                confirm = {
+                    LoadingButton(signing, onClick = {
+                        nullable {
+                            val request = SignRequest.SignTyped(
+                                chainId = ensureNotNull(signTyped.call).chainId,
+                                dapp = ensureNotNull(signTyped.request).dapp,
+                                account = ensureNotNull(signTyped.call).account,
+                                json = ensureNotNull(signTyped.call).json,
+                            )
+                            onSign(request)
+                        }
+                    }) {
+                        Text(stringResource(Res.string.wc_request_sign_btn))
+                    }
+                }
+            )
+        }
     }
 }

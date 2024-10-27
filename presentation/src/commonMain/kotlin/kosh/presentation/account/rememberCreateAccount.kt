@@ -12,7 +12,6 @@ import kosh.presentation.core.di
 fun rememberCreateAccount(
     accountService: AccountService = di { domain.accountService },
 ): CreateAccountState {
-
     val create = Perform { signer: Signer ->
         accountService.create(
             location = signer.location,

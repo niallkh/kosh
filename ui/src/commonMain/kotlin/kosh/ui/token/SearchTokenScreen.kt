@@ -1,31 +1,28 @@
 package kosh.ui.token
 
-import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.consumeWindowInsets
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.imePadding
-import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.windowInsetsPadding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
-import androidx.compose.foundation.shape.CircleShape
-import androidx.compose.material3.ListItem
 import androidx.compose.material3.LocalAbsoluteTonalElevation
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
+import androidx.compose.material3.SnackbarHost
+import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.clip
 import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.unit.dp
 import kosh.domain.entities.TokenEntity
@@ -37,13 +34,12 @@ import kosh.domain.models.token.TokenMetadata
 import kosh.domain.models.token.isNft
 import kosh.domain.serializers.ImmutableList
 import kosh.presentation.component.textfield.rememberTextField
-import kosh.presentation.network.rememberNetwork
 import kosh.presentation.token.SearchTokenState
 import kosh.presentation.token.rememberCreateToken
 import kosh.presentation.token.rememberSearchToken
 import kosh.ui.component.LoadingIndicator
-import kosh.ui.component.icon.ChainBadge
-import kosh.ui.component.icon.TokenIcon
+import kosh.ui.component.items.TokenItem
+import kosh.ui.component.scaffold.LocalSnackbarHostState
 import kosh.ui.component.search.SearchView
 import kosh.ui.component.text.TextHeader
 import kosh.ui.component.text.TextLine
@@ -60,7 +56,12 @@ fun SearchTokenScreen(
     onNft: (ChainAddress) -> Unit,
     onNavigateUp: () -> Unit,
 ) {
-    CompositionLocalProvider(LocalAbsoluteTonalElevation provides 3.dp) {
+    val snackbarHostState = remember { SnackbarHostState() }
+
+    CompositionLocalProvider(
+        LocalAbsoluteTonalElevation provides 3.dp,
+        LocalSnackbarHostState provides snackbarHostState,
+    ) {
         Scaffold(
             topBar = {
                 SearchView(
@@ -79,6 +80,7 @@ fun SearchTokenScreen(
                 )
             },
             containerColor = MaterialTheme.colorScheme.surface,
+            snackbarHost = { SnackbarHost(snackbarHostState) }
         ) { innerPadding ->
 
             Box(
@@ -150,9 +152,11 @@ private fun SearchTokenContent(
                 items = tokens,
                 key = { ChainAddress(it.chainId, it.address).caip10() }
             ) { token ->
-                SearchTokenItem(token) {
-                    onSelect(token)
-                }
+                TokenItem(
+                    token = token,
+                    onClick = { onSelect(token) },
+                    trailingContent = { TextLine(token.symbol) },
+                )
             }
         } else {
             item {
@@ -169,41 +173,4 @@ private fun SearchTokenContent(
             }
         }
     }
-}
-
-@Composable
-fun SearchTokenItem(
-    token: TokenMetadata,
-    modifier: Modifier = Modifier,
-    onClick: () -> Unit,
-) {
-    ListItem(
-        modifier = modifier.clickable(onClick = onClick),
-        leadingContent = {
-            Box {
-                TokenIcon(
-                    modifier = Modifier
-                        .size(40.dp)
-                        .clip(CircleShape),
-                    symbol = token.symbol,
-                    icon = token.icon,
-                )
-
-                val (network) = rememberNetwork(token.chainId)
-
-                if (network?.chainId != null) {
-                    ChainBadge(
-                        modifier = Modifier
-                            .align(Alignment.BottomEnd)
-                            .offset(2.dp, 2.dp),
-                        chainId = network.chainId,
-                        symbol = network.name,
-                        icon = network.icon,
-                    )
-                }
-            }
-        },
-        headlineContent = { TextLine(token.name) },
-        trailingContent = { TextLine(token.symbol) },
-    )
 }

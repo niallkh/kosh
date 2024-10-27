@@ -6,7 +6,7 @@ import kosh.libs.ble.Ble
 import kosh.libs.usb.AndroidUsb
 import kosh.libs.usb.Usb
 
-class AndroidTransportComponent(
+internal class AndroidTransportComponent(
     androidComponent: AndroidComponent,
 ) : TransportComponent, AndroidComponent by androidComponent {
 

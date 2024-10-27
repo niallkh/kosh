@@ -2,6 +2,7 @@ package kosh.ui.network
 
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.imePadding
@@ -71,36 +72,8 @@ fun NetworkScreen(
     onDelete: (NetworkEntity.Id) -> Unit,
 ) {
     val network = id?.let { rememberNetwork(it) }
-
     val networkForm = rememberNetworkForm(id)
 
-    AppFailureMessage(networkForm.failure) {
-        networkForm.retry()
-    }
-
-    LaunchedEffect(networkForm.saved) {
-        if (networkForm.saved) {
-            onFinish()
-        }
-    }
-
-    NetworkContent(
-        network = network,
-        networkForm = networkForm,
-        onNavigateUp = onNavigateUp,
-        onCancel = onCancel,
-        onDelete = onDelete,
-    )
-}
-
-@Composable
-fun NetworkContent(
-    network: Network?,
-    networkForm: NetworkFormState,
-    onNavigateUp: () -> Unit,
-    onCancel: () -> Unit,
-    onDelete: (NetworkEntity.Id) -> Unit,
-) {
     KoshScaffold(
         title = { TextLine(network?.entity?.name ?: "New Network") },
         onNavigateUp = { onNavigateUp() },
@@ -132,116 +105,140 @@ fun NetworkContent(
             }
         },
     ) { paddingValues ->
-        Column(
-            modifier = Modifier
-                .verticalScroll(rememberScrollState())
-                .imePadding()
-                .padding(horizontal = 16.dp, vertical = 8.dp)
-                .padding(paddingValues),
-            verticalArrangement = Arrangement.spacedBy(16.dp)
-        ) {
 
-            network?.entity?.let {
-                Column(
-                    modifier = Modifier,
-                    verticalArrangement = Arrangement.spacedBy(8.dp)
-                ) {
+        AppFailureMessage(networkForm.failure) {
+            networkForm.retry()
+        }
 
-                    KeyValueRow(
-                        modifier = Modifier.fillMaxWidth(),
-                        key = { TextLine("Chain Id") },
-                        value = { TextChainId(it.chainId) }
-                    )
-                }
+        LaunchedEffect(networkForm.saved) {
+            if (networkForm.saved) {
+                onFinish()
             }
+        }
 
+        NetworkContent(
+            network = network,
+            networkForm = networkForm,
+            onCancel = onCancel,
+            contentPadding = paddingValues,
+        )
+    }
+}
+
+@Composable
+fun NetworkContent(
+    network: Network?,
+    networkForm: NetworkFormState,
+    onCancel: () -> Unit,
+    contentPadding: PaddingValues = PaddingValues(),
+) {
+    Column(
+        modifier = Modifier
+            .verticalScroll(rememberScrollState())
+            .imePadding()
+            .padding(horizontal = 16.dp, vertical = 8.dp)
+            .padding(contentPadding),
+        verticalArrangement = Arrangement.spacedBy(16.dp)
+    ) {
+
+        network?.entity?.let {
             Column(
+                modifier = Modifier,
                 verticalArrangement = Arrangement.spacedBy(8.dp)
             ) {
 
-                NetworkTextFiled(
+                KeyValueRow(
                     modifier = Modifier.fillMaxWidth(),
-                    textField = networkForm.networkNameTextField,
-                    label = { Text(stringResource(Res.string.network_input_name_label)) }
+                    key = { TextLine("Chain Id") },
+                    value = { TextChainId(it.chainId) }
                 )
+            }
+        }
 
+        Column(
+            verticalArrangement = Arrangement.spacedBy(8.dp)
+        ) {
+
+            NetworkTextFiled(
+                modifier = Modifier.fillMaxWidth(),
+                textField = networkForm.networkNameTextField,
+                label = { Text(stringResource(Res.string.network_input_name_label)) }
+            )
+
+            NetworkTextFiled(
+                modifier = Modifier.fillMaxWidth(),
+                textField = networkForm.readRpcTextField,
+                keyboardType = KeyboardType.Uri,
+                label = { Text(stringResource(Res.string.network_input_read_rpc_label)) }
+            )
+
+            NetworkTextFiled(
+                modifier = Modifier.fillMaxWidth(),
+                textField = networkForm.writeRpcTextField,
+                keyboardType = KeyboardType.Uri,
+                label = { Text(stringResource(Res.string.network_input_write_rpc_label)) },
+            )
+
+            if (network == null) {
                 NetworkTextFiled(
                     modifier = Modifier.fillMaxWidth(),
-                    textField = networkForm.readRpcTextField,
-                    keyboardType = KeyboardType.Uri,
-                    label = { Text(stringResource(Res.string.network_input_read_rpc_label)) }
-                )
-
-                NetworkTextFiled(
-                    modifier = Modifier.fillMaxWidth(),
-                    textField = networkForm.writeRpcTextField,
-                    keyboardType = KeyboardType.Uri,
-                    label = { Text(stringResource(Res.string.network_input_write_rpc_label)) },
-                )
-
-                if (network == null) {
-                    NetworkTextFiled(
-                        modifier = Modifier.fillMaxWidth(),
-                        textField = networkForm.chainIdTextField,
-                        keyboardType = KeyboardType.Number,
-                        label = { Text(stringResource(Res.string.network_input_chain_id_label)) }
-                    )
-                }
-
-                NetworkTextFiled(
-                    modifier = Modifier.fillMaxWidth(),
-                    textField = networkForm.tokenNameTextField,
-                    label = { Text(stringResource(Res.string.network_input_token_name_label)) },
-                )
-
-
-                NetworkTextFiled(
-                    modifier = Modifier.fillMaxWidth(),
-                    textField = networkForm.tokenSymbolTextField,
-                    label = { Text(stringResource(Res.string.network_input_token_symbol_label)) }
-                )
-
-
-                NetworkTextFiled(
-                    modifier = Modifier.fillMaxWidth(),
-                    textField = networkForm.explorerTextField,
-                    keyboardType = KeyboardType.Uri,
-                    label = { Text(stringResource(Res.string.network_input_explorer_label)) }
-                )
-
-                NetworkTextFiled(
-                    modifier = Modifier.fillMaxWidth(),
-                    textField = networkForm.networkIconTextField,
-                    keyboardType = KeyboardType.Uri,
-                    label = { Text(stringResource(Res.string.network_input_icon_label)) }
-                )
-
-                NetworkTextFiled(
-                    modifier = Modifier.fillMaxWidth(),
-                    textField = networkForm.tokenIconTextField,
-                    keyboardType = KeyboardType.Uri,
-                    label = { Text(stringResource(Res.string.network_input_token_icon_label)) },
-                    onDone = {
-                        defaultKeyboardAction(ImeAction.Done)
-                        networkForm.save()
-                    }
+                    textField = networkForm.chainIdTextField,
+                    keyboardType = KeyboardType.Number,
+                    label = { Text(stringResource(Res.string.network_input_chain_id_label)) }
                 )
             }
 
-            PrimaryButtons(
+            NetworkTextFiled(
                 modifier = Modifier.fillMaxWidth(),
-                cancel = {
-                    TextButton(onClick = onCancel) {
-                        Text("Cancel")
-                    }
-                },
-                confirm = {
-                    LoadingButton(networkForm.loading, onClick = { networkForm.save() }) {
-                        Text("Save")
-                    }
+                textField = networkForm.tokenNameTextField,
+                label = { Text(stringResource(Res.string.network_input_token_name_label)) },
+            )
+
+            NetworkTextFiled(
+                modifier = Modifier.fillMaxWidth(),
+                textField = networkForm.tokenSymbolTextField,
+                label = { Text(stringResource(Res.string.network_input_token_symbol_label)) }
+            )
+
+            NetworkTextFiled(
+                modifier = Modifier.fillMaxWidth(),
+                textField = networkForm.explorerTextField,
+                keyboardType = KeyboardType.Uri,
+                label = { Text(stringResource(Res.string.network_input_explorer_label)) }
+            )
+
+            NetworkTextFiled(
+                modifier = Modifier.fillMaxWidth(),
+                textField = networkForm.networkIconTextField,
+                keyboardType = KeyboardType.Uri,
+                label = { Text(stringResource(Res.string.network_input_icon_label)) }
+            )
+
+            NetworkTextFiled(
+                modifier = Modifier.fillMaxWidth(),
+                textField = networkForm.tokenIconTextField,
+                keyboardType = KeyboardType.Uri,
+                label = { Text(stringResource(Res.string.network_input_token_icon_label)) },
+                onDone = {
+                    defaultKeyboardAction(ImeAction.Done)
+                    networkForm.save()
                 }
             )
         }
+
+        PrimaryButtons(
+            modifier = Modifier.fillMaxWidth(),
+            cancel = {
+                TextButton(onClick = onCancel) {
+                    Text("Cancel")
+                }
+            },
+            confirm = {
+                LoadingButton(networkForm.loading, onClick = { networkForm.save() }) {
+                    Text("Save")
+                }
+            }
+        )
     }
 }
 

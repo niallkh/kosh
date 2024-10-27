@@ -1,6 +1,7 @@
 package kosh.ui.network
 
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
@@ -27,7 +28,7 @@ import kosh.domain.serializers.ImmutableSet
 import kosh.presentation.network.rememberNetworks
 import kosh.presentation.network.rememberToggleNetwork
 import kosh.ui.component.illustration.Illustration
-import kosh.ui.component.network.NetworkItem
+import kosh.ui.component.items.NetworkItem
 import kosh.ui.component.placeholder.placeholder
 import kosh.ui.component.scaffold.KoshScaffold
 import kosh.ui.component.single.single
@@ -43,35 +44,10 @@ fun NetworksScreen(
     onOpen: (NetworkEntity.Id) -> Unit,
     onAdd: () -> Unit,
 ) {
-    val networks = rememberNetworks()
-    val toggleNetwork = rememberToggleNetwork()
 
-    NetworksContent(
-        init = networks.init,
-        networks = networks.networks,
-        enabled = networks.enabled,
-        onSelect = { onOpen(it.id) },
-        onAdd = onAdd,
-        onNavigateUp = onNavigateUp,
-        onToggle = { network, enabled -> toggleNetwork.toggle(network.id, enabled) }
-    )
-}
 
-@Composable
-fun NetworksContent(
-    init: Boolean,
-    networks: ImmutableList<NetworkEntity>,
-    enabled: ImmutableSet<NetworkEntity.Id>,
-    onSelect: (NetworkEntity) -> Unit,
-    onToggle: (NetworkEntity, Boolean) -> Unit,
-    onAdd: () -> Unit,
-    onNavigateUp: () -> Unit,
-    modifier: Modifier = Modifier,
-) {
     KoshScaffold(
-        modifier = modifier,
         title = { Text(stringResource(Res.string.networks_title)) },
-
         floatingActionButton = {
             FloatingActionButton(
                 onClick = onAdd.single(),
@@ -81,36 +57,59 @@ fun NetworksContent(
         },
         onNavigateUp = { onNavigateUp() }
     ) { paddingValues ->
-        LazyColumn(
+        val networks = rememberNetworks()
+        val toggleNetwork = rememberToggleNetwork()
+
+        NetworksContent(
+            init = networks.init,
+            networks = networks.networks,
+            enabled = networks.enabled,
+            onSelect = { onOpen(it.id) },
+            onToggle = { network, enabled -> toggleNetwork.toggle(network.id, enabled) },
             contentPadding = paddingValues,
-            modifier = Modifier.fillMaxSize(),
-        ) {
+        )
+    }
+}
 
-            when {
-                !init -> networks(
-                    networks = List(5) { null }.toPersistentList(),
-                    enabled = enabled,
-                    onSelect = onSelect,
-                    onToggle = onToggle
-                )
+@Composable
+fun NetworksContent(
+    init: Boolean,
+    networks: ImmutableList<NetworkEntity>,
+    enabled: ImmutableSet<NetworkEntity.Id>,
+    onSelect: (NetworkEntity) -> Unit,
+    onToggle: (NetworkEntity, Boolean) -> Unit,
+    modifier: Modifier = Modifier,
+    contentPadding: PaddingValues = PaddingValues(),
+) {
+    LazyColumn(
+        contentPadding = contentPadding,
+        modifier = modifier.fillMaxSize(),
+    ) {
 
-                networks.isEmpty() -> {
-                    item {
-                        EmptyNetworksContent()
-                    }
+        when {
+            !init -> networks(
+                networks = List(5) { null }.toPersistentList(),
+                enabled = enabled,
+                onSelect = onSelect,
+                onToggle = onToggle
+            )
+
+            networks.isEmpty() -> {
+                item {
+                    EmptyNetworksContent()
                 }
-
-                else -> networks(
-                    networks = networks,
-                    enabled = enabled,
-                    onSelect = onSelect,
-                    onToggle = onToggle
-                )
             }
 
-            item {
-                Spacer(Modifier.height(64.dp))
-            }
+            else -> networks(
+                networks = networks,
+                enabled = enabled,
+                onSelect = onSelect,
+                onToggle = onToggle
+            )
+        }
+
+        item {
+            Spacer(Modifier.height(64.dp))
         }
     }
 }

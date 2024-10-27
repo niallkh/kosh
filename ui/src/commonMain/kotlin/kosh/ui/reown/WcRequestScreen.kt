@@ -10,7 +10,6 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.ui.Modifier
 import kosh.domain.models.reown.WcRequest
-import kosh.presentation.reown.RequestState
 import kosh.presentation.reown.rememberRequest
 import kosh.ui.component.LoadingIndicator
 import kosh.ui.component.scaffold.KoshScaffold
@@ -27,25 +26,14 @@ fun WcRequestScreen(
 ) {
     val request = rememberRequest(id)
 
-    LaunchedEffect(request.request) {
-        request.request?.let(onResult)
-    }
-
-    WcRequestContent(
-        request = request,
-        onNavigateUp = onNavigateUp
-    )
-}
-
-@Composable
-fun WcRequestContent(
-    request: RequestState,
-    onNavigateUp: () -> Unit,
-) {
     KoshScaffold(
         title = { Text(stringResource(Res.string.wc_request_title)) },
         onNavigateUp = { onNavigateUp() }
     ) { paddingValues ->
+        LaunchedEffect(request.request) {
+            request.request?.let(onResult)
+        }
+
         Column(
             modifier = Modifier.verticalScroll(rememberScrollState())
                 .padding(paddingValues)

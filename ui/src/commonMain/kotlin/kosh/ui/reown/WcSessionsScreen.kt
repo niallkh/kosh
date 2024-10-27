@@ -18,8 +18,8 @@ import androidx.compose.ui.unit.dp
 import kosh.domain.models.reown.WcSession
 import kosh.domain.serializers.ImmutableList
 import kosh.presentation.reown.rememberSessions
-import kosh.ui.component.dapp.DappItem
 import kosh.ui.component.illustration.Illustration
+import kosh.ui.component.items.DappItem
 import kosh.ui.resources.illustrations.DappsEmpty
 import kotlinx.collections.immutable.toPersistentList
 

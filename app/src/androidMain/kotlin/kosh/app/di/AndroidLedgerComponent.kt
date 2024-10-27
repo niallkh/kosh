@@ -1,2 +1,0 @@
-package kosh.app.di
-

@@ -4,7 +4,6 @@ import androidx.compose.foundation.Image
 import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.offset
-import androidx.compose.foundation.layout.size
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.remember
@@ -116,7 +115,6 @@ private fun DappIcon(
 
     Image(
         modifier = modifier
-            .size(40.dp)
             .clip(MaterialTheme.shapes.extraSmall)
             .placeholder(placeholder),
         painter = rememberImagePainter(

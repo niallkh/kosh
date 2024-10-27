@@ -2,6 +2,7 @@ package kosh.ui.reown
 
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.imePadding
 import androidx.compose.foundation.layout.padding
@@ -39,135 +40,135 @@ fun WcAddNetworkScreen(
 ) {
     val addNetwork = rememberAddNetworkRequest(id)
 
-    AppFailureMessage(addNetwork.networkFailure)
+    KoshScaffold(
+        title = { TextLine("Add Network") },
+        onNavigateUp = { onNavigateUp() },
+    ) { paddingValues ->
+        AppFailureMessage(addNetwork.networkFailure)
 
-    LaunchedEffect(addNetwork.added) {
-        if (addNetwork.added) {
-            onResult()
+        LaunchedEffect(addNetwork.added) {
+            if (addNetwork.added) {
+                onResult()
+            }
         }
-    }
 
-    WcAddNetworkContent(
-        addNetwork = addNetwork,
-        onNavigateUp = onNavigateUp,
-        onReject = {
-            addNetwork.reject()
-            onCancel()
-        },
-    )
+        WcAddNetworkContent(
+            addNetwork = addNetwork,
+            onReject = {
+                addNetwork.reject()
+                onCancel()
+            },
+            contentPadding = paddingValues
+        )
+
+        LoadingIndicator(
+            addNetwork.loading,
+            Modifier.padding(paddingValues),
+        )
+    }
 }
 
 @Composable
 fun WcAddNetworkContent(
     addNetwork: AddNetworkRequestState,
-    onNavigateUp: () -> Unit,
     onReject: () -> Unit,
+    contentPadding: PaddingValues = PaddingValues(),
 ) {
-    KoshScaffold(
-        title = { TextLine("Add Network") },
-        onNavigateUp = { onNavigateUp() },
-    ) { innerPadding ->
-        addNetwork.failure?.let {
-            AppFailureItem(it, Modifier.padding(innerPadding)) { addNetwork.retry() }
-        } ?: Column(
-            modifier = Modifier.verticalScroll(rememberScrollState())
-                .imePadding()
-                .padding(horizontal = 16.dp, vertical = 8.dp)
-                .padding(innerPadding),
-            verticalArrangement = Arrangement.spacedBy(8.dp)
-        ) {
+    addNetwork.failure?.let {
+        AppFailureItem(it, Modifier.padding(contentPadding)) { addNetwork.retry() }
+    } ?: Column(
+        modifier = Modifier.verticalScroll(rememberScrollState())
+            .imePadding()
+            .padding(horizontal = 16.dp, vertical = 8.dp)
+            .padding(contentPadding),
+        verticalArrangement = Arrangement.spacedBy(8.dp)
+    ) {
 
-            KeyValueColumn(
-                key = { Text("Chain Id") },
-                value = {
-                    TextChainId(
-                        addNetwork.call?.chainId.orZero(),
-                        Modifier.placeholder(addNetwork.call == null)
-                    )
-                },
-                modifier = Modifier.fillMaxWidth()
-            )
-
-            KeyValueColumn(
-                key = { Text("Network Name") },
-                value = {
-                    TextLine(
-                        addNetwork.call?.chainName ?: "Unknown Network Name",
-                        Modifier.placeholder(addNetwork.call == null)
-                    )
-                },
-                modifier = Modifier.fillMaxWidth()
-            )
-
-            KeyValueColumn(
-                key = { Text("Token Name") },
-                value = {
-                    TextLine(
-                        addNetwork.call?.tokenName ?: "Unknown Token Name",
-                        Modifier.placeholder(addNetwork.call == null)
-                    )
-                },
-                modifier = Modifier.fillMaxWidth()
-            )
-
-            KeyValueColumn(
-                key = { Text("Token Symbol") },
-                value = {
-                    TextLine(
-                        addNetwork.call?.tokenSymbol ?: "UNKWN",
-                        Modifier.placeholder(addNetwork.call == null)
-                    )
-                },
-                modifier = Modifier.fillMaxWidth()
-            )
-
-            KeyValueColumn(
-                key = { Text("Rpc Provider") },
-                value = {
-                    TextUri(
-                        addNetwork.call?.rpcProviders?.first() ?: Uri(),
-                        Modifier.placeholder(addNetwork.call == null)
-                    )
-                },
-                modifier = Modifier.fillMaxWidth()
-            )
-
-            addNetwork.call?.explorers?.firstOrNull()?.let { explorer ->
-                KeyValueColumn(
-                    key = { Text("Explorer") },
-                    value = { TextUri(explorer) },
-                    modifier = Modifier.fillMaxWidth()
+        KeyValueColumn(
+            key = { Text("Chain Id") },
+            value = {
+                TextChainId(
+                    addNetwork.call?.chainId.orZero(),
+                    Modifier.placeholder(addNetwork.call == null)
                 )
-            }
+            },
+            modifier = Modifier.fillMaxWidth()
+        )
 
-            addNetwork.call?.icons?.firstOrNull()?.let { icon ->
-                KeyValueColumn(
-                    key = { Text("Icon") },
-                    value = { TextUri(icon) },
-                    modifier = Modifier.fillMaxWidth()
+        KeyValueColumn(
+            key = { Text("Network Name") },
+            value = {
+                TextLine(
+                    addNetwork.call?.chainName ?: "Unknown Network Name",
+                    Modifier.placeholder(addNetwork.call == null)
                 )
-            }
+            },
+            modifier = Modifier.fillMaxWidth()
+        )
 
-            PrimaryButtons(
-                modifier = Modifier.fillMaxWidth(),
-                cancel = {
-                    TextButton(onClick = onReject) {
-                        Text("Reject")
-                    }
-                },
-                confirm = {
-                    LoadingButton(addNetwork.adding, onClick = {
-                        addNetwork.add()
-                    }) {
-                        Text("Add")
-                    }
-                }
+        KeyValueColumn(
+            key = { Text("Token Name") },
+            value = {
+                TextLine(
+                    addNetwork.call?.tokenName ?: "Unknown Token Name",
+                    Modifier.placeholder(addNetwork.call == null)
+                )
+            },
+            modifier = Modifier.fillMaxWidth()
+        )
+
+        KeyValueColumn(
+            key = { Text("Token Symbol") },
+            value = {
+                TextLine(
+                    addNetwork.call?.tokenSymbol ?: "UNKWN",
+                    Modifier.placeholder(addNetwork.call == null)
+                )
+            },
+            modifier = Modifier.fillMaxWidth()
+        )
+
+        KeyValueColumn(
+            key = { Text("Rpc Provider") },
+            value = {
+                TextUri(
+                    addNetwork.call?.rpcProviders?.first() ?: Uri(),
+                    Modifier.placeholder(addNetwork.call == null)
+                )
+            },
+            modifier = Modifier.fillMaxWidth()
+        )
+
+        addNetwork.call?.explorers?.firstOrNull()?.let { explorer ->
+            KeyValueColumn(
+                key = { Text("Explorer") },
+                value = { TextUri(explorer) },
+                modifier = Modifier.fillMaxWidth()
             )
         }
 
-        LoadingIndicator(
-            addNetwork.loading,
-            Modifier.padding(innerPadding),
+        addNetwork.call?.icons?.firstOrNull()?.let { icon ->
+            KeyValueColumn(
+                key = { Text("Icon") },
+                value = { TextUri(icon) },
+                modifier = Modifier.fillMaxWidth()
+            )
+        }
+
+        PrimaryButtons(
+            modifier = Modifier.fillMaxWidth(),
+            cancel = {
+                TextButton(onClick = onReject) {
+                    Text("Reject")
+                }
+            },
+            confirm = {
+                LoadingButton(addNetwork.adding, onClick = {
+                    addNetwork.add()
+                }) {
+                    Text("Add")
+                }
+            }
         )
     }
 }

@@ -4,22 +4,22 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.Immutable
 import kosh.domain.entities.TokenEntity
 import kosh.domain.usecases.token.TokenService
-import kosh.presentation.Perform
 import kosh.presentation.core.di
+import kosh.presentation.rememberEffect
 
 @Composable
 fun rememberDeleteToken(
     id: TokenEntity.Id,
     tokenService: TokenService = di { domain.tokenService },
 ): DeleteTokenState {
-    val delete = Perform(id) {
+    val delete = rememberEffect(id) {
         tokenService.delete(id)
     }
 
     return DeleteTokenState(
-        deleted = delete.performed,
+        deleted = delete.done,
         deleting = delete.inProgress,
-        delete = { delete(Unit) },
+        delete = { delete() },
     )
 }
 

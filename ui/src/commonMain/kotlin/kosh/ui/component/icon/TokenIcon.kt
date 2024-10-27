@@ -12,6 +12,7 @@ import com.seiko.imageloader.model.ImageRequest
 import com.seiko.imageloader.rememberImagePainter
 import kosh.domain.entities.TokenEntity
 import kosh.domain.models.Uri
+import kosh.domain.models.token.TokenMetadata
 import kosh.ui.component.colors.symbolColor
 import kosh.ui.component.placeholder.placeholder
 
@@ -22,16 +23,30 @@ fun TokenIcon(
 ) {
     TokenIcon(
         symbol = token?.symbol ?: "Lorem",
-        icon = token?.icon,
-        modifier = modifier
-            .placeholder(token == null),
+        icon = token?.icon ?: token?.image,
+        placeholder = token == null,
+        modifier = modifier,
     )
 }
 
 @Composable
 fun TokenIcon(
+    token: TokenMetadata?,
+    modifier: Modifier = Modifier,
+) {
+    TokenIcon(
+        symbol = token?.symbol ?: "Lorem",
+        icon = token?.icon,
+        placeholder = token == null,
+        modifier = modifier,
+    )
+}
+
+@Composable
+private fun TokenIcon(
     symbol: String,
     icon: Uri?,
+    placeholder: Boolean = false,
     modifier: Modifier = Modifier,
 ) {
     val request = remember(icon) {
@@ -52,12 +67,15 @@ fun TokenIcon(
     }
 
     Image(
-        modifier = modifier.clip(CircleShape),
+        modifier = modifier
+            .clip(CircleShape)
+            .placeholder(placeholder),
         painter = rememberImagePainter(
             request = request,
+            placeholderPainter = symbolPainter,
             errorPainter = symbolPainter,
         ),
-        contentDescription = "ChainIcon",
+        contentDescription = "TokenIcon",
         contentScale = ContentScale.Crop,
     )
 }

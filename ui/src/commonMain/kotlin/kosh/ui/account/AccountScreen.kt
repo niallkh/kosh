@@ -2,6 +2,7 @@ package kosh.ui.account
 
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.rememberScrollState
@@ -22,9 +23,8 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.focus.onFocusChanged
 import androidx.compose.ui.unit.dp
+import arrow.core.raise.nullable
 import kosh.domain.entities.AccountEntity
-import kosh.domain.models.account.ethereumDerivationPath
-import kosh.domain.models.orZero
 import kosh.domain.usecases.account.accountNameValidator
 import kosh.presentation.account.rememberAccount
 import kosh.presentation.account.rememberUpdateAccount
@@ -38,7 +38,6 @@ import kosh.ui.component.icon.AccountIcon
 import kosh.ui.component.menu.AdaptiveMenuItem
 import kosh.ui.component.menu.AdaptiveMoreMenu
 import kosh.ui.component.nullUnless
-import kosh.ui.component.placeholder.placeholder
 import kosh.ui.component.scaffold.KoshScaffold
 import kosh.ui.component.text.KeyValueRow
 import kosh.ui.component.text.TextAddressShort
@@ -58,41 +57,13 @@ fun AccountScreen(
     val account = rememberAccount(id)
     val updateAccount = rememberUpdateAccount(id)
 
-    AppFailureMessage(updateAccount.failure)
-
-    LaunchedEffect(updateAccount.updated) {
-        if (updateAccount.updated) {
-            onCancel()
-        }
-    }
-
-    AccountContent(
-        account = account.entity,
-        onNavigateUp = { onNavigateUp() },
-        onDelete = { onDelete(id) },
-        onCancel = { onCancel() },
-        onUpdate = { updateAccount.update(it) },
-    )
-}
-
-@Composable
-fun AccountContent(
-    account: AccountEntity?,
-    onNavigateUp: () -> Unit,
-    onUpdate: (String) -> Unit,
-    onDelete: () -> Unit,
-    onCancel: () -> Unit,
-) {
     KoshScaffold(
         title = {
-            TextLine(
-                account.let { it?.name ?: "Unknown Account Name" },
-                Modifier.placeholder(account == null)
-            )
+            TextLine(account.entity?.name)
         },
         onNavigateUp = { onNavigateUp() },
         actions = {
-            AccountIcon(account?.address)
+            AccountIcon(account.entity?.address)
 
             AdaptiveMoreMenu { dismiss ->
                 val networkId = rememberNetworks().enabled.firstOrNull()
@@ -104,7 +75,10 @@ fun AccountContent(
                     },
                     onClick = {
                         dismiss {
-                            account?.address?.let { openExplorer?.openAddress?.invoke(it) }
+                            nullable {
+                                ensureNotNull(openExplorer)
+                                    .openAddress(ensureNotNull(account.entity).address)
+                            }
                         }
                     },
                 ) {
@@ -114,83 +88,101 @@ fun AccountContent(
                 AdaptiveMenuItem(
                     text = { Text("Delete") },
                     leadingIcon = { Icon(Icons.Default.Delete, contentDescription = "Delete") },
-                    onClick = { dismiss { onDelete() } }
+                    onClick = {
+                        dismiss {
+                            nullable {
+                                onDelete(ensureNotNull(account.entity).id)
+                            }
+                        }
+                    }
                 )
             }
         }
     ) { paddingValues ->
+
+        AppFailureMessage(updateAccount.failure)
+
+        LaunchedEffect(updateAccount.updated) {
+            if (updateAccount.updated) {
+                onCancel()
+            }
+        }
+
+        AccountContent(
+            account = account.entity,
+            onCancel = { onCancel() },
+            onUpdate = { updateAccount.update(it) },
+            contentPadding = paddingValues,
+        )
+    }
+}
+
+@Composable
+fun AccountContent(
+    account: AccountEntity?,
+    onUpdate: (String) -> Unit,
+    onCancel: () -> Unit,
+    contentPadding: PaddingValues = PaddingValues(),
+) {
+    Column(
+        modifier = Modifier
+            .padding(vertical = 8.dp)
+            .padding(contentPadding)
+            .verticalScroll(rememberScrollState()),
+        verticalArrangement = Arrangement.spacedBy(16.dp),
+    ) {
         Column(
-            modifier = Modifier
-                .padding(vertical = 8.dp)
-                .padding(paddingValues)
-                .verticalScroll(rememberScrollState()),
-            verticalArrangement = Arrangement.spacedBy(16.dp),
+            modifier = Modifier.padding(horizontal = 16.dp),
+            verticalArrangement = Arrangement.spacedBy(8.dp)
         ) {
-            Column(
-                modifier = Modifier.padding(horizontal = 16.dp),
-                verticalArrangement = Arrangement.spacedBy(8.dp)
-            ) {
 
-                KeyValueRow(
-                    modifier = Modifier.fillMaxWidth(),
-                    key = { TextLine("Address") },
-                    value = {
-                        TextAddressShort(
-                            account?.address.orZero(),
-                            Modifier.placeholder(account == null),
-                            clickable = true,
-                        )
-                    }
-                )
+            KeyValueRow(
+                modifier = Modifier.fillMaxWidth(),
+                key = { TextLine("Address") },
+                value = { TextAddressShort(account?.address, clickable = true) }
+            )
 
-                KeyValueRow(
-                    modifier = Modifier.fillMaxWidth(),
-                    key = { TextLine("Derivation path") },
-                    value = {
-                        TextDerivationPath(
-                            account?.derivationPath ?: ethereumDerivationPath(),
-                            Modifier.placeholder(account == null),
-                            clickable = true
-                        )
-                    }
-                )
-            }
-
-            val textField = rememberTextField(account?.name) {
-                accountNameValidator(it)
-            }
-
-            AccountNameTextField(
-                textField = textField,
-                modifier = Modifier
-                    .padding(horizontal = 16.dp)
-                    .fillMaxWidth()
-            ) {
-                textField.validate().getOrNull()?.let {
-                    onUpdate(it)
-                }
-            }
-
-            PrimaryButtons(
-                modifier = Modifier
-                    .padding(horizontal = 16.dp)
-                    .fillMaxWidth(),
-                cancel = {
-                    TextButton(onCancel) {
-                        Text("Cancel")
-                    }
-                },
-                confirm = {
-                    LoadingButton(false, {
-                        textField.validate().getOrNull()?.let {
-                            onUpdate(it)
-                        }
-                    }) {
-                        Text("Save")
-                    }
-                }
+            KeyValueRow(
+                modifier = Modifier.fillMaxWidth(),
+                key = { TextLine("Derivation path") },
+                value = { TextDerivationPath(account?.derivationPath, clickable = true) }
             )
         }
+
+        val textField = rememberTextField(account?.name) {
+            accountNameValidator(it)
+        }
+
+        AccountNameTextField(
+            textField = textField,
+            modifier = Modifier
+                .padding(horizontal = 16.dp)
+                .fillMaxWidth()
+        ) {
+            textField.validate().getOrNull()?.let {
+                onUpdate(it)
+            }
+        }
+
+        PrimaryButtons(
+            modifier = Modifier
+                .padding(horizontal = 16.dp)
+                .fillMaxWidth(),
+            cancel = {
+                TextButton(onCancel) {
+                    Text("Cancel")
+                }
+            },
+            confirm = {
+                LoadingButton(false, {
+                    textField.validate().getOrNull()?.let {
+                        onUpdate(it)
+                    }
+                }) {
+                    Text("Save")
+                }
+            }
+        )
     }
 }
 

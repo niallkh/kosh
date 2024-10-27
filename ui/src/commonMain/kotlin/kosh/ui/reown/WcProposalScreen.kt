@@ -1,5 +1,6 @@
 package kosh.ui.reown
 
+import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
@@ -35,14 +36,13 @@ import kosh.ui.component.button.LoadingButton
 import kosh.ui.component.button.PrimaryButtons
 import kosh.ui.component.dapp.DappIcon
 import kosh.ui.component.dapp.DappTitle
-import kosh.ui.component.dapp.VerifyContextItem
-import kosh.ui.component.network.NetworkItem
+import kosh.ui.component.items.AccountItem
+import kosh.ui.component.items.NetworkItem
+import kosh.ui.component.items.VerifyContextItem
 import kosh.ui.component.scaffold.KoshScaffold
 import kosh.ui.component.text.Header
-import kosh.ui.component.wallet.AccountItem
 import kosh.ui.failure.AppFailureItem
 import kosh.ui.failure.AppFailureMessage
-import kosh.ui.navigation.BackHandler
 import kosh.ui.resources.Res
 import kosh.ui.resources.wc_proposal_approve_btn
 import kosh.ui.resources.wc_proposal_reject_btn
@@ -58,17 +58,13 @@ fun WcProposalScreen(
     onNavigateUp: () -> Unit,
 ) {
     val proposal = rememberProposal(id, requestId)
-
     val reject = rememberRejectProposal(id)
-
     val approve = rememberApproveProposal(id)
-
     val accountSelector = proposal.proposal?.let {
         rememberAccountMultiSelector(
             optic = AppState.accounts compose Getter { it.values.toPersistentList() },
         )
     }
-
     val networkSelector = proposal.proposal?.let { proposalAggregated ->
         rememberNetworkMultiSelector(
             initial = AppState.networks compose Getter { map ->
@@ -78,50 +74,10 @@ fun WcProposalScreen(
         )
     }
 
-    AppFailureMessage(approve.failure) {
-        approve.retry()
-    }
-
-    LaunchedEffect(approve.approved) {
-        if (approve.approved) {
-            onResult(approve.redirect)
-        }
-    }
-
-    LaunchedEffect(reject.rejected) {
-        if (reject.rejected) {
-            onCancel()
-        }
-    }
-
-    BackHandler { reject.reject() }
-
-    WcSessionProposalContent(
-        proposal = proposal,
-        networkSelector = networkSelector,
-        accountSelector = accountSelector,
-        approve = approve,
-        onNavigateUp = onNavigateUp,
-        onReject = { reject.reject() }
-    )
-}
-
-@Composable
-fun WcSessionProposalContent(
-    proposal: ProposalState,
-    networkSelector: NetworkMultiSelectorState?,
-    accountSelector: AccountMultiSelectorState?,
-    approve: ApproveProposalState,
-    onNavigateUp: () -> Unit,
-    onReject: () -> Unit,
-) {
     KoshScaffold(
         title = {
             if (proposal.failure == null) {
-                DappTitle(
-                    proposal.proposal?.proposal?.dapp?.name,
-                    proposal.proposal?.proposal?.dapp?.url,
-                )
+                DappTitle(proposal.proposal?.proposal?.dapp)
             }
         },
 
@@ -132,97 +88,133 @@ fun WcSessionProposalContent(
             }
         },
         onNavigateUp = { onNavigateUp() }
-    ) { innerPadding ->
-        proposal.failure?.let {
-            AppFailureItem(it, Modifier.padding(innerPadding)) { proposal.retry() }
-        } ?: LazyColumn(
-            contentPadding = innerPadding
-        ) {
+    ) { paddingValues ->
 
-            item {
-                proposal.proposal?.proposal?.let {
-                    VerifyContextItem(it.verifyContext)
-                }
-            }
+        AppFailureMessage(approve.failure) {
+            approve.retry()
+        }
 
-            stickyHeader {
-                Header("Networks")
-            }
-
-            items(
-                items = networkSelector?.available.orEmpty(),
-                key = { it.id.value.leastSignificantBits }
-            ) { network ->
-                NetworkItem(
-                    network = network,
-                    onClick = { networkSelector?.select?.invoke(network.id) },
-                ) {
-                    Checkbox(
-                        checked = network.id in networkSelector?.selected.orEmpty(),
-                        onCheckedChange = { networkSelector?.select?.invoke(network.id) },
-                        enabled = network.id !in networkSelector?.required.orEmpty()
-                    )
-                }
-            }
-
-            stickyHeader {
-                Header("Accounts")
-            }
-
-            items(
-                items = accountSelector?.available.orEmpty(),
-                key = { it.id.value.leastSignificantBits }
-            ) { account ->
-                AccountItem(
-                    account = account,
-                    onClick = { accountSelector?.select?.invoke(account.id) },
-                ) {
-                    Checkbox(
-                        checked = account.id in accountSelector?.selected.orEmpty(),
-                        onCheckedChange = { accountSelector?.select?.invoke(account.id) }
-                    )
-                }
-            }
-
-            item {
-                PrimaryButtons(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(horizontal = 16.dp, vertical = 8.dp),
-                    cancel = {
-                        TextButton(onReject) {
-                            Text(stringResource(Res.string.wc_proposal_reject_btn))
-                        }
-                    },
-                    confirm = {
-                        LoadingButton(approve.loading, onClick = {
-                            nullable {
-                                approve.approve(
-                                    ensureNotNull(accountSelector).available
-                                        .filter { it.id in accountSelector.selected }
-                                        .map { it.address },
-                                    ensureNotNull(networkSelector).available
-                                        .filter { it.id in networkSelector.selected }
-                                        .map { it.chainId },
-                                )
-
-                            }
-                        }) {
-                            Text(stringResource(Res.string.wc_proposal_approve_btn))
-                        }
-                    }
-                )
-            }
-
-            item {
-                Spacer(Modifier.height(64.dp))
+        LaunchedEffect(approve.approved) {
+            if (approve.approved) {
+                onResult(approve.redirect)
             }
         }
 
+        LaunchedEffect(reject.rejected) {
+            if (reject.rejected) {
+                onCancel()
+            }
+        }
+
+        WcSessionProposalContent(
+            proposal = proposal,
+            networkSelector = networkSelector,
+            accountSelector = accountSelector,
+            approve = approve,
+            onNavigateUp = onNavigateUp,
+            onReject = { reject.reject() },
+            contentPadding = paddingValues
+        )
+
         LoadingIndicator(
             proposal.loading,
-            Modifier.padding(innerPadding),
+            Modifier.padding(paddingValues),
         )
     }
 }
 
+@Composable
+fun WcSessionProposalContent(
+    proposal: ProposalState,
+    networkSelector: NetworkMultiSelectorState?,
+    accountSelector: AccountMultiSelectorState?,
+    approve: ApproveProposalState, onNavigateUp: () -> Unit,
+    onReject: () -> Unit,
+    contentPadding: PaddingValues = PaddingValues(),
+) {
+    proposal.failure?.let {
+        AppFailureItem(it, Modifier.padding(contentPadding)) { proposal.retry() }
+    } ?: LazyColumn(
+        contentPadding = contentPadding
+    ) {
+
+        item {
+            proposal.proposal?.proposal?.let {
+                VerifyContextItem(it.verifyContext)
+            }
+        }
+
+        stickyHeader {
+            Header("Networks")
+        }
+
+        items(
+            items = networkSelector?.available.orEmpty(),
+            key = { it.id.value.leastSignificantBits }
+        ) { network ->
+            NetworkItem(
+                network = network,
+                onClick = { networkSelector?.select?.invoke(network.id) },
+            ) {
+                Checkbox(
+                    checked = network.id in networkSelector?.selected.orEmpty(),
+                    onCheckedChange = { networkSelector?.select?.invoke(network.id) },
+                    enabled = network.id !in networkSelector?.required.orEmpty()
+                )
+            }
+        }
+
+        stickyHeader {
+            Header("Accounts")
+        }
+
+        items(
+            items = accountSelector?.available.orEmpty(),
+            key = { it.id.value.leastSignificantBits }
+        ) { account ->
+            AccountItem(
+                account = account,
+                onClick = { accountSelector?.select?.invoke(account.id) },
+            ) {
+                Checkbox(
+                    checked = account.id in accountSelector?.selected.orEmpty(),
+                    onCheckedChange = { accountSelector?.select?.invoke(account.id) }
+                )
+            }
+        }
+
+        item {
+            PrimaryButtons(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(horizontal = 16.dp, vertical = 8.dp),
+                cancel = {
+                    TextButton(onReject) {
+                        Text(stringResource(Res.string.wc_proposal_reject_btn))
+                    }
+                },
+                confirm = {
+                    LoadingButton(approve.loading, onClick = {
+                        nullable {
+                            approve.approve(
+                                ensureNotNull(accountSelector).available
+                                    .filter { it.id in accountSelector.selected }
+                                    .map { it.address },
+                                ensureNotNull(networkSelector).available
+                                    .filter { it.id in networkSelector.selected }
+                                    .map { it.chainId },
+                            )
+
+                        }
+                    }) {
+                        Text(stringResource(Res.string.wc_proposal_approve_btn))
+                    }
+                }
+            )
+        }
+
+        item {
+            Spacer(Modifier.height(64.dp))
+        }
+    }
+}

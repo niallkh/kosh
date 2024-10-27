@@ -15,10 +15,10 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import arrow.core.raise.nullable
+import com.ionspin.kotlin.bignum.integer.BigInteger.Companion.ZERO
 import kosh.domain.entities.TransactionEntity
 import kosh.domain.models.web3.Transaction
 import kosh.domain.models.web3.gasPrice
-import kosh.domain.utils.orZero
 import kosh.presentation.token.rememberNativeToken
 import kosh.presentation.transaction.EstimateGasState
 import kosh.presentation.transaction.GasPricesState
@@ -83,13 +83,13 @@ fun NetworkFeesCard(
                     KeyValueRow(
                         modifier = Modifier.placeholder(transaction == null),
                         key = { Text("Estimated Gas Used") },
-                        value = { TextNumber(gasEstimation?.estimation?.estimated.orZero()) }
+                        value = { TextNumber(gasEstimation?.estimation?.estimated ?: 0u) }
                     )
 
                     KeyValueRow(
                         modifier = Modifier.placeholder(transaction == null),
                         key = { Text("Gas Limit") },
-                        value = { TextNumber(gasEstimation?.estimation?.gas.orZero()) }
+                        value = { TextNumber(gasEstimation?.estimation?.gas ?: 0u) }
                     )
 
                     KeyValueRow(
@@ -97,9 +97,8 @@ fun NetworkFeesCard(
                         key = { Text("Max Base Gas Price") },
                         value = {
                             TextAmount(
-                                gasPrice?.base.orZero(),
-                                token?.entity?.symbol.orEmpty(),
-                                token?.entity?.decimals
+                                token = token?.entity,
+                                amount = gasPrice?.base,
                             )
                         }
                     )
@@ -109,9 +108,8 @@ fun NetworkFeesCard(
                         key = { Text("Priority Gas Price") },
                         value = {
                             TextAmount(
-                                gasPrice?.priority.orZero(),
-                                token?.entity?.symbol.orEmpty(),
-                                token?.entity?.decimals
+                                token = token?.entity,
+                                amount = gasPrice?.priority,
                             )
                         }
                     )
@@ -143,8 +141,8 @@ fun NetworkFeesCard(
         ) {
 
             if (transaction.receipt != null) {
-                val amount = transaction.receipt?.gasPrice?.gasPrice.orZero() *
-                        transaction.receipt?.gasUsed?.toLong().orZero()
+                val amount = (transaction.receipt?.gasPrice?.gasPrice ?: ZERO) *
+                        (transaction.receipt?.gasUsed?.toLong() ?: 0L)
 
                 TokenAmountItem(token.entity, amount) {
                     Text("Amount")
@@ -179,9 +177,8 @@ fun NetworkFeesCard(
                             key = { Text("Base Gas Price") },
                             value = {
                                 TextAmount(
-                                    transaction.receipt?.gasPrice?.base.orZero(),
-                                    token.entity?.symbol.orEmpty(),
-                                    token.entity?.decimals
+                                    token = token.entity,
+                                    amount = transaction.receipt?.gasPrice?.base,
                                 )
                             }
                         )
@@ -191,9 +188,8 @@ fun NetworkFeesCard(
                         key = { Text("Max Base Gas Price") },
                         value = {
                             TextAmount(
-                                transaction.gasPrice.base.orZero(),
-                                token.entity?.symbol.orEmpty(),
-                                token.entity?.decimals
+                                amount = transaction.gasPrice.base,
+                                token = token.entity,
                             )
                         }
                     )
@@ -202,9 +198,8 @@ fun NetworkFeesCard(
                         key = { Text("Priority Gas Price") },
                         value = {
                             TextAmount(
-                                transaction.gasPrice.priority.orZero(),
-                                token.entity?.symbol.orEmpty(),
-                                token.entity?.decimals
+                                amount = transaction.gasPrice.priority,
+                                token = token.entity,
                             )
                         }
                     )

@@ -8,6 +8,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import kosh.domain.models.web3.ContractCall
+import kosh.ui.component.items.AddressItem
 import kosh.ui.component.text.TextHeader
 
 @Composable
@@ -29,7 +30,7 @@ fun ApproveCard(
                 approve.tokenId
             )
 
-            AccountItem(approve.spender) {
+            AddressItem(approve.spender) {
                 Text("Spender")
             }
         }

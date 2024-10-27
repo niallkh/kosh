@@ -9,6 +9,7 @@ import androidx.compose.runtime.key
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import kosh.domain.models.web3.ContractCall
+import kosh.ui.component.items.AddressItem
 import kosh.ui.component.text.TextHeader
 
 @Composable
@@ -34,12 +35,12 @@ fun TransferCard(
             }
 
             if (transfer.from != transfer.sender) {
-                AccountItem(transfer.from) {
+                AddressItem(transfer.from) {
                     Text("From")
                 }
             }
 
-            AccountItem(transfer.destination) {
+            AddressItem(transfer.destination) {
                 Text("Destination")
             }
         }

@@ -13,6 +13,7 @@ import androidx.compose.ui.unit.dp
 import kosh.domain.models.web3.ContractCall
 import kosh.domain.utils.orEmpty
 import kosh.presentation.transaction.rememberFunctionName
+import kosh.ui.component.items.AddressItem
 import kosh.ui.component.placeholder.placeholder
 import kosh.ui.component.text.KeyValueColumn
 import kosh.ui.component.text.TextBytes
@@ -42,7 +43,7 @@ fun FallbackCard(
                 Text("Value")
             }
 
-            AccountItem(call?.contract) {
+            AddressItem(call?.contract) {
                 Text("Contract Address")
             }
 

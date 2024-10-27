@@ -3,6 +3,7 @@ package kosh.ui.transaction
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.height
@@ -28,9 +29,10 @@ import kosh.presentation.transaction.rememberContractCall
 import kosh.presentation.transaction.rememberTransaction
 import kosh.ui.component.dapp.DappIcon
 import kosh.ui.component.dapp.DappTitle
+import kosh.ui.component.items.AccountItem
+import kosh.ui.component.items.NetworkItem
 import kosh.ui.component.menu.AdaptiveMenuItem
 import kosh.ui.component.menu.AdaptiveMoreMenu
-import kosh.ui.component.network.NetworkItem
 import kosh.ui.component.path.resolve
 import kosh.ui.component.scaffold.KoshScaffold
 import kosh.ui.component.single.single
@@ -40,7 +42,6 @@ import kosh.ui.component.text.TextDate
 import kosh.ui.component.text.TextHeader
 import kosh.ui.component.text.TextLine
 import kosh.ui.component.text.TextNumber
-import kosh.ui.component.wallet.AccountItem
 import kosh.ui.transaction.calls.ApproveCard
 import kosh.ui.transaction.calls.DeployCard
 import kosh.ui.transaction.calls.FallbackCard
@@ -57,43 +58,32 @@ fun TransactionScreen(
 ) {
     val transaction = rememberTransaction(id)
 
-    TransactionContent(
-        id = id,
-        transaction = transaction.entity,
-        onNavigateUp = onNavigateUp,
-        onDelete = onDelete
-    )
-}
-
-@Composable
-fun TransactionContent(
-    id: TransactionEntity.Id,
-    transaction: TransactionEntity?,
-    onNavigateUp: () -> Unit,
-    onDelete: (TransactionEntity.Id) -> Unit,
-) {
     KoshScaffold(
-        title = { DappTitle(transaction?.dapp?.name, transaction?.dapp?.url) },
+        title = { DappTitle(transaction.entity?.dapp) },
         onNavigateUp = onNavigateUp,
 
         actions = {
-            DappIcon(transaction?.dapp)
+            DappIcon(transaction.entity?.dapp)
 
             AdaptiveMoreMenu { dismiss ->
-                if (transaction is TransactionEntity.Eip1559) {
-                    val openExplorer = rememberOpenExplorer(transaction.networkId)
+                when (val tx = transaction.entity) {
+                    is TransactionEntity.Eip1559 -> {
+                        val openExplorer = rememberOpenExplorer(tx.networkId)
 
-                    AdaptiveMenuItem(
-                        leadingIcon = {
-                            Icon(
-                                Icons.AutoMirrored.Filled.OpenInNew,
-                                "Open in explorer"
-                            )
-                        },
-                        onClick = { dismiss { openExplorer.openTransaction(transaction.hash) } },
-                    ) {
-                        Text("Open In Explorer")
+                        AdaptiveMenuItem(
+                            leadingIcon = {
+                                Icon(
+                                    Icons.AutoMirrored.Filled.OpenInNew,
+                                    "Open in explorer"
+                                )
+                            },
+                            onClick = { dismiss { openExplorer.openTransaction(tx.hash) } },
+                        ) {
+                            Text("Open In Explorer")
+                        }
                     }
+
+                    else -> Unit
                 }
 
                 AdaptiveMenuItem(
@@ -107,22 +97,34 @@ fun TransactionContent(
             Spacer(Modifier.width(8.dp))
         }
     ) { paddingValues ->
-        Box(Modifier.padding(paddingValues)) {
-            when (transaction) {
-                is TransactionEntity.PersonalMessage -> PersonalMessageContent(
-                    personalMessage = transaction,
-                )
 
-                is TransactionEntity.Eip712 -> TypedMessageContent(
-                    typedMessage = transaction,
-                )
+        TransactionContent(
+            transaction = transaction.entity,
+            contentPadding = paddingValues
+        )
+    }
+}
 
-                is TransactionEntity.Eip1559 -> TransactionContent(
-                    transaction = transaction,
-                )
+@Composable
+fun TransactionContent(
+    transaction: TransactionEntity?,
+    contentPadding: PaddingValues = PaddingValues(),
+) {
+    Box(Modifier.padding(contentPadding)) {
+        when (transaction) {
+            is TransactionEntity.PersonalMessage -> PersonalMessageContent(
+                personalMessage = transaction,
+            )
 
-                null -> Unit
-            }
+            is TransactionEntity.Eip712 -> TypedMessageContent(
+                typedMessage = transaction,
+            )
+
+            is TransactionEntity.Eip1559 -> TransactionContent(
+                transaction = transaction,
+            )
+
+            null -> Unit
         }
     }
 }
