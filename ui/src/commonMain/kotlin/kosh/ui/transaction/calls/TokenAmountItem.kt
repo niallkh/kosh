@@ -28,7 +28,6 @@ import kosh.ui.component.menu.AdaptiveMenuItem
 import kosh.ui.component.text.TextAmount
 import kosh.ui.component.text.TextLine
 import kosh.ui.component.text.TextNumber
-import kosh.ui.navigation.LocalRootNavigator
 import kosh.ui.navigation.routes.AddTokenRoute
 import kosh.ui.navigation.routes.RootRoute
 
@@ -38,6 +37,7 @@ fun TokenAmountItem(
     token: Address,
     amount: BigInteger,
     tokenId: BigInteger? = null,
+    onOpen: (RootRoute) -> Unit,
     modifier: Modifier = Modifier,
 ) {
     val tokenEntity = rememberToken(chainId, token, tokenId).entity
@@ -85,20 +85,18 @@ fun TokenAmountItem(
         visible = menuVisible,
         onDismiss = { menuVisible = false }
     ) { dismiss ->
-        val rootNavigator = LocalRootNavigator.current
-
         if (tokenEntity == null) {
             AdaptiveMenuItem(
                 onClick = {
                     dismiss {
                         if (tokenId == null) {
-                            rootNavigator.open(
+                            onOpen(
                                 RootRoute.AddToken(
                                     AddTokenRoute.Search(token)
                                 )
                             )
                         } else {
-                            rootNavigator.open(
+                            onOpen(
                                 RootRoute.AddToken(
                                     AddTokenRoute.NftSearch(chainId.at(token), tokenId)
                                 )

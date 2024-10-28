@@ -21,27 +21,28 @@ import kosh.ui.analytics.LogScreen
 import kosh.ui.component.scaffold.LocalSnackbarHostState
 import kosh.ui.navigation.RouteResult
 import kosh.ui.navigation.routes.RootRoute
-import kosh.ui.navigation.routes.TokensRoute
+import kosh.ui.navigation.routes.WalletConnectRoute
 import kosh.ui.navigation.stack.StackHost
+import kosh.ui.reown.WcAuthenticationScreen
+import kosh.ui.reown.WcPairScreen
+import kosh.ui.reown.WcProposalScreen
+import kosh.ui.reown.WcSessionScreen
+import kosh.ui.reown.WcSessionsScreen
 import kosh.ui.resources.icons.Networks
-import kosh.ui.token.AssetsScreen
-import kosh.ui.token.DeleteTokenScreen
-import kosh.ui.token.TokenScreen
 
 @Composable
-fun TokensHost(
-    link: TokensRoute?,
+fun WalletConnectHost(
+    link: WalletConnectRoute?,
     onOpen: (RootRoute) -> Unit,
-    onAddToken: () -> Unit,
-    onResult: (RouteResult<TokensRoute>) -> Unit,
+    onResult: (RouteResult<WalletConnectRoute>) -> Unit,
 ) {
     StackHost(
-        start = TokensRoute.List,
+        start = WalletConnectRoute.List,
         link = link,
         onResult = { onResult(it) },
     ) { route ->
         when (route) {
-            TokensRoute.List -> {
+            WalletConnectRoute.List -> {
                 val scrollBehavior = TopAppBarDefaults.exitUntilCollapsedScrollBehavior()
                 val snackbarHostState = remember { SnackbarHostState() }
 
@@ -49,7 +50,7 @@ fun TokensHost(
                     topBar = {
                         LargeTopAppBar(
                             scrollBehavior = scrollBehavior,
-                            title = { Text("Assets") },
+                            title = { Text("WalletConnect") },
                             actions = {
                                 IconButton(onClick = {
                                     onOpen(RootRoute.Networks())
@@ -67,37 +68,55 @@ fun TokensHost(
                     },
                     floatingActionButton = {
                         FloatingActionButton(
-                            onClick = { onAddToken() },
+                            onClick = { pushNew(WalletConnectRoute.Pair()) },
                         ) {
-                            Icon(Icons.Default.Add, contentDescription = "Add Token")
+                            Icon(Icons.Default.Add, contentDescription = "Add Dapp")
                         }
                     },
                     snackbarHost = { SnackbarHost(snackbarHostState) }
-                ) { contentPadding ->
+                ) { paddingValues ->
                     CompositionLocalProvider(LocalSnackbarHostState provides snackbarHostState) {
-                        AssetsScreen(
-                            contentPadding = contentPadding,
+                        WcSessionsScreen(
+                            contentPadding = paddingValues,
                             scrollBehavior = scrollBehavior,
-                            onOpenToken = { token, _ -> pushNew(TokensRoute.Details(token)) },
-                            onOpenNetworks = { onOpen(RootRoute.Networks()) },
-                            onOpenWallets = { onOpen(RootRoute.Wallets()) }
+                            onOpen = { pushNew(WalletConnectRoute.Session(it.id)) },
                         )
                     }
                 }
             }
 
-            is TokensRoute.Details -> TokenScreen(
+            is WalletConnectRoute.Session -> WcSessionScreen(
                 id = route.id,
+                onCancel = { pop() },
                 onNavigateUp = { navigateUp() },
-                onDelete = { replaceCurrent(TokensRoute.Delete(it)) }
+                onFinish = { result() }
             )
 
-            is TokensRoute.Delete -> DeleteTokenScreen(
+            is WalletConnectRoute.Pair -> WcPairScreen(
+                initial = route.uri,
+                onCancel = { pop() },
+                onProposal = { replaceCurrent(WalletConnectRoute.Proposal(it.id, it.requestId)) },
+                onAuthenticate = { replaceCurrent(WalletConnectRoute.Auth(it.id)) },
+                onNavigateUp = { navigateUp() }
+            )
+
+            is WalletConnectRoute.Proposal -> WcProposalScreen(
                 id = route.id,
-                onFinish = { pop() }
+                requestId = route.requestId,
+                onResult = { result(it?.value) },
+                onCancel = { pop() },
+                onNavigateUp = { navigateUp() }
+            )
+
+            is WalletConnectRoute.Auth -> WcAuthenticationScreen(
+                id = route.id,
+                onResult = { result() },
+                onCancel = { pop() },
+                onNavigateUp = { navigateUp() }
             )
         }
 
         LogScreen(route)
     }
 }
+

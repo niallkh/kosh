@@ -7,6 +7,9 @@ import kotlinx.serialization.Serializable
 sealed class TokensRoute : Route {
 
     @Serializable
+    data object List : TokensRoute()
+
+    @Serializable
     data class Details(val id: TokenEntity.Id) : TokensRoute()
 
     @Serializable

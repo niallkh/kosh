@@ -6,11 +6,6 @@ import kotlinx.serialization.Serializable
 sealed class RootRoute : Route {
 
     @Serializable
-    data class Home(
-        override val link: HomeRoute? = null,
-    ) : RootRoute()
-
-    @Serializable
     data class Wallets(
         override val link: WalletsRoute? = null,
     ) : RootRoute()
@@ -22,7 +17,7 @@ sealed class RootRoute : Route {
 
     @Serializable
     data class Tokens(
-        override val link: TokensRoute,
+        override val link: TokensRoute? = null,
         val isNft: Boolean = false,
     ) : RootRoute()
 
@@ -33,12 +28,12 @@ sealed class RootRoute : Route {
 
     @Serializable
     data class Transactions(
-        override val link: TransactionsRoute,
+        override val link: TransactionsRoute? = null,
     ) : RootRoute()
 
     @Serializable
-    data class WcSessions(
-        override val link: WcSessionsRoute,
+    data class WalletConnect(
+        override val link: WalletConnectRoute? = null,
     ) : RootRoute()
 
     @Serializable

@@ -1,24 +1,51 @@
 package kosh.ui.navigation.hosts
 
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.DisallowComposableCalls
 import com.arkivanov.decompose.router.stack.pushNew
+import com.arkivanov.decompose.router.stack.replaceAll
+import kosh.ui.navigation.RouteResult
 import kosh.ui.navigation.pop
 import kosh.ui.navigation.routes.RootRoute
 import kosh.ui.navigation.stack.StackHost
-import kosh.ui.navigation.stack.StackRouter
 
 @Composable
 fun RootHost(
-    stackRouter: StackRouter<RootRoute>,
+    start: RootRoute,
+    link: RootRoute?,
+    onResult: @DisallowComposableCalls (RouteResult.Result) -> Unit,
 ) {
     StackHost(
-        stackRouter = stackRouter,
+        start = start,
+        link = link,
+        onResult = {
+            when (it) {
+                is RouteResult.Result -> onResult(it)
+                is RouteResult.Up -> when (val route = it.route) {
+                    null -> replaceAll(start)
+                    else -> replaceAll(start, route)
+                }
+            }
+        },
     ) { route ->
         when (route) {
-            is RootRoute.Home -> HomeHost(
+            is RootRoute.Tokens -> TokensHost(
                 link = route.link,
                 onOpen = { pushNew(it) },
-                onResult = { pop(it, RootRoute::Home) },
+                onAddToken = { pushNew(RootRoute.AddToken()) },
+                onResult = { pop(it, RootRoute::Tokens) }
+            )
+
+            is RootRoute.Transactions -> TransactionsHost(
+                link = route.link,
+                onOpen = { pushNew(it) },
+                onResult = { pop(it, RootRoute::Transactions) }
+            )
+
+            is RootRoute.WalletConnect -> WalletConnectHost(
+                link = route.link,
+                onOpen = { pushNew(it) },
+                onResult = { pop(it, RootRoute::WalletConnect) },
             )
 
             is RootRoute.Wallets -> WalletsHost(
@@ -39,21 +66,6 @@ fun RootHost(
             is RootRoute.TrezorPasskeys -> TrezorPasskeysHost(
                 link = route.link,
                 onResult = { pop(it, RootRoute::TrezorPasskeys) }
-            )
-
-            is RootRoute.WcSessions -> WcSessionsHost(
-                link = route.link,
-                onResult = { pop(it, RootRoute::WcSessions) },
-            )
-
-            is RootRoute.Transactions -> TransactionsHost(
-                link = route.link,
-                onResult = { pop(it, RootRoute::Transactions) }
-            )
-
-            is RootRoute.Tokens -> TokensHost(
-                link = route.link,
-                onResult = { pop(it, RootRoute::Tokens) }
             )
         }
     }

@@ -11,10 +11,12 @@ import androidx.compose.ui.unit.dp
 import kosh.domain.models.web3.ContractCall
 import kosh.ui.component.items.AddressItem
 import kosh.ui.component.text.TextHeader
+import kosh.ui.navigation.routes.RootRoute
 
 @Composable
 fun TransferCard(
     transfer: ContractCall.Transfer,
+    onOpen: (RootRoute) -> Unit,
     modifier: Modifier = Modifier,
 ) {
     Column(
@@ -25,11 +27,17 @@ fun TransferCard(
 
         OutlinedCard {
             if (transfer.tokenIds.isEmpty()) {
-                TokenAmountItem(transfer.chainId, transfer.token, transfer.amounts.first())
+                TokenAmountItem(
+                    transfer.chainId,
+                    transfer.token,
+                    transfer.amounts.first(),
+                    null,
+                    onOpen
+                )
             } else {
                 transfer.tokenIds.zip(transfer.amounts).forEachIndexed { index, (tokenId, amount) ->
                     key(index) {
-                        TokenAmountItem(transfer.chainId, transfer.token, amount, tokenId)
+                        TokenAmountItem(transfer.chainId, transfer.token, amount, tokenId, onOpen)
                     }
                 }
             }

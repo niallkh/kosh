@@ -33,7 +33,7 @@ inline fun <R : Route> StackHost(
 
 @Composable
 inline fun <reified R : Route> StackHost(
-    start: R,
+    start: R?,
     link: R?,
     noinline onResult: @DisallowComposableCalls StackRouter<R>.(RouteResult<R>) -> Unit,
     animation: StackAnimation<R, UiContext>? = null,
@@ -41,27 +41,6 @@ inline fun <reified R : Route> StackHost(
 ) {
     val stackRouter = rememberStackRouter<R>(
         start = start,
-        link = link,
-        onResult = { onResult(it) },
-        serializer = serializer()
-    )
-
-    StackHost(
-        stackRouter = stackRouter,
-        animation = animation,
-        content = content,
-    )
-}
-
-@Composable
-inline fun <reified R : Route> StackHost(
-    link: R,
-    noinline onResult: @DisallowComposableCalls StackRouter<R>.(RouteResult<R>) -> Unit,
-    animation: StackAnimation<R, UiContext>? = null,
-    crossinline content: @Composable StackRouter<R>.(R) -> Unit,
-) {
-    val stackRouter = rememberStackRouter<R>(
-        start = null,
         link = link,
         onResult = { onResult(it) },
         serializer = serializer()

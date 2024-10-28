@@ -17,7 +17,9 @@ import kosh.presentation.trezor.rememberTrezorListener
 import kosh.ui.failure.AppFailureMessage
 import kosh.ui.keystore.KeyStoreListenerContent
 import kosh.ui.ledger.LedgerButtonRequest
+import kosh.ui.navigation.slot.Slot
 import kosh.ui.navigation.slot.SlotHost
+import kosh.ui.navigation.slot.activate
 import kosh.ui.navigation.slot.rememberSlotRouter
 import kosh.ui.trezor.TrezorListenerContent
 import kosh.ui.wallet.HardwareWalletSelector
@@ -59,7 +61,7 @@ fun SignContent(
 
     var signRequest by remember { mutableStateOf<SignRequest?>(null) }
 
-    val slotRouter = rememberSlotRouter()
+    val slotRouter = rememberSlotRouter<Slot>()
 
     SlotHost(slotRouter) {
         HardwareWalletSelector(

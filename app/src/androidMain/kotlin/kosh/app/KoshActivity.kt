@@ -14,35 +14,31 @@ import androidx.activity.result.contract.ActivityResultContracts.RequestPermissi
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.setValue
 import androidx.core.app.TaskStackBuilder
 import androidx.core.net.toUri
 import androidx.core.splashscreen.SplashScreen.Companion.installSplashScreen
 import androidx.fragment.app.FragmentActivity
 import co.touchlab.kermit.Logger
-import com.arkivanov.decompose.router.stack.pushNew
 import com.seiko.imageloader.LocalImageLoader
 import kosh.app.di.androidUiContext
 import kosh.presentation.core.LocalUiContext
 import kosh.presentation.core.UiContext
 import kosh.ui.component.path.LocalPathResolver
 import kosh.ui.component.path.PathResolver
-import kosh.ui.navigation.LocalRootNavigator
-import kosh.ui.navigation.RootNavigator
-import kosh.ui.navigation.RouteResult
 import kosh.ui.navigation.deeplink
 import kosh.ui.navigation.parseDeeplink
-import kosh.ui.navigation.routes.HomeRoute
 import kosh.ui.navigation.routes.RootRoute
-import kosh.ui.navigation.stack.DefaultStackRouter
-import kosh.ui.navigation.stack.StackRouter
-import kotlinx.serialization.serializer
 
 public class KoshActivity : FragmentActivity() {
 
     private val logger = Logger.withTag("[K]KoshActivity")
 
     private lateinit var uiContext: UiContext
-    private lateinit var rootRouter: StackRouter<RootRoute>
+
+    private var link by mutableStateOf<RootRoute?>(null)
 
     override fun onCreate(savedInstanceState: Bundle?) {
         installSplashScreen()
@@ -50,7 +46,7 @@ public class KoshActivity : FragmentActivity() {
         enableEdgeToEdge()
         logger.d { "onCreate()" }
 
-        val deeplink = intent?.data?.toString()?.let(::parseDeeplink)
+        link = intent?.data?.toString()?.let(::parseDeeplink)
 
         logger.v { "action=${intent.action}, deeplink=${intent.data}" }
 
@@ -59,34 +55,8 @@ public class KoshActivity : FragmentActivity() {
             activity = this,
         )
 
-        val start = RootRoute.Home()
-        val rootRouter = DefaultStackRouter(
-            uiContext = uiContext,
-            serializer = serializer(),
-            start = { link ->
-                when (link) {
-                    is RootRoute.Tokens -> RootRoute.Home(HomeRoute.Assets)
-                    is RootRoute.Transactions -> RootRoute.Home(HomeRoute.Activity)
-                    is RootRoute.WcSessions -> RootRoute.Home(HomeRoute.WalletConnect)
-                    else -> start
-                }
-            },
-            link = deeplink,
-            onResult = {
-                when (it) {
-                    is RouteResult.Result -> onResult(it.redirect)
-                    is RouteResult.Up -> onNavigateUp(it.route)
-                }
-            },
-        )
-        this.rootRouter = rootRouter
-
-        val rootNavigator = RootNavigator { rootRouter.pushNew(it) }
         val pathResolver = PathResolver {
             uiContext.uiScope.appRepositoriesComponent.fileRepo.read(it)
-        }
-        uiContext.uiScope.deeplinkHandler.subscribe {
-            it?.let(::parseDeeplink).let(rootRouter::handle)
         }
 
         setContent {
@@ -94,10 +64,10 @@ public class KoshActivity : FragmentActivity() {
                 LocalUiContext provides uiContext,
                 LocalImageLoader provides KoshApp.appScope.imageComponent.imageLoader,
                 LocalPathResolver provides pathResolver,
-                LocalRootNavigator provides rootNavigator,
             ) {
                 App(
-                    stackRouter = rootRouter,
+                    link = link,
+                    onResult = { onResult(it.redirect) }
                 )
 
                 NotificationPermission()
@@ -150,7 +120,7 @@ public class KoshActivity : FragmentActivity() {
         logger.v { "action=${intent.action}, deeplink=${intent.data}" }
 
         intent.data?.toString()?.let {
-            uiContext.uiScope.deeplinkHandler.handle(it)
+            link = parseDeeplink(it)
         }
     }
 

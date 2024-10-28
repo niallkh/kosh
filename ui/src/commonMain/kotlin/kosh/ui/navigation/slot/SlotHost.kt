@@ -5,17 +5,18 @@ import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.getValue
 import com.arkivanov.decompose.extensions.compose.subscribeAsState
 import kosh.presentation.core.LocalUiContext
+import kosh.ui.navigation.routes.Route
 
 @Composable
-fun SlotHost(
-    slotRouter: SlotRouter = rememberSlotRouter(),
-    content: @Composable SlotRouter.() -> Unit,
+inline fun <reified R : Route> SlotHost(
+    slotRouter: SlotRouter<R> = rememberSlotRouter<R>(),
+    crossinline content: @Composable SlotRouter<R>.(R) -> Unit,
 ) {
     val slot by slotRouter.slot.subscribeAsState()
 
     slot.child?.let {
         CompositionLocalProvider(LocalUiContext provides it.instance) {
-            slotRouter.content()
+            slotRouter.content(it.configuration)
         }
     }
 }

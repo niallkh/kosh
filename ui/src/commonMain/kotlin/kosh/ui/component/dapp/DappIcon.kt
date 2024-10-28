@@ -4,6 +4,7 @@ import androidx.compose.foundation.Image
 import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.offset
+import androidx.compose.foundation.layout.size
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.remember
@@ -36,7 +37,7 @@ fun DappIcon(
         dapp = dapp?.url,
         icon = dapp?.icon,
         networkId = networkId,
-        modifier = modifier
+        modifier = modifier.size(40.dp)
     )
 }
 
@@ -51,7 +52,7 @@ fun DappIcon(
         dapp = dapp?.url,
         icon = dapp?.icon,
         networkId = networkId,
-        modifier = modifier
+        modifier = modifier.size(40.dp)
     )
 }
 

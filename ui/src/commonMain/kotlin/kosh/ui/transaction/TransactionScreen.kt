@@ -42,6 +42,7 @@ import kosh.ui.component.text.TextDate
 import kosh.ui.component.text.TextHeader
 import kosh.ui.component.text.TextLine
 import kosh.ui.component.text.TextNumber
+import kosh.ui.navigation.routes.RootRoute
 import kosh.ui.transaction.calls.ApproveCard
 import kosh.ui.transaction.calls.DeployCard
 import kosh.ui.transaction.calls.FallbackCard
@@ -54,6 +55,7 @@ import kotlinx.io.bytestring.decodeToString
 fun TransactionScreen(
     id: TransactionEntity.Id,
     onNavigateUp: () -> Unit,
+    onOpen: (RootRoute) -> Unit,
     onDelete: (TransactionEntity.Id) -> Unit,
 ) {
     val transaction = rememberTransaction(id)
@@ -100,7 +102,8 @@ fun TransactionScreen(
 
         TransactionContent(
             transaction = transaction.entity,
-            contentPadding = paddingValues
+            contentPadding = paddingValues,
+            onOpen = onOpen
         )
     }
 }
@@ -108,6 +111,7 @@ fun TransactionScreen(
 @Composable
 fun TransactionContent(
     transaction: TransactionEntity?,
+    onOpen: (RootRoute) -> Unit,
     contentPadding: PaddingValues = PaddingValues(),
 ) {
     Box(Modifier.padding(contentPadding)) {
@@ -122,6 +126,7 @@ fun TransactionContent(
 
             is TransactionEntity.Eip1559 -> TransactionContent(
                 transaction = transaction,
+                onOpen = onOpen,
             )
 
             null -> Unit
@@ -206,6 +211,7 @@ fun TypedMessageContent(
 @Composable
 fun TransactionContent(
     transaction: TransactionEntity.Eip1559,
+    onOpen: (RootRoute) -> Unit,
 ) {
     val network = rememberNetwork(transaction.networkId)
     val account = rememberAccount(transaction.sender)
@@ -240,8 +246,8 @@ fun TransactionContent(
                 modifier = Modifier.padding(horizontal = 16.dp)
             ) {
                 when (val call = parsed?.contractCall) {
-                    is ContractCall.Transfer -> TransferCard(call)
-                    is ContractCall.Approve -> ApproveCard(call)
+                    is ContractCall.Transfer -> TransferCard(call, onOpen)
+                    is ContractCall.Approve -> ApproveCard(call, onOpen)
                     is ContractCall.NativeTransfer -> NativeTransferCard(call)
                     is ContractCall.Deploy -> DeployCard(call)
                     is ContractCall.Fallback -> FallbackCard(call)

@@ -98,7 +98,7 @@ class AndroidReownAdapter(
             connectionType = ConnectionType.MANUAL,
             application = context as Application,
             metaData = appMetaData,
-            onError = { logger.e(it.throwable) { "Error happened core wc" } },
+            onError = { logger.e(it.throwable) { "Error happened in WC Core" } },
         )
 
         suspendCancellableCoroutine { cont ->

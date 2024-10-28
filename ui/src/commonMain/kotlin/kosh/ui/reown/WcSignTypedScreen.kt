@@ -57,7 +57,6 @@ fun WcSignTypedScreen(
             }
         },
         onNavigateUp = onNavigateUp,
-
         actions = {
             if (signTyped.failure == null) {
                 DappIcon(signTyped.request?.dapp)

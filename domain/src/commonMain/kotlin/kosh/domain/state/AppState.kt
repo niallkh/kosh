@@ -213,3 +213,15 @@ fun AppState.Companion.balancesKey() = Getter<AppState, String> { state ->
         .md5()
         .toHexString()
 }
+
+fun AppState.Companion.transactionsKey() = Getter<AppState, String> { state ->
+    AppState.activeTransactions().get(state).asSequence().map { it.id.value }
+        .fold(Buffer()) { buffer, uuid ->
+            buffer.apply {
+                writeLong(uuid.mostSignificantBits)
+                writeLong(uuid.leastSignificantBits)
+            }
+        }
+        .md5()
+        .toHexString()
+}

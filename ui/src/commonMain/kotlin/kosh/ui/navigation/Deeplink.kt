@@ -4,7 +4,8 @@ import kosh.domain.models.reown.PairingUri
 import kosh.domain.models.reown.WcRequest
 import kosh.ui.navigation.routes.RootRoute
 import kosh.ui.navigation.routes.Route
-import kosh.ui.navigation.routes.WcSessionsRoute
+import kosh.ui.navigation.routes.TransactionsRoute
+import kosh.ui.navigation.routes.WalletConnectRoute
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.builtins.nullable
 import kotlinx.serialization.cbor.Cbor
@@ -61,11 +62,11 @@ fun parseDeeplink(uriStr: String): RootRoute? {
 }
 
 private fun wcPairRoute(uriStr: String): RootRoute? = PairingUri(uriStr).getOrNull()?.let {
-    RootRoute.WcSessions(WcSessionsRoute.Pair(it, Deeplink))
+    RootRoute.WalletConnect(WalletConnectRoute.Pair(it, Deeplink))
 }
 
-private fun wcRequestRoute(requestId: Long?) = RootRoute.WcSessions(
-    WcSessionsRoute.Request(requestId?.let { WcRequest.Id(it) }, Deeplink)
+private fun wcRequestRoute(requestId: Long?) = RootRoute.Transactions(
+    TransactionsRoute.Request(requestId?.let { WcRequest.Id(it) }, Deeplink)
 )
 
 private fun appRoute(path: String): RootRoute? = path.decodeBase64()

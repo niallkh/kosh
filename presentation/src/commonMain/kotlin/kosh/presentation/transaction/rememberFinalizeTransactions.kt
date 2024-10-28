@@ -16,6 +16,7 @@ import kosh.domain.failure.TransactionFailure
 import kosh.domain.state.AppState
 import kosh.domain.state.AppStateProvider
 import kosh.domain.state.activeTransactions
+import kosh.domain.state.transactionsKey
 import kosh.domain.usecases.transaction.Eip1559TransactionService
 import kosh.domain.utils.optic
 import kosh.presentation.component.selector.selector
@@ -73,7 +74,7 @@ fun rememberFinalizeTransactions(
         }
     }
 
-    appStateProvider.collectAsState().optic(AppState.activeTransactions()).selector {
+    appStateProvider.collectAsState().optic(AppState.transactionsKey()).selector {
         timer.reset()
     }
 

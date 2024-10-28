@@ -1,16 +1,14 @@
 package kosh.ui.token
 
 import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.PaddingValues
-import androidx.compose.foundation.layout.consumeWindowInsets
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.imePadding
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.windowInsetsPadding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
-import androidx.compose.material3.LocalAbsoluteTonalElevation
-import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.SnackbarHost
 import androidx.compose.material3.SnackbarHostState
@@ -59,7 +57,6 @@ fun SearchTokenScreen(
     val snackbarHostState = remember { SnackbarHostState() }
 
     CompositionLocalProvider(
-        LocalAbsoluteTonalElevation provides 3.dp,
         LocalSnackbarHostState provides snackbarHostState,
     ) {
         Scaffold(
@@ -79,13 +76,11 @@ fun SearchTokenScreen(
                     }
                 )
             },
-            containerColor = MaterialTheme.colorScheme.surface,
             snackbarHost = { SnackbarHost(snackbarHostState) }
         ) { innerPadding ->
 
             Box(
                 modifier = Modifier.padding(innerPadding)
-                    .consumeWindowInsets(innerPadding)
                     .imePadding()
             ) {
 
@@ -130,20 +125,16 @@ private fun SearchTokenContent(
 ) {
     LazyColumn(
         modifier = modifier,
-        contentPadding = PaddingValues(vertical = 8.dp)
     ) {
         if (tokens.isNotEmpty()) {
             stickyHeader {
-                Surface(
-                    modifier = Modifier.fillMaxWidth(),
-                    color = MaterialTheme.colorScheme.background,
-                ) {
+                Surface(Modifier.fillMaxWidth()) {
                     TextHeader(
-                        modifier = Modifier.padding(
+                        "Results",
+                        Modifier.padding(
                             horizontal = 16.dp,
                             vertical = 8.dp
-                        ),
-                        text = "Results",
+                        )
                     )
                 }
             }
@@ -171,6 +162,10 @@ private fun SearchTokenContent(
                     )
                 }
             }
+        }
+
+        item {
+            Spacer(Modifier.height(8.dp))
         }
     }
 }

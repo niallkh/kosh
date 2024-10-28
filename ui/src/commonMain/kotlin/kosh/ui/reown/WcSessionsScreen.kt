@@ -25,14 +25,14 @@ import kotlinx.collections.immutable.toPersistentList
 
 @Composable
 fun WcSessionsScreen(
-    paddingValues: PaddingValues,
+    contentPadding: PaddingValues,
     scrollBehavior: TopAppBarScrollBehavior,
     onOpen: (WcSession) -> Unit,
 ) {
     val sessions = rememberSessions()
 
     WcSessionsContent(
-        paddingValues = paddingValues,
+        paddingValues = contentPadding,
         sessions = sessions.sessions,
         init = sessions.init,
         onSelect = onOpen,

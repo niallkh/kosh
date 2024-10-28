@@ -41,7 +41,9 @@ import kosh.ui.component.items.AccountItem
 import kosh.ui.component.placeholder.placeholder
 import kosh.ui.component.scaffold.KoshScaffold
 import kosh.ui.component.text.TextLine
+import kosh.ui.navigation.slot.Slot
 import kosh.ui.navigation.slot.SlotHost
+import kosh.ui.navigation.slot.activate
 import kosh.ui.navigation.slot.rememberSlotRouter
 import kosh.ui.resources.Res
 import kosh.ui.resources.icons.LedgerIcon
@@ -64,7 +66,7 @@ fun WalletsScreen(
         modifier = modifier,
         title = { Text(stringResource(Res.string.wallets_title)) },
         floatingActionButton = {
-            val slotRouter = rememberSlotRouter()
+            val slotRouter = rememberSlotRouter<Slot>()
 
             SlotHost(slotRouter) {
                 HardwareWalletSelector(

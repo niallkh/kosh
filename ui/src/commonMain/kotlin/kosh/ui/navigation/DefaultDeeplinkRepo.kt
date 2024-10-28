@@ -6,24 +6,24 @@ import kosh.domain.models.reown.WcRequest
 import kosh.domain.models.reown.WcSessionProposal
 import kosh.domain.repositories.DeeplinkRepo
 import kosh.ui.navigation.routes.RootRoute
-import kosh.ui.navigation.routes.WcSessionsRoute
+import kosh.ui.navigation.routes.TransactionsRoute
 
 class DefaultDeeplinkRepo : DeeplinkRepo {
     override fun wcProposal(proposal: WcSessionProposal): Uri {
         return deeplink(
-            RootRoute.WcSessions(WcSessionsRoute.Proposal(proposal.id, proposal.requestId))
+            RootRoute.Transactions(TransactionsRoute.Proposal(proposal.id, proposal.requestId))
         )
     }
 
     override fun wcAuthentication(authentication: WcAuthentication): Uri {
         return deeplink(
-            RootRoute.WcSessions(WcSessionsRoute.Auth(authentication.id))
+            RootRoute.Transactions(TransactionsRoute.Auth(authentication.id))
         )
     }
 
     override fun wcRequest(request: WcRequest): Uri {
         return deeplink(
-            RootRoute.WcSessions(WcSessionsRoute.Request(request.id))
+            RootRoute.Transactions(TransactionsRoute.Request(request.id))
         )
     }
 }

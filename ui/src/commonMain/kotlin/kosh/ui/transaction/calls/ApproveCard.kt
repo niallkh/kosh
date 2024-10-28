@@ -10,10 +10,12 @@ import androidx.compose.ui.unit.dp
 import kosh.domain.models.web3.ContractCall
 import kosh.ui.component.items.AddressItem
 import kosh.ui.component.text.TextHeader
+import kosh.ui.navigation.routes.RootRoute
 
 @Composable
 fun ApproveCard(
     approve: ContractCall.Approve,
+    onOpen: (RootRoute) -> Unit,
     modifier: Modifier = Modifier,
 ) {
     Column(
@@ -27,7 +29,8 @@ fun ApproveCard(
                 approve.chainId,
                 approve.token,
                 approve.approved,
-                approve.tokenId
+                approve.tokenId,
+                onOpen,
             )
 
             AddressItem(approve.spender) {

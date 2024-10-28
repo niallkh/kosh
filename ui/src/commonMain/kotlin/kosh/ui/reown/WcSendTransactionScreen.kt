@@ -51,6 +51,7 @@ import kosh.ui.component.single.single
 import kosh.ui.component.text.TextNumber
 import kosh.ui.failure.AppFailureItem
 import kosh.ui.failure.AppFailureMessage
+import kosh.ui.navigation.routes.RootRoute
 import kosh.ui.resources.Res
 import kosh.ui.resources.wc_request_reject_btn
 import kosh.ui.resources.wc_sign_tx_send_btn
@@ -68,6 +69,7 @@ fun WcSendTransactionScreen(
     id: WcRequest.Id,
     onCancel: () -> Unit,
     onResult: () -> Unit,
+    onOpen: (RootRoute) -> Unit,
     onNavigateUp: () -> Unit,
 ) {
     val sendTransaction = rememberSendTransactionRequest(id)
@@ -115,6 +117,7 @@ fun WcSendTransactionScreen(
             },
             onSign = { sign.sign(it) },
             contentPadding = paddingValues,
+            onOpen = onOpen,
         )
 
         LoadingIndicator(
@@ -130,6 +133,7 @@ fun WcSendTransactionContent(
     signing: Boolean,
     onSign: (SignRequest.SignTransaction) -> Unit,
     onReject: () -> Unit,
+    onOpen: (RootRoute) -> Unit,
     contentPadding: PaddingValues = PaddingValues(),
 ) {
     Column(
@@ -180,6 +184,7 @@ fun WcSendTransactionContent(
                 ) {
                     TransactionCall(
                         data = transaction,
+                        onOpen = onOpen,
                         modifier = Modifier.padding(horizontal = 16.dp),
                     )
 
@@ -237,6 +242,7 @@ fun WcSendTransactionContent(
 @Composable
 fun TransactionCall(
     data: Transaction?,
+    onOpen: (RootRoute) -> Unit,
     modifier: Modifier = Modifier,
 ) {
     val contractCall = data?.let {
@@ -248,8 +254,8 @@ fun TransactionCall(
     } ?: run {
 
         when (val call = contractCall?.contractCall) {
-            is ContractCall.Transfer -> TransferCard(call, modifier)
-            is ContractCall.Approve -> ApproveCard(call, modifier)
+            is ContractCall.Transfer -> TransferCard(call, onOpen, modifier)
+            is ContractCall.Approve -> ApproveCard(call, onOpen, modifier)
             is ContractCall.Deploy -> DeployCard(call)
             is ContractCall.NativeTransfer -> NativeTransferCard(call, modifier)
             is ContractCall.Fallback -> FallbackCard(call, modifier)

@@ -1,8 +1,10 @@
 package kosh.app
 
 import androidx.compose.foundation.isSystemInDarkTheme
+import androidx.compose.material3.LocalTonalElevationEnabled
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.CompositionLocalProvider
 import kosh.app.theme.appTypography
 import kosh.app.theme.darkScheme
 import kosh.app.theme.dynamicColorScheme
@@ -21,6 +23,8 @@ internal fun KoshTheme(content: @Composable () -> Unit) {
         colorScheme = colorScheme,
         typography = appTypography(),
     ) {
-        content()
+        CompositionLocalProvider(LocalTonalElevationEnabled provides false) {
+            content()
+        }
     }
 }

@@ -2,6 +2,7 @@ package kosh.ui.navigation.stack
 
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.DisallowComposableCalls
+import androidx.compose.runtime.currentCompositeKeyHash
 import com.arkivanov.decompose.router.stack.ChildStack
 import com.arkivanov.decompose.router.stack.StackNavigation
 import com.arkivanov.decompose.router.stack.childStack
@@ -23,6 +24,7 @@ class DefaultStackRouter<R : Route>(
     serializer: KSerializer<R>,
     private val start: (R?) -> R?,
     link: R?,
+    key: String,
     private val onResult: StackRouter<R>.(RouteResult<R>) -> Unit,
 ) : StackRouter<R>, StackNavigation<R> by StackNavigation(), UiContext by uiContext {
 
@@ -31,12 +33,12 @@ class DefaultStackRouter<R : Route>(
         serializer = serializer,
         initialStack = {
             if (link.isDeeplink()) {
-                listOfNotNull(link)
+                setOfNotNull(link).toList()
             } else {
-                listOfNotNull(start(link), link)
+                setOfNotNull(start(link), link).toList()
             }
         },
-        key = "StackRouter",
+        key = "StackRouter_$key",
         childFactory = { _, ctx -> ctx },
         handleBackButton = true,
     )
@@ -60,7 +62,7 @@ class DefaultStackRouter<R : Route>(
     override fun handle(link: R?) {
         if (link != null) {
             val start = start(link)
-            if (link.isDeeplink() || start == null) {
+            if (link.isDeeplink() || start == null || start == link) {
                 replaceAll(link)
             } else {
                 replaceAll(start, link)
@@ -78,6 +80,7 @@ inline fun <reified R : @Serializable Route> rememberStackRouter(
     start: R?,
     link: R? = null,
     serializer: KSerializer<R> = serializer(),
+    key: String = currentCompositeKeyHash.toString(36),
     noinline onResult: @DisallowComposableCalls StackRouter<R>.(RouteResult<R>) -> Unit,
 ): StackRouter<R> {
     val uiContext = LocalUiContext.current
@@ -88,6 +91,7 @@ inline fun <reified R : @Serializable Route> rememberStackRouter(
             serializer = serializer,
             start = { start },
             link = link,
+            key = key,
             onResult = onResult,
         )
     }

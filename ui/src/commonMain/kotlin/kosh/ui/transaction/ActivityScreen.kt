@@ -42,7 +42,7 @@ import kotlinx.collections.immutable.toPersistentList
 
 @Composable
 fun ActivityScreen(
-    paddingValues: PaddingValues,
+    contentPading: PaddingValues,
     scrollBehavior: TopAppBarScrollBehavior,
     onOpenTransaction: (TransactionEntity.Id) -> Unit,
     onOpenProposal: (WcSessionProposal) -> Unit,
@@ -61,7 +61,7 @@ fun ActivityScreen(
         scrollBehavior = scrollBehavior,
         modifier = Modifier
             .fillMaxSize()
-            .padding(paddingValues)
+            .padding(contentPading)
     ) {
         ActivityContent(
             isRefreshing = finalizeTransactions.refreshing,
@@ -75,7 +75,7 @@ fun ActivityScreen(
 
     LoadingIndicator(
         finalizeTransactions.loading && !finalizeTransactions.refreshing,
-        Modifier.padding(paddingValues),
+        Modifier.padding(contentPading),
     )
 }
 

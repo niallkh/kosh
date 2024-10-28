@@ -36,7 +36,7 @@ import kotlinx.collections.immutable.toPersistentList
 
 @Composable
 fun AssetsScreen(
-    paddingValues: PaddingValues,
+    contentPadding: PaddingValues,
     scrollBehavior: TopAppBarScrollBehavior,
     onOpenToken: (TokenEntity.Id, Boolean) -> Unit,
     onOpenWallets: () -> Unit,
@@ -52,7 +52,7 @@ fun AssetsScreen(
         enabled = balances.init,
         onRefresh = { updateBalances.refresh() },
         scrollBehavior = scrollBehavior,
-        modifier = Modifier.padding(paddingValues),
+        modifier = Modifier.padding(contentPadding),
     ) {
         AssetsContent(
             isRefreshing = updateBalances.refreshing,
@@ -65,7 +65,7 @@ fun AssetsScreen(
 
     LoadingIndicator(
         updateBalances.loading && !updateBalances.refreshing,
-        Modifier.padding(paddingValues),
+        Modifier.padding(contentPadding),
     )
 }
 
