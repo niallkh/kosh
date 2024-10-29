@@ -17,8 +17,8 @@ import kosh.presentation.ledger.LedgerAccountsState
 import kosh.presentation.ledger.rememberLedgerAccounts
 import kosh.presentation.ledger.rememberLedgerListener
 import kosh.ui.component.LoadingIndicator
+import kosh.ui.component.items.SignerItem
 import kosh.ui.component.scaffold.KoshScaffold
-import kosh.ui.component.signer.SignerItem
 import kosh.ui.failure.AppFailureItem
 import kosh.ui.failure.AppFailureMessage
 

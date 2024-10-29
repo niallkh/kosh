@@ -7,7 +7,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.DisallowComposableCalls
 import androidx.compose.ui.Modifier
 import kosh.ui.navigation.RouteResult
-import kosh.ui.navigation.hosts.HomeHost
+import kosh.ui.navigation.hosts.home.HomeHost
 import kosh.ui.navigation.routes.RootRoute
 
 @Composable

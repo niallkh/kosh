@@ -8,11 +8,15 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyListScope
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Add
+import androidx.compose.material.icons.outlined.AccountBalanceWallet
+import androidx.compose.material3.FloatingActionButton
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
 import androidx.compose.material3.Text
-import androidx.compose.material3.TopAppBarScrollBehavior
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.input.nestedscroll.nestedScroll
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import kosh.domain.models.reown.WcSession
@@ -20,39 +24,58 @@ import kosh.domain.serializers.ImmutableList
 import kosh.presentation.reown.rememberSessions
 import kosh.ui.component.illustration.Illustration
 import kosh.ui.component.items.DappItem
+import kosh.ui.component.scaffold.KoshScaffold
+import kosh.ui.component.single.single
+import kosh.ui.resources.icons.Networks
 import kosh.ui.resources.illustrations.DappsEmpty
 import kotlinx.collections.immutable.toPersistentList
 
 @Composable
 fun WcSessionsScreen(
-    contentPadding: PaddingValues,
-    scrollBehavior: TopAppBarScrollBehavior,
     onOpen: (WcSession) -> Unit,
+    onOpenNetworks: () -> Unit,
+    onOpenWallets: () -> Unit,
+    onPair: () -> Unit,
 ) {
     val sessions = rememberSessions()
 
-    WcSessionsContent(
-        paddingValues = contentPadding,
-        sessions = sessions.sessions,
-        init = sessions.init,
-        onSelect = onOpen,
-        scrollBehavior = scrollBehavior,
-    )
+    KoshScaffold(
+        title = { Text("WalletConnect") },
+        onNavigateUp = null,
+        actions = {
+            IconButton(onClick = onOpenNetworks.single()) {
+                Icon(Networks, "Networks")
+            }
+
+            IconButton(onClick = onOpenWallets.single()) {
+                Icon(Icons.Outlined.AccountBalanceWallet, "Accounts")
+            }
+        },
+        floatingActionButton = {
+            FloatingActionButton(onClick = onPair.single()) {
+                Icon(Icons.Default.Add, contentDescription = "Add Dapp")
+            }
+        }
+    ) { contentPadding ->
+        WcSessionsContent(
+            paddingValues = contentPadding,
+            sessions = sessions.sessions,
+            init = sessions.init,
+            onSelect = onOpen,
+        )
+    }
 }
 
 @Composable
 fun WcSessionsContent(
     paddingValues: PaddingValues,
-    scrollBehavior: TopAppBarScrollBehavior,
     sessions: ImmutableList<WcSession>,
     init: Boolean,
     onSelect: (WcSession) -> Unit,
 ) {
     LazyColumn(
         contentPadding = paddingValues,
-        modifier = Modifier
-            .fillMaxSize()
-            .nestedScroll(scrollBehavior.nestedScrollConnection)
+        modifier = Modifier.fillMaxSize()
     ) {
 
         when {

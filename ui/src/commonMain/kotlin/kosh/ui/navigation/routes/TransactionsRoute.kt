@@ -40,27 +40,7 @@ sealed class TransactionsRoute : Route {
     data class Request(
         val id: WcRequest.Id?,
         override val link: Deeplink? = null,
-    ) : TransactionsRoute() {
-
-        override fun equals(other: Any?): Boolean {
-            if (this === other) return true
-            if (other == null || this::class != other::class) return false
-
-            other as Request
-
-            if (id != other.id) return false
-            if (link != other.link) return false
-            if (id == null || other.id == null) return false
-
-            return true
-        }
-
-        override fun hashCode(): Int {
-            var result = id?.hashCode() ?: 0
-            result = 31 * result + (link?.hashCode() ?: 0)
-            return result
-        }
-    }
+    ) : TransactionsRoute()
 
     @Serializable
     data class PersonalSign(

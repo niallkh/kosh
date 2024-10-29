@@ -8,7 +8,6 @@ import com.arkivanov.decompose.router.pages.ChildPages
 import com.arkivanov.decompose.router.pages.Pages
 import com.arkivanov.decompose.router.pages.PagesNavigation
 import com.arkivanov.decompose.router.pages.childPages
-import com.arkivanov.decompose.router.pages.navigate
 import com.arkivanov.decompose.value.Value
 import kosh.presentation.core.LocalUiContext
 import kosh.presentation.core.UiContext
@@ -56,16 +55,6 @@ class DefaultPagesRouter<R : Route>(
     override fun navigateUp() {
         onResult(RouteResult.Up(null))
     }
-
-    override fun handle(link: R?) {
-        if (link != null) {
-            navigate { current ->
-                val items = current.items.toMutableList()
-                items[current.selectedIndex] = link
-                Pages(items.toList(), 0)
-            }
-        }
-    }
 }
 
 @Composable
@@ -77,7 +66,7 @@ inline fun <reified R : @Serializable Route> rememberPagesRouter(
 ): PagesRouter<R> {
     val uiContext = LocalUiContext.current
 
-    return rememberRetained(key = "StackRouter") {
+    return rememberRetained {
         DefaultPagesRouter(
             uiContext = uiContext,
             serializer = serializer,

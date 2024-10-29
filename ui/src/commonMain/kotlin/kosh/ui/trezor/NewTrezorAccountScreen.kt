@@ -5,6 +5,8 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material3.Text
+import androidx.compose.material3.pulltorefresh.pullToRefresh
+import androidx.compose.material3.pulltorefresh.rememberPullToRefreshState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.ui.Modifier
@@ -18,8 +20,9 @@ import kosh.presentation.trezor.TrezorAccountsState
 import kosh.presentation.trezor.rememberTrezorAccounts
 import kosh.presentation.trezor.rememberTrezorListener
 import kosh.ui.component.LoadingIndicator
+import kosh.ui.component.items.SignerItem
+import kosh.ui.component.refresh.PullRefreshBox
 import kosh.ui.component.scaffold.KoshScaffold
-import kosh.ui.component.signer.SignerItem
 import kosh.ui.failure.AppFailureItem
 import kosh.ui.failure.AppFailureMessage
 import kosh.ui.keystore.KeyStoreListenerContent
@@ -29,17 +32,26 @@ fun NewTrezorAccountScreen(
     trezor: Trezor,
     onNavigateUp: () -> Unit,
     onFinish: (AccountEntity.Id) -> Unit,
-    modifier: Modifier = Modifier,
 ) {
+    val keyStoreListener = rememberKeyStoreListener()
+    val trezorListener = rememberTrezorListener(null, keyStoreListener.listener)
+    val trezorAccounts = rememberTrezorAccounts(
+        listener = trezorListener.listener,
+        trezor = trezor,
+    )
+    val refreshState = rememberPullToRefreshState()
+
     KoshScaffold(
-        modifier = modifier,
+        modifier = Modifier
+            .pullToRefresh(
+                isRefreshing = trezorAccounts.refreshing,
+                state = refreshState,
+                onRefresh = { trezorAccounts.refresh() },
+                enabled = !trezorAccounts.loading,
+            ),
         title = { Text("Trezor New Account") },
         onNavigateUp = onNavigateUp
-    ) { paddingValues ->
-
-        val keyStoreListener = rememberKeyStoreListener()
-
-        val trezorListener = rememberTrezorListener(null, keyStoreListener.listener)
+    ) { contentPadding ->
 
         TrezorListenerContent(
             trezorListener = trezorListener,
@@ -57,20 +69,22 @@ fun NewTrezorAccountScreen(
             createAccountState.createdAccount?.let(onFinish)
         }
 
-        val trezorAccounts = rememberTrezorAccounts(
-            listener = trezorListener.listener,
-            trezor = trezor,
-        )
-
-        NewTrezorAccountContent(
-            trezorAccounts = trezorAccounts,
-            paddingValues = paddingValues,
-            onSelect = { createAccountState.create(it) },
-        )
+        PullRefreshBox(
+            modifier = Modifier.padding(contentPadding),
+            isRefreshing = trezorAccounts.refreshing,
+            state = refreshState,
+        ) {
+            NewTrezorAccountContent(
+                trezorAccounts = trezorAccounts,
+                paddingValues = contentPadding,
+                onSelect = { createAccountState.create(it) },
+            )
+        }
 
         LoadingIndicator(
-            createAccountState.loading || trezorAccounts.loading,
-            Modifier.padding(paddingValues),
+            createAccountState.loading ||
+                    trezorAccounts.loading && !trezorAccounts.refreshing,
+            Modifier.padding(contentPadding),
         )
     }
 }
@@ -87,7 +101,7 @@ fun NewTrezorAccountContent(
         trezorAccounts.failure?.let {
             item {
                 AppFailureItem(it) {
-                    trezorAccounts.retry(true)
+                    trezorAccounts.retry()
                 }
             }
         } ?: run {

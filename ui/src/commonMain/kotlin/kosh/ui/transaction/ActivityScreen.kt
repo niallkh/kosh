@@ -9,8 +9,13 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyListScope
 import androidx.compose.foundation.lazy.items
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.outlined.AccountBalanceWallet
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
 import androidx.compose.material3.Text
-import androidx.compose.material3.TopAppBarScrollBehavior
+import androidx.compose.material3.pulltorefresh.pullToRefresh
+import androidx.compose.material3.pulltorefresh.rememberPullToRefreshState
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.style.TextAlign
@@ -31,52 +36,72 @@ import kosh.presentation.transaction.rememberFinalizeTransactions
 import kosh.presentation.transaction.rememberTransactions
 import kosh.ui.component.LoadingIndicator
 import kosh.ui.component.illustration.Illustration
-import kosh.ui.component.refresh.DragToRefreshBox
+import kosh.ui.component.refresh.PullRefreshBox
+import kosh.ui.component.scaffold.KoshScaffold
+import kosh.ui.component.single.single
 import kosh.ui.component.text.Header
 import kosh.ui.failure.AppFailureMessage
 import kosh.ui.reown.WcAuthenticationItem
 import kosh.ui.reown.WcProposalItem
 import kosh.ui.reown.WcRequestItem
+import kosh.ui.resources.icons.Networks
 import kosh.ui.resources.illustrations.ActivityEmpty
 import kotlinx.collections.immutable.toPersistentList
 
 @Composable
 fun ActivityScreen(
-    contentPading: PaddingValues,
-    scrollBehavior: TopAppBarScrollBehavior,
     onOpenTransaction: (TransactionEntity.Id) -> Unit,
     onOpenProposal: (WcSessionProposal) -> Unit,
     onOpenAuth: (WcAuthentication) -> Unit,
     onOpenRequest: (WcRequest) -> Unit,
+    onOpenNetworks: () -> Unit,
+    onOpenWallets: () -> Unit,
 ) {
     val finalizeTransactions = rememberFinalizeTransactions()
     val transactions = rememberTransactions()
+    val refreshState = rememberPullToRefreshState()
 
-    AppFailureMessage(finalizeTransactions.failures)
-
-    DragToRefreshBox(
-        isRefreshing = finalizeTransactions.refreshing,
-        enabled = transactions.init,
-        onRefresh = { finalizeTransactions.refresh() },
-        scrollBehavior = scrollBehavior,
-        modifier = Modifier
-            .fillMaxSize()
-            .padding(contentPading)
-    ) {
-        ActivityContent(
+    KoshScaffold(
+        modifier = Modifier.pullToRefresh(
             isRefreshing = finalizeTransactions.refreshing,
-            transactions = transactions,
-            onSelectTransaction = { onOpenTransaction(it.id) },
-            onSelectRequest = { onOpenRequest(it) },
-            onSelectProposal = { onOpenProposal(it) },
-            onSelectAuthentication = { onOpenAuth(it) },
+            onRefresh = finalizeTransactions.refresh,
+            state = refreshState
+        ),
+        title = { Text("Activity") },
+        onNavigateUp = null,
+        actions = {
+            IconButton(onClick = onOpenNetworks.single()) {
+                Icon(Networks, "Networks")
+            }
+
+            IconButton(onClick = onOpenWallets.single()) {
+                Icon(Icons.Outlined.AccountBalanceWallet, "Accounts")
+            }
+        }
+    ) { contentPadding ->
+        AppFailureMessage(finalizeTransactions.failures)
+
+        PullRefreshBox(
+            modifier = Modifier.padding(contentPadding),
+            state = refreshState,
+            isRefreshing = finalizeTransactions.refreshing
+        ) {
+            ActivityContent(
+                isRefreshing = finalizeTransactions.refreshing,
+                transactions = transactions,
+                onSelectTransaction = { onOpenTransaction(it.id) },
+                onSelectRequest = { onOpenRequest(it) },
+                onSelectProposal = { onOpenProposal(it) },
+                onSelectAuthentication = { onOpenAuth(it) },
+                contentPadding = contentPadding
+            )
+        }
+
+        LoadingIndicator(
+            finalizeTransactions.loading && !finalizeTransactions.refreshing,
+            Modifier.padding(contentPadding),
         )
     }
-
-    LoadingIndicator(
-        finalizeTransactions.loading && !finalizeTransactions.refreshing,
-        Modifier.padding(contentPading),
-    )
 }
 
 @Composable
@@ -90,10 +115,12 @@ fun ActivityContent(
     onSelectProposal: (WcSessionProposal) -> Unit,
     onSelectAuthentication: (WcAuthentication) -> Unit,
     onSelectRequest: (WcRequest) -> Unit,
+    contentPadding: PaddingValues = PaddingValues(),
 ) {
     LazyColumn(
-        Modifier.fillMaxSize(),
-        userScrollEnabled = !isRefreshing
+        modifier = Modifier.fillMaxSize(),
+        userScrollEnabled = !isRefreshing,
+        contentPadding = contentPadding,
     ) {
 
         when {

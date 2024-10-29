@@ -85,6 +85,8 @@ public class IosAppScope(
                 BugsnagLogWriter()
             )
         }
+
+//        DecomposeExperimentFlags.duplicateConfigurationsEnabled = true
     }
 
     init {

@@ -73,11 +73,7 @@ class DefaultListDetailRouter<R : Route>(
     override fun navigateUp() {
         onResult(RouteResult.Up(null))
     }
-
-    override fun handle(link: R?) {
-    }
 }
-
 
 @Composable
 inline fun <reified R : @Serializable Route> rememberListDetailRouter(
@@ -93,7 +89,6 @@ inline fun <reified R : @Serializable Route> rememberListDetailRouter(
             uiContext = uiContext,
             serializer = serializer,
             initial = {
-                // TODO check if deeplink
                 ListDetailState(
                     list = list(),
                     detail = link.takeIf { it != list() }

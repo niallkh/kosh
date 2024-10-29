@@ -1,22 +1,10 @@
 package kosh.ui.navigation.hosts
 
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.outlined.AccountBalanceWallet
-import androidx.compose.material3.Icon
-import androidx.compose.material3.IconButton
-import androidx.compose.material3.LargeTopAppBar
-import androidx.compose.material3.Scaffold
-import androidx.compose.material3.SnackbarHost
-import androidx.compose.material3.SnackbarHostState
-import androidx.compose.material3.Text
-import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.CompositionLocalProvider
-import androidx.compose.runtime.remember
+import arrow.core.partially1
 import com.arkivanov.decompose.router.stack.pushNew
 import com.arkivanov.decompose.router.stack.replaceCurrent
 import kosh.ui.analytics.LogScreen
-import kosh.ui.component.scaffold.LocalSnackbarHostState
 import kosh.ui.navigation.RouteResult
 import kosh.ui.navigation.routes.RootRoute
 import kosh.ui.navigation.routes.TransactionsRoute
@@ -31,7 +19,6 @@ import kosh.ui.reown.WcSignPersonalScreen
 import kosh.ui.reown.WcSignTypedScreen
 import kosh.ui.reown.WcWatchNftScreen
 import kosh.ui.reown.WcWatchTokenScreen
-import kosh.ui.resources.icons.Networks
 import kosh.ui.transaction.ActivityScreen
 import kosh.ui.transaction.DeleteTransactionScreen
 import kosh.ui.transaction.TransactionScreen
@@ -49,52 +36,14 @@ fun TransactionsHost(
         onResult = { onResult(it) },
     ) { route ->
         when (route) {
-            TransactionsRoute.List -> {
-                val scrollBehavior = TopAppBarDefaults.exitUntilCollapsedScrollBehavior()
-                val snackbarHostState = remember { SnackbarHostState() }
-
-                Scaffold(
-                    topBar = {
-                        LargeTopAppBar(
-                            scrollBehavior = scrollBehavior,
-                            title = { Text("Activity") },
-                            actions = {
-                                IconButton(onClick = {
-                                    onOpen(RootRoute.Networks())
-                                }) {
-                                    Icon(Networks, "Networks")
-                                }
-
-                                IconButton(onClick = {
-                                    onOpen(RootRoute.Wallets())
-                                }) {
-                                    Icon(Icons.Outlined.AccountBalanceWallet, "Accounts")
-                                }
-                            }
-                        )
-                    },
-                    snackbarHost = { SnackbarHost(snackbarHostState) }
-                ) { paddingValues ->
-                    CompositionLocalProvider(LocalSnackbarHostState provides snackbarHostState) {
-                        ActivityScreen(
-                            contentPading = paddingValues,
-                            scrollBehavior = scrollBehavior,
-                            onOpenTransaction = {
-                                pushNew(TransactionsRoute.Details(it))
-                            },
-                            onOpenRequest = {
-                                pushNew(wcRequestRoute(it))
-                            },
-                            onOpenAuth = {
-                                pushNew(TransactionsRoute.Auth(it.id))
-                            },
-                            onOpenProposal = {
-                                pushNew(TransactionsRoute.Proposal(it.id, it.requestId))
-                            }
-                        )
-                    }
-                }
-            }
+            TransactionsRoute.List -> ActivityScreen(
+                onOpenTransaction = { pushNew(TransactionsRoute.Details(it)) },
+                onOpenRequest = { pushNew(wcRequestRoute(it)) },
+                onOpenAuth = { pushNew(TransactionsRoute.Auth(it.id)) },
+                onOpenProposal = { pushNew(TransactionsRoute.Proposal(it.id, it.requestId)) },
+                onOpenNetworks = onOpen.partially1(RootRoute.Networks()),
+                onOpenWallets = onOpen.partially1(RootRoute.Wallets()),
+            )
 
             is TransactionsRoute.Details -> TransactionScreen(
                 id = route.id,

@@ -33,14 +33,14 @@ inline fun <R : Route> StackHost(
 
 @Composable
 inline fun <reified R : Route> StackHost(
-    start: R?,
+    start: R,
     link: R?,
     noinline onResult: @DisallowComposableCalls StackRouter<R>.(RouteResult<R>) -> Unit,
     animation: StackAnimation<R, UiContext>? = null,
     crossinline content: @Composable StackRouter<R>.(R) -> Unit,
 ) {
     val stackRouter = rememberStackRouter<R>(
-        start = start,
+        start = { start },
         link = link,
         onResult = { onResult(it) },
         serializer = serializer()

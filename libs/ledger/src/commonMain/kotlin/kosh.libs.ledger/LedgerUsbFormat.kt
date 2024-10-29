@@ -59,7 +59,7 @@ class LedgerUsbFormat(
             require(chunk.readByte() == TAG.toByte())
             require(chunk.readShort() == counter.toShort())
 
-            buffer.write(chunk, min(msgSize - chunk.size, chunk.size))
+            buffer.write(chunk, min(msgSize - buffer.size, chunk.size))
 
             counter++
         }

@@ -54,18 +54,16 @@ public fun rootViewController(
                         link = link,
                         onResult = {
                             Logger.d { "RouteResult.Result: ${it.redirect}" }
-                            if (it.redirect.isNullOrEmpty()) {
-                                link = null
-                            } else {
+                            if (!it.redirect.isNullOrEmpty()) {
                                 UIApplication.sharedApplication.openURL(
                                     url = URLWithString(it.redirect!!)!!,
                                     options = emptyMap<Any?, Any>(),
-                                    completionHandler = { redirected ->
-                                        if (!redirected) {
-                                            link = null
-                                        }
+                                    completionHandler = {
+                                        link = null
                                     }
                                 )
+                            } else {
+                                link = null
                             }
                         }
                     )

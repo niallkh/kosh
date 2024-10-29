@@ -13,7 +13,7 @@ fun TrezorPasskeysHost(
     link: TrezorPasskeysRoute?,
     onResult: (RouteResult<TrezorPasskeysRoute>) -> Unit,
 ) {
-    val stackRouter = rememberStackRouter(TrezorPasskeysRoute.List, link) {
+    val stackRouter = rememberStackRouter({ TrezorPasskeysRoute.List }, link) {
         onResult(it)
     }
 

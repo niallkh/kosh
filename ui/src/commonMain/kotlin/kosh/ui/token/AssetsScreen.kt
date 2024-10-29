@@ -11,7 +11,15 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyListScope
-import androidx.compose.material3.TopAppBarScrollBehavior
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Add
+import androidx.compose.material.icons.outlined.AccountBalanceWallet
+import androidx.compose.material3.FloatingActionButton
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
+import androidx.compose.material3.Text
+import androidx.compose.material3.pulltorefresh.pullToRefresh
+import androidx.compose.material3.pulltorefresh.rememberPullToRefreshState
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
@@ -29,44 +37,72 @@ import kosh.presentation.token.rememberUpdateBalances
 import kosh.ui.component.LoadingIndicator
 import kosh.ui.component.cards.NftBalanceCard
 import kosh.ui.component.items.TokenBalanceItem
-import kosh.ui.component.refresh.DragToRefreshBox
+import kosh.ui.component.refresh.PullRefreshBox
+import kosh.ui.component.scaffold.KoshScaffold
+import kosh.ui.component.single.single
 import kosh.ui.component.text.Header
 import kosh.ui.failure.AppFailureMessage
+import kosh.ui.resources.icons.Networks
 import kotlinx.collections.immutable.toPersistentList
 
 @Composable
 fun AssetsScreen(
-    contentPadding: PaddingValues,
-    scrollBehavior: TopAppBarScrollBehavior,
     onOpenToken: (TokenEntity.Id, Boolean) -> Unit,
     onOpenWallets: () -> Unit,
     onOpenNetworks: () -> Unit,
+    onAddToken: () -> Unit,
 ) {
     val updateBalances = rememberUpdateBalances()
     val balances = rememberBalances()
+    val refreshState = rememberPullToRefreshState()
 
-    AppFailureMessage(updateBalances.failures)
+    KoshScaffold(
+        modifier = Modifier
+            .pullToRefresh(
+                isRefreshing = updateBalances.refreshing,
+                state = refreshState,
+                onRefresh = { updateBalances.refresh() },
+                enabled = balances.init,
+            ),
+        title = { Text("Assets") },
+        actions = {
+            IconButton(onClick = onOpenNetworks.single()) {
+                Icon(Networks, "Networks")
+            }
 
-    DragToRefreshBox(
-        isRefreshing = updateBalances.refreshing,
-        enabled = balances.init,
-        onRefresh = { updateBalances.refresh() },
-        scrollBehavior = scrollBehavior,
-        modifier = Modifier.padding(contentPadding),
-    ) {
-        AssetsContent(
+            IconButton(onClick = onOpenWallets.single()) {
+                Icon(Icons.Outlined.AccountBalanceWallet, "Accounts")
+            }
+        },
+        floatingActionButton = {
+            FloatingActionButton(onClick = onAddToken.single()) {
+                Icon(Icons.Default.Add, contentDescription = "Add Token")
+            }
+        },
+        onNavigateUp = null,
+    ) { contentPadding ->
+        AppFailureMessage(updateBalances.failures)
+
+        PullRefreshBox(
             isRefreshing = updateBalances.refreshing,
-            balances = balances,
-            onSelectToken = { onOpenToken(it.id, it.isNft) },
-            onOpenWallets = onOpenWallets,
-            onOpenNetworks = onOpenNetworks
+            state = refreshState,
+            modifier = Modifier.padding(contentPadding),
+        ) {
+            AssetsContent(
+                isRefreshing = updateBalances.refreshing,
+                balances = balances,
+                onSelectToken = { onOpenToken(it.id, it.isNft) },
+                onOpenWallets = onOpenWallets,
+                onOpenNetworks = onOpenNetworks,
+                contentPadding = contentPadding,
+            )
+        }
+
+        LoadingIndicator(
+            updateBalances.loading && !updateBalances.refreshing,
+            Modifier.padding(contentPadding),
         )
     }
-
-    LoadingIndicator(
-        updateBalances.loading && !updateBalances.refreshing,
-        Modifier.padding(contentPadding),
-    )
 }
 
 @Composable
@@ -78,9 +114,11 @@ fun AssetsContent(
     onSelectToken: (TokenEntity) -> Unit,
     onOpenWallets: () -> Unit,
     onOpenNetworks: () -> Unit,
+    contentPadding: PaddingValues,
 ) {
     LazyColumn(
         userScrollEnabled = !isRefreshing,
+        contentPadding = contentPadding,
         modifier = Modifier.fillMaxSize(),
     ) {
         when {

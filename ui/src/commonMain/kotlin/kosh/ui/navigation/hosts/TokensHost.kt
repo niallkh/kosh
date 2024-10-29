@@ -1,29 +1,14 @@
 package kosh.ui.navigation.hosts
 
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Add
-import androidx.compose.material.icons.outlined.AccountBalanceWallet
-import androidx.compose.material3.FloatingActionButton
-import androidx.compose.material3.Icon
-import androidx.compose.material3.IconButton
-import androidx.compose.material3.LargeTopAppBar
-import androidx.compose.material3.Scaffold
-import androidx.compose.material3.SnackbarHost
-import androidx.compose.material3.SnackbarHostState
-import androidx.compose.material3.Text
-import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.CompositionLocalProvider
-import androidx.compose.runtime.remember
+import arrow.core.partially1
 import com.arkivanov.decompose.router.stack.pushNew
 import com.arkivanov.decompose.router.stack.replaceCurrent
 import kosh.ui.analytics.LogScreen
-import kosh.ui.component.scaffold.LocalSnackbarHostState
 import kosh.ui.navigation.RouteResult
 import kosh.ui.navigation.routes.RootRoute
 import kosh.ui.navigation.routes.TokensRoute
 import kosh.ui.navigation.stack.StackHost
-import kosh.ui.resources.icons.Networks
 import kosh.ui.token.AssetsScreen
 import kosh.ui.token.DeleteTokenScreen
 import kosh.ui.token.TokenScreen
@@ -41,54 +26,16 @@ fun TokensHost(
         onResult = { onResult(it) },
     ) { route ->
         when (route) {
-            TokensRoute.List -> {
-                val scrollBehavior = TopAppBarDefaults.exitUntilCollapsedScrollBehavior()
-                val snackbarHostState = remember { SnackbarHostState() }
-
-                Scaffold(
-                    topBar = {
-                        LargeTopAppBar(
-                            scrollBehavior = scrollBehavior,
-                            title = { Text("Assets") },
-                            actions = {
-                                IconButton(onClick = {
-                                    onOpen(RootRoute.Networks())
-                                }) {
-                                    Icon(Networks, "Networks")
-                                }
-
-                                IconButton(onClick = {
-                                    onOpen(RootRoute.Wallets())
-                                }) {
-                                    Icon(Icons.Outlined.AccountBalanceWallet, "Accounts")
-                                }
-                            }
-                        )
-                    },
-                    floatingActionButton = {
-                        FloatingActionButton(
-                            onClick = { onAddToken() },
-                        ) {
-                            Icon(Icons.Default.Add, contentDescription = "Add Token")
-                        }
-                    },
-                    snackbarHost = { SnackbarHost(snackbarHostState) }
-                ) { contentPadding ->
-                    CompositionLocalProvider(LocalSnackbarHostState provides snackbarHostState) {
-                        AssetsScreen(
-                            contentPadding = contentPadding,
-                            scrollBehavior = scrollBehavior,
-                            onOpenToken = { token, _ -> pushNew(TokensRoute.Details(token)) },
-                            onOpenNetworks = { onOpen(RootRoute.Networks()) },
-                            onOpenWallets = { onOpen(RootRoute.Wallets()) }
-                        )
-                    }
-                }
-            }
+            TokensRoute.List -> AssetsScreen(
+                onOpenToken = { token, _ -> pushNew(TokensRoute.Details(token)) },
+                onAddToken = { onAddToken() },
+                onOpenNetworks = onOpen.partially1(RootRoute.Networks()),
+                onOpenWallets = onOpen.partially1(RootRoute.Wallets()),
+            )
 
             is TokensRoute.Details -> TokenScreen(
                 id = route.id,
-                onNavigateUp = { navigateUp() },
+                onNavigateUp = ::navigateUp,
                 onDelete = { replaceCurrent(TokensRoute.Delete(it)) }
             )
 

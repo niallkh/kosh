@@ -55,7 +55,7 @@ class LedgerBleFormat(
             require(chunk.readByte() == TAG.toByte())
             require(chunk.readShort() == counter.toShort())
 
-            buffer.write(chunk, min(msgSize - buffer.size, buffer.size))
+            buffer.write(chunk, min(msgSize - buffer.size, chunk.size))
 
             counter++
         }

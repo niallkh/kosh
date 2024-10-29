@@ -125,6 +125,8 @@ internal class AndroidAppScope(
                 BugsnagLogWriter()
             )
         }
+
+//        DecomposeExperimentFlags.duplicateConfigurationsEnabled = true
     }
 
     init {

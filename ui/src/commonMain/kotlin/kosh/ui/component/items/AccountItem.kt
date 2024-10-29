@@ -1,10 +1,8 @@
 package kosh.ui.component.items
 
-import androidx.compose.foundation.layout.size
 import androidx.compose.material3.ListItem
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.unit.dp
 import kosh.domain.entities.AccountEntity
 import kosh.ui.component.icon.AccountIcon
 import kosh.ui.component.modifier.optionalClickable
@@ -21,7 +19,7 @@ fun AccountItem(
 ) {
     ListItem(
         modifier = modifier.optionalClickable(account != null, onClick?.single()),
-        leadingContent = { AccountIcon(account?.address, Modifier.size(40.dp)) },
+        leadingContent = { AccountIcon(account?.address) },
         headlineContent = { TextLine(account?.name) },
         supportingContent = { TextAddressShort(account?.address) },
         trailingContent = trailingContent

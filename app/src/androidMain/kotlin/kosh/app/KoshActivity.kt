@@ -144,9 +144,10 @@ public class KoshActivity : FragmentActivity() {
 
         if (!redirect.isNullOrEmpty()) {
             startActivity(Intent(Intent.ACTION_VIEW, redirect.toUri()))
+            link = null
+        } else {
+            finish()
         }
-
-        finish()
     }
 
     override fun onDestroy() {

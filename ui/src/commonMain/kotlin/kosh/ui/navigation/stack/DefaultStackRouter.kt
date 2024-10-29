@@ -7,7 +7,6 @@ import com.arkivanov.decompose.router.stack.ChildStack
 import com.arkivanov.decompose.router.stack.StackNavigation
 import com.arkivanov.decompose.router.stack.childStack
 import com.arkivanov.decompose.router.stack.pop
-import com.arkivanov.decompose.router.stack.replaceAll
 import com.arkivanov.decompose.value.Value
 import kosh.presentation.core.LocalUiContext
 import kosh.presentation.core.UiContext
@@ -22,7 +21,7 @@ import kotlinx.serialization.serializer
 class DefaultStackRouter<R : Route>(
     uiContext: UiContext,
     serializer: KSerializer<R>,
-    private val start: (R?) -> R?,
+    private val start: () -> R,
     link: R?,
     key: String,
     private val onResult: StackRouter<R>.(RouteResult<R>) -> Unit,
@@ -35,7 +34,7 @@ class DefaultStackRouter<R : Route>(
             if (link.isDeeplink()) {
                 setOfNotNull(link).toList()
             } else {
-                setOfNotNull(start(link), link).toList()
+                setOfNotNull(start(), link).toList()
             }
         },
         key = "StackRouter_$key",
@@ -56,28 +55,13 @@ class DefaultStackRouter<R : Route>(
     }
 
     override fun navigateUp() {
-        pop { if (!it) onResult(RouteResult.Up(start(null))) }
-    }
-
-    override fun handle(link: R?) {
-        if (link != null) {
-            val start = start(link)
-            if (link.isDeeplink() || start == null || start == link) {
-                replaceAll(link)
-            } else {
-                replaceAll(start, link)
-            }
-        } else {
-            start(link)?.let {
-                replaceAll(it)
-            }
-        }
+        pop { if (!it) onResult(RouteResult.Up(start())) }
     }
 }
 
 @Composable
 inline fun <reified R : @Serializable Route> rememberStackRouter(
-    start: R?,
+    noinline start: () -> R,
     link: R? = null,
     serializer: KSerializer<R> = serializer(),
     key: String = currentCompositeKeyHash.toString(36),
@@ -85,11 +69,11 @@ inline fun <reified R : @Serializable Route> rememberStackRouter(
 ): StackRouter<R> {
     val uiContext = LocalUiContext.current
 
-    return rememberRetained(key = "StackRouter") {
+    return rememberRetained {
         DefaultStackRouter(
             uiContext = uiContext,
             serializer = serializer,
-            start = { start },
+            start = start,
             link = link,
             key = key,
             onResult = onResult,

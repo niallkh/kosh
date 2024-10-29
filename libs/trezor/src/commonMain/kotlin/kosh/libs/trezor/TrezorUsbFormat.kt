@@ -60,7 +60,7 @@ class TrezorUsbFormat(
 
             require(chunk.readByte() == '?'.code.toByte())
 
-            buffer.write(chunk, min(msgSize - chunk.size, chunk.size))
+            buffer.write(chunk, min(msgSize - buffer.size, chunk.size))
         }
 
         return buffer.run {
@@ -68,7 +68,6 @@ class TrezorUsbFormat(
             readByteString()
         }
     }
-
 
     private suspend fun readHeader(): Buffer {
         logger.v { "readHeader()" }

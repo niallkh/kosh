@@ -1,9 +1,10 @@
-package kosh.ui.component.signer
+package kosh.ui.component.items
 
 import androidx.compose.foundation.clickable
 import androidx.compose.material3.ListItem
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
+import kosh.domain.entities.AccountEntity
 import kosh.domain.models.web3.Signer
 import kosh.presentation.account.rememberAccount
 import kosh.ui.component.icon.AccountIcon
@@ -15,16 +16,16 @@ import kosh.ui.component.text.TextLine
 @Composable
 fun SignerItem(
     signer: Signer,
+    account: AccountEntity? = rememberAccount(signer.address).entity,
     modifier: Modifier = Modifier,
     onClick: () -> Unit,
 ) {
-    val account = rememberAccount(signer.address)
-
     ListItem(
         modifier = modifier.clickable(onClick = onClick.single()),
         leadingContent = { AccountIcon(signer.address) },
         headlineContent = {
-            account.entity?.let { TextLine(it.name) } ?: TextAddressShort(signer.address)
+            account?.let { TextLine(it.name) }
+                ?: TextAddressShort(signer.address)
         },
         supportingContent = { TextDerivationPath(signer.derivationPath) }
     )
