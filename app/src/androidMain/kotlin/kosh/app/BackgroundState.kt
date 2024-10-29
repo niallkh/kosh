@@ -9,12 +9,11 @@ internal object BackgroundState : DefaultLifecycleObserver {
 
     private val logger = Logger.withTag("[K]BackgroundState")
 
-    val background = MutableStateFlow(true)
+    private val background = MutableStateFlow(true)
 
     override fun onStart(owner: LifecycleOwner) {
         logger.v { "onStart()" }
         super.onStart(owner)
-        background.value = false
         ReownConnectionManager.connect()
         ReownConnectionWorker.stop(KoshApp.appScope.context)
     }
@@ -22,7 +21,6 @@ internal object BackgroundState : DefaultLifecycleObserver {
     override fun onStop(owner: LifecycleOwner) {
         logger.v { "onStop()" }
         super.onStop(owner)
-        background.value = true
         ReownConnectionWorker.start(KoshApp.appScope.context)
         ReownConnectionManager.disconnect()
     }

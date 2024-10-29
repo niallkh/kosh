@@ -1,7 +1,6 @@
 package kosh.ui.transaction.calls
 
 import androidx.compose.foundation.clickable
-import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.size
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.AddCircle
@@ -28,6 +27,7 @@ import kosh.ui.component.menu.AdaptiveMenuItem
 import kosh.ui.component.text.TextAmount
 import kosh.ui.component.text.TextLine
 import kosh.ui.component.text.TextNumber
+import kosh.ui.navigation.Deeplink
 import kosh.ui.navigation.routes.AddTokenRoute
 import kosh.ui.navigation.routes.RootRoute
 
@@ -45,12 +45,7 @@ fun TokenAmountItem(
     var menuVisible by rememberSaveable { mutableStateOf(false) }
 
     val supportingText: @Composable (() -> Unit)? = tokenId?.let {
-        {
-            Row {
-                Text("Token Id: ")
-                TextNumber(it)
-            }
-        }
+        { TextNumber(it, prefix = "#: ") }
     }
 
     ListItem(
@@ -76,7 +71,7 @@ fun TokenAmountItem(
         trailingContent = {
             TextAmount(
                 token = tokenEntity,
-                amount = amount
+                amount = amount,
             )
         },
     )
@@ -92,13 +87,13 @@ fun TokenAmountItem(
                         if (tokenId == null) {
                             onOpen(
                                 RootRoute.AddToken(
-                                    AddTokenRoute.Search(token)
+                                    AddTokenRoute.Search(token, Deeplink())
                                 )
                             )
                         } else {
                             onOpen(
                                 RootRoute.AddToken(
-                                    AddTokenRoute.NftSearch(chainId.at(token), tokenId)
+                                    AddTokenRoute.NftSearch(chainId.at(token), tokenId, Deeplink())
                                 )
                             )
                         }

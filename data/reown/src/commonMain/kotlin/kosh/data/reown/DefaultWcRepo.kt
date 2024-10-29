@@ -65,7 +65,6 @@ class DefaultWcRepo(
 
     override val newProposal: Flow<WcSessionProposal>
         get() = callbackFlow {
-            logger.v { "newProposal" }
             init()
             val cancelable = adapter.getNewProposal { proposal ->
                 proposal.map().fold(
@@ -80,7 +79,6 @@ class DefaultWcRepo(
 
     override val proposals: Flow<List<WcSessionProposal>>
         get() = callbackFlow {
-            logger.v { "proposals" }
             init()
             val cancelable = adapter.getProposals { proposals ->
                 proposals.mapNotNull { proposal ->
@@ -99,7 +97,6 @@ class DefaultWcRepo(
 
     override val newAuthentication: Flow<WcAuthentication>
         get() = callbackFlow {
-            logger.v { "newAuthentication" }
             init()
             val cancelable = adapter.getNewAuthentication { authentication ->
                 authentication.map().fold(
@@ -114,7 +111,6 @@ class DefaultWcRepo(
 
     override val authentications: Flow<List<WcAuthentication>>
         get() = callbackFlow {
-            logger.v { "authentications" }
             init()
             val cancelable = adapter.getAuthentications { authentications ->
                 authentications.mapNotNull { authentication ->
@@ -133,7 +129,6 @@ class DefaultWcRepo(
 
     override val newRequest: Flow<WcRequest>
         get() = callbackFlow {
-            logger.v { "newRequest" }
             init()
             val cancelable = adapter.getNewRequest { request ->
                 request.map().fold(
@@ -148,7 +143,6 @@ class DefaultWcRepo(
 
     override val requests: Flow<List<WcRequest>>
         get() = callbackFlow {
-            logger.v { "requests" }
             init()
             val cancelable = adapter.getRequests { requests ->
                 requests.mapNotNull { authentication ->
@@ -167,7 +161,6 @@ class DefaultWcRepo(
 
     override val sessions: Flow<List<WcSession>>
         get() = callbackFlow {
-            logger.v { "sessions" }
             init()
             val cancelable = adapter.getSessions { sessions ->
                 sessions.mapNotNull { session ->

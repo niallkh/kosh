@@ -22,7 +22,7 @@ interface TokenService {
         address: Address?,
         tokenId: BigInteger?,
         name: String,
-        symbol: String,
+        symbol: String?,
         decimals: UByte,
         type: Type,
         tokenName: String?,
@@ -35,7 +35,7 @@ interface TokenService {
     suspend fun update(
         id: TokenEntity.Id,
         name: String,
-        symbol: String,
+        symbol: String?,
         decimals: UByte,
         type: Type,
         tokenName: String?,

@@ -24,5 +24,8 @@ fun Throwable.toReownResult(): ReownFailure = when (this) {
 
     is InvalidNamespaceException -> ReownFailure.InvalidNamespace(message)
 
-    else -> ReownFailure.Other(message)
+    else -> when {
+        "Pairing URI expired" in message.orEmpty() -> ReownFailure.NotFound(message)
+        else -> ReownFailure.Other(message)
+    }
 }

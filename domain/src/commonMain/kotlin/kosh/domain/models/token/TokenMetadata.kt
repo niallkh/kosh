@@ -15,7 +15,7 @@ data class TokenMetadata(
     val chainId: ChainId,
     val address: Address,
     val name: String,
-    val symbol: String,
+    val symbol: String?,
     val decimals: UByte,
     val icon: Uri?,
     val type: Type,

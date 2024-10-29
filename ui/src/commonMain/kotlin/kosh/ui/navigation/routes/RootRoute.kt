@@ -1,8 +1,6 @@
 package kosh.ui.navigation.routes
 
 import kotlinx.serialization.Serializable
-import kotlinx.serialization.Transient
-import kotlin.uuid.Uuid
 
 @Serializable
 sealed class RootRoute : Route {
@@ -11,22 +9,16 @@ sealed class RootRoute : Route {
     data class Tokens(
         override val link: TokensRoute? = null,
         val isNft: Boolean = false,
-        @Transient
-        private val uuid: Uuid = Uuid.random(),
     ) : RootRoute()
 
     @Serializable
     data class Transactions(
         override val link: TransactionsRoute? = null,
-        @Transient
-        private val uuid: Uuid = Uuid.random(),
     ) : RootRoute()
 
     @Serializable
     data class WalletConnect(
         override val link: WalletConnectRoute? = null,
-        @Transient
-        private val uuid: Uuid = Uuid.random(),
     ) : RootRoute()
 
     @Serializable

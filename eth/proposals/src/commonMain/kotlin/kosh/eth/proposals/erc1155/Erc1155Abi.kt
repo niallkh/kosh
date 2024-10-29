@@ -8,6 +8,7 @@ import kosh.eth.abi.abi
 import kosh.eth.abi.abiBigNumber
 import kosh.eth.abi.abiString
 import kosh.eth.abi.coder.decode
+import kosh.eth.abi.coder.decodeInputs
 import kosh.eth.abi.coder.encode
 import kosh.eth.abi.dsl.abiFunction
 import kosh.eth.abi.dsl.abiViewFunction
@@ -63,7 +64,7 @@ public object Erc1155Abi {
     )
 
     public fun setApprovalForAll(data: ByteString): Pair<Value.Address, Value.Bool> {
-        val decoded = setApprovalForAll.decode(data)
+        val decoded = setApprovalForAll.decodeInputs(data)
         val operator: Value.Address by decoded
         val approved: Value.Bool by decoded
         return operator to approved
@@ -72,7 +73,7 @@ public object Erc1155Abi {
     public fun safeTransferFrom(
         input: ByteString,
     ): Tuple5<Value.Address, Value.Address, Value.BigNumber, Value.BigNumber, Value.Bytes> {
-        val decoded = safeTransferFrom.decode(input)
+        val decoded = safeTransferFrom.decodeInputs(input)
         val from: Value.Address by decoded
         val to: Value.Address by decoded
         val id: Value.BigNumber by decoded
@@ -84,7 +85,7 @@ public object Erc1155Abi {
     public fun safeBatchTransferFrom(
         input: ByteString,
     ): Tuple5<Value.Address, Value.Address, Value.Array<Value.BigNumber>, Value.Array<Value.BigNumber>, Value.Bytes> {
-        val decoded = safeBatchTransferFrom.decode(input)
+        val decoded = safeBatchTransferFrom.decodeInputs(input)
         val from: Value.Address by decoded
         val to: Value.Address by decoded
         val ids: Value.Array<Value.BigNumber> by decoded

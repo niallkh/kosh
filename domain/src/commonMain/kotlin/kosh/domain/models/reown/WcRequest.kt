@@ -93,6 +93,9 @@ data class WcRequest(
             val gas: ULong?,
             val value: BigInteger,
             val data: ByteString,
+            val maxFeePerGas: BigInteger?,
+            val maxPriorityFeePerGas: BigInteger?,
+            val nonce: BigInteger?,
         ) : Call() {
             companion object
         }

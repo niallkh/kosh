@@ -45,10 +45,16 @@ internal fun mapRequest(
     description = request.peerMetaData?.description,
     url = request.peerMetaData?.url,
     icon = request.peerMetaData?.icons?.firstOrNull()?.toString(),
-    chainId = request.chainId?.toULongOrNull(),
+    chainId = request.chainId?.parseNumber(),
     method = request.request.method,
     params = request.request.params,
 )
+
+private fun String.parseNumber(): ULong? = when {
+    startsWith("0x") -> removePrefix("0x").toULongOrNull(16)
+    startsWith("eip155") -> removePrefix("eip155:").toULongOrNull()
+    else -> toULongOrNull()
+}
 
 internal fun mapSession(
     session: Wallet.Model.Session,

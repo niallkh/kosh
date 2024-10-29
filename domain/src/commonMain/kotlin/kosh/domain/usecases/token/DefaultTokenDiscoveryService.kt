@@ -55,7 +55,9 @@ class DefaultTokenDiscoveryService(
     ): Either<Web3Failure, List<TokenMetadata>> = either {
         withContext(Dispatchers.Default) {
             Address(query).fold(
-                ifLeft = { queryTokenLists(query) },
+                ifLeft = {
+                    queryTokenLists(query)
+                },
                 ifRight = { address ->
                     listOfNotNull(queryTokenLists(address) ?: queryToken(address))
                 },
@@ -117,9 +119,10 @@ class DefaultTokenDiscoveryService(
 
     override suspend fun getNftExtendedMetadata(
         uri: Uri,
+        tokenId: BigInteger,
         refresh: Boolean,
     ): Either<Web3Failure, NftExtendedMetadata?> = either {
-        tokenRepo.getNftMetadata(uri, refresh).bind()
+        tokenRepo.getNftMetadata(uri, tokenId, refresh).bind()
     }
 
     private suspend fun queryTokenLists(
@@ -127,8 +130,8 @@ class DefaultTokenDiscoveryService(
     ): List<TokenMetadata> = getVerifiedTokens()
         .mapNotNull { token ->
             when {
-                token.symbol.startsWith(q, ignoreCase = true) -> 0 to token
-                token.symbol.contains(q, ignoreCase = true) -> 1 to token
+                token.symbol.orEmpty().startsWith(q, ignoreCase = true) -> 0 to token
+                token.symbol.orEmpty().contains(q, ignoreCase = true) -> 1 to token
                 token.name.startsWith(q, ignoreCase = true) -> 2 to token
                 token.name.contains(q, ignoreCase = true) -> 3 to token
                 else -> null

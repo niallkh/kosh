@@ -21,8 +21,8 @@ fun TextAmount(
     modifier: Modifier = Modifier,
 ) {
     TextAmount(
-        amount = amount ?: BigInteger.TEN,
-        symbol = token?.symbol ?: "Lorem",
+        amount = amount ?: BigInteger(100000),
+        symbol = token?.symbol,
         decimals = token?.decimals ?: 0u,
         placeholder = amount == null || token == null,
         modifier = modifier,
@@ -36,7 +36,7 @@ fun TextAmount(
     modifier: Modifier = Modifier,
 ) {
     TextAmount(
-        amount = amount ?: BigInteger.TEN,
+        amount = amount ?: BigInteger(100000),
         symbol = token?.symbol ?: "Lorem",
         decimals = token?.decimals ?: 0u,
         placeholder = amount == null || token == null,
@@ -46,7 +46,7 @@ fun TextAmount(
 
 @Composable
 private fun TextAmount(
-    symbol: String,
+    symbol: String?,
     amount: BigInteger,
     decimals: UByte,
     placeholder: Boolean = false,
@@ -68,11 +68,12 @@ private fun TextAmount(
 private fun formatAmount(
     amount: BigInteger,
     decimals: UByte,
-    symbol: String,
+    symbol: String?,
 ): String {
-    if (amount == BigInteger.ZERO) return "0 $symbol"
-    if (amount == Value.BigNumber.UINT256_MAX) return "UNLIMITED $symbol"
-    if (amount > Value.BigNumber.UINT256_MAX) return "INVALID $symbol"
+    val symbol1 = symbol?.let { " $it" } ?: ""
+    if (amount == BigInteger.ZERO) return "0 $symbol1"
+    if (amount == Value.BigNumber.UINT256_MAX) return "UNLIMITED $symbol1"
+    if (amount > Value.BigNumber.UINT256_MAX) return "INVALID $symbol1"
 
     val decimalMode = DecimalMode(decimals.toLong(), ROUND_HALF_AWAY_FROM_ZERO, 5)
 
@@ -86,10 +87,10 @@ private fun formatAmount(
 
             val txt = value.toStringExpanded()
             if (txt == "0") return@mapNotNull null
-            "$txt ${scale.prefix}$symbol"
+            "$txt ${scale.prefix}$symbol1"
         }
         .firstOrNull()
-        ?: "0 $symbol"
+        ?: "0 $symbol1"
 }
 
 private enum class Scale(val correction: Byte, val prefix: String) {

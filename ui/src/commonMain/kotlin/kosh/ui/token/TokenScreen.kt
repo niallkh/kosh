@@ -79,7 +79,12 @@ fun TokenScreen(
 ) {
     val token = rememberToken(id)
 
-    val nftMetadata = token.entity?.uri?.let { rememberNftMetadata(it) }
+    val nftMetadata = nullable {
+        rememberNftMetadata(
+            uri = ensureNotNull(token.entity?.uri),
+            tokenId = ensureNotNull(token.entity?.tokenId)
+        )
+    }
 
     val refreshToken = rememberRefreshToken(id)
 
@@ -339,14 +344,11 @@ private fun InfoSection(
                 modifier = Modifier.fillMaxWidth(),
                 key = { TextLine(text = "Token ID") },
                 value = {
-                    Row {
-                        Text("#")
-                        TextNumber(
-                            token.entity?.tokenId ?: ZERO,
-                            Modifier.placeholder(token.entity == null),
-                            clickable = true,
-                        )
-                    }
+                    TextNumber(
+                        token.entity?.tokenId ?: ZERO,
+                        Modifier.placeholder(token.entity == null),
+                        clickable = true,
+                    )
                 }
             )
 

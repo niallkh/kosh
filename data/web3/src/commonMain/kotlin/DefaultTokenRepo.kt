@@ -1,4 +1,4 @@
-@file:OptIn(ExperimentalSerializationApi::class)
+@file:OptIn(ExperimentalSerializationApi::class, ExperimentalStdlibApi::class)
 
 package kosh.data.web3
 
@@ -18,6 +18,7 @@ import kosh.domain.failure.Web3Failure
 import kosh.domain.models.Address
 import kosh.domain.models.ChainId
 import kosh.domain.models.Uri
+import kosh.domain.models.ethereum
 import kosh.domain.models.toLibUri
 import kosh.domain.models.token.NftExtendedMetadata
 import kosh.domain.models.token.NftMetadata
@@ -42,8 +43,11 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import kotlinx.io.Buffer
 import kotlinx.io.Source
+import kotlinx.io.bytestring.hexToByteString
+import kotlinx.io.bytestring.toHexString
 import kotlinx.serialization.ExperimentalSerializationApi
 import kotlinx.serialization.json.Json
+import kotlinx.serialization.json.JsonPrimitive
 import kotlinx.serialization.json.io.decodeFromSource
 
 class DefaultTokenRepo(
@@ -99,10 +103,7 @@ class DefaultTokenRepo(
                     raise(null)
                 }
 
-                val symbol = symbolCall.result.getOrElse {
-                    logger.i(it) { "Invalid token symbol" }
-                    raise(null)
-                }
+                val symbol = symbolCall.result.getOrElse { null }
 
                 val decimals = decimalsCall.result.getOrElse { 0u }
 
@@ -153,9 +154,24 @@ class DefaultTokenRepo(
                 val tokenUri = tokenUriCall.result.getOrElse {
                     logger.i(it) { "Invalid token uri" }
                     raise(null)
+                }.let {
+                    if (
+                        chainId == ethereum &&
+                        address.bytes() == "D4416b13d2b3a9aBae7AcD5D6C2BbDBE25686401".hexToByteString()
+                    ) {
+                        "https://ens-metadata-service.appspot.com/mainnet/" +
+                                "0x${address.bytes().toHexString()}/" +
+                                "0x${tokenId.toString(16)}"
+                    } else {
+                        it
+                    }
                 }
 
-                val metadata = getMetadata(tokenUri, refresh)
+                val metadata = getMetadata(
+                    tokenUri = tokenUri,
+                    refresh = refresh,
+                    tokenId = tokenId,
+                )
 
                 val image = metadata.image ?: raise(null)
 
@@ -177,19 +193,22 @@ class DefaultTokenRepo(
 
     override suspend fun getNftMetadata(
         uri: Uri,
+        tokenId: BigInteger,
         refresh: Boolean,
     ): Either<Web3Failure, NftExtendedMetadata?> = withContext(Dispatchers.Default) {
         either {
-            val metadata = getMetadata(uri.toString(), refresh)
+            val metadata = getMetadata(uri.toString(), tokenId, refresh)
 
             NftExtendedMetadata(
                 description = metadata.description,
-                attributes = metadata.attributes.map {
-                    NftExtendedMetadata.Attribute(
-                        traitType = it.traitType,
-                        displayType = it.displayType,
-                        value = it.value,
-                    )
+                attributes = metadata.attributes.mapNotNull {
+                    nullable {
+                        NftExtendedMetadata.Attribute(
+                            traitType = it.traitType,
+                            displayType = it.displayType,
+                            value = ensureNotNull(it.value as? JsonPrimitive).content,
+                        )
+                    }
                 }.toImmutableList()
             )
         }
@@ -197,10 +216,16 @@ class DefaultTokenRepo(
 
     private suspend fun Raise<Web3Failure>.getMetadata(
         tokenUri: String,
+        tokenId: BigInteger,
         refresh: Boolean,
     ): Metadata {
+
         val response = httpClient.catch(logger) {
-            get(tokenUri) {
+            get(
+                tokenUri
+                    .replace("0x{id}", "0x${tokenId.toString(16)}")
+                    .replace("{id}", tokenId.toString(10))
+            ) {
                 if (refresh) {
                     headers {
                         append(HttpHeaders.CacheControl, CacheControl.NoCache(null).toString())

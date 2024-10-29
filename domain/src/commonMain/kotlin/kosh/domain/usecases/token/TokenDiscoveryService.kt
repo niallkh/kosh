@@ -39,6 +39,7 @@ interface TokenDiscoveryService {
 
     suspend fun getNftExtendedMetadata(
         uri: Uri,
+        tokenId: BigInteger,
         refresh: Boolean = false,
     ): Either<Web3Failure, NftExtendedMetadata?>
 }

@@ -12,6 +12,7 @@ import arrow.core.raise.recover
 import kosh.domain.failure.Web3Failure
 import kosh.domain.models.Uri
 import kosh.domain.models.token.NftExtendedMetadata
+import kosh.domain.serializers.BigInteger
 import kosh.domain.usecases.token.TokenDiscoveryService
 import kosh.presentation.core.di
 import kosh.presentation.di.rememberSerializable
@@ -19,6 +20,7 @@ import kosh.presentation.di.rememberSerializable
 @Composable
 fun rememberNftMetadata(
     uri: Uri,
+    tokenId: BigInteger,
     tokenDiscoveryService: TokenDiscoveryService = di { domain.tokenDiscoveryService },
 ): NftMetadataState {
     var nft by rememberSerializable { mutableStateOf<NftExtendedMetadata?>(null) }
@@ -31,7 +33,7 @@ fun rememberNftMetadata(
         loading = true
 
         recover({
-            nft = tokenDiscoveryService.getNftExtendedMetadata(uri, refresh).bind()
+            nft = tokenDiscoveryService.getNftExtendedMetadata(uri, tokenId, refresh).bind()
 
             refresh = false
             loading = false

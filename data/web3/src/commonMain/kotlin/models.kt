@@ -2,6 +2,7 @@ package kosh.data.web3
 
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
+import kotlinx.serialization.json.JsonElement
 
 @Serializable
 data class Metadata(
@@ -25,7 +26,7 @@ data class Metadata(
     data class Attribute(
         @SerialName("trait_type")
         val traitType: String? = null,
-        val value: String? = null,
+        val value: JsonElement? = null,
         @SerialName("display_type")
         val displayType: String? = null,
     )

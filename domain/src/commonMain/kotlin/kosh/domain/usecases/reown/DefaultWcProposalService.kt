@@ -55,6 +55,7 @@ class DefaultWcProposalService(
     override suspend fun pair(
         uri: PairingUri,
     ): Either<WcFailure, Either<WcSessionProposal, WcAuthentication>> = either {
+        logger.i { "pair()" }
 
         reownRepo.pair(uri = uri).bind()
 
@@ -109,16 +110,20 @@ class DefaultWcProposalService(
         id: WcSessionProposal.Id,
         approvedAccounts: List<Address>,
         approvedChains: List<ChainId>,
-    ): Either<WcFailure, Redirect?> = reownRepo.approveProposal(
-        id = id,
-        approvedAccounts = approvedChains.flatMap { chainId ->
-            approvedAccounts.map { account -> ChainAddress(chainId, account) }
-        },
-    )
+    ): Either<WcFailure, Redirect?> {
+        logger.i { "approve()" }
+        return reownRepo.approveProposal(
+            id = id,
+            approvedAccounts = approvedChains.flatMap { chainId ->
+                approvedAccounts.map { account -> ChainAddress(chainId, account) }
+            },
+        )
+    }
 
     override fun reject(
         id: WcSessionProposal.Id,
     ): Job = applicationScope.launch {
+        logger.i { "reject()" }
 
         recover({
             reownRepo.rejectProposal(id).bind()

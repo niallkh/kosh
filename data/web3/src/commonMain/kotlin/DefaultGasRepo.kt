@@ -51,8 +51,8 @@ class DefaultGasRepo(
 
             val base = feeHistory.baseFeePerGas.max().let {
                 var extra = it
-                extra = extra.add(it.multiply(BigInteger.ONE).div(BigInteger(8)))
-                if (full) extra = extra.add(it.multiply(BigInteger.ONE).div(BigInteger(8)))
+                extra = extra.add(it.multiply(BigInteger.TWO).div(BigInteger(8)))
+                if (full) extra = extra.add(it.multiply(BigInteger.TWO).div(BigInteger(8)))
                 extra
             }
 

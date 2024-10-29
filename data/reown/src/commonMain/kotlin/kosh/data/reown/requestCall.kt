@@ -71,7 +71,7 @@ internal fun requestCall(
             val addNetwork = json.decodeFromString<List<AddEthereumNetwork>>(params).first()
 
             WcRequest.Call.AddNetwork(
-                chainId = ChainId(addNetwork.chainId.parseHexNumber().ulongValue()),
+                chainId = ChainId(addNetwork.chainId.parseNumber().ulongValue()),
                 chainName = ensureNotNull(addNetwork.chainName) {
                     WcInvalidRequest.Other("Missing network name")
                 },
@@ -114,22 +114,23 @@ internal fun requestCall(
 
             WcRequest.Call.SendTransaction(
                 chainId = transaction.chainId
-                    ?.parseHexNumber()?.ulongValue()?.let(ChainId::invoke)
+                    ?.parseNumber()?.ulongValue()?.let(ChainId::invoke)
                     ?: requestChainId?.let(ChainId::invoke)
-                    ?: error("Missing chain id"),
+                    ?: raise(WcInvalidRequest.Other("Missing chain id")),
                 from = from,
                 to = transaction.to?.let { parseAddress(it) },
                 data = (transaction.data ?: transaction.input)?.parseHex() ?: ByteString(),
-                value = transaction.value?.parseHexNumber() ?: BigInteger.ZERO,
-                gas = transaction.gas?.parseHexNumber()?.ulongValue(),
+                value = transaction.value?.parseNumber() ?: BigInteger.ZERO,
+                gas = transaction.gas?.parseNumber()?.ulongValue(),
+                maxPriorityFeePerGas = transaction.maxPriorityFeePerGas?.parseNumber(),
+                maxFeePerGas = transaction.maxFeePerGas?.parseNumber(),
+                nonce = transaction.nonce?.parseNumber(),
             )
         }
 
         else -> raise(WcInvalidRequest.MethodNotSupported(method))
     }
 }
-
-private fun String.parseHexNumber() = removePrefix("0x").toBigInteger(16)
 
 private fun String.parseNumber(): BigInteger = if (startsWith("0x")) {
     removePrefix("0x").toBigInteger(16)

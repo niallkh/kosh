@@ -15,7 +15,9 @@ import com.reown.walletkit.client.WalletKit
 import kotlinx.collections.immutable.persistentHashMapOf
 import kotlinx.collections.immutable.persistentListOf
 import kotlinx.collections.immutable.plus
+import kotlinx.coroutines.CancellableContinuation
 import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.distinctUntilChanged
@@ -24,8 +26,11 @@ import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.suspendCancellableCoroutine
+import kotlinx.coroutines.withTimeoutOrNull
 import kotlin.coroutines.resume
 import kotlin.coroutines.resumeWithException
+import kotlin.time.Duration.Companion.milliseconds
+import kotlin.time.Duration.Companion.seconds
 import com.reown.walletkit.client.Wallet.Model.VerifyContext as ReownVerifyContext
 
 class AndroidReownAdapter(
@@ -45,6 +50,9 @@ class AndroidReownAdapter(
     private val requestsState = MutableStateFlow<List<SessionRequest>>(listOf())
 
     private val sessionsState = MutableStateFlow<List<Session>>(listOf())
+
+    private var approveProposalCont =
+        AtomicRef<CancellableContinuation<ReownResult<StringWrapper>>?>()
 
     private val logger = Logger.withTag("[K]AndroidReownAdapter")
 
@@ -245,11 +253,14 @@ class AndroidReownAdapter(
         methods: List<String>,
         events: List<String>,
     ): ReownResult<StringWrapper> {
-        val redirect: ReownResult<StringWrapper> = suspendCancellableCoroutine { cont ->
-            val proposal = WalletKit.getSessionProposals().find { it.pairingTopic == pairingTopic }
-                ?: error("Session proposal not found")
+        val proposal = WalletKit.getSessionProposals().find { it.pairingTopic == pairingTopic }
+            ?: return ReownResult.Failure(ReownFailure.NotFound("Session proposal not found"))
 
-            logger.v { proposal.toString() }
+        val redirect: ReownResult<StringWrapper> = suspendCancellableCoroutine { cont ->
+            approveProposalCont.update { cont }
+            cont.invokeOnCancellation {
+                approveProposalCont.update { null }
+            }
 
             WalletKit.approveSession(
                 params = Wallet.Params.SessionApprove(
@@ -307,7 +318,12 @@ class AndroidReownAdapter(
             )
         }
 
-        updateProposals()
+        withTimeoutOrNull(10.seconds) {
+            do {
+                delay(300.milliseconds)
+                updateProposals()
+            } while (proposalsState.value.any { it.pairingTopic == pairingTopic })
+        }
 
         return redirect
     }
@@ -614,6 +630,8 @@ class AndroidReownAdapter(
                 it + (sessionProposal.pairingTopic to verifyContext.id)
             }
             newProposalFlow.emit(mapProposal(sessionProposal, verifyContext))
+
+            updateProposals()
         }
     }
 
@@ -627,6 +645,8 @@ class AndroidReownAdapter(
             logger.v { "onSessionAuthenticate: $auth, $ctx" }
             applicationScope.launch {
                 newAuthenticationFlow.emit(mapAuth(auth, ctx))
+
+                updateAuthentications()
             }
             Unit
         }
@@ -638,6 +658,8 @@ class AndroidReownAdapter(
         logger.v { "onSessionRequest: $sessionRequest, $verifyContext" }
         applicationScope.launch {
             newRequestsFlow.emit(mapRequest(sessionRequest, verifyContext))
+
+            updateRequests()
         }
     }
 
@@ -667,7 +689,18 @@ class AndroidReownAdapter(
     }
 
     override fun onError(error: Wallet.Model.Error) {
-        logger.e(error.throwable) { "Error happened" }
+        val proposalNotFoundMessage =
+            "No proposal or pending session authenticate request for pairing topic"
+        if (proposalNotFoundMessage in error.throwable.message.orEmpty()) {
+            val continuation = approveProposalCont.get()
+            if (continuation?.isActive == true) {
+                continuation.resume(
+                    ReownResult.Failure(ReownFailure.NotFound(proposalNotFoundMessage))
+                )
+            }
+        } else {
+            logger.e(error.throwable) { "Error happened" }
+        }
     }
 
     private fun updateProposals() {

@@ -7,14 +7,19 @@ import kosh.ui.navigation.routes.Route
 import kosh.ui.navigation.routes.TransactionsRoute
 import kosh.ui.navigation.routes.WalletConnectRoute
 import kotlinx.serialization.Serializable
+import kotlinx.serialization.Transient
 import kotlinx.serialization.builtins.nullable
 import kotlinx.serialization.cbor.Cbor
 import okio.ByteString.Companion.decodeBase64
 import okio.ByteString.Companion.toByteString
 import kotlin.LazyThreadSafetyMode.NONE
+import kotlin.uuid.Uuid
 
 @Serializable
-data object Deeplink : Route
+data class Deeplink(
+    @Transient
+    private val uuid: Uuid = Uuid.random(),
+) : Route
 
 fun parseDeeplink(uriStr: String): RootRoute? {
 
@@ -62,11 +67,11 @@ fun parseDeeplink(uriStr: String): RootRoute? {
 }
 
 private fun wcPairRoute(uriStr: String): RootRoute? = PairingUri(uriStr).getOrNull()?.let {
-    RootRoute.WalletConnect(WalletConnectRoute.Pair(it, Deeplink))
+    RootRoute.WalletConnect(WalletConnectRoute.Pair(it, Deeplink()))
 }
 
 private fun wcRequestRoute(requestId: Long?) = RootRoute.Transactions(
-    TransactionsRoute.Request(requestId?.let { WcRequest.Id(it) }, Deeplink)
+    TransactionsRoute.Request(requestId?.let { WcRequest.Id(it) }, Deeplink())
 )
 
 private fun appRoute(path: String): RootRoute? = path.decodeBase64()
@@ -81,6 +86,6 @@ fun deeplink(route: RootRoute?): kosh.domain.models.Uri {
 
 tailrec fun Route?.isDeeplink(): Boolean {
     if (this == null) return false
-    return if (link == Deeplink) true
+    return if (link is Deeplink) true
     else link.isDeeplink()
 }

@@ -27,6 +27,7 @@ interface TokenRepo : Repository {
 
     suspend fun getNftMetadata(
         uri: Uri,
+        tokenId: BigInteger,
         refresh: Boolean = false,
     ): Either<Web3Failure, NftExtendedMetadata?>
 }

@@ -11,9 +11,9 @@ import kosh.domain.entities.name
 import kosh.domain.entities.nullableExternal
 import kosh.domain.entities.nullableIcon
 import kosh.domain.entities.nullableImage
+import kosh.domain.entities.nullableSymbol
 import kosh.domain.entities.nullableTokenName
 import kosh.domain.entities.nullableUri
-import kosh.domain.entities.symbol
 import kosh.domain.entities.type
 import kosh.domain.failure.TokenFailure
 import kosh.domain.models.Address
@@ -46,7 +46,7 @@ class DefaultTokenService(
         address: Address?,
         tokenId: BigInteger?,
         name: String,
-        symbol: String,
+        symbol: String?,
         decimals: UByte,
         type: Type,
         tokenName: String?,
@@ -87,7 +87,7 @@ class DefaultTokenService(
     override suspend fun update(
         id: TokenEntity.Id,
         name: String,
-        symbol: String,
+        symbol: String?,
         decimals: UByte,
         type: Type,
         tokenName: String?,
@@ -103,7 +103,7 @@ class DefaultTokenService(
 
             inside(AppState.optionalToken(id)) {
                 TokenEntity.name set name
-                TokenEntity.symbol set symbol
+                TokenEntity.nullableSymbol set symbol
                 TokenEntity.decimals set decimals
                 TokenEntity.type set type
                 TokenEntity.nullableTokenName set tokenName

@@ -114,6 +114,7 @@ interface WcRepo {
         )
 
         val supportedEvents = persistentListOf(
+            "message",
             "chainChanged",
             "accountsChanged",
         )

@@ -17,13 +17,14 @@ import com.ionspin.kotlin.bignum.integer.BigInteger
 fun TextNumber(
     number: BigInteger,
     modifier: Modifier = Modifier,
+    prefix: String = "",
     clickable: Boolean = false,
 ) {
     val text = remember(number) {
         if (number.bitLength() < 64) {
-            number.toString()
+            prefix + number.toString()
         } else {
-            number.toString(16)
+            prefix + "0x" + number.toString(16)
         }
     }
 
