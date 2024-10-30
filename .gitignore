@@ -17,3 +17,5 @@ captures
 !*.xcworkspace/contents.xcworkspacedata
 **/xcshareddata/WorkspaceSettings.xcsettings
 Local.xcconfig
+app/google-services.json
+iosApp/iosApp/GoogleService-Info.plist

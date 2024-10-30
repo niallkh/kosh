@@ -9,8 +9,8 @@ import com.arkivanov.decompose.router.pages.Pages
 import com.arkivanov.decompose.router.pages.PagesNavigation
 import com.arkivanov.decompose.router.pages.childPages
 import com.arkivanov.decompose.value.Value
-import kosh.presentation.core.LocalUiContext
-import kosh.presentation.core.UiContext
+import kosh.presentation.core.LocalPresentationContext
+import kosh.presentation.core.PresentationContext
 import kosh.presentation.di.rememberRetained
 import kosh.ui.navigation.RouteResult
 import kosh.ui.navigation.routes.Route
@@ -19,14 +19,15 @@ import kotlinx.serialization.Serializable
 import kotlinx.serialization.serializer
 
 class DefaultPagesRouter<R : Route>(
-    uiContext: UiContext,
+    presentationContext: PresentationContext,
     serializer: KSerializer<R>,
     private val initial: () -> Pages<R>,
     key: String,
     private val onResult: PagesRouter<R>.(RouteResult<R>) -> Unit,
-) : PagesRouter<R>, PagesNavigation<R> by PagesNavigation(), UiContext by uiContext {
+) : PagesRouter<R>, PagesNavigation<R> by PagesNavigation(),
+    PresentationContext by presentationContext {
 
-    override val pages: Value<ChildPages<R, UiContext>> = childPages(
+    override val pages: Value<ChildPages<R, PresentationContext>> = childPages(
         source = this,
         serializer = serializer,
         initialPages = { initial() },
@@ -64,11 +65,11 @@ inline fun <reified R : @Serializable Route> rememberPagesRouter(
     key: String = currentCompositeKeyHash.toString(36),
     noinline onResult: @DisallowComposableCalls PagesRouter<R>.(RouteResult<R>) -> Unit,
 ): PagesRouter<R> {
-    val uiContext = LocalUiContext.current
+    val presentationContext = LocalPresentationContext.current
 
     return rememberRetained {
         DefaultPagesRouter(
-            uiContext = uiContext,
+            presentationContext = presentationContext,
             serializer = serializer,
             initial = initial,
             onResult = onResult,

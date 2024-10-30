@@ -12,13 +12,13 @@ import kosh.ui.navigation.routes.RootRoute
 
 @Composable
 internal fun App(
-    link: RootRoute?,
+    initialLink: RootRoute?,
     onResult: @DisallowComposableCalls (RouteResult.Result) -> Unit,
 ) {
     KoshTheme {
         Box(Modifier.background(MaterialTheme.colorScheme.background)) {
             HomeHost(
-                link = link,
+                initialLink = initialLink,
                 onResult = onResult,
             )
         }

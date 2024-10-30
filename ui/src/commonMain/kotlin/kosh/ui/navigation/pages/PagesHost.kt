@@ -11,8 +11,8 @@ import androidx.compose.ui.Modifier
 import com.arkivanov.decompose.Child
 import com.arkivanov.decompose.extensions.compose.subscribeAsState
 import com.arkivanov.decompose.router.pages.ChildPages
-import kosh.presentation.core.LocalUiContext
-import kosh.presentation.core.UiContext
+import kosh.presentation.core.LocalPresentationContext
+import kosh.presentation.core.PresentationContext
 import kosh.ui.navigation.koshAnimation
 import kosh.ui.navigation.routes.Route
 
@@ -30,11 +30,11 @@ fun <R : Route> PagesHost(
 
     koshAnimation(
         modifier = modifier,
-        state = pages.items[pages.selectedIndex] as Child.Created<R, UiContext>,
+        state = pages.items[pages.selectedIndex] as Child.Created<R, PresentationContext>,
         contentKey = { it.configuration },
     ) {
         holder.SaveableStateProvider(it.keyHashString()) {
-            CompositionLocalProvider(LocalUiContext provides it.instance) {
+            CompositionLocalProvider(LocalPresentationContext provides it.instance) {
                 pagesRouter.content(it.configuration)
             }
         }

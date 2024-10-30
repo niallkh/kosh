@@ -4,19 +4,20 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.currentCompositeKeyHash
 import com.arkivanov.decompose.router.slot.SlotNavigation
 import com.arkivanov.decompose.router.slot.childSlot
-import kosh.presentation.core.LocalUiContext
-import kosh.presentation.core.UiContext
+import kosh.presentation.core.LocalPresentationContext
+import kosh.presentation.core.PresentationContext
 import kosh.presentation.di.rememberRetained
 import kosh.ui.navigation.routes.Route
 import kotlinx.serialization.KSerializer
 import kotlinx.serialization.serializer
 
 class DefaultSlotRouter<R : Route>(
-    uiContext: UiContext,
+    presentationContext: PresentationContext,
     start: R?,
     serializer: KSerializer<R>,
     key: String,
-) : SlotRouter<R>, UiContext by uiContext, SlotNavigation<R> by SlotNavigation() {
+) : SlotRouter<R>, PresentationContext by presentationContext,
+    SlotNavigation<R> by SlotNavigation() {
 
     override val slot = childSlot(
         source = this,
@@ -34,11 +35,11 @@ inline fun <reified R : Route> rememberSlotRouter(
     serializer: KSerializer<R> = serializer(),
     key: String = currentCompositeKeyHash.toString(36),
 ): SlotRouter<R> {
-    val uiContext = LocalUiContext.current
+    val presentationContext = LocalPresentationContext.current
 
     return rememberRetained {
         DefaultSlotRouter(
-            uiContext = uiContext,
+            presentationContext = presentationContext,
             start = initial,
             serializer = serializer,
             key = key,

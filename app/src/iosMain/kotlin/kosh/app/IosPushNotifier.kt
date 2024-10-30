@@ -10,9 +10,7 @@ import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.launch
 import platform.UserNotifications.UNAuthorizationOptionAlert
 import platform.UserNotifications.UNAuthorizationOptionBadge
-import platform.UserNotifications.UNAuthorizationOptionProvisional
 import platform.UserNotifications.UNAuthorizationStatusAuthorized
-import platform.UserNotifications.UNAuthorizationStatusProvisional
 import platform.UserNotifications.UNMutableNotificationContent
 import platform.UserNotifications.UNNotificationInterruptionLevel.UNNotificationInterruptionLevelTimeSensitive
 import platform.UserNotifications.UNNotificationRequest
@@ -58,11 +56,7 @@ public class IosPushNotifier(
                 }
             }
 
-            if (settings?.authorizationStatus in arrayOf(
-                    UNAuthorizationStatusAuthorized,
-                    UNAuthorizationStatusProvisional
-                )
-            ) {
+            if (settings?.authorizationStatus in arrayOf(UNAuthorizationStatusAuthorized)) {
                 val request = createNotification(appNotification)
 
                 suspendCoroutine { cont ->
@@ -124,9 +118,7 @@ internal fun requestNotificationPermission() {
     val notificationCenter = UNUserNotificationCenter.currentNotificationCenter()
 
     notificationCenter.requestAuthorizationWithOptions(
-        UNAuthorizationOptionAlert or
-                UNAuthorizationOptionBadge or
-                UNAuthorizationOptionProvisional
+        UNAuthorizationOptionAlert or UNAuthorizationOptionBadge
     ) { granted, _ ->
         Logger.d { "requestNotificationPermission, granted=$granted" }
     }

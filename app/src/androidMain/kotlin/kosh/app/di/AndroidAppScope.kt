@@ -2,11 +2,11 @@ package kosh.app.di
 
 import android.content.Context
 import android.os.StrictMode
-import co.touchlab.kermit.LogcatWriter
+import co.touchlab.crashkios.crashlytics.enableCrashlytics
 import co.touchlab.kermit.Logger
 import co.touchlab.kermit.Severity
-import co.touchlab.kermit.bugsnag.BugsnagLogWriter
-import com.bugsnag.android.Bugsnag
+import co.touchlab.kermit.crashlytics.CrashlyticsLogWriter
+import co.touchlab.kermit.platformLogWriter
 import kosh.app.AndroidPushNotifier
 import kosh.app.BuildConfig
 import kosh.app.di.impl.DefaultAppScope
@@ -106,27 +106,23 @@ internal class AndroidAppScope(
     }
 
     init {
-        Bugsnag.start(context)
-
         Logger.setTag("[K]")
+
+        enableCrashlytics()
 
         if (BuildConfig.DEBUG) {
             StrictMode.enableDefaults()
             Logger.setMinSeverity(Severity.Verbose)
             Logger.setLogWriters(
-                LogcatWriter(),
-                BugsnagLogWriter(
-                    minCrashSeverity = Severity.Error,
-                )
+                platformLogWriter(),
+                CrashlyticsLogWriter()
             )
         } else {
             Logger.setMinSeverity(Severity.Info)
             Logger.setLogWriters(
-                BugsnagLogWriter()
+                CrashlyticsLogWriter()
             )
         }
-
-//        DecomposeExperimentFlags.duplicateConfigurationsEnabled = true
     }
 
     init {

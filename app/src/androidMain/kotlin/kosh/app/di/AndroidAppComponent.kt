@@ -17,10 +17,6 @@ internal class AndroidAppComponent(
             .metaData
     }
 
-    override val bugsnagKey: String by provider {
-        getMetadataValue("com.bugsnag.android.API_KEY")
-    }
-
     override val reownProject: String by provider {
         getMetadataValue("eth.kosh.REOWN_PROJECT")
     }

@@ -10,11 +10,11 @@ struct iOSApp: App {
         WindowGroup {
             RootView(
                 appScope: appDelegate.appScope!,
-                uiContext: appDelegate.uiContext!
+                presentationContext: appDelegate.presentationContext!
             )
                 .ignoresSafeArea()
                 .onOpenURL { url in
-                    appDelegate.uiContext!.uiScope.deeplinkHandler.handle(url: url.absoluteString)
+                    appDelegate.presentationContext!.presentationScope.deeplinkHandler.handle(url: url.absoluteString)
                 }
         }
     }

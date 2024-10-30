@@ -8,8 +8,8 @@ import com.arkivanov.decompose.router.stack.StackNavigation
 import com.arkivanov.decompose.router.stack.childStack
 import com.arkivanov.decompose.router.stack.pop
 import com.arkivanov.decompose.value.Value
-import kosh.presentation.core.LocalUiContext
-import kosh.presentation.core.UiContext
+import kosh.presentation.core.LocalPresentationContext
+import kosh.presentation.core.PresentationContext
 import kosh.presentation.di.rememberRetained
 import kosh.ui.navigation.RouteResult
 import kosh.ui.navigation.isDeeplink
@@ -19,15 +19,16 @@ import kotlinx.serialization.Serializable
 import kotlinx.serialization.serializer
 
 class DefaultStackRouter<R : Route>(
-    uiContext: UiContext,
+    presentationContext: PresentationContext,
     serializer: KSerializer<R>,
     private val start: () -> R,
     link: R?,
     key: String,
     private val onResult: StackRouter<R>.(RouteResult<R>) -> Unit,
-) : StackRouter<R>, StackNavigation<R> by StackNavigation(), UiContext by uiContext {
+) : StackRouter<R>, StackNavigation<R> by StackNavigation(),
+    PresentationContext by presentationContext {
 
-    override val stack: Value<ChildStack<R, UiContext>> = childStack(
+    override val stack: Value<ChildStack<R, PresentationContext>> = childStack(
         source = this,
         serializer = serializer,
         initialStack = {
@@ -67,11 +68,11 @@ inline fun <reified R : @Serializable Route> rememberStackRouter(
     key: String = currentCompositeKeyHash.toString(36),
     noinline onResult: @DisallowComposableCalls StackRouter<R>.(RouteResult<R>) -> Unit,
 ): StackRouter<R> {
-    val uiContext = LocalUiContext.current
+    val presentationContext = LocalPresentationContext.current
 
     return rememberRetained {
         DefaultStackRouter(
-            uiContext = uiContext,
+            presentationContext = presentationContext,
             serializer = serializer,
             start = start,
             link = link,

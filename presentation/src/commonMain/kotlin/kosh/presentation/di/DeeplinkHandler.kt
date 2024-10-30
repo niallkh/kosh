@@ -1,29 +1,31 @@
 package kosh.presentation.di
 
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import co.touchlab.kermit.Logger
+import kosh.presentation.core.di
+import kotlinx.coroutines.channels.Channel
 
 class DeeplinkHandler {
 
     private val logger = Logger.withTag("[K]")
 
-    private var subscriber: ((String?) -> Unit)? = null
-    private var deeplink: String? = null
+    internal val channel = Channel<String?>(Channel.CONFLATED)
 
     fun handle(url: String?) {
-        logger.d { "handle(url: $url)" }
-        if (subscriber != null) {
-            subscriber?.invoke(url)
-        } else {
-            deeplink = url
-        }
+        logger.v { "handle(url: $url)" }
+        channel.trySend(url)
     }
+}
 
-    fun subscribe(subscriber: (String?) -> Unit) {
-        require(this.subscriber == null) {
-            "DeeplinkHandler is already subscribed"
+@Composable
+fun HandleDeeplink(
+    handler: DeeplinkHandler = di { deeplinkHandler },
+    callback: (String?) -> Unit,
+) {
+    LaunchedEffect(callback) {
+        for (uri in handler.channel) {
+            callback(uri)
         }
-        this.subscriber = subscriber
-        deeplink?.let(subscriber)
-        deeplink = null
     }
 }

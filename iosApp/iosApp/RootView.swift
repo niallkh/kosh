@@ -4,12 +4,12 @@ import App
 
 struct RootView: UIViewControllerRepresentable {
     let appScope: AppScope
-    var uiContext: PresentationUiContext
+    var presentationContext: PresentationContext
 
     func makeUIViewController(context: Context) -> UIViewController {                
         return RootViewControllerKt.rootViewController(
             appScope: appScope,
-            uiContext: uiContext
+            presentationContext: presentationContext
         )
     }
 

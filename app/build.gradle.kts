@@ -1,4 +1,3 @@
-
 import org.jetbrains.compose.internal.utils.getLocalProperty
 import org.jetbrains.kotlin.gradle.dsl.JvmTarget
 
@@ -7,7 +6,9 @@ plugins {
     alias(libs.plugins.androidApplication)
     alias(libs.plugins.jetbrainsCompose)
     alias(libs.plugins.compose.compiler)
-    alias(libs.plugins.bugsnagAndroid)
+    alias(libs.plugins.googleServices)
+    alias(libs.plugins.firebaseCrashlytics)
+//    alias(libs.plugins.crashlyticsLink)
 }
 
 kotlin {
@@ -29,16 +30,15 @@ kotlin {
             isStatic = true
 
             export(projects.domain)
+            export(projects.presentation)
             export(projects.libs.reown)
 
-            export(libs.arrow)
             export(libs.decompose)
             export(libs.essenty.lifecycle)
             export(libs.essenty.lifecycle)
             export(libs.essenty.state.keeper)
             export(libs.essenty.instance.keeper)
             export(libs.essenty.back.handler)
-            export(libs.bugsnag.crashkios)
             export(libs.kermit.simple)
         }
     }
@@ -66,13 +66,12 @@ kotlin {
             implementation(libs.androidx.work)
             implementation(libs.androidx.lifecycle.service)
             implementation(libs.androidx.lifecycle.process)
-            implementation(libs.bugsnag.android)
-            implementation(libs.bugsnag.android.perf)
             implementation(libs.decompose.android)
             implementation(libs.ktor.client.okhttp)
             implementation(libs.secp256k1.android)
             implementation(libs.okhttp)
             implementation(libs.okhttp.logging)
+            implementation(libs.firebase.crashlytics)
         }
 
         commonMain.dependencies {
@@ -84,8 +83,8 @@ kotlin {
 
             api(projects.domain)
             api(projects.libs.reown)
+            api(projects.presentation)
             implementation(projects.ui)
-            implementation(projects.presentation)
             implementation(projects.data)
             implementation(projects.data.trezor)
             implementation(projects.data.ledger)
@@ -106,7 +105,7 @@ kotlin {
             implementation(libs.ktor.client)
             implementation(libs.ktor.client.logging)
             implementation(libs.ktor.client.encoding)
-            implementation(libs.kermit.bugsnag)
+            implementation(libs.kermit.crashlytics)
 
             api(libs.arrow)
             api(libs.decompose)
@@ -115,7 +114,7 @@ kotlin {
             api(libs.essenty.state.keeper)
             api(libs.essenty.instance.keeper)
             api(libs.essenty.back.handler)
-            api(libs.bugsnag.crashkios)
+            api(libs.crashkios)
         }
 
         commonTest.dependencies {
@@ -144,14 +143,12 @@ android {
         versionCode = 8
         versionName = "0.0.4"
 
-        manifestPlaceholders["BUGSNAG_KEY"] = getLocalProperty("bugsnag.key") as String
         manifestPlaceholders["REOWN_PROJECT"] = getLocalProperty("reown.project") as String
         manifestPlaceholders["GROVE_KEY"] = getLocalProperty("grove.key") as String
     }
 
     buildTypes {
         debug {
-            applicationIdSuffix = ".debug"
             isDebuggable = true
             isMinifyEnabled = false
         }

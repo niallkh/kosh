@@ -5,8 +5,8 @@ import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.DisallowComposableCalls
 import com.arkivanov.decompose.extensions.compose.stack.Children
 import com.arkivanov.decompose.extensions.compose.stack.animation.StackAnimation
-import kosh.presentation.core.LocalUiContext
-import kosh.presentation.core.UiContext
+import kosh.presentation.core.LocalPresentationContext
+import kosh.presentation.core.PresentationContext
 import kosh.ui.navigation.RouteResult
 import kosh.ui.navigation.animation.backStackAnimation
 import kosh.ui.navigation.routes.Route
@@ -15,7 +15,7 @@ import kotlinx.serialization.serializer
 @Composable
 inline fun <R : Route> StackHost(
     stackRouter: StackRouter<R>,
-    animation: StackAnimation<R, UiContext>? = null,
+    animation: StackAnimation<R, PresentationContext>? = null,
     crossinline content: @Composable StackRouter<R>.(R) -> Unit,
 ) {
     Children(
@@ -25,7 +25,7 @@ inline fun <R : Route> StackHost(
             onBack = stackRouter::pop,
         ),
     ) { child ->
-        CompositionLocalProvider(LocalUiContext provides child.instance) {
+        CompositionLocalProvider(LocalPresentationContext provides child.instance) {
             stackRouter.content(child.configuration)
         }
     }
@@ -36,7 +36,7 @@ inline fun <reified R : Route> StackHost(
     start: R,
     link: R?,
     noinline onResult: @DisallowComposableCalls StackRouter<R>.(RouteResult<R>) -> Unit,
-    animation: StackAnimation<R, UiContext>? = null,
+    animation: StackAnimation<R, PresentationContext>? = null,
     crossinline content: @Composable StackRouter<R>.(R) -> Unit,
 ) {
     val stackRouter = rememberStackRouter<R>(

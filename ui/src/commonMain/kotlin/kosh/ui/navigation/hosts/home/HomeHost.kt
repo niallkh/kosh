@@ -18,11 +18,12 @@ import com.arkivanov.decompose.extensions.compose.subscribeAsState
 import com.arkivanov.decompose.router.pages.Pages
 import com.arkivanov.decompose.router.pages.navigate
 import com.arkivanov.decompose.router.pages.select
-import kosh.presentation.component.selector.selector
+import kosh.presentation.di.HandleDeeplink
 import kosh.ui.navigation.RouteResult
 import kosh.ui.navigation.hosts.RootHost
 import kosh.ui.navigation.pages.PagesHost
 import kosh.ui.navigation.pages.rememberPagesRouter
+import kosh.ui.navigation.parseDeeplink
 import kosh.ui.navigation.routes.HomeRoute
 import kosh.ui.navigation.routes.HomeRoute.Activity
 import kosh.ui.navigation.routes.HomeRoute.Assets
@@ -31,17 +32,20 @@ import kosh.ui.navigation.routes.RootRoute
 
 @Composable
 fun HomeHost(
-    link: RootRoute?,
+    initialLink: RootRoute?,
     onResult: @DisallowComposableCalls (RouteResult.Result) -> Unit,
 ) {
     val pagesRouter = rememberPagesRouter(
-        { Pages(listOf(Assets(), Activity(), WalletConnect()), 0).update(link) },
+        { Pages(listOf(Assets(), Activity(), WalletConnect()), 0).update(initialLink) },
     ) {
         onResult(RouteResult.Result())
     }
-    selector(link) { newLink ->
-        pagesRouter.navigate { pages -> pages.update(newLink) }
+
+    HandleDeeplink {
+        val link = it?.let { parseDeeplink(it) }
+        pagesRouter.navigate { pages -> pages.update(link) }
     }
+
     val childPages by pagesRouter.pages.subscribeAsState()
     val resetHandler = remember { HomeTabResetHandler() }
 

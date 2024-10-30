@@ -6,14 +6,14 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberUpdatedState
 import com.arkivanov.essenty.backhandler.BackCallback
-import kosh.presentation.core.LocalUiContext
+import kosh.presentation.core.LocalPresentationContext
 
 @Composable
 fun BackHandler(
     enabled: Boolean = true,
     onBack: () -> Unit,
 ) {
-    val backHandler = LocalUiContext.current.backHandler
+    val backHandler = LocalPresentationContext.current.backHandler
 
     val currentOnBack by rememberUpdatedState(onBack)
 

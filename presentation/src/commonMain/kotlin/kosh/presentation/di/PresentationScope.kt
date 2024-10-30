@@ -5,7 +5,7 @@ import kosh.domain.DomainComponent
 import kosh.domain.UiRepositoriesComponent
 import kotlinx.serialization.cbor.Cbor
 
-interface UiScope {
+interface PresentationScope {
 
     val cbor: Cbor
 
@@ -17,5 +17,5 @@ interface UiScope {
 
     val deeplinkHandler: DeeplinkHandler
 
-    fun create(): UiScope
+    fun create(): PresentationScope
 }

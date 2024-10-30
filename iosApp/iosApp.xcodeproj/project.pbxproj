@@ -11,15 +11,12 @@
 		058557D9273AAEEB004C7B11 /* Preview Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 058557D8273AAEEB004C7B11 /* Preview Assets.xcassets */; };
 		2152FB042600AC8F00CF470E /* iOSApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2152FB032600AC8F00CF470E /* iOSApp.swift */; };
 		7555FF83242A565900829871 /* RootView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7555FF82242A565900829871 /* RootView.swift */; };
+		EC6C27472CD17482003F3E2D /* FirebaseCrashlytics in Frameworks */ = {isa = PBXBuildFile; productRef = EC6C27462CD17482003F3E2D /* FirebaseCrashlytics */; };
 		EC77D4822CBBF2FB001FB256 /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = EC77D4812CBBF2FB001FB256 /* LaunchScreen.storyboard */; };
 		EC900D9C2CAEA269004B5044 /* Starscream in Frameworks */ = {isa = PBXBuildFile; productRef = EC900D9B2CAEA269004B5044 /* Starscream */; };
 		EC9122FA2CB84E8000913E89 /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = EC9122F92CB84E8000913E89 /* AppDelegate.swift */; };
+		ECA6C5F72CD1898200ECD8FB /* GoogleService-Info.plist in Resources */ = {isa = PBXBuildFile; fileRef = ECA6C5F62CD1898200ECD8FB /* GoogleService-Info.plist */; };
 		ECB0F1E62CAAFB6A00F1B561 /* ReownWalletKit in Frameworks */ = {isa = PBXBuildFile; productRef = ECB0F1E52CAAFB6A00F1B561 /* ReownWalletKit */; };
-		ECFE891E2CCA975500CE0454 /* Bugsnag in Frameworks */ = {isa = PBXBuildFile; productRef = ECFE891D2CCA975500CE0454 /* Bugsnag */; };
-		ECFE89202CCA975500CE0454 /* BugsnagNetworkRequestPlugin in Frameworks */ = {isa = PBXBuildFile; productRef = ECFE891F2CCA975500CE0454 /* BugsnagNetworkRequestPlugin */; };
-		ECFE89232CCA9A1500CE0454 /* BugsnagPerformance in Frameworks */ = {isa = PBXBuildFile; productRef = ECFE89222CCA9A1500CE0454 /* BugsnagPerformance */; };
-		ECFE89252CCA9A1500CE0454 /* BugsnagPerformanceSwift in Frameworks */ = {isa = PBXBuildFile; productRef = ECFE89242CCA9A1500CE0454 /* BugsnagPerformanceSwift */; };
-		ECFE89272CCA9A1500CE0454 /* BugsnagPerformanceSwiftUI in Frameworks */ = {isa = PBXBuildFile; productRef = ECFE89262CCA9A1500CE0454 /* BugsnagPerformanceSwiftUI */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -34,6 +31,7 @@
 		EC8583962CB6F72900BDBB6F /* Debug.xcconfig */ = {isa = PBXFileReference; lastKnownFileType = text.xcconfig; path = Debug.xcconfig; sourceTree = "<group>"; };
 		EC8583972CB6F73700BDBB6F /* Release.xcconfig */ = {isa = PBXFileReference; lastKnownFileType = text.xcconfig; path = Release.xcconfig; sourceTree = "<group>"; };
 		EC9122F92CB84E8000913E89 /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
+		ECA6C5F62CD1898200ECD8FB /* GoogleService-Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = "GoogleService-Info.plist"; sourceTree = "<group>"; };
 		ECF0BEC62CB4187300014D91 /* iosAppDebug.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = iosAppDebug.entitlements; sourceTree = "<group>"; };
 		ECF0BEC72CB41C1700014D91 /* iosApp.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = iosApp.entitlements; sourceTree = "<group>"; };
 /* End PBXFileReference section */
@@ -47,13 +45,9 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				ECFE89232CCA9A1500CE0454 /* BugsnagPerformance in Frameworks */,
-				ECFE89272CCA9A1500CE0454 /* BugsnagPerformanceSwiftUI in Frameworks */,
-				ECFE89202CCA975500CE0454 /* BugsnagNetworkRequestPlugin in Frameworks */,
-				ECFE891E2CCA975500CE0454 /* Bugsnag in Frameworks */,
 				ECB0F1E62CAAFB6A00F1B561 /* ReownWalletKit in Frameworks */,
+				EC6C27472CD17482003F3E2D /* FirebaseCrashlytics in Frameworks */,
 				EC900D9C2CAEA269004B5044 /* Starscream in Frameworks */,
-				ECFE89252CCA9A1500CE0454 /* BugsnagPerformanceSwift in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -97,6 +91,7 @@
 		7555FF7D242A565900829871 /* iosApp */ = {
 			isa = PBXGroup;
 			children = (
+				ECA6C5F62CD1898200ECD8FB /* GoogleService-Info.plist */,
 				ECF0BEC72CB41C1700014D91 /* iosApp.entitlements */,
 				ECF0BEC62CB4187300014D91 /* iosAppDebug.entitlements */,
 				ECB0F1E92CAAFC0F00F1B561 /* reown */,
@@ -131,6 +126,7 @@
 				7555FF77242A565900829871 /* Sources */,
 				B92378962B6B1156000C7307 /* Frameworks */,
 				7555FF79242A565900829871 /* Resources */,
+				ECA6C5F42CD179DD00ECD8FB /* Upload firebase dSYM */,
 			);
 			buildRules = (
 			);
@@ -143,11 +139,7 @@
 			packageProductDependencies = (
 				ECB0F1E52CAAFB6A00F1B561 /* ReownWalletKit */,
 				EC900D9B2CAEA269004B5044 /* Starscream */,
-				ECFE891D2CCA975500CE0454 /* Bugsnag */,
-				ECFE891F2CCA975500CE0454 /* BugsnagNetworkRequestPlugin */,
-				ECFE89222CCA9A1500CE0454 /* BugsnagPerformance */,
-				ECFE89242CCA9A1500CE0454 /* BugsnagPerformanceSwift */,
-				ECFE89262CCA9A1500CE0454 /* BugsnagPerformanceSwiftUI */,
+				EC6C27462CD17482003F3E2D /* FirebaseCrashlytics */,
 			);
 			productName = iosApp;
 			productReference = 7555FF7B242A565900829871 /* Kosh Debug.app */;
@@ -181,8 +173,7 @@
 			packageReferences = (
 				ECB0F1E22CAAE19B00F1B561 /* XCRemoteSwiftPackageReference "reown-swift" */,
 				EC900D9A2CAEA269004B5044 /* XCRemoteSwiftPackageReference "Starscream" */,
-				ECFE891C2CCA975500CE0454 /* XCRemoteSwiftPackageReference "bugsnag-cocoa" */,
-				ECFE89212CCA9A1500CE0454 /* XCRemoteSwiftPackageReference "bugsnag-cocoa-performance" */,
+				EC6C27452CD17482003F3E2D /* XCRemoteSwiftPackageReference "firebase-ios-sdk" */,
 			);
 			productRefGroup = 7555FF7C242A565900829871 /* Products */;
 			projectDirPath = "";
@@ -199,6 +190,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				EC77D4822CBBF2FB001FB256 /* LaunchScreen.storyboard in Resources */,
+				ECA6C5F72CD1898200ECD8FB /* GoogleService-Info.plist in Resources */,
 				058557D9273AAEEB004C7B11 /* Preview Assets.xcassets in Resources */,
 				058557BB273AAA24004C7B11 /* Assets.xcassets in Resources */,
 			);
@@ -207,6 +199,29 @@
 /* End PBXResourcesBuildPhase section */
 
 /* Begin PBXShellScriptBuildPhase section */
+		ECA6C5F42CD179DD00ECD8FB /* Upload firebase dSYM */ = {
+			isa = PBXShellScriptBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputFileListPaths = (
+			);
+			inputPaths = (
+				"${DWARF_DSYM_FOLDER_PATH}/${DWARF_DSYM_FILE_NAME}",
+				"${DWARF_DSYM_FOLDER_PATH}/${DWARF_DSYM_FILE_NAME}/Contents/Resources/DWARF/${PRODUCT_NAME}",
+				"${DWARF_DSYM_FOLDER_PATH}/${DWARF_DSYM_FILE_NAME}/Contents/Info.plist",
+				"$(TARGET_BUILD_DIR)/$(UNLOCALIZED_RESOURCES_FOLDER_PATH)/GoogleService-Info.plist",
+				"$(TARGET_BUILD_DIR)/$(EXECUTABLE_PATH)",
+			);
+			name = "Upload firebase dSYM";
+			outputFileListPaths = (
+			);
+			outputPaths = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "# Type a script or drag a script file from your workspace to insert its path.\n\"${BUILD_DIR%/Build/*}/SourcePackages/checkouts/firebase-ios-sdk/Crashlytics/run\"\n\n";
+		};
 		F36B1CEB2AD83DDC00CB74D5 /* Compile Kotlin Framework */ = {
 			isa = PBXShellScriptBuildPhase;
 			buildActionMask = 2147483647;
@@ -455,6 +470,14 @@
 /* End XCConfigurationList section */
 
 /* Begin XCRemoteSwiftPackageReference section */
+		EC6C27452CD17482003F3E2D /* XCRemoteSwiftPackageReference "firebase-ios-sdk" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/firebase/firebase-ios-sdk";
+			requirement = {
+				kind = upToNextMajorVersion;
+				minimumVersion = 11.4.0;
+			};
+		};
 		EC900D9A2CAEA269004B5044 /* XCRemoteSwiftPackageReference "Starscream" */ = {
 			isa = XCRemoteSwiftPackageReference;
 			repositoryURL = "https://github.com/daltoniam/Starscream.git";
@@ -471,25 +494,14 @@
 				minimumVersion = 1.0.1;
 			};
 		};
-		ECFE891C2CCA975500CE0454 /* XCRemoteSwiftPackageReference "bugsnag-cocoa" */ = {
-			isa = XCRemoteSwiftPackageReference;
-			repositoryURL = "https://github.com/bugsnag/bugsnag-cocoa";
-			requirement = {
-				kind = upToNextMajorVersion;
-				minimumVersion = 6.30.1;
-			};
-		};
-		ECFE89212CCA9A1500CE0454 /* XCRemoteSwiftPackageReference "bugsnag-cocoa-performance" */ = {
-			isa = XCRemoteSwiftPackageReference;
-			repositoryURL = "https://github.com/bugsnag/bugsnag-cocoa-performance";
-			requirement = {
-				kind = upToNextMajorVersion;
-				minimumVersion = 1.10.0;
-			};
-		};
 /* End XCRemoteSwiftPackageReference section */
 
 /* Begin XCSwiftPackageProductDependency section */
+		EC6C27462CD17482003F3E2D /* FirebaseCrashlytics */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = EC6C27452CD17482003F3E2D /* XCRemoteSwiftPackageReference "firebase-ios-sdk" */;
+			productName = FirebaseCrashlytics;
+		};
 		EC900D9B2CAEA269004B5044 /* Starscream */ = {
 			isa = XCSwiftPackageProductDependency;
 			package = EC900D9A2CAEA269004B5044 /* XCRemoteSwiftPackageReference "Starscream" */;
@@ -499,31 +511,6 @@
 			isa = XCSwiftPackageProductDependency;
 			package = ECB0F1E22CAAE19B00F1B561 /* XCRemoteSwiftPackageReference "reown-swift" */;
 			productName = ReownWalletKit;
-		};
-		ECFE891D2CCA975500CE0454 /* Bugsnag */ = {
-			isa = XCSwiftPackageProductDependency;
-			package = ECFE891C2CCA975500CE0454 /* XCRemoteSwiftPackageReference "bugsnag-cocoa" */;
-			productName = Bugsnag;
-		};
-		ECFE891F2CCA975500CE0454 /* BugsnagNetworkRequestPlugin */ = {
-			isa = XCSwiftPackageProductDependency;
-			package = ECFE891C2CCA975500CE0454 /* XCRemoteSwiftPackageReference "bugsnag-cocoa" */;
-			productName = BugsnagNetworkRequestPlugin;
-		};
-		ECFE89222CCA9A1500CE0454 /* BugsnagPerformance */ = {
-			isa = XCSwiftPackageProductDependency;
-			package = ECFE89212CCA9A1500CE0454 /* XCRemoteSwiftPackageReference "bugsnag-cocoa-performance" */;
-			productName = BugsnagPerformance;
-		};
-		ECFE89242CCA9A1500CE0454 /* BugsnagPerformanceSwift */ = {
-			isa = XCSwiftPackageProductDependency;
-			package = ECFE89212CCA9A1500CE0454 /* XCRemoteSwiftPackageReference "bugsnag-cocoa-performance" */;
-			productName = BugsnagPerformanceSwift;
-		};
-		ECFE89262CCA9A1500CE0454 /* BugsnagPerformanceSwiftUI */ = {
-			isa = XCSwiftPackageProductDependency;
-			package = ECFE89212CCA9A1500CE0454 /* XCRemoteSwiftPackageReference "bugsnag-cocoa-performance" */;
-			productName = BugsnagPerformanceSwiftUI;
 		};
 /* End XCSwiftPackageProductDependency section */
 	};

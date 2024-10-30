@@ -3,18 +3,18 @@ package kosh.presentation.core
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.ProvidableCompositionLocal
 import androidx.compose.runtime.compositionLocalOf
-import kosh.presentation.di.UiScope
+import kosh.presentation.di.PresentationScope
 
-val LocalUiContext: ProvidableCompositionLocal<UiContext> = compositionLocalOf {
-    error("UiContext not provided")
+val LocalPresentationContext: ProvidableCompositionLocal<PresentationContext> = compositionLocalOf {
+    error("PresentationContext not provided")
 }
 
 @Composable
 inline fun <reified VM : Any> di(
-    crossinline block: UiScope.() -> VM,
-): VM = LocalUiContext.current.uiScope.block()
+    crossinline block: PresentationScope.() -> VM,
+): VM = LocalPresentationContext.current.presentationScope.block()
 
-inline fun <reified T : Any> UiContext.getOrCreate(
+inline fun <reified T : Any> PresentationContext.getOrCreate(
     key: String,
     factory: () -> T,
 ): T {

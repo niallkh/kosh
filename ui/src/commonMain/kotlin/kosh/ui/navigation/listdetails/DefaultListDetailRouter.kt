@@ -7,8 +7,8 @@ import com.arkivanov.decompose.router.children.SimpleNavigation
 import com.arkivanov.decompose.router.children.children
 import com.arkivanov.decompose.value.Value
 import com.arkivanov.essenty.backhandler.BackCallback
-import kosh.presentation.core.LocalUiContext
-import kosh.presentation.core.UiContext
+import kosh.presentation.core.LocalPresentationContext
+import kosh.presentation.core.PresentationContext
 import kosh.presentation.di.rememberRetained
 import kosh.ui.navigation.RouteResult
 import kosh.ui.navigation.routes.Route
@@ -17,11 +17,11 @@ import kotlinx.serialization.Serializable
 import kotlinx.serialization.serializer
 
 class DefaultListDetailRouter<R : Route>(
-    uiContext: UiContext,
+    presentationContext: PresentationContext,
     serializer: KSerializer<R>,
     initial: () -> ListDetailState<R>,
     private val onResult: ListDetailRouter<R>.(RouteResult<R>) -> Unit,
-) : ListDetailRouter<R>, UiContext by uiContext {
+) : ListDetailRouter<R>, PresentationContext by presentationContext {
 
     private val navigation = SimpleNavigation<ListDetailEvent<R>>()
 
@@ -43,8 +43,8 @@ class DefaultListDetailRouter<R : Route>(
         stateMapper = { navState, children ->
             ListDetailRouter.Children(
                 multipane = navState.multipane,
-                list = children[0] as Child.Created<R, UiContext>,
-                detail = children.getOrNull(1) as Child.Created<R, UiContext>?,
+                list = children[0] as Child.Created<R, PresentationContext>,
+                detail = children.getOrNull(1) as Child.Created<R, PresentationContext>?,
             )
         },
         childFactory = { _, ctx -> ctx },
@@ -82,11 +82,11 @@ inline fun <reified R : @Serializable Route> rememberListDetailRouter(
     serializer: KSerializer<R> = serializer(),
     noinline list: @DisallowComposableCalls () -> R,
 ): ListDetailRouter<R> {
-    val uiContext = LocalUiContext.current
+    val presentationContext = LocalPresentationContext.current
 
     val stackRouter = rememberRetained {
         DefaultListDetailRouter(
-            uiContext = uiContext,
+            presentationContext = presentationContext,
             serializer = serializer,
             initial = {
                 ListDetailState(

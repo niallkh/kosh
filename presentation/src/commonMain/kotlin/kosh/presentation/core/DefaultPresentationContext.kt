@@ -7,20 +7,20 @@ import com.arkivanov.essenty.backhandler.BackHandlerOwner
 import com.arkivanov.essenty.instancekeeper.InstanceKeeperOwner
 import com.arkivanov.essenty.lifecycle.LifecycleOwner
 import com.arkivanov.essenty.statekeeper.StateKeeperOwner
-import kosh.presentation.di.UiScope
+import kosh.presentation.di.PresentationScope
 
-class DefaultUiContext(
+class DefaultPresentationContext(
     componentContext: ComponentContext,
     override val logger: Logger,
-    override val uiScope: UiScope,
+    override val presentationScope: PresentationScope,
     override val container: MutableMap<String, Any>,
-) : UiContext,
+) : PresentationContext,
     LifecycleOwner by componentContext,
     StateKeeperOwner by componentContext,
     InstanceKeeperOwner by componentContext,
     BackHandlerOwner by componentContext {
 
-    override val componentContextFactory: ComponentContextFactory<UiContext> =
+    override val componentContextFactory: ComponentContextFactory<PresentationContext> =
         ComponentContextFactory { lifecycle, stateKeeper, instanceKeeper, backHandler ->
             val ctx = componentContext.componentContextFactory(
                 lifecycle = lifecycle,
@@ -29,21 +29,21 @@ class DefaultUiContext(
                 backHandler = backHandler
             )
 
-            DefaultUiContext(
+            DefaultPresentationContext(
                 componentContext = ctx,
                 logger = logger,
-                uiScope = uiScope.create(),
+                presentationScope = presentationScope.create(),
                 container = mutableMapOf()
             )
         }
 }
 
-fun defaultUiContext(
+fun defaultPresentationContext(
     componentContext: ComponentContext,
-    uiScope: UiScope,
-): UiContext = DefaultUiContext(
+    presentationScope: PresentationScope,
+): PresentationContext = DefaultPresentationContext(
     componentContext = componentContext,
-    logger = Logger.withTag("[K]UiContext"),
-    uiScope = uiScope,
+    logger = Logger.withTag("[K]PresentationContext"),
+    presentationScope = presentationScope,
     container = mutableMapOf()
 )

@@ -6,8 +6,8 @@ import androidx.compose.runtime.RememberObserver
 import androidx.compose.runtime.SideEffect
 import androidx.compose.runtime.currentCompositeKeyHash
 import androidx.compose.runtime.remember
-import kosh.presentation.core.LocalUiContext
-import kosh.presentation.core.UiContext
+import kosh.presentation.core.LocalPresentationContext
+import kosh.presentation.core.PresentationContext
 import kosh.presentation.core.getOrCreate
 
 @Composable
@@ -16,18 +16,18 @@ fun <T : Any> rememberRetained(
     key: String = currentCompositeKeyHash.toString(36),
     init: @DisallowComposableCalls () -> T,
 ): T {
-    val uiContext = LocalUiContext.current
+    val presentationContext = LocalPresentationContext.current
 
     val holder = remember {
-        uiContext.getOrCreate(key) {
-            Holder(inputs, init(), uiContext, key)
+        presentationContext.getOrCreate(key) {
+            Holder(inputs, init(), presentationContext, key)
         }
     }
 
     val value = holder.getValueIfInputsDidntChange(inputs) ?: init()
 
     SideEffect {
-        holder.update(inputs, value, uiContext, key)
+        holder.update(inputs, value, presentationContext, key)
     }
 
     return value
@@ -36,19 +36,19 @@ fun <T : Any> rememberRetained(
 private class Holder<T>(
     private var inputs: Array<out Any?>,
     private var value: T,
-    private var uiContext: UiContext,
+    private var presentationContext: PresentationContext,
     private var key: String,
 ) : RememberObserver {
 
     fun update(
         inputs: Array<out Any?>,
         value: T,
-        uiContext: UiContext,
+        presentationContext: PresentationContext,
         key: String,
     ) {
-        if (uiContext != this.uiContext || key == this.key) {
+        if (presentationContext != this.presentationContext || key == this.key) {
             remove()
-            this.uiContext = uiContext
+            this.presentationContext = presentationContext
             this.key = key
             put()
         }
@@ -68,11 +68,11 @@ private class Holder<T>(
     }
 
     private fun put() {
-        uiContext.container[key] = this
+        presentationContext.container[key] = this
     }
 
     private fun remove() {
-        uiContext.container.remove(key)
+        presentationContext.container.remove(key)
     }
 
     override fun onRemembered() {

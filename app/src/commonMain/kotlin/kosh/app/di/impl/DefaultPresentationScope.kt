@@ -6,14 +6,14 @@ import kosh.domain.DomainComponent
 import kosh.domain.UiRepositoriesComponent
 import kosh.domain.core.provider
 import kosh.presentation.di.DeeplinkHandler
-import kosh.presentation.di.UiScope
+import kosh.presentation.di.PresentationScope
 import kotlinx.serialization.cbor.Cbor
 
-internal class DefaultUiScope(
+internal class DefaultPresentationScope(
     private val appScope: AppScope,
     override val uiRepositoriesComponent: UiRepositoriesComponent,
     override val deeplinkHandler: DeeplinkHandler,
-) : UiScope {
+) : PresentationScope {
 
     override val cbor: Cbor by provider {
         appScope.serializationComponent.cbor
@@ -30,7 +30,7 @@ internal class DefaultUiScope(
         )
     }
 
-    override fun create(): UiScope = DefaultUiScope(
+    override fun create(): PresentationScope = DefaultPresentationScope(
         appScope = appScope,
         uiRepositoriesComponent = uiRepositoriesComponent,
         deeplinkHandler = deeplinkHandler,

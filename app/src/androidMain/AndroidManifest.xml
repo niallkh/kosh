@@ -40,14 +40,6 @@
         tools:targetApi="34">
 
         <meta-data
-            android:name="com.bugsnag.android.API_KEY"
-            android:value="${BUGSNAG_KEY}" />
-
-        <meta-data
-            android:name="com.bugsnag.performance.android.API_KEY"
-            android:value="${BUGSNAG_KEY}" />
-
-        <meta-data
             android:name="eth.kosh.REOWN_PROJECT"
             android:value="${REOWN_PROJECT}" />
 

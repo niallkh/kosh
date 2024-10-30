@@ -8,5 +8,7 @@ plugins {
     alias(libs.plugins.ksp) apply false
     alias(libs.plugins.wire) apply false
     alias(libs.plugins.sqldelight) apply false
-    alias(libs.plugins.bugsnagAndroid) apply false
+    alias(libs.plugins.googleServices) apply false
+    alias(libs.plugins.firebaseCrashlytics) apply false
+    alias(libs.plugins.crashlyticsLink) apply false
 }

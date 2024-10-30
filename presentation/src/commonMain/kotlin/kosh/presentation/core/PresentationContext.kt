@@ -2,11 +2,11 @@ package kosh.presentation.core
 
 import co.touchlab.kermit.Logger
 import com.arkivanov.decompose.GenericComponentContext
-import kosh.presentation.di.UiScope
+import kosh.presentation.di.PresentationScope
 
-interface UiContext : GenericComponentContext<UiContext> {
+interface PresentationContext : GenericComponentContext<PresentationContext> {
     val logger: Logger
-    val uiScope: UiScope
+    val presentationScope: PresentationScope
     val container: MutableMap<String, Any>
 }
 

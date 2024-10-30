@@ -5,7 +5,7 @@ import com.arkivanov.decompose.router.children.ChildNavState
 import com.arkivanov.decompose.router.children.NavState
 import com.arkivanov.decompose.router.children.SimpleChildNavState
 import com.arkivanov.decompose.value.Value
-import kosh.presentation.core.UiContext
+import kosh.presentation.core.PresentationContext
 import kosh.ui.navigation.Router
 import kosh.ui.navigation.routes.Route
 import kotlinx.serialization.Serializable
@@ -20,8 +20,8 @@ interface ListDetailRouter<R : Route> : Router<R> {
 
     data class Children<C : Any>(
         val multipane: Boolean,
-        val list: Child.Created<C, UiContext>,
-        val detail: Child.Created<C, UiContext>?,
+        val list: Child.Created<C, PresentationContext>,
+        val detail: Child.Created<C, PresentationContext>?,
     )
 }
 

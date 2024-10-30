@@ -14,18 +14,15 @@ import androidx.activity.result.contract.ActivityResultContracts.RequestPermissi
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.setValue
 import androidx.core.app.TaskStackBuilder
 import androidx.core.net.toUri
 import androidx.core.splashscreen.SplashScreen.Companion.installSplashScreen
 import androidx.fragment.app.FragmentActivity
 import co.touchlab.kermit.Logger
 import com.seiko.imageloader.LocalImageLoader
-import kosh.app.di.androidUiContext
-import kosh.presentation.core.LocalUiContext
-import kosh.presentation.core.UiContext
+import kosh.app.di.androidPresentationContext
+import kosh.presentation.core.LocalPresentationContext
+import kosh.presentation.core.PresentationContext
 import kosh.ui.component.path.LocalPathResolver
 import kosh.ui.component.path.PathResolver
 import kosh.ui.navigation.deeplink
@@ -36,9 +33,7 @@ public class KoshActivity : FragmentActivity() {
 
     private val logger = Logger.withTag("[K]KoshActivity")
 
-    private lateinit var uiContext: UiContext
-
-    private var link by mutableStateOf<RootRoute?>(null)
+    private lateinit var presentationContext: PresentationContext
 
     override fun onCreate(savedInstanceState: Bundle?) {
         installSplashScreen()
@@ -46,27 +41,27 @@ public class KoshActivity : FragmentActivity() {
         enableEdgeToEdge()
         logger.d { "onCreate()" }
 
-        link = intent?.data?.toString()?.let(::parseDeeplink)
+        val initialLink = intent?.data?.toString()?.let(::parseDeeplink)
 
         logger.v { "action=${intent.action}, deeplink=${intent.data}" }
 
-        uiContext = androidUiContext(
+        presentationContext = androidPresentationContext(
             applicationScope = KoshApp.appScope,
             activity = this,
         )
 
         val pathResolver = PathResolver {
-            uiContext.uiScope.appRepositoriesComponent.fileRepo.read(it)
+            presentationContext.presentationScope.appRepositoriesComponent.fileRepo.read(it)
         }
 
         setContent {
             CompositionLocalProvider(
-                LocalUiContext provides uiContext,
+                LocalPresentationContext provides presentationContext,
                 LocalImageLoader provides KoshApp.appScope.imageComponent.imageLoader,
                 LocalPathResolver provides pathResolver,
             ) {
                 App(
-                    link = link,
+                    initialLink = initialLink,
                     onResult = { onResult(it.redirect) }
                 )
 
@@ -120,7 +115,7 @@ public class KoshActivity : FragmentActivity() {
         logger.v { "action=${intent.action}, deeplink=${intent.data}" }
 
         intent.data?.toString()?.let {
-            link = parseDeeplink(it)
+            presentationContext.presentationScope.deeplinkHandler.handle(it)
         }
     }
 
@@ -144,9 +139,13 @@ public class KoshActivity : FragmentActivity() {
 
         if (!redirect.isNullOrEmpty()) {
             startActivity(Intent(Intent.ACTION_VIEW, redirect.toUri()))
-            link = null
+            presentationContext.presentationScope.deeplinkHandler.handle(null)
         } else {
-            finish()
+            if (!moveTaskToBack(false)) {
+                finish()
+            } else {
+                presentationContext.presentationScope.deeplinkHandler.handle(null)
+            }
         }
     }
 

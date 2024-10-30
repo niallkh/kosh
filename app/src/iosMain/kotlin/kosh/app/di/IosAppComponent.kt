@@ -9,10 +9,6 @@ internal class IosAppComponent : AppComponent {
         getBundleValue("DEBUG") == "true"
     }
 
-    override val bugsnagKey: String by provider {
-        getBundleValue("BUGSNAG_KEY")
-    }
-
     override val reownProject: String by provider {
         getBundleValue("REOWN_PROJECT")
     }
