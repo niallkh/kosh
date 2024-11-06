@@ -140,11 +140,13 @@ android {
         applicationId = "eth.kosh.app"
         minSdk = libs.versions.android.minSdk.get().toInt()
         targetSdk = libs.versions.android.compileSdk.get().toInt()
-        versionCode = 8
+        versionCode = 9
         versionName = "0.0.4"
 
-        manifestPlaceholders["REOWN_PROJECT"] = getLocalProperty("reown.project") as String
-        manifestPlaceholders["GROVE_KEY"] = getLocalProperty("grove.key") as String
+        manifestPlaceholders["REOWN_PROJECT"] = getLocalProperty("reown.project")
+            ?: error("Local property reown.project not provided")
+        manifestPlaceholders["GROVE_KEY"] = getLocalProperty("grove.key")
+            ?: error("Local property grove.key not provided")
     }
 
     buildTypes {

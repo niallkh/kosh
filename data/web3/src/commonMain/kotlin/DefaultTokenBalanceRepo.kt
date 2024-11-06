@@ -41,8 +41,6 @@ class DefaultTokenBalanceRepo(
         tokens: List<TokenEntity>,
     ): Either<Web3Failure, List<Balance>> = withContext(Dispatchers.Default) {
         either {
-            val now = Clock.System.now()
-
             val calls = tokens.map { token -> mapToCall(account, token) }
 
             val web3 = web3ProviderFactory(networkService.getRpc(networkId).toLibUri())

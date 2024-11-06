@@ -10,7 +10,8 @@ import kosh.ui.navigation.Router
 import kosh.ui.navigation.routes.Route
 
 @Stable
-interface StackRouter<R : Route> : Router<R>, StackNavigation<R>, BackHandlerOwner {
+interface StackRouter<R : Route> : Router<R>, StackNavigation<R>, BackHandlerOwner,
+    PresentationContext {
 
     val stack: Value<ChildStack<R, PresentationContext>>
 }

@@ -32,12 +32,13 @@ from your mobile device.
 - [x] Material You design
 - [x] IPFS Trustless client
 - [x] EIP-191, EIP-712, EIP-1559
-- [ ] iOS
-- [ ] WalletConnect Inbox
-- [ ] EIP-7702
+- [x] iOS
+- [ ] Export/Import passkeys
 - [ ] ENS
 - [ ] Keystone (USB)
-- [ ] Export/Import passkeys
+- [ ] EIP-7702
+- [ ] WalletConnect Inbox
+- [ ] publish iOS
 
 ## Built With
 

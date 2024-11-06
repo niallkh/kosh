@@ -16,11 +16,11 @@ interface Router<R : Route> {
 }
 
 sealed class RouteResult<out R : Route> {
-    data class Result(
+    data class Finished(
         val redirect: String?,
     ) : RouteResult<Nothing>() {
         companion object {
-            private val empty = Result(null)
+            private val empty = Finished(null)
             operator fun invoke() = empty
         }
     }
@@ -35,7 +35,7 @@ inline fun <R1 : Route, R2 : Route> Router<R1>.pop(
     map: (R2) -> R1?,
 ) = pop(
     when (result) {
-        is RouteResult.Result -> result
+        is RouteResult.Finished -> result
         is RouteResult.Up -> RouteResult.Up(result.route?.let(map))
     }
 )

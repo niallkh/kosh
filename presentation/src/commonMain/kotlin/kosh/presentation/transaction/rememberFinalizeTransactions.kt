@@ -37,7 +37,7 @@ fun rememberFinalizeTransactions(
     var failures by remember { mutableStateOf<Nel<TransactionFailure>?>(null) }
     val timer = rememberTimer(1.minutes)
 
-    if (rememberLifecycleState()) {
+    if (appStateProvider.init && rememberLifecycleState()) {
         LaunchedEffect(Unit) {
             while (true) {
                 timer.waitNext()

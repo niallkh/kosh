@@ -29,6 +29,7 @@ import kotlinx.coroutines.suspendCancellableCoroutine
 import kotlinx.coroutines.withTimeoutOrNull
 import kotlin.coroutines.resume
 import kotlin.coroutines.resumeWithException
+import kotlin.coroutines.suspendCoroutine
 import kotlin.time.Duration.Companion.milliseconds
 import kotlin.time.Duration.Companion.seconds
 import com.reown.walletkit.client.Wallet.Model.VerifyContext as ReownVerifyContext
@@ -51,8 +52,8 @@ class AndroidReownAdapter(
 
     private val sessionsState = MutableStateFlow<List<Session>>(listOf())
 
-    private var approveProposalCont =
-        AtomicRef<CancellableContinuation<ReownResult<StringWrapper>>?>()
+    private var pairCont =
+        AtomicRef<CancellableContinuation<ReownResult<Unit>>?>()
 
     private val logger = Logger.withTag("[K]AndroidReownAdapter")
 
@@ -106,10 +107,10 @@ class AndroidReownAdapter(
             connectionType = ConnectionType.MANUAL,
             application = context as Application,
             metaData = appMetaData,
-            onError = { logger.e(it.throwable) { "Error happened in WC Core" } },
+            onError = { logger.e(it.throwable) { "Error happened in WC CoreClient" } },
         )
 
-        suspendCancellableCoroutine { cont ->
+        suspendCoroutine { cont ->
             SignClient.initialize(
                 init = Sign.Params.Init(CoreClient),
                 onSuccess = { cont.resume(Unit) },
@@ -216,6 +217,9 @@ class AndroidReownAdapter(
 
     override suspend fun pair(uri: String): ReownResult<Unit> =
         suspendCancellableCoroutine { cont ->
+            pairCont.update { cont }
+            cont.invokeOnCancellation { pairCont.update { null } }
+
             WalletKit.pair(
                 params = Wallet.Params.Pair(uri),
                 onSuccess = {
@@ -257,11 +261,6 @@ class AndroidReownAdapter(
             ?: return ReownResult.Failure(ReownFailure.NotFound("Session proposal not found"))
 
         val redirect: ReownResult<StringWrapper> = suspendCancellableCoroutine { cont ->
-            approveProposalCont.update { cont }
-            cont.invokeOnCancellation {
-                approveProposalCont.update { null }
-            }
-
             WalletKit.approveSession(
                 params = Wallet.Params.SessionApprove(
                     proposerPublicKey = proposal.proposerPublicKey,
@@ -692,15 +691,14 @@ class AndroidReownAdapter(
         val proposalNotFoundMessage =
             "No proposal or pending session authenticate request for pairing topic"
         if (proposalNotFoundMessage in error.throwable.message.orEmpty()) {
-            val continuation = approveProposalCont.get()
+            val continuation = pairCont.get()
             if (continuation?.isActive == true) {
                 continuation.resume(
                     ReownResult.Failure(ReownFailure.NotFound(proposalNotFoundMessage))
                 )
             }
-        } else {
-            logger.e(error.throwable) { "Error happened" }
         }
+        logger.e(error.throwable) { "Wallet error happened" }
     }
 
     private fun updateProposals() {

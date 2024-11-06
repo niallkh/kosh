@@ -16,14 +16,14 @@ import kotlinx.serialization.serializer
 fun RootHost(
     start: () -> RootRoute,
     link: RootRoute?,
-    onResult: @DisallowComposableCalls (RouteResult.Result) -> Unit,
+    onResult: @DisallowComposableCalls (RouteResult.Finished) -> Unit,
 ) {
     val stackRouter = rememberStackRouter<RootRoute>(
         start = start,
         link = link,
         onResult = {
             when (it) {
-                is RouteResult.Result -> onResult(it)
+                is RouteResult.Finished -> onResult(it)
                 is RouteResult.Up -> when (val route = it.route) {
                     null -> replaceAll(start())
                     else -> replaceAll(start(), route)
@@ -41,7 +41,7 @@ fun RootHost(
         stackRouter = stackRouter,
     ) { route ->
 
-    when (route) {
+        when (route) {
             is RootRoute.Tokens -> TokensHost(
                 link = route.link,
                 onOpen = { pushNew(it) },

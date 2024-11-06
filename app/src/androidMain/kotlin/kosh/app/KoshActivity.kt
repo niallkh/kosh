@@ -10,7 +10,6 @@ import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
 import androidx.activity.result.contract.ActivityResultContracts
-import androidx.activity.result.contract.ActivityResultContracts.RequestPermission
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.LaunchedEffect
@@ -65,42 +64,38 @@ public class KoshActivity : FragmentActivity() {
                     onResult = { onResult(it.redirect) }
                 )
 
-                NotificationPermission()
-                BluetoothPermission()
+                Permissions()
             }
         }
     }
 
     @Composable
-    private fun NotificationPermission() {
-        val launcher = rememberLauncherForActivityResult(RequestPermission()) {
-            logger.v { "NotificationPermission() = $it" }
-        }
-
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
-            LaunchedEffect(Unit) {
-                launcher.launch(Manifest.permission.POST_NOTIFICATIONS)
-            }
-        }
-    }
-
-    @Composable
-    private fun BluetoothPermission() {
+    private fun Permissions() {
         val launcher = rememberLauncherForActivityResult(
             ActivityResultContracts.RequestMultiplePermissions()
         ) {
-            logger.v { "BluetoothPermission() = $it" }
+            logger.v { "Permissions() = $it" }
         }
 
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
-            LaunchedEffect(Unit) {
-                launcher.launch(
-                    arrayOf(
+        LaunchedEffect(Unit) {
+            val permissions = when {
+                Build.VERSION.SDK_INT >= Build.VERSION_CODES.S -> when {
+                    Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU -> arrayOf(
+                        Manifest.permission.POST_NOTIFICATIONS,
                         Manifest.permission.BLUETOOTH_SCAN,
                         Manifest.permission.BLUETOOTH_CONNECT,
                     )
-                )
+
+                    else -> arrayOf(
+                        Manifest.permission.BLUETOOTH_SCAN,
+                        Manifest.permission.BLUETOOTH_CONNECT,
+                    )
+                }
+
+                else -> arrayOf(Manifest.permission.ACCESS_FINE_LOCATION)
             }
+
+            launcher.launch(permissions)
         }
     }
 

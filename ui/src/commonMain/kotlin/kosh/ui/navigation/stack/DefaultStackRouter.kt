@@ -48,11 +48,11 @@ class DefaultStackRouter<R : Route>(
     }
 
     override fun pop() {
-        pop(RouteResult.Result())
+        pop(RouteResult.Finished())
     }
 
     override fun result(redirect: String?) {
-        pop { if (!it) onResult(RouteResult.Result(redirect)) }
+        pop { if (!it) onResult(RouteResult.Finished(redirect)) }
     }
 
     override fun navigateUp() {

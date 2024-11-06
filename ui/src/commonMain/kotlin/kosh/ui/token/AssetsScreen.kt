@@ -98,6 +98,8 @@ fun AssetsScreen(
             )
         }
 
+        println("${updateBalances.loading} && ${updateBalances.refreshing}")
+
         LoadingIndicator(
             updateBalances.loading && !updateBalances.refreshing,
             Modifier.padding(contentPadding),

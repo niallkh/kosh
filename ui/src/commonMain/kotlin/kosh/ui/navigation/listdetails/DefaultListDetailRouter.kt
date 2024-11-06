@@ -63,11 +63,11 @@ class DefaultListDetailRouter<R : Route>(
     }
 
     override fun pop() {
-        navigation.popOr { onResult(RouteResult.Result()) }
+        navigation.popOr { onResult(RouteResult.Finished()) }
     }
 
     override fun result(redirect: String?) {
-        onResult(RouteResult.Result())
+        onResult(RouteResult.Finished())
     }
 
     override fun navigateUp() {

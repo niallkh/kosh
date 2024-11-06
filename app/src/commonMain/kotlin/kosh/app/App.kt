@@ -13,7 +13,7 @@ import kosh.ui.navigation.routes.RootRoute
 @Composable
 internal fun App(
     initialLink: RootRoute?,
-    onResult: @DisallowComposableCalls (RouteResult.Result) -> Unit,
+    onResult: @DisallowComposableCalls (RouteResult.Finished) -> Unit,
 ) {
     KoshTheme {
         Box(Modifier.background(MaterialTheme.colorScheme.background)) {

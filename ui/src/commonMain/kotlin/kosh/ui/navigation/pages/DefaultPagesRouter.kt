@@ -46,11 +46,11 @@ class DefaultPagesRouter<R : Route>(
     }
 
     override fun pop() {
-        onResult(RouteResult.Result())
+        onResult(RouteResult.Finished())
     }
 
     override fun result(redirect: String?) {
-        onResult(RouteResult.Result(redirect = redirect))
+        onResult(RouteResult.Finished(redirect = redirect))
     }
 
     override fun navigateUp() {

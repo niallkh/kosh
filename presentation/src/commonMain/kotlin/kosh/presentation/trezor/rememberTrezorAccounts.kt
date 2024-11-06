@@ -61,11 +61,9 @@ fun rememberTrezorAccounts(
         refreshing = refreshing,
         failure = failure,
         retry = {
-            println("[T]Retry")
             retry++
         },
         refresh = {
-            println("[T]Refresh")
             retry++
             refresh = true
             refreshing = true

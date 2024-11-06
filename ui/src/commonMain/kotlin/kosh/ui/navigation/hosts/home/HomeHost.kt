@@ -33,12 +33,12 @@ import kosh.ui.navigation.routes.RootRoute
 @Composable
 fun HomeHost(
     initialLink: RootRoute?,
-    onResult: @DisallowComposableCalls (RouteResult.Result) -> Unit,
+    onResult: @DisallowComposableCalls (RouteResult.Finished) -> Unit,
 ) {
     val pagesRouter = rememberPagesRouter(
         { Pages(listOf(Assets(), Activity(), WalletConnect()), 0).update(initialLink) },
     ) {
-        onResult(RouteResult.Result())
+        onResult(RouteResult.Finished())
     }
 
     HandleDeeplink {

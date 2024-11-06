@@ -34,7 +34,7 @@ fun rememberUpdateBalances(
     var failures by remember { mutableStateOf<Nel<Web3Failure>?>(null) }
     val timer = rememberTimer(5.minutes)
 
-    if (rememberLifecycleState()) {
+    if (appStateProvider.init && rememberLifecycleState()) {
         LaunchedEffect(Unit) {
             while (true) {
                 timer.waitNext()

@@ -57,7 +57,6 @@ import kotlin.uuid.toKotlinUuid
 class AndroidBle(
     private val context: Context,
 ) : Ble {
-
     private val logger = Logger.withTag("[K]AndroidBle")
 
     private val bluetoothManager = context.getSystemService(BLUETOOTH_SERVICE) as BluetoothManager
@@ -145,15 +144,22 @@ class AndroidBle(
     @SuppressLint("MissingPermission")
     private fun startScan() {
         logger.v { "startScan()" }
-        val scanSettings = ScanSettings.Builder()
-            .setScanMode(SCAN_MODE_BALANCED)
-            .setMatchMode(MATCH_MODE_STICKY)
-            .build()
 
-        val filters = configs.get().flatMap { it.serviceUuids }
-            .map { ScanFilter.Builder().setServiceUuid(ParcelUuid(it.toJavaUuid())).build() }
+        if (hasBlePermission()) {
+            val scanSettings = ScanSettings.Builder()
+                .setScanMode(SCAN_MODE_BALANCED)
+                .setMatchMode(MATCH_MODE_STICKY)
+                .build()
 
-        bluetoothManager.adapter.bluetoothLeScanner?.startScan(filters, scanSettings, scanCallback)
+            val filters = configs.get().flatMap { it.serviceUuids }
+                .map { ScanFilter.Builder().setServiceUuid(ParcelUuid(it.toJavaUuid())).build() }
+
+            bluetoothManager.adapter.bluetoothLeScanner?.startScan(
+                filters,
+                scanSettings,
+                scanCallback
+            )
+        }
     }
 
     @SuppressLint("MissingPermission")
