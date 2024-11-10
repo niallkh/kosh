@@ -43,8 +43,8 @@ class TrezorUsbFormat(
 
     private fun parseWriteData(data: ByteString): Pair<ByteString, Short> {
         val source = Buffer().apply { write(data) }
-        val message = source.readByteString(data.size - 2)
         val msgType = source.readShort()
+        val message = source.readByteString()
         return message to msgType
     }
 

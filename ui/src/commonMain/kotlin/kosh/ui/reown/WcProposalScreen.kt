@@ -22,6 +22,7 @@ import kosh.domain.models.reown.WcSessionProposal
 import kosh.domain.state.AppState
 import kosh.domain.state.accounts
 import kosh.domain.state.networks
+import kosh.domain.uuid.leastSignificantBits
 import kosh.presentation.account.AccountMultiSelectorState
 import kosh.presentation.account.rememberAccountMultiSelector
 import kosh.presentation.network.NetworkMultiSelectorState

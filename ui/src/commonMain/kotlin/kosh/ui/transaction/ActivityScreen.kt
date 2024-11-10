@@ -25,6 +25,7 @@ import kosh.domain.models.reown.WcAuthentication
 import kosh.domain.models.reown.WcRequest
 import kosh.domain.models.reown.WcSessionProposal
 import kosh.domain.serializers.ImmutableList
+import kosh.domain.uuid.leastSignificantBits
 import kosh.presentation.reown.AuthenticationsState
 import kosh.presentation.reown.ProposalsState
 import kosh.presentation.reown.RequestsState

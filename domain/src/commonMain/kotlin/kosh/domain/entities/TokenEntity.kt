@@ -24,7 +24,7 @@ private val namespace = uuid5(UuidNil, "TokenEntity")
 @Immutable
 @optics
 data class TokenEntity(
-    override val id: Id,
+    val id: Id,
     val networkId: NetworkEntity.Id,
     val address: Address?,
     val tokenId: BigInteger?,
@@ -37,14 +37,14 @@ data class TokenEntity(
     val uri: Uri?,
     val external: Uri?,
     val image: Uri?,
-    override val createdAt: Instant,
-    override val modifiedAt: Instant,
-) : Entity {
+    val createdAt: Instant,
+    val modifiedAt: Instant,
+) {
 
     @JvmInline
     @Immutable
     @Serializable(Id.Companion.Serializer::class)
-    value class Id private constructor(override val value: Uuid) : Entity.Id<TokenEntity> {
+    value class Id private constructor(val value: Uuid) {
 
         companion object {
             private val memo = ::Id.memoize()
@@ -116,10 +116,10 @@ val TokenEntity.isNft: Boolean
     inline get() = when (type) {
         TokenEntity.Type.Native,
         TokenEntity.Type.Erc20,
-        -> false
+            -> false
 
         TokenEntity.Type.Erc1155,
         TokenEntity.Type.Erc721,
-        -> true
+            -> true
     }
 

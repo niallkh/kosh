@@ -23,19 +23,19 @@ private val namespace = uuid5(UuidNil, "AccountEntity")
 @Immutable
 @optics
 data class AccountEntity(
-    override val id: Id,
+    val id: Id,
     val walletId: WalletEntity.Id,
     val name: String,
     val derivationPath: DerivationPath,
     val address: Address,
-    override val createdAt: Instant,
-    override val modifiedAt: Instant,
-) : Entity {
+    val createdAt: Instant,
+    val modifiedAt: Instant,
+) {
 
     @JvmInline
     @Immutable
     @Serializable(Id.Companion.Serializer::class)
-    value class Id private constructor(override val value: Uuid) : Entity.Id<AccountEntity> {
+    value class Id private constructor(val value: Uuid) {
 
         companion object {
             private val memo = ::Id.memoize()

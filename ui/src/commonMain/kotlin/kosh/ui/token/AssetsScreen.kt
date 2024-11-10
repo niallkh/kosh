@@ -27,6 +27,7 @@ import kosh.domain.entities.TokenEntity
 import kosh.domain.entities.isNft
 import kosh.domain.models.token.TokenBalance
 import kosh.domain.serializers.ImmutableList
+import kosh.domain.uuid.leastSignificantBits
 import kosh.presentation.account.WalletState
 import kosh.presentation.account.rememberWallets
 import kosh.presentation.network.NetworksState
@@ -97,8 +98,6 @@ fun AssetsScreen(
                 contentPadding = contentPadding,
             )
         }
-
-        println("${updateBalances.loading} && ${updateBalances.refreshing}")
 
         LoadingIndicator(
             updateBalances.loading && !updateBalances.refreshing,

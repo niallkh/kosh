@@ -155,8 +155,8 @@ internal class DefaultTrezorConnection(
     }
 
     private fun encode(message: Message<*, *>): ByteString = Buffer().run {
-        write(message.encode())
         writeShort(message.toMessageType().value.toShort())
+        write(message.encode())
         readByteString()
     }
 

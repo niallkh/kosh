@@ -16,15 +16,15 @@ import kosh.domain.models.web3.TransactionData
 import kosh.domain.repositories.AppStateRepo
 import kosh.domain.repositories.TrezorListener
 import kosh.domain.repositories.TrezorRepo
-import kosh.domain.repositories.optic
 import kosh.domain.state.AppState
 import kosh.domain.state.account
+import kosh.domain.usecases.transaction.PersonalMessageService
 import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.firstOrNull
 
 class DefaultTrezorAccountService(
     private val trezorRepo: TrezorRepo,
     private val appStateRepo: AppStateRepo,
+    private val personalTransactionService: PersonalMessageService,
 ) : TrezorAccountService {
 
     private val logger = Logger.withTag("[K]TrezorAccountService")
@@ -50,8 +50,8 @@ class DefaultTrezorAccountService(
         address: Address,
         jsonTypeData: JsonTypeData,
     ): Either<TrezorFailure, Signature> = either {
-
-        val account = appStateRepo.optic(AppState.account(address)).firstOrNull()
+        val appState = appStateRepo.state
+        val account = AppState.account(address).get(appState)
             ?: raise(TrezorFailure.Other())
 
         val signature = trezorRepo.signTypedMessage(
@@ -76,8 +76,8 @@ class DefaultTrezorAccountService(
         address: Address,
         message: EthMessage,
     ): Either<TrezorFailure, Signature> = either {
-
-        val account = appStateRepo.optic(AppState.account(address)).firstOrNull()
+        val appState = appStateRepo.state
+        val account = AppState.account(address).get(appState)
             ?: raise(TrezorFailure.Other())
 
         val signature = trezorRepo.signPersonalMessage(
@@ -101,8 +101,8 @@ class DefaultTrezorAccountService(
         refresh: Boolean,
         transaction: TransactionData,
     ): Either<TrezorFailure, Signature> = either {
-
-        val account = appStateRepo.optic(AppState.account(transaction.tx.from)).firstOrNull()
+        val appState = appStateRepo.state
+        val account = AppState.account(transaction.tx.from).get(appState)
             ?: raise(TrezorFailure.Other())
 
         val signature = trezorRepo.signTransaction(

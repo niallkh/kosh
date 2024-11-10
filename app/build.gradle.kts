@@ -55,6 +55,7 @@ kotlin {
                 optIn("com.arkivanov.decompose.ExperimentalDecomposeApi")
                 optIn("kotlinx.coroutines.ExperimentalCoroutinesApi")
                 optIn("co.touchlab.kermit.ExperimentalKermitApi")
+                optIn("kotlin.uuid.ExperimentalUuidApi")
             }
         }
 
@@ -90,7 +91,7 @@ kotlin {
             implementation(projects.data.ledger)
             implementation(projects.data.web3)
             implementation(projects.data.reown)
-            implementation(projects.datastore)
+            implementation(projects.files)
             implementation(projects.eth.wallet)
             implementation(projects.eth.abi)
             implementation(projects.libs.trezor)
@@ -140,8 +141,8 @@ android {
         applicationId = "eth.kosh.app"
         minSdk = libs.versions.android.minSdk.get().toInt()
         targetSdk = libs.versions.android.compileSdk.get().toInt()
-        versionCode = 9
-        versionName = "0.0.4"
+        versionCode = 10
+        versionName = "0.0.5"
 
         manifestPlaceholders["REOWN_PROJECT"] = getLocalProperty("reown.project")
             ?: error("Local property reown.project not provided")

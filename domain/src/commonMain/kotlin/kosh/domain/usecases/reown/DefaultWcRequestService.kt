@@ -17,11 +17,9 @@ import kosh.domain.repositories.WcRepo
 import kosh.domain.serializers.ImmutableList
 import kosh.domain.state.AppState
 import kosh.domain.state.AppStateProvider
+import kosh.domain.state.isActive
 import kosh.domain.state.network
-import kosh.domain.usecases.account.AccountService
-import kosh.domain.usecases.network.NetworkService
 import kosh.domain.usecases.notification.NotificationService
-import kosh.domain.utils.optic
 import kotlinx.collections.immutable.toPersistentList
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Job
@@ -33,8 +31,6 @@ class DefaultWcRequestService(
     private val reownRepo: WcRepo,
     private val applicationScope: CoroutineScope,
     private val notificationService: NotificationService,
-    private val networkService: NetworkService,
-    private val accountService: AccountService,
     private val sessionService: WcSessionService,
     private val appStateProvider: AppStateProvider,
 ) : WcRequestService {
@@ -49,8 +45,6 @@ class DefaultWcRequestService(
     override suspend fun get(
         id: WcRequest.Id?,
     ): Either<WcFailure, WcRequest> = either {
-        id?.value?.let { notificationService.cancel(id.value) }
-
         val request = reownRepo.getSessionRequest(id).bind()
 
         notificationService.cancel(request.id.value)
@@ -134,45 +128,49 @@ class DefaultWcRequestService(
         })
     }
 
-    private suspend fun validate(request: WcRequest): Either<WcFailure, WcRequest> = either {
+    private fun validate(
+        request: WcRequest,
+    ): Either<WcFailure, WcRequest> = either {
+        val appState = appStateProvider.state
+
         when (val call = request.call) {
             is WcRequest.Call.AddNetwork -> {
-                ensure(appStateProvider.optic(AppState.network(call.chainId)).value == null) {
+                ensure(AppState.network(call.chainId).get(appState) == null) {
                     WcFailure.WcInvalidRequest.NetworkAlreadyExists(
                         chainId = call.chainId,
-                        enabled = networkService.isActive(call.chainId)
+                        enabled = AppState.isActive(call.chainId).get(appState)
                     )
                 }
             }
 
             is WcRequest.Call.SignPersonal -> {
-                ensure(accountService.isActive(call.account)) {
+                ensure(AppState.isActive(call.account).get(appState)) {
                     WcFailure.WcInvalidRequest.AccountDisabled(call.account)
                 }
             }
 
             is WcRequest.Call.SendTransaction -> {
-                ensure(networkService.isActive(call.chainId)) {
+                ensure(AppState.isActive(call.chainId).get(appState)) {
                     WcFailure.WcInvalidRequest.NetworkDisabled(call.chainId)
                 }
-                ensure(accountService.isActive(call.from)) {
+                ensure(AppState.isActive(call.from).get(appState)) {
                     WcFailure.WcInvalidRequest.AccountDisabled(call.from)
                 }
             }
 
             is WcRequest.Call.SignTyped -> {
                 if (call.chainId != null) {
-                    ensure(networkService.isActive(call.chainId)) {
+                    ensure(AppState.isActive(call.chainId).get(appState)) {
                         WcFailure.WcInvalidRequest.NetworkDisabled(call.chainId)
                     }
                 }
-                ensure(accountService.isActive(call.account)) {
+                ensure(AppState.isActive(call.account).get(appState)) {
                     WcFailure.WcInvalidRequest.AccountDisabled(call.account)
                 }
             }
 
             is WcRequest.Call.WatchAsset -> {
-                ensure(networkService.isActive(call.chainId)) {
+                ensure(AppState.isActive(call.chainId).get(appState)) {
                     WcFailure.WcInvalidRequest.NetworkDisabled(call.chainId)
                 }
             }

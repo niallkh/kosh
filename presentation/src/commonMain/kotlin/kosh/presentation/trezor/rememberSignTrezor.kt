@@ -38,16 +38,16 @@ fun rememberSignTrezor(
 
             val signature = when (request) {
                 is SignRequest.SignPersonal -> trezorAccountService.sign(
-                    trezor = trezor ?: raise(TrezorFailure.Disconnected()),
+                    trezor = trezor ?: raise(null),
                     listener = trezorListener,
                     address = request.account,
                     message = request.message,
-                    refresh = refresh
+                    refresh = refresh,
                 )
 
                 is SignRequest.SignTyped -> trezorAccountService.sign(
                     listener = trezorListener,
-                    trezor = trezor ?: raise(TrezorFailure.Disconnected()),
+                    trezor = trezor ?: raise(null),
                     address = request.account,
                     jsonTypeData = request.json,
                     refresh = refresh
@@ -55,7 +55,7 @@ fun rememberSignTrezor(
 
                 is SignRequest.SignTransaction -> trezorAccountService.sign(
                     listener = trezorListener,
-                    trezor = trezor ?: raise(TrezorFailure.Disconnected()),
+                    trezor = trezor ?: raise(null),
                     transaction = request.data,
                     refresh = refresh,
                 )

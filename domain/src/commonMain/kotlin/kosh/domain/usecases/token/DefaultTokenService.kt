@@ -2,7 +2,6 @@ package kosh.domain.usecases.token
 
 import arrow.core.raise.either
 import arrow.core.raise.ensure
-import kosh.domain.entities.NetworkEntity
 import kosh.domain.entities.TokenEntity
 import kosh.domain.entities.TokenEntity.Type
 import kosh.domain.entities.decimals
@@ -20,7 +19,6 @@ import kosh.domain.models.Address
 import kosh.domain.models.ChainId
 import kosh.domain.models.Uri
 import kosh.domain.repositories.AppStateRepo
-import kosh.domain.repositories.optic
 import kosh.domain.serializers.BigInteger
 import kosh.domain.serializers.Either
 import kosh.domain.state.AppState
@@ -28,18 +26,11 @@ import kosh.domain.state.network
 import kosh.domain.state.optionalToken
 import kosh.domain.state.token
 import kosh.domain.state.tokens
-import kotlinx.coroutines.flow.Flow
 import kotlinx.datetime.Clock
 
 class DefaultTokenService(
     private val appStateRepo: AppStateRepo,
 ) : TokenService {
-
-    override fun getNativeToken(id: NetworkEntity.Id): Flow<TokenEntity?> =
-        get(TokenEntity.Id(id))
-
-    override fun get(id: TokenEntity.Id): Flow<TokenEntity?> =
-        appStateRepo.optic(AppState.token(id))
 
     override suspend fun add(
         chainId: ChainId,
@@ -55,7 +46,7 @@ class DefaultTokenService(
         external: Uri?,
         image: Uri?,
     ): Either<TokenFailure, TokenEntity.Id> = either {
-        val network = appStateRepo.optic(AppState.network(chainId)).value
+        val network = AppState.network(chainId).get(appStateRepo.state)
             ?: raise(TokenFailure.NotFound())
 
         val token = TokenEntity(
@@ -73,7 +64,7 @@ class DefaultTokenService(
             type = type,
         )
 
-        appStateRepo.modify {
+        appStateRepo.update {
             ensure(token.id !in AppState.tokens.get()) {
                 TokenFailure.AlreadyExist()
             }
@@ -96,7 +87,7 @@ class DefaultTokenService(
         external: Uri?,
         image: Uri?,
     ): Either<TokenFailure, Unit> = either {
-        appStateRepo.modify {
+        appStateRepo.update {
             ensure(id in AppState.tokens.get()) {
                 TokenFailure.NotFound()
             }
@@ -117,7 +108,7 @@ class DefaultTokenService(
     }
 
     override suspend fun delete(id: TokenEntity.Id) {
-        appStateRepo.modify {
+        appStateRepo.update {
             AppState.token(id) set null
         }
     }

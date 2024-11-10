@@ -1,9 +1,9 @@
 package kosh.data
 
-import kosh.data.sources.AppStateSource
+import kosh.data.sources.KeyValueStore
 import kosh.libs.keystore.KeyStore
 
 interface DataComponent {
-    val appStateSource: AppStateSource
+    val keyValueStore: KeyValueStore
     val keyStore: KeyStore
 }

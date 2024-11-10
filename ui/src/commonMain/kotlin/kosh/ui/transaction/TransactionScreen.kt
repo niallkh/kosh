@@ -22,6 +22,8 @@ import androidx.compose.ui.unit.dp
 import arrow.core.raise.nullable
 import kosh.domain.entities.TransactionEntity
 import kosh.domain.models.web3.ContractCall
+import kosh.domain.models.web3.EthMessage
+import kosh.domain.models.web3.JsonTypeData
 import kosh.presentation.account.rememberAccount
 import kosh.presentation.network.rememberNetwork
 import kosh.presentation.network.rememberOpenExplorer
@@ -49,7 +51,6 @@ import kosh.ui.transaction.calls.FallbackCard
 import kosh.ui.transaction.calls.NativeTransferCard
 import kosh.ui.transaction.calls.TransferCard
 import kotlinx.datetime.Instant
-import kotlinx.io.bytestring.decodeToString
 
 @Composable
 fun TransactionScreen(
@@ -146,9 +147,9 @@ fun PersonalMessageContent(
 
         AccountItem(account.entity)
 
-        val message = personalMessage.message.resolve { it.bytes().decodeToString() }
+        val message = personalMessage.message.resolve(EthMessage.serializer())
 
-        PersonalMessageCard(message)
+        PersonalMessageCard(message?.value)
 
         Column(
             modifier = Modifier.padding(horizontal = 16.dp),
@@ -168,7 +169,7 @@ fun PersonalMessageContent(
 fun TypedMessageContent(
     typedMessage: TransactionEntity.Eip712,
 ) {
-    val jsonText = typedMessage.jsonTypeData.resolve { it.bytes().decodeToString() }
+    val jsonText = typedMessage.jsonTypeData.resolve(JsonTypeData.serializer())
 
     Column(
         modifier = Modifier.verticalScroll(rememberScrollState()),
@@ -185,12 +186,12 @@ fun TypedMessageContent(
         AccountItem(account.entity)
 
         TypedMessageDomainCard(
-            jsonText = jsonText,
+            jsonText = jsonText?.json,
             modifier = Modifier.padding(horizontal = 16.dp)
         )
 
         TypedMessageCard(
-            jsonText = jsonText,
+            jsonText = jsonText?.json,
             modifier = Modifier.padding(horizontal = 16.dp),
         )
 
@@ -215,7 +216,7 @@ fun TransactionContent(
 ) {
     val network = rememberNetwork(transaction.networkId)
     val account = rememberAccount(transaction.sender)
-    val data = transaction.data.resolve { it }
+    val data = transaction.data.resolve()
 
     val parsed = nullable {
         rememberContractCall(

@@ -11,14 +11,14 @@ import androidx.compose.runtime.setValue
 import arrow.core.raise.recover
 import kosh.domain.failure.TransactionFailure
 import kosh.domain.models.web3.Signature
-import kosh.domain.usecases.transaction.PersonalTransactionService
+import kosh.domain.usecases.transaction.PersonalMessageService
 import kosh.presentation.core.di
 import kosh.presentation.di.rememberSerializable
 import kosh.presentation.models.SignRequest
 
 @Composable
 fun rememberSignPersonal(
-    transactionService: PersonalTransactionService = di { domain.personalTransactionService },
+    transactionService: PersonalMessageService = di { domain.personalMessageService },
 ): SignPersonalState {
     var data by rememberSerializable { mutableStateOf<Signature?>(null) }
     var signRequest by rememberSerializable { mutableStateOf<SignRequest.SignPersonal?>(null) }

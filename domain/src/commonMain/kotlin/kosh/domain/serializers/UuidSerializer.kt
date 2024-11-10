@@ -1,14 +1,12 @@
 package kosh.domain.serializers
 
-import com.benasher44.uuid.Uuid
-import com.benasher44.uuid.bytes
-import com.benasher44.uuid.uuidOf
 import kotlinx.serialization.KSerializer
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.builtins.ByteArraySerializer
 import kotlinx.serialization.descriptors.SerialDescriptor
 import kotlinx.serialization.encoding.Decoder
 import kotlinx.serialization.encoding.Encoder
+import kotlin.uuid.Uuid
 
 typealias Uuid = @Serializable(UuidSerializer::class) Uuid
 
@@ -18,10 +16,10 @@ object UuidSerializer : KSerializer<Uuid> {
     override val descriptor: SerialDescriptor = delegate.descriptor
 
     override fun serialize(encoder: Encoder, value: Uuid) {
-        delegate.serialize(encoder, value.bytes)
+        delegate.serialize(encoder, value.toByteArray())
     }
 
     override fun deserialize(decoder: Decoder): Uuid {
-        return delegate.deserialize(decoder).let(::uuidOf)
+        return delegate.deserialize(decoder).let(Uuid::fromByteArray)
     }
 }

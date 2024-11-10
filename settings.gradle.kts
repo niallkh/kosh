@@ -42,7 +42,7 @@ include(":data:reown")
 include(":data:trezor")
 include(":data:ledger")
 include(":data:web3")
-include(":datastore")
+include(":files")
 
 include(":eth:rpc")
 include(":eth:wallet")

@@ -9,4 +9,3 @@ interface PresentationContext : GenericComponentContext<PresentationContext> {
     val presentationScope: PresentationScope
     val container: MutableMap<String, Any>
 }
-

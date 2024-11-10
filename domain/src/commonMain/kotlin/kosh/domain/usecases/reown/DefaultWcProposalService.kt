@@ -99,9 +99,9 @@ class DefaultWcProposalService(
         id: WcSessionProposal.Id,
         requestId: Long,
     ): Either<WcFailure, WcProposalAggregated> = either {
-        requestId.let { notificationService.cancel(it) }
-
         val proposal = reownRepo.getProposal(id).bind()
+
+        requestId.let { notificationService.cancel(proposal.requestId) }
 
         wcProposalAggregated(proposal)
     }

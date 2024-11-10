@@ -22,8 +22,6 @@ import com.seiko.imageloader.LocalImageLoader
 import kosh.app.di.androidPresentationContext
 import kosh.presentation.core.LocalPresentationContext
 import kosh.presentation.core.PresentationContext
-import kosh.ui.component.path.LocalPathResolver
-import kosh.ui.component.path.PathResolver
 import kosh.ui.navigation.deeplink
 import kosh.ui.navigation.parseDeeplink
 import kosh.ui.navigation.routes.RootRoute
@@ -49,15 +47,10 @@ public class KoshActivity : FragmentActivity() {
             activity = this,
         )
 
-        val pathResolver = PathResolver {
-            presentationContext.presentationScope.appRepositoriesComponent.fileRepo.read(it)
-        }
-
         setContent {
             CompositionLocalProvider(
                 LocalPresentationContext provides presentationContext,
                 LocalImageLoader provides KoshApp.appScope.imageComponent.imageLoader,
-                LocalPathResolver provides pathResolver,
             ) {
                 App(
                     initialLink = initialLink,

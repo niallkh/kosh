@@ -39,9 +39,10 @@ class DefaultWcAuthenticationService(
     override suspend fun get(
         id: WcAuthentication.Id,
     ): Either<WcFailure, WcAuthentication> = either {
-        notificationService.cancel(id.value)
 
         val authentication = reownRepo.getAuthentication(id).bind()
+
+        notificationService.cancel(authentication.id.value)
 
         authentication
     }

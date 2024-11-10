@@ -8,7 +8,7 @@ import kotlinx.coroutines.channels.Channel
 
 class DeeplinkHandler {
 
-    private val logger = Logger.withTag("[K]")
+    private val logger = Logger.withTag("[K]DeeplinkHandler")
 
     internal val channel = Channel<String?>(Channel.CONFLATED)
 

@@ -23,8 +23,10 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import kosh.domain.entities.NetworkEntity
+import kosh.domain.models.ethereum
 import kosh.domain.serializers.ImmutableList
 import kosh.domain.serializers.ImmutableSet
+import kosh.domain.uuid.leastSignificantBits
 import kosh.presentation.network.rememberNetworks
 import kosh.presentation.network.rememberToggleNetwork
 import kosh.ui.component.illustration.Illustration
@@ -142,6 +144,7 @@ private fun LazyListScope.networks(
                     )
 
                     Switch(
+                        enabled = network?.chainId != ethereum,
                         checked = network?.id in enabled,
                         onCheckedChange = { checked -> network?.let { onToggle(it, checked) } },
                         modifier = Modifier.placeholder(network == null),

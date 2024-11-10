@@ -19,6 +19,7 @@ internal class AndroidAppRepositoriesComponent(
     filesComponent: FilesComponent,
     ledgerComponent: LedgerComponent,
     reownComponent: ReownComponent,
+    appComponent: AppComponent,
 ) : AppRepositoriesComponent,
     DefaultAppRepositoriesComponent(
         dataComponent = dataComponent,
@@ -30,5 +31,6 @@ internal class AndroidAppRepositoriesComponent(
         filesComponent = filesComponent,
         ledgerComponent = ledgerComponent,
         reownComponent = reownComponent,
+        appComponent = appComponent,
     ),
     AndroidComponent by androidComponent

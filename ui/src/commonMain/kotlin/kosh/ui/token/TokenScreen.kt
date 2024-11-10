@@ -42,6 +42,7 @@ import kosh.domain.models.orZero
 import kosh.domain.models.token.AccountBalance
 import kosh.domain.models.token.NftExtendedMetadata
 import kosh.domain.serializers.ImmutableList
+import kosh.domain.uuid.leastSignificantBits
 import kosh.presentation.network.rememberNetwork
 import kosh.presentation.network.rememberOpenExplorer
 import kosh.presentation.token.NftMetadataState

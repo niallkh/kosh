@@ -9,8 +9,6 @@ import kosh.domain.models.account.DerivationPath
 
 interface AccountService {
 
-    suspend fun isActive(address: Address): Boolean
-
     suspend fun create(
         location: Location,
         derivationPath: DerivationPath,

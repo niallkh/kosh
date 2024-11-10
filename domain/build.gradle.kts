@@ -32,6 +32,7 @@ kotlin {
                 optIn("kotlinx.io.bytestring.unsafe.UnsafeByteStringApi")
                 optIn("kotlin.ExperimentalStdlibApi")
                 optIn("kotlinx.coroutines.FlowPreview")
+                optIn("kotlin.uuid.ExperimentalUuidApi")
             }
         }
 
@@ -55,10 +56,10 @@ kotlin {
             api(libs.kotlinx.collections.immutable)
 
             api(libs.kotlinx.datetime)
-            api(libs.uuid)
             api(libs.uri)
 
             implementation(libs.kotlinx.io)
+            implementation(libs.crypto.sha1)
         }
 
         commonMain {

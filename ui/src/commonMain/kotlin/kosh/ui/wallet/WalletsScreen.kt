@@ -34,6 +34,7 @@ import kosh.domain.entities.WalletEntity
 import kosh.domain.models.hw.HardwareWallet
 import kosh.domain.serializers.ImmutableList
 import kosh.domain.serializers.ImmutableSet
+import kosh.domain.uuid.leastSignificantBits
 import kosh.presentation.account.rememberToggleAccount
 import kosh.presentation.account.rememberWallets
 import kosh.ui.component.illustration.Illustration

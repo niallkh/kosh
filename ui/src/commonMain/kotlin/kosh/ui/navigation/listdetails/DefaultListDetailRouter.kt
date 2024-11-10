@@ -73,6 +73,10 @@ class DefaultListDetailRouter<R : Route>(
     override fun navigateUp() {
         onResult(RouteResult.Up(null))
     }
+
+    override fun reset(link: R?) {
+        TODO("Not yet implemented")
+    }
 }
 
 @Composable

@@ -49,7 +49,10 @@ public class IosAppScope(
     }
 
     override val dataComponent: DataComponent by provider {
-        IosDataComponent(dataStoreComponent = dataStoreComponent)
+        IosDataComponent(
+            serializationComponent = serializationComponent,
+            filesComponent = filesComponent,
+        )
     }
 
     override val appRepositoriesComponent: AppRepositoriesComponent by provider {

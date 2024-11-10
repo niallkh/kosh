@@ -4,12 +4,16 @@ import android.app.Notification
 import android.app.NotificationChannel
 import android.app.NotificationManager
 import android.content.Context
+import android.content.pm.ServiceInfo
+import android.os.Build
 import androidx.core.app.NotificationCompat
 import androidx.core.app.NotificationCompat.Action
 import androidx.core.app.NotificationManagerCompat
+import androidx.work.Constraints
 import androidx.work.CoroutineWorker
 import androidx.work.ExistingWorkPolicy
 import androidx.work.ForegroundInfo
+import androidx.work.NetworkType
 import androidx.work.OneTimeWorkRequestBuilder
 import androidx.work.OutOfQuotaPolicy
 import androidx.work.WorkManager
@@ -32,6 +36,8 @@ public class ReownConnectionWorker(
 
     override suspend fun doWork(): Result = coroutineScope {
         logger.v { "Work started" }
+        setForeground(getForegroundInfo())
+
         ReownConnectionManager.connect()
 
         try {
@@ -48,10 +54,19 @@ public class ReownConnectionWorker(
         Result.success()
     }
 
-    override suspend fun getForegroundInfo(): ForegroundInfo = ForegroundInfo(
-        Random.nextInt(),
-        createNotification(),
-    )
+    override suspend fun getForegroundInfo(): ForegroundInfo =
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.UPSIDE_DOWN_CAKE) {
+            ForegroundInfo(
+                Random.nextInt(),
+                createNotification(),
+                ServiceInfo.FOREGROUND_SERVICE_TYPE_SPECIAL_USE
+            )
+        } else {
+            ForegroundInfo(
+                Random.nextInt(),
+                createNotification(),
+            )
+        }
 
     private fun createNotification(): Notification {
         val stopIntent = WorkManager.getInstance(applicationContext).createCancelPendingIntent(id)
@@ -85,6 +100,11 @@ public class ReownConnectionWorker(
 
             val request = OneTimeWorkRequestBuilder<ReownConnectionWorker>().run {
                 setExpedited(OutOfQuotaPolicy.DROP_WORK_REQUEST)
+                setConstraints(
+                    Constraints(
+                        requiredNetworkType = NetworkType.CONNECTED,
+                    )
+                )
                 build()
             }
 

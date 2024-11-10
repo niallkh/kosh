@@ -683,7 +683,7 @@ class AndroidReownAdapter(
     }
 
     override fun onRequestExpired(request: Wallet.Model.ExpiredRequest) {
-        logger.v { "onSessionExpired: $request" }
+        logger.v { "onRequestExpired: $request" }
         updateRequests()
     }
 

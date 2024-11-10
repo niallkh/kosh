@@ -14,10 +14,8 @@ import kosh.domain.models.web3.TransactionData
 import kosh.domain.repositories.AppStateRepo
 import kosh.domain.repositories.LedgerListener
 import kosh.domain.repositories.LedgerRepo
-import kosh.domain.repositories.optic
 import kosh.domain.state.AppState
 import kosh.domain.state.account
-import kotlinx.coroutines.flow.firstOrNull
 
 class DefaultLedgerAccountService(
     private val ledgerRepo: LedgerRepo,
@@ -41,8 +39,8 @@ class DefaultLedgerAccountService(
         address: Address,
         message: EthMessage,
     ): Either<LedgerFailure, Signature> = either {
-        val account = appStateRepo.optic(AppState.account(address)).firstOrNull()
-            ?: raise(LedgerFailure.Other())
+        val appState = appStateRepo.state
+        val account = AppState.account(address).get(appState) ?: raise(LedgerFailure.Other())
 
         val signature = ledgerRepo.signPersonalMessage(
             listener, ledger, message.value, account.derivationPath
@@ -61,8 +59,8 @@ class DefaultLedgerAccountService(
         address: Address,
         jsonTypeData: JsonTypeData,
     ): Either<LedgerFailure, Signature> = either {
-        val account = appStateRepo.optic(AppState.account(address)).firstOrNull()
-            ?: raise(LedgerFailure.Other())
+        val appState = appStateRepo.state
+        val account = AppState.account(address).get(appState) ?: raise(LedgerFailure.Other())
 
         val signature = ledgerRepo.signTypedMessage(
             listener, ledger, jsonTypeData.json, account.derivationPath
@@ -80,9 +78,9 @@ class DefaultLedgerAccountService(
         ledger: Ledger,
         transaction: TransactionData,
     ): Either<LedgerFailure, Signature> = either {
-
-        val account = appStateRepo.optic(AppState.account(transaction.tx.from)).firstOrNull()
-            ?: raise(LedgerFailure.Other())
+        val appState = appStateRepo.state
+        val account =
+            AppState.account(transaction.tx.from).get(appState) ?: raise(LedgerFailure.Other())
 
         val signature = ledgerRepo.signTransaction(
             listener = listener,

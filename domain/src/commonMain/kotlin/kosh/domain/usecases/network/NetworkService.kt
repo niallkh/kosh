@@ -13,8 +13,6 @@ interface NetworkService {
         write: Boolean = false,
     ): Uri
 
-    suspend fun isActive(chainId: ChainId): Boolean
-
     suspend fun add(
         chainId: ChainId,
         name: String,

@@ -4,7 +4,6 @@ import kosh.domain.entities.NetworkEntity
 import kosh.domain.models.ChainId
 import kosh.domain.models.Uri
 import kosh.domain.repositories.AppStateRepo
-import kosh.domain.repositories.state
 import kosh.domain.state.AppState
 import kosh.domain.state.network
 
@@ -16,7 +15,7 @@ fun interface GetRpcProvidersUC {
 }
 
 fun getRpcProvidersUC(appStateRepo: AppStateRepo) = GetRpcProvidersUC { chainId, write ->
-    val state = appStateRepo.state()
+    val state = appStateRepo.state
     val id = NetworkEntity.Id(chainId)
     val network = AppState.network(id).get(state)
     if (write) {

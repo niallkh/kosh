@@ -13,6 +13,8 @@ interface Router<R : Route> {
     fun result(redirect: String? = null)
 
     fun navigateUp()
+
+    fun reset(link: R? = null)
 }
 
 sealed class RouteResult<out R : Route> {

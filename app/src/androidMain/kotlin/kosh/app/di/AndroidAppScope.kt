@@ -1,7 +1,6 @@
 package kosh.app.di
 
 import android.content.Context
-import android.os.StrictMode
 import co.touchlab.crashkios.crashlytics.enableCrashlytics
 import co.touchlab.kermit.Logger
 import co.touchlab.kermit.Severity
@@ -85,8 +84,8 @@ internal class AndroidAppScope(
     override val dataComponent: DataComponent by provider {
         AndroidDataComponent(
             androidComponent = this,
-            dataStoreComponent = dataStoreComponent,
             filesComponent = filesComponent,
+            serializationComponent = serializationComponent,
         )
     }
 
@@ -102,6 +101,7 @@ internal class AndroidAppScope(
             filesComponent = filesComponent,
             ledgerComponent = ledgerComponent,
             reownComponent = reownComponent,
+            appComponent = appComponent,
         )
     }
 
@@ -111,7 +111,7 @@ internal class AndroidAppScope(
         enableCrashlytics()
 
         if (BuildConfig.DEBUG) {
-            StrictMode.enableDefaults()
+//            StrictMode.enableDefaults()
             Logger.setMinSeverity(Severity.Verbose)
             Logger.setLogWriters(
                 platformLogWriter(),

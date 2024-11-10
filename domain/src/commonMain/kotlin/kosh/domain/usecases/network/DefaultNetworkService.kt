@@ -19,7 +19,6 @@ import kosh.domain.models.ChainId
 import kosh.domain.models.Uri
 import kosh.domain.repositories.AppStateRepo
 import kosh.domain.repositories.NetworkRepo
-import kosh.domain.repositories.state
 import kosh.domain.state.AppState
 import kosh.domain.state.enabledNetworkIds
 import kosh.domain.state.nativeToken
@@ -40,12 +39,8 @@ class DefaultNetworkService(
     private val networkRepo: NetworkRepo,
 ) : NetworkService {
 
-    override suspend fun isActive(chainId: ChainId): Boolean {
-        return NetworkEntity.Id(chainId) in appStateRepo.state().enabledNetworkIds
-    }
-
     override suspend fun getRpc(id: NetworkEntity.Id, write: Boolean): Uri {
-        val network = AppState.network(id).get(appStateRepo.state())
+        val network = AppState.network(id).get(appStateRepo.state)
         val rpc = if (write) network?.writeRpcProvider ?: network?.readRpcProvider
         else network?.readRpcProvider
         return rpc ?: error("No web3 provider for chain: $id")
@@ -90,7 +85,7 @@ class DefaultNetworkService(
             icon = tokenIcon,
         )
 
-        appStateRepo.modify {
+        appStateRepo.update {
             ensure(network.id !in AppState.networks.get()) {
                 NetworkFailure.AlreadyExist()
             }
@@ -117,8 +112,7 @@ class DefaultNetworkService(
         tokenSymbol: String,
         tokenIcon: Uri?,
     ) = either {
-        val appState = appStateRepo.state()
-        val chainId = AppState.network(id).get(appState)?.chainId
+        val chainId = AppState.network(id).get(appStateRepo.state)?.chainId
             ?: raise(NetworkFailure.NotFound())
 
         ensure(networkRepo.validateRpc(chainId, readRpcProvider)) {
@@ -131,11 +125,14 @@ class DefaultNetworkService(
             }
         }
 
-        appStateRepo.modify {
+        appStateRepo.update {
             ensure(id in AppState.networks.get()) {
                 NetworkFailure.NotFound()
             }
-            val token = AppState.token(TokenEntity.Id(id)).get() ?: raise(NetworkFailure.NotFound())
+
+            val token = AppState.token(TokenEntity.Id(id)).get()
+                ?: raise(NetworkFailure.NotFound())
+
             ensure(token.type == TokenEntity.Type.Native) {
                 NetworkFailure.NotFound()
             }
@@ -159,7 +156,7 @@ class DefaultNetworkService(
     }
 
     override suspend fun toggle(id: NetworkEntity.Id, enabled: Boolean) {
-        appStateRepo.modify {
+        appStateRepo.update {
             if (enabled) {
                 AppState.enabledNetworkIds.at(At.phset(), id) set true
             } else {
@@ -169,7 +166,7 @@ class DefaultNetworkService(
     }
 
     override suspend fun delete(id: NetworkEntity.Id) {
-        appStateRepo.modify {
+        appStateRepo.update {
 
             AppState.network(id) set null
 

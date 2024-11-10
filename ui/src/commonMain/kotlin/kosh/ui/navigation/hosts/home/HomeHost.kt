@@ -9,10 +9,8 @@ import androidx.compose.material3.NavigationBarItem
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.DisallowComposableCalls
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import com.arkivanov.decompose.extensions.compose.subscribeAsState
 import com.arkivanov.decompose.router.pages.Pages
@@ -47,7 +45,6 @@ fun HomeHost(
     }
 
     val childPages by pagesRouter.pages.subscribeAsState()
-    val resetHandler = remember { HomeTabResetHandler() }
 
     Scaffold(
         bottomBar = {
@@ -55,33 +52,31 @@ fun HomeHost(
                 selected = childPages.selectedIndex,
                 items = HomeTab.entries,
                 onSelect = { index -> pagesRouter.select(index) },
-                onSelected = { _ -> resetHandler().trySend(Unit) }
+                onSelected = { _ -> pagesRouter.reset() }
             )
         },
     ) { contentPadding ->
-        CompositionLocalProvider(LocalHomeTabResetHandler provides resetHandler) {
-            PagesHost(
-                pagesRouter = pagesRouter,
-                modifier = Modifier
-                    .padding(bottom = contentPadding.calculateBottomPadding())
-                    .consumeWindowInsets(WindowInsets(bottom = contentPadding.calculateBottomPadding()))
-            ) { route ->
-                when (route) {
-                    is Assets -> RootHost(
-                        start = { RootRoute.Tokens() },
-                        link = route.link
-                    ) { onResult(it) }
+        PagesHost(
+            pagesRouter = pagesRouter,
+            modifier = Modifier
+                .padding(bottom = contentPadding.calculateBottomPadding())
+                .consumeWindowInsets(WindowInsets(bottom = contentPadding.calculateBottomPadding()))
+        ) { route ->
+            when (route) {
+                is Assets -> RootHost(
+                    start = { RootRoute.Tokens() },
+                    link = route.link
+                ) { onResult(it) }
 
-                    is Activity -> RootHost(
-                        start = { RootRoute.Transactions() },
-                        link = route.link
-                    ) { onResult(it) }
+                is Activity -> RootHost(
+                    start = { RootRoute.Transactions() },
+                    link = route.link
+                ) { onResult(it) }
 
-                    is WalletConnect -> RootHost(
-                        start = { RootRoute.WalletConnect() },
-                        link = route.link
-                    ) { onResult(it) }
-                }
+                is WalletConnect -> RootHost(
+                    start = { RootRoute.WalletConnect() },
+                    link = route.link
+                ) { onResult(it) }
             }
         }
     }

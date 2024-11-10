@@ -6,6 +6,7 @@ import androidx.compose.material3.ListItem
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import kosh.domain.entities.TransactionEntity
+import kosh.domain.models.web3.EthMessage
 import kosh.ui.component.dapp.DappIcon
 import kosh.ui.component.path.resolve
 import kosh.ui.component.placeholder.placeholder
@@ -13,7 +14,6 @@ import kosh.ui.component.single.single
 import kosh.ui.component.text.TextDate
 import kosh.ui.component.text.TextLine
 import kosh.ui.resources.icons.PersonalSignature
-import kotlinx.io.bytestring.decodeToString
 
 @Composable
 fun PersonalMessageItem(
@@ -21,7 +21,7 @@ fun PersonalMessageItem(
     onClick: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
-    val message = personalMessage?.message?.resolve { it.bytes().decodeToString() }
+    val message = personalMessage?.message?.resolve(EthMessage.serializer())
 
     ListItem(
         modifier = modifier.clickable(
@@ -29,7 +29,7 @@ fun PersonalMessageItem(
             onClick = onClick.single()
         ),
         headlineContent = {
-            TextLine(message)
+            TextLine(message?.value)
         },
         leadingContent = {
             DappIcon(personalMessage?.dapp)

@@ -17,7 +17,7 @@ import kosh.domain.usecases.token.TokenDiscoveryService
 import kosh.domain.usecases.token.TokenService
 import kosh.domain.usecases.transaction.ContractCallService
 import kosh.domain.usecases.transaction.Eip1559TransactionService
-import kosh.domain.usecases.transaction.PersonalTransactionService
+import kosh.domain.usecases.transaction.PersonalMessageService
 import kosh.domain.usecases.transaction.TransactionService
 import kosh.domain.usecases.transaction.TypedTransactionService
 import kosh.domain.usecases.trezor.TrezorAccountService
@@ -34,7 +34,7 @@ interface DomainComponent {
     val tokenDiscoveryService: TokenDiscoveryService
     val tokenBalanceService: TokenBalanceService
     val eip1559TransactionService: Eip1559TransactionService
-    val personalTransactionService: PersonalTransactionService
+    val personalMessageService: PersonalMessageService
     val typedTransactionService: TypedTransactionService
     val transactionService: TransactionService
     val notificationService: NotificationService

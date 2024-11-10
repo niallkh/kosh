@@ -1,15 +1,16 @@
 package kosh.app.di.impl
 
 import kosh.app.DefaultAnalyticsRepo
+import kosh.app.di.AppComponent
 import kosh.app.di.CoroutinesComponent
 import kosh.app.di.FilesComponent
 import kosh.app.di.NetworkComponent
 import kosh.app.di.SerializationComponent
 import kosh.data.DataComponent
 import kosh.data.DefaultAppStateRepo
-import kosh.data.DefaultFilesRepo
 import kosh.data.DefaultKeyStoreRepo
 import kosh.data.DefaultNotificationRepo
+import kosh.data.DefaultReferenceRepo
 import kosh.data.reown.DefaultWcRepo
 import kosh.data.reown.ReownComponent
 import kosh.data.trezor.DefaultLedgerRepo
@@ -31,13 +32,13 @@ import kosh.domain.analytics.AnalyticsRepo
 import kosh.domain.core.provider
 import kosh.domain.repositories.AppStateRepo
 import kosh.domain.repositories.DeeplinkRepo
-import kosh.domain.repositories.FilesRepo
 import kosh.domain.repositories.FunctionSignatureRepo
 import kosh.domain.repositories.GasRepo
 import kosh.domain.repositories.KeyStoreRepo
 import kosh.domain.repositories.LedgerRepo
 import kosh.domain.repositories.NetworkRepo
 import kosh.domain.repositories.NotificationRepo
+import kosh.domain.repositories.ReferenceRepo
 import kosh.domain.repositories.TokenBalanceRepo
 import kosh.domain.repositories.TokenListsRepo
 import kosh.domain.repositories.TokenRepo
@@ -47,6 +48,7 @@ import kosh.domain.repositories.TrezorRepo
 import kosh.domain.repositories.WcRepo
 import kosh.domain.usecases.network.DefaultNetworkService
 import kosh.domain.usecases.network.getRpcProvidersUC
+import kosh.files.migration.migration1
 import kosh.ui.navigation.DefaultDeeplinkRepo
 import kosh.ui.resources.DefaultTokenListsRepo
 
@@ -60,6 +62,7 @@ internal abstract class DefaultAppRepositoriesComponent(
     filesComponent: FilesComponent,
     ledgerComponent: LedgerComponent,
     reownComponent: ReownComponent,
+    appComponent: AppComponent,
 ) : AppRepositoriesComponent,
     DataComponent by dataComponent,
     TrezorComponent by trezorComponent,
@@ -69,7 +72,8 @@ internal abstract class DefaultAppRepositoriesComponent(
     FilesComponent by filesComponent,
     CoroutinesComponent by coroutinesComponent,
     LedgerComponent by ledgerComponent,
-    ReownComponent by reownComponent {
+    ReownComponent by reownComponent,
+    AppComponent by appComponent {
 
     private val networkService by provider {
         DefaultNetworkService(
@@ -80,8 +84,11 @@ internal abstract class DefaultAppRepositoriesComponent(
 
     override val appStateRepo: AppStateRepo by provider {
         DefaultAppStateRepo(
-            appStateSource = appStateSource,
-            applicationScope = applicationScope
+            applicationScope = applicationScope,
+            keyValueStore = keyValueStore,
+            migrations = listOf(
+                migration1(debug)
+            )
         )
     }
 
@@ -157,11 +164,8 @@ internal abstract class DefaultAppRepositoriesComponent(
         DefaultNotificationRepo()
     }
 
-    override val fileRepo: FilesRepo by provider {
-        DefaultFilesRepo(
-            fileSystem = fileSystem,
-            folder = { filesComponent.fileRepoPath() },
-        )
+    override val referenceRepo: ReferenceRepo by provider {
+        DefaultReferenceRepo(keyValueStore = keyValueStore)
     }
 
     override val functionSignatureRepo: FunctionSignatureRepo by provider {

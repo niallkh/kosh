@@ -3,14 +3,18 @@ package kosh.domain.entities
 import androidx.compose.runtime.Immutable
 import arrow.optics.optics
 import kosh.domain.models.Address
+import kosh.domain.models.ByteString
 import kosh.domain.models.Hash
 import kosh.domain.models.Uri
+import kosh.domain.models.web3.EthMessage
 import kosh.domain.models.web3.GasPrice
+import kosh.domain.models.web3.JsonTypeData
+import kosh.domain.models.web3.Log
 import kosh.domain.models.web3.Receipt
 import kosh.domain.serializers.BigInteger
-import kosh.domain.serializers.Path
 import kosh.domain.serializers.Uuid
 import kosh.domain.uuid.UuidNil
+import kosh.domain.uuid.uuid4
 import kosh.domain.uuid.uuid5
 import kotlinx.datetime.Clock
 import kotlinx.datetime.Instant
@@ -23,9 +27,10 @@ val transactionsNamespace = uuid5(UuidNil, "TokenEntity")
 @Serializable
 @Immutable
 @optics
-sealed interface TransactionEntity : Entity {
-    override val id: Id
+sealed interface TransactionEntity {
+    val id: Id
     val dapp: Dapp
+    val createdAt: Instant
 
     @Serializable
     @Immutable
@@ -37,17 +42,18 @@ sealed interface TransactionEntity : Entity {
         val sender: AccountEntity.Id,
         val target: Address?,
         val value: BigInteger,
-        val data: Path,
+
+        val data: Reference<ByteString>,
         override val dapp: Dapp,
         val nonce: ULong,
         val gasLimit: ULong,
         val gasPrice: GasPrice,
         override val createdAt: Instant,
-        override val modifiedAt: Instant,
+        val modifiedAt: Instant,
 
         val hash: Hash,
         val receipt: Receipt?,
-        val logs: Path?,
+        val logs: Reference<List<Log>>?,
     ) : TransactionEntity {
 
         companion object {
@@ -56,14 +62,14 @@ sealed interface TransactionEntity : Entity {
                 sender: AccountEntity.Id,
                 target: Address?,
                 value: BigInteger,
-                data: Path,
+                data: Reference<ByteString>,
                 dapp: Dapp,
                 nonce: ULong,
                 gasLimit: ULong,
                 hash: Hash,
                 gasPrice: GasPrice,
             ) = Eip1559(
-                id = Id(networkId, sender, nonce),
+                id = Id(),
                 data = data,
                 nonce = nonce,
                 gasLimit = gasLimit,
@@ -90,21 +96,18 @@ sealed interface TransactionEntity : Entity {
         override val id: Id,
         val sender: AccountEntity.Id,
         override val dapp: Dapp,
-        val message: Path,
+        val message: Reference<EthMessage>,
         override val createdAt: Instant,
-        override val modifiedAt: Instant,
+        val modifiedAt: Instant,
     ) : TransactionEntity {
 
         companion object {
             operator fun invoke(
                 sender: AccountEntity.Id,
                 dapp: Dapp,
-                message: Path,
+                message: Reference<EthMessage>,
             ) = PersonalMessage(
-                id = Id(
-                    sender = sender,
-                    message = message,
-                ),
+                id = Id(),
                 sender = sender,
                 dapp = dapp,
                 createdAt = Clock.System.now(),
@@ -123,9 +126,9 @@ sealed interface TransactionEntity : Entity {
         val networkId: NetworkEntity.Id?,
         val sender: AccountEntity.Id,
         override val dapp: Dapp,
-        val jsonTypeData: Path,
+        val jsonTypeData: Reference<JsonTypeData>,
         override val createdAt: Instant,
-        override val modifiedAt: Instant,
+        val modifiedAt: Instant,
     ) : TransactionEntity {
 
         companion object {
@@ -133,12 +136,9 @@ sealed interface TransactionEntity : Entity {
                 sender: AccountEntity.Id,
                 dapp: Dapp,
                 networkId: NetworkEntity.Id?,
-                jsonTypeData: Path,
+                jsonTypeData: Reference<JsonTypeData>,
             ) = Eip712(
-                id = Id(
-                    sender = sender,
-                    networkId = networkId,
-                ),
+                id = Id(),
                 sender = sender,
                 dapp = dapp,
                 networkId = networkId,
@@ -152,47 +152,13 @@ sealed interface TransactionEntity : Entity {
     @JvmInline
     @Serializable
     @Immutable
-    value class Id private constructor(override val value: Uuid) : Entity.Id<TransactionEntity> {
+    value class Id private constructor(val value: Uuid) {
 
         companion object {
-            operator fun invoke(
-                network: NetworkEntity.Id,
-                sender: AccountEntity.Id,
-                nonce: ULong,
-            ) = Id(
+            operator fun invoke() = Id(
                 uuid5(
                     transactionsNamespace,
-                    listOfNotNull(
-                        network.value.toString(),
-                        sender.value.toString(),
-                        nonce.toString(),
-                    ).joinToString(separator = ":")
-                )
-            )
-
-            operator fun invoke(
-                networkId: NetworkEntity.Id?,
-                sender: AccountEntity.Id,
-            ) = Id(
-                uuid5(
-                    transactionsNamespace,
-                    listOfNotNull(
-                        networkId?.value?.toString(),
-                        sender.value.toString(),
-                    ).joinToString(separator = ":")
-                )
-            )
-
-            operator fun invoke(
-                sender: AccountEntity.Id,
-                message: Path,
-            ) = Id(
-                uuid5(
-                    transactionsNamespace,
-                    listOfNotNull(
-                        sender.value.toString(),
-                        message.toString(),
-                    ).joinToString(separator = ":")
+                    uuid4().toString()
                 )
             )
         }
@@ -218,7 +184,7 @@ val TransactionEntity.accountId: AccountEntity.Id?
         ?: TransactionEntity.eip712.sender.getOrNull(this)
         ?: TransactionEntity.personalMessage.sender.getOrNull(this)
 
-val TransactionEntity.path: Path?
+val TransactionEntity.path: Reference<*>?
     inline get() = TransactionEntity.eip1559.data.getOrNull(this)
         ?: TransactionEntity.eip712.jsonTypeData.getOrNull(this)
         ?: TransactionEntity.personalMessage.message.getOrNull(this)

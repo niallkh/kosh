@@ -34,7 +34,7 @@ import kosh.domain.usecases.token.TokenDiscoveryService
 import kosh.domain.usecases.token.TokenService
 import kosh.domain.usecases.transaction.ContractCallService
 import kosh.domain.usecases.transaction.Eip1559TransactionService
-import kosh.domain.usecases.transaction.PersonalTransactionService
+import kosh.domain.usecases.transaction.PersonalMessageService
 import kosh.domain.usecases.transaction.TransactionService
 import kosh.domain.usecases.transaction.TypedTransactionService
 import kosh.domain.usecases.transaction.parser.ApproveParser
@@ -106,23 +106,29 @@ internal class DefaultDomainComponent(
         Eip1559TransactionService(
             appStateRepo = appStateRepo,
             transactionRepo = transactionRepo,
-            fileRepo = fileRepo,
+            referenceRepo = referenceRepo,
         )
     }
 
-    override val personalTransactionService: PersonalTransactionService by provider {
-        PersonalTransactionService(appStateRepo = appStateRepo, fileRepo = fileRepo)
+    override val personalMessageService: PersonalMessageService by provider {
+        PersonalMessageService(
+            appStateRepo = appStateRepo,
+            referenceRepo = referenceRepo
+        )
     }
 
     override val typedTransactionService: TypedTransactionService by provider {
-        TypedTransactionService(fileRepo = fileRepo, appStateRepo = appStateRepo)
+        TypedTransactionService(
+            appStateRepo = appStateRepo,
+            referenceRepo = referenceRepo
+        )
     }
 
     override val transactionService: TransactionService by provider {
         TransactionService(
             appStateRepo = appStateRepo,
-            filesRepo = fileRepo,
             applicationScope = applicationScope,
+            referenceRepo = referenceRepo,
         )
     }
 
@@ -166,6 +172,7 @@ internal class DefaultDomainComponent(
         DefaultTrezorAccountService(
             trezorRepo = trezorRepo,
             appStateRepo = appStateRepo,
+            personalTransactionService = personalMessageService,
         )
     }
 
@@ -204,8 +211,6 @@ internal class DefaultDomainComponent(
             reownRepo = wcRepo,
             applicationScope = applicationScope,
             notificationService = notificationService,
-            accountService = accountService,
-            networkService = networkService,
             sessionService = wcSessionService,
             appStateProvider = appStateProvider,
         )

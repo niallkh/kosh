@@ -15,7 +15,6 @@ import kosh.domain.models.account.DerivationPath
 import kosh.domain.models.account.ethereumAddressIndex
 import kosh.domain.models.account.ledgerAddressIndex
 import kosh.domain.repositories.AppStateRepo
-import kosh.domain.repositories.state
 import kosh.domain.state.AppState
 import kosh.domain.state.account
 import kosh.domain.state.accounts
@@ -33,16 +32,12 @@ class DefaultAccountService(
     private val appStateRepo: AppStateRepo,
 ) : AccountService {
 
-    override suspend fun isActive(address: Address): Boolean {
-        return AccountEntity.Id(address) in appStateRepo.state().enabledAccountIds
-    }
-
     override suspend fun create(
         location: WalletEntity.Location,
         derivationPath: DerivationPath,
         address: Address,
     ): Either<AccountFailure, AccountEntity.Id> = either {
-        val walletsAmount = appStateRepo.state().wallets.size
+        val walletsAmount = appStateRepo.state.wallets.size
 
         val wallet = WalletEntity(
             name = "Wallet #$walletsAmount",
@@ -61,7 +56,7 @@ class DefaultAccountService(
             name = "Account #$addressIndex"
         )
 
-        appStateRepo.modify {
+        appStateRepo.update {
             ensure(account.id !in AppState.accounts.get()) {
                 AccountFailure.AlreadyExist()
             }
@@ -78,7 +73,7 @@ class DefaultAccountService(
     }
 
     override suspend fun update(id: AccountEntity.Id, name: String) = either {
-        appStateRepo.modify {
+        appStateRepo.update {
             ensure(id in AppState.accounts.get()) {
                 AccountFailure.NotFound()
             }
@@ -90,13 +85,13 @@ class DefaultAccountService(
     }
 
     override suspend fun toggle(id: AccountEntity.Id, enabled: Boolean) {
-        appStateRepo.modify {
+        appStateRepo.update {
             AppState.enabledAccountIds.at(At.phset(), id) set enabled
         }
     }
 
     override suspend fun delete(id: AccountEntity.Id) {
-        appStateRepo.modify {
+        appStateRepo.update {
             val account = AppState.account(id).get()
 
             AppState.account(id) set null

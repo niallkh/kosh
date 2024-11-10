@@ -32,6 +32,10 @@ import kosh.domain.serializers.PersistentMap
 import kosh.domain.serializers.PersistentMapSerializer
 import kosh.domain.utils.md5
 import kosh.domain.utils.pmap
+import kosh.domain.uuid.UuidNil
+import kosh.domain.uuid.leastSignificantBits
+import kosh.domain.uuid.mostSignificantBits
+import kosh.domain.uuid.uuid5
 import kotlinx.collections.immutable.PersistentList
 import kotlinx.collections.immutable.persistentHashMapOf
 import kotlinx.collections.immutable.persistentHashSetOf
@@ -61,7 +65,9 @@ data class AppState(
 ) {
 
     companion object {
-        val Default = AppState()
+        val Default = { AppState() }
+
+        val key = uuid5(UuidNil, "kosh.domain.AppState")
     }
 }
 
@@ -118,6 +124,20 @@ fun AppState.Companion.accountsByWallet() =
     }
 
 fun AppState.Companion.account(id: AccountEntity.Id) = AppState.accounts.at(At.pmap(), id)
+
+fun AppState.Companion.isActive(
+    id: AccountEntity.Id,
+) = AppState.enabledAccountIds compose Getter { ids -> id in ids }
+
+fun AppState.Companion.isActive(address: Address) = isActive(AccountEntity.Id(address))
+
+fun AppState.Companion.isActive(
+    id: NetworkEntity.Id,
+) = AppState.enabledNetworkIds compose Getter { ids -> id in ids }
+
+fun AppState.Companion.isActive(
+    chainId: ChainId,
+) = isActive(NetworkEntity.Id(chainId))
 
 fun AppState.Companion.account(address: Address) = account(AccountEntity.Id(address))
 

@@ -27,7 +27,7 @@ import kosh.domain.models.web3.Signature
 import kosh.domain.repositories.WcRepo
 import kosh.domain.repositories.WcRepo.Companion.supportedEvents
 import kosh.domain.repositories.WcRepo.Companion.supportedMethods
-import kosh.domain.repositories.suspendLazy
+import kosh.domain.utils.suspendLazy
 import kosh.libs.reown.ReownAdapter
 import kosh.libs.reown.ReownFailure
 import kosh.libs.reown.ReownResult

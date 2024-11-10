@@ -11,15 +11,15 @@ internal class DefaultFilesComponent(
     FileSystemComponent by fileSystemComponent {
 
     override val appDataStorePath: () -> Path = {
-        Path(noBackupFilesDir(), "app_state.pb")
+        Path(noBackupFilesDir(), "app_state")
     }.memoize()
 
     override val keyStorePath: () -> Path = {
-        Path(noBackupFilesDir(), "keystore.preferences_pb")
+        Path(noBackupFilesDir(), "keystore.preferences")
     }.memoize()
 
-    override val fileRepoPath: () -> Path = {
-        Path(noBackupFilesDir(), "file_repo")
+    override val keyValuePath: () -> Path = {
+        Path(noBackupFilesDir(), "kvstore")
     }.memoize()
 
     override val httpPath: () -> Path = {

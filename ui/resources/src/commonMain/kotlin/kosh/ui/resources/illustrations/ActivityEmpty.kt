@@ -18,12 +18,10 @@ public fun ActivityEmpty(
     upperClothes: Color = MaterialTheme.colorScheme.primary,
     upperClothesDetails: Color = MaterialTheme.colorScheme.onPrimaryContainer,
     downClothes: Color = MaterialTheme.colorScheme.primaryContainer,
-    downClothesDetails: Color = MaterialTheme.colorScheme.primary,
     shoes: Color = MaterialTheme.colorScheme.secondary,
     shoesDetails: Color = MaterialTheme.colorScheme.onSecondary,
     shoesBase: Color = MaterialTheme.colorScheme.outlineVariant,
     accessories: Color = MaterialTheme.colorScheme.tertiary,
-    accessoriesDetails: Color = MaterialTheme.colorScheme.onTertiaryContainer,
     objects: Color = MaterialTheme.colorScheme.tertiaryContainer,
     background: Color = MaterialTheme.colorScheme.background,
 ): ImageVector = remember(upperClothes, downClothes, shoes, accessories, objects, background) {

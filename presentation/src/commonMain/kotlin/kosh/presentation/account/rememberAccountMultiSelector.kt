@@ -2,7 +2,6 @@ package kosh.presentation.account
 
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.Immutable
-import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
@@ -24,8 +23,8 @@ fun rememberAccountMultiSelector(
     initialSelected: Set<AccountEntity.Id> = setOf(),
     appStateProvider: AppStateProvider = di { domain.appStateProvider },
 ): AccountMultiSelectorState {
-    val accounts by appStateProvider.collectAsState().optic(optic)
     var selected by rememberSerializable { mutableStateOf(initialSelected) }
+    val accounts by optic(optic) { appStateProvider.state }
 
     return AccountMultiSelectorState(
         selected = selected,

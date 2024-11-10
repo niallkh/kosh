@@ -27,7 +27,7 @@ fun TransactionItem(
 ) {
     val network = rememberNetwork(transaction.networkId)
     val account = rememberAccount(transaction.sender)
-    val data = transaction.data.resolve { it }
+    val data = transaction.data.resolve()
 
     val parsed = nullable {
         rememberContractCall(

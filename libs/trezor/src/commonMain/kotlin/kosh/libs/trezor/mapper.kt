@@ -731,7 +731,7 @@ internal fun MessageType.toAdapter() = when (this) {
     MessageType_SolanaTxSignature -> SolanaTxSignature.ADAPTER
     MessageType_Deprecated_PassphraseStateRequest,
     MessageType_Deprecated_PassphraseStateAck,
-    -> error("Deprectated message type")
+        -> error("Deprecated message type")
 }
 
 internal fun Message<*, *>.toMessageType() = when (this) {

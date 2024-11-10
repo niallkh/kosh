@@ -7,7 +7,6 @@ import kosh.app.di.SerializationComponent
 import kosh.data.trezor.LedgerComponent
 import kosh.data.trezor.TrezorComponent
 import kosh.data.web3.Web3Component
-import kosh.datastore.DataStoreComponent
 import kosh.domain.DomainComponent
 import kosh.domain.UiRepositoriesComponent
 import kosh.domain.core.provider
@@ -18,14 +17,6 @@ public abstract class DefaultAppScope : AppScope {
     override val filesComponent: FilesComponent by provider {
         DefaultFilesComponent(
             fileSystemComponent = fileSystemComponent
-        )
-    }
-
-    override val dataStoreComponent: DataStoreComponent by provider {
-        DefaultDataStoreComponent(
-            filesComponent = filesComponent,
-            serializationComponent = serializationComponent,
-            appComponent = appComponent,
         )
     }
 

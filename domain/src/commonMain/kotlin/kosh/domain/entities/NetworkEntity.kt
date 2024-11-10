@@ -23,7 +23,7 @@ private val namespace = uuid5(UuidNil, "NetworkEntity")
 @Immutable
 @optics
 data class NetworkEntity(
-    override val id: Id,
+    val id: Id,
     val chainId: ChainId,
     val name: String,
     val readRpcProvider: Uri,
@@ -31,14 +31,14 @@ data class NetworkEntity(
     val explorers: List<Uri>,
     val icon: Uri?,
     val testnet: Boolean,
-    override val createdAt: Instant,
-    override val modifiedAt: Instant,
-) : Entity {
+    val createdAt: Instant,
+    val modifiedAt: Instant,
+) {
 
     @JvmInline
     @Immutable
     @Serializable(Id.Companion.Serializer::class)
-    value class Id private constructor(override val value: Uuid) : Entity.Id<NetworkEntity> {
+    value class Id private constructor(val value: Uuid) {
 
         companion object {
             private val memo = ::Id.memoize()

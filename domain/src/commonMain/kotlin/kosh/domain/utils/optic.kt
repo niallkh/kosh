@@ -10,7 +10,6 @@ import androidx.compose.runtime.snapshots.Snapshot
 import androidx.compose.runtime.structuralEqualityPolicy
 import arrow.optics.Getter
 import arrow.optics.Lens
-import kosh.domain.repositories.NIL
 import kotlinx.coroutines.flow.FlowCollector
 import kotlinx.coroutines.flow.StateFlow
 
@@ -40,11 +39,16 @@ fun <T, A> State<T>.optic(
     g: Getter<T, A>,
     policy: SnapshotMutationPolicy<A> = structuralEqualityPolicy(),
 ): State<A> = remember(this, g, policy) {
-    object : State<A> {
-        val derived = derivedStateOf(policy) { g.get(this@optic.value) }
-        override val value: A
-            get() = derived.value
-    }
+    derivedStateOf(policy) { g.get(this@optic.value) }
+}
+
+@Composable
+fun <T, A> optic(
+    g: Getter<T, A>,
+    policy: SnapshotMutationPolicy<A> = structuralEqualityPolicy(),
+    calculation: () -> T,
+): State<A> = remember(g, policy) {
+    derivedStateOf(policy) { g.get(calculation()) }
 }
 
 @Composable

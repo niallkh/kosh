@@ -3,9 +3,7 @@ package kosh.ui.navigation.hosts
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.DisallowComposableCalls
 import com.arkivanov.decompose.router.stack.pushNew
-import com.arkivanov.decompose.router.stack.replaceAll
 import kosh.ui.navigation.RouteResult
-import kosh.ui.navigation.hosts.home.HandleHomeTabReset
 import kosh.ui.navigation.pop
 import kosh.ui.navigation.routes.RootRoute
 import kosh.ui.navigation.stack.StackHost
@@ -25,17 +23,13 @@ fun RootHost(
             when (it) {
                 is RouteResult.Finished -> onResult(it)
                 is RouteResult.Up -> when (val route = it.route) {
-                    null -> replaceAll(start())
-                    else -> replaceAll(start(), route)
+                    null -> reset()
+                    else -> reset(route)
                 }
             }
         },
         serializer = serializer()
     )
-
-    HandleHomeTabReset {
-        stackRouter.replaceAll(start())
-    }
 
     StackHost(
         stackRouter = stackRouter,

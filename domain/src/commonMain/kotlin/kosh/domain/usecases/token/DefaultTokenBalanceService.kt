@@ -17,7 +17,6 @@ import kosh.domain.state.AppState
 import kosh.domain.state.activeAccounts
 import kosh.domain.state.activeTokens
 import kosh.domain.state.tokenBalances
-import kosh.domain.utils.optic
 import kosh.domain.utils.phmap
 import kotlinx.collections.immutable.toPersistentMap
 
@@ -27,8 +26,9 @@ class DefaultTokenBalanceService(
 ) : TokenBalanceService {
 
     override suspend fun update(): Ior<Nel<Web3Failure>, Unit> = iorNel {
-        val accounts = appStateRepo.state.optic(AppState.activeAccounts()).value
-        val tokens = appStateRepo.state.optic(AppState.activeTokens()).value
+        val state = appStateRepo.state
+        val accounts = AppState.activeAccounts().get(state)
+        val tokens = AppState.activeTokens().get(state)
 
         accounts.mapOrAccumulate { account ->
             val tokensByChain = tokens.groupBy { it.networkId }
@@ -45,7 +45,7 @@ class DefaultTokenBalanceService(
                 .flatten()
                 .associate { (token, balance) -> token.id to balance }
 
-            appStateRepo.modify {
+            appStateRepo.update {
                 AppState.tokenBalances.at(
                     At.phmap(),
                     account.id

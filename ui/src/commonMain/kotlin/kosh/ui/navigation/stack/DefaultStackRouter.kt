@@ -3,15 +3,18 @@ package kosh.ui.navigation.stack
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.DisallowComposableCalls
 import androidx.compose.runtime.currentCompositeKeyHash
+import androidx.compose.runtime.remember
 import com.arkivanov.decompose.router.stack.ChildStack
 import com.arkivanov.decompose.router.stack.StackNavigation
 import com.arkivanov.decompose.router.stack.childStack
+import com.arkivanov.decompose.router.stack.navigate
 import com.arkivanov.decompose.router.stack.pop
 import com.arkivanov.decompose.value.Value
 import kosh.presentation.core.LocalPresentationContext
 import kosh.presentation.core.PresentationContext
-import kosh.presentation.di.rememberRetained
+import kosh.presentation.core.getOrCreate
 import kosh.ui.navigation.RouteResult
+import kosh.ui.navigation.Router
 import kosh.ui.navigation.isDeeplink
 import kosh.ui.navigation.routes.Route
 import kotlinx.serialization.KSerializer
@@ -25,20 +28,21 @@ class DefaultStackRouter<R : Route>(
     link: R?,
     key: String,
     private val onResult: StackRouter<R>.(RouteResult<R>) -> Unit,
-) : StackRouter<R>, StackNavigation<R> by StackNavigation(),
+) : StackRouter<R>,
+    StackNavigation<R> by StackNavigation(),
     PresentationContext by presentationContext {
 
     override val stack: Value<ChildStack<R, PresentationContext>> = childStack(
         source = this,
         serializer = serializer,
         initialStack = {
-            if (link.isDeeplink()) {
-                setOfNotNull(link).toList()
-            } else {
-                setOfNotNull(start(), link).toList()
+            when {
+                link.isDeeplink() -> setOfNotNull(link).toList()
+                link?.link != null -> setOfNotNull(link).toList()
+                else -> setOfNotNull(start(), link).toList()
             }
         },
-        key = "StackRouter_$key",
+        key = key,
         childFactory = { _, ctx -> ctx },
         handleBackButton = true,
     )
@@ -58,6 +62,20 @@ class DefaultStackRouter<R : Route>(
     override fun navigateUp() {
         pop { if (!it) onResult(RouteResult.Up(start())) }
     }
+
+    override fun reset(link: R?) {
+        stack.value.items.firstOrNull()
+            ?.takeIf { it.configuration == start() }
+            ?.instance?.container?.values
+            ?.filterIsInstance<Router<*>>()
+            ?.forEach { it.reset() }
+
+        if (link.isDeeplink()) {
+            navigate { setOfNotNull(link).toList() }
+        } else {
+            navigate { setOfNotNull(start(), link).toList() }
+        }
+    }
 }
 
 @Composable
@@ -70,14 +88,16 @@ inline fun <reified R : @Serializable Route> rememberStackRouter(
 ): StackRouter<R> {
     val presentationContext = LocalPresentationContext.current
 
-    return rememberRetained {
-        DefaultStackRouter(
-            presentationContext = presentationContext,
-            serializer = serializer,
-            start = start,
-            link = link,
-            key = key,
-            onResult = onResult,
-        )
+    return remember {
+        presentationContext.getOrCreate(key) {
+            DefaultStackRouter(
+                presentationContext = presentationContext,
+                serializer = serializer,
+                start = start,
+                link = link,
+                key = "StackRouter_$key",
+                onResult = onResult,
+            )
+        }
     }
 }

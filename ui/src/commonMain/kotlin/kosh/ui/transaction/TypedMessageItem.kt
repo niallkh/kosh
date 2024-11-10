@@ -4,8 +4,10 @@ import androidx.compose.foundation.clickable
 import androidx.compose.material3.Icon
 import androidx.compose.material3.ListItem
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import kosh.domain.entities.TransactionEntity
+import kosh.domain.models.web3.JsonTypeData
 import kosh.eth.abi.json.JsonEip712
 import kosh.ui.component.dapp.DappIcon
 import kosh.ui.component.path.resolve
@@ -14,7 +16,6 @@ import kosh.ui.component.single.single
 import kosh.ui.component.text.TextDate
 import kosh.ui.component.text.TextLine
 import kosh.ui.resources.icons.TypedSignature
-import kotlinx.io.bytestring.decodeToString
 
 @Composable
 fun TypedMessageItem(
@@ -22,8 +23,10 @@ fun TypedMessageItem(
     onClick: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
-    val jsonEip712 = typedMessage.jsonTypeData.resolve {
-        JsonEip712.from(it.bytes().decodeToString())
+    val jsonTypeData = typedMessage.jsonTypeData.resolve(JsonTypeData.serializer())
+
+    val jsonEip712 = remember(jsonTypeData) {
+        jsonTypeData?.json?.let(JsonEip712.Companion::from)
     }
 
     ListItem(
