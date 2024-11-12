@@ -24,6 +24,7 @@ interface KeystoneRepo {
     suspend fun signPersonalMessage(
         listener: KeystoneListener,
         keystone: Keystone,
+        masterFingerprint: ULong,
         message: EthMessage,
         derivationPath: DerivationPath,
     ): Either<KeystoneFailure, Signature>
@@ -31,6 +32,7 @@ interface KeystoneRepo {
     suspend fun signTypedMessage(
         listener: KeystoneListener,
         keystone: Keystone,
+        masterFingerprint: ULong,
         jsonTypedData: JsonTypedData,
         derivationPath: DerivationPath,
     ): Either<KeystoneFailure, Signature>
@@ -38,6 +40,7 @@ interface KeystoneRepo {
     suspend fun signTransaction(
         listener: KeystoneListener,
         keystone: Keystone,
+        masterFingerprint: ULong,
         transaction: TransactionData,
         derivationPath: DerivationPath,
     ): Either<KeystoneFailure, Signature>

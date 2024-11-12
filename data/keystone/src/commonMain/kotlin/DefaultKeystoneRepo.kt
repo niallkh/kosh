@@ -64,17 +64,18 @@ class DefaultKeystoneRepo(
             listener = KeystoneListenerAdapter(listener),
         ).use { connection ->
 
-            val mainAddress = connection.ethereumAddress(ethereumDerivationPath().components)
+            val (masterFingerprint, mainAddress) = connection.ethereumAddress(ethereumDerivationPath().components)
 
             val location = Location.Keystone(
                 mainAddress = Address(mainAddress).getOrNull()!!,
                 product = keystone.product,
+                masterFingerprint = masterFingerprint,
             )
 
             suspend fun derive(
                 derivationPath: DerivationPath,
             ): Signer {
-                val address = connection.ethereumAddress(derivationPath.components)
+                val (_, address) = connection.ethereumAddress(derivationPath.components)
 
                 return Signer(
                     derivationPath = derivationPath,
@@ -94,12 +95,19 @@ class DefaultKeystoneRepo(
     override suspend fun signPersonalMessage(
         listener: KeystoneListener,
         keystone: Keystone,
+        masterFingerprint: ULong,
         message: EthMessage,
         derivationPath: DerivationPath,
     ): Either<KeystoneFailure, Signature> = withContext(Dispatchers.Default) {
         either {
             arrow.core.raise.catch({
-                doSignPersonalMessage(keystone, listener, message, derivationPath)
+                doSignPersonalMessage(
+                    keystone = keystone,
+                    masterFingerprint = masterFingerprint,
+                    listener = listener,
+                    message = message,
+                    derivationPath = derivationPath
+                )
             }) {
                 raise(it.mapKeystoneFailure(logger))
             }
@@ -108,6 +116,7 @@ class DefaultKeystoneRepo(
 
     private suspend fun Raise<KeystoneFailure>.doSignPersonalMessage(
         keystone: Keystone,
+        masterFingerprint: ULong,
         listener: KeystoneListener,
         message: EthMessage,
         derivationPath: DerivationPath,
@@ -121,6 +130,7 @@ class DefaultKeystoneRepo(
         val signature = connection.signPersonalMessage(
             derivationPath = derivationPath.components,
             message = bytes,
+            masterFingerprint = masterFingerprint
         )
 
         val hash = Wallet.personalHash(bytes)
@@ -141,12 +151,19 @@ class DefaultKeystoneRepo(
     override suspend fun signTypedMessage(
         listener: KeystoneListener,
         keystone: Keystone,
+        masterFingerprint: ULong,
         jsonTypedData: JsonTypedData,
         derivationPath: DerivationPath,
     ): Either<KeystoneFailure, Signature> = withContext(Dispatchers.Default) {
         either {
             arrow.core.raise.catch({
-                doSignTypedMessage(listener, keystone, jsonTypedData, derivationPath)
+                doSignTypedMessage(
+                    listener = listener,
+                    keystone = keystone,
+                    masterFingerprint = masterFingerprint,
+                    jsonTypedData = jsonTypedData,
+                    derivationPath = derivationPath
+                )
             }) {
                 raise(it.mapKeystoneFailure(logger))
             }
@@ -156,6 +173,7 @@ class DefaultKeystoneRepo(
     private suspend fun Raise<KeystoneFailure>.doSignTypedMessage(
         listener: KeystoneListener,
         keystone: Keystone,
+        masterFingerprint: ULong,
         jsonTypedData: JsonTypedData,
         derivationPath: DerivationPath,
     ): Signature = keystoneManager.open(
@@ -166,6 +184,7 @@ class DefaultKeystoneRepo(
         val signature = connection.signTypedMessage(
             derivationPath = derivationPath.components,
             eip712 = jsonTypedData.json.encodeToByteString(),
+            masterFingerprint = masterFingerprint
         )
 
         val messageHash = Wallet.typeDataHash(Eip712.fromJson(jsonTypedData.json))
@@ -186,12 +205,19 @@ class DefaultKeystoneRepo(
     override suspend fun signTransaction(
         listener: KeystoneListener,
         keystone: Keystone,
+        masterFingerprint: ULong,
         transaction: TransactionData,
         derivationPath: DerivationPath,
     ): Either<KeystoneFailure, Signature> = withContext(Dispatchers.Default) {
         either {
             arrow.core.raise.catch({
-                doSignTransaction(listener, keystone, transaction, derivationPath)
+                doSignTransaction(
+                    listener = listener,
+                    keystone = keystone,
+                    masterFingerprint = masterFingerprint,
+                    transaction = transaction,
+                    derivationPath = derivationPath
+                )
             }) {
                 raise(it.mapKeystoneFailure(logger))
             }
@@ -201,6 +227,7 @@ class DefaultKeystoneRepo(
     private suspend fun Raise<KeystoneFailure>.doSignTransaction(
         listener: KeystoneListener,
         keystone: Keystone,
+        masterFingerprint: ULong,
         transaction: TransactionData,
         derivationPath: DerivationPath,
     ): Signature = keystoneManager.open(
@@ -222,6 +249,7 @@ class DefaultKeystoneRepo(
         val signature = connection.signTransaction(
             derivationPath = derivationPath.components,
             rawTransaction = type1559.encode(),
+            masterFingerprint = masterFingerprint
         )
 
         val encodedTransaction = Wallet.encode1559Transaction(

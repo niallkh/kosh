@@ -5,7 +5,10 @@
 
 package kosh.domain.state
 
+import arrow.core.toOption
 import arrow.optics.Getter
+import arrow.optics.Lens
+import arrow.optics.Optional
 import arrow.optics.dsl.at
 import arrow.optics.dsl.index
 import arrow.optics.optics
@@ -245,3 +248,8 @@ fun AppState.Companion.transactionsKey() = Getter<AppState, String> { state ->
         .md5()
         .toHexString()
 }
+
+fun <S, A : Any> Lens<S, A?>.optional() = Optional(
+    getOption = { get(it).toOption() },
+    set = ::set
+)

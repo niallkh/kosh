@@ -16,7 +16,7 @@ import kosh.libs.keystone.resolveUr
 
 suspend fun KeystoneManager.Connection.ethereumAddress(
     derivationPath: List<UInt>,
-): String = resolveUr(
+): Pair<ULong, String> = resolveUr(
     QRHardwareCall(
         type = QRHardwareCallType.KeyDerivation,
         params = KeyDerivation(listOf(KeyDerivationSchema(CryptoKeypath(derivationPath)))),
@@ -26,5 +26,5 @@ suspend fun KeystoneManager.Connection.ethereumAddress(
     sc.expectSuccess(ur)
     val cryptoMultiAccounts = CryptoMultiAccounts(ur)
     val compressedPublicKey = cryptoMultiAccounts.keys[0].key ?: error("missing key")
-    Wallet.address(compressedPublicKey).eip55()
+    cryptoMultiAccounts.masterFingerprint to Wallet.address(compressedPublicKey).eip55()
 }

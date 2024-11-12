@@ -11,11 +11,12 @@ import kotlinx.io.bytestring.ByteString
 
 suspend fun KeystoneManager.Connection.signTypedMessage(
     derivationPath: List<UInt>,
+    masterFingerprint: ULong,
     eip712: ByteString,
 ) = resolveUr(
     EthSignRequest(
         signData = eip712,
-        derivationPath = CryptoKeypath(derivationPath, 413577848uL),
+        derivationPath = CryptoKeypath(derivationPath, masterFingerprint),
         dataType = DataType.TypedData,
     ).toUr(),
 ) { sc, ur ->

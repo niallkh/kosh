@@ -5,6 +5,7 @@ import arrow.core.left
 import co.touchlab.kermit.Logger
 import kosh.domain.failure.KeystoneFailure
 import kosh.domain.failure.RequestCanceledException
+import kosh.libs.keystone.KeystoneManager
 import kosh.libs.transport.TransportException
 import kosh.libs.transport.TransportException.CommunicationFailedException
 import kosh.libs.transport.TransportException.ConnectionFailedException
@@ -38,6 +39,8 @@ internal fun Throwable.mapKeystoneFailure(
         }
 
         is RequestCanceledException -> KeystoneFailure.ActionCanceled()
+        is KeystoneManager.ActionRejectedException -> KeystoneFailure.ActionCanceled()
+        is KeystoneManager.WrongStateException -> KeystoneFailure.WrongState()
         else -> KeystoneFailure.Other()
     }
 }

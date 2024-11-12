@@ -88,6 +88,7 @@ data class WalletEntity(
         @optics
         data class Keystone(
             override val mainAddress: Address,
+            val masterFingerprint: ULong,
             val product: String?,
         ) : Location {
 

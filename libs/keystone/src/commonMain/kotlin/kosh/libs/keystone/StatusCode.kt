@@ -27,9 +27,32 @@ enum class StatusCode(val code: Long) {
     RSP_MAX_VALUE(0xFFFFFFFF), // Max value
 }
 
-val StatusCode.isSuccess: Boolean
-    inline get() = this == StatusCode.RSP_SUCCESS_CODE
-
 fun StatusCode.expectSuccess(payload: String = "") {
-    require(isSuccess) { "Expected RSP_SUCCESS_CODE, but got $this: $payload" }
+    when (this) {
+        StatusCode.RSP_SUCCESS_CODE -> Unit
+        StatusCode.PRS_PARSING_REJECTED -> throw KeystoneManager.ActionRejectedException()
+        StatusCode.PRS_PARSING_DISALLOWED -> throw KeystoneManager.WrongStateException()
+        StatusCode.PRS_EXPORT_ADDRESS_DISALLOWED -> throw KeystoneManager.WrongStateException()
+        StatusCode.PRS_PARSING_MISMATCHED_WALLET,
+        StatusCode.RSP_FAILURE_CODE,
+        StatusCode.PRS_INVALID_TOTAL_PACKETS,
+        StatusCode.PRS_INVALID_INDEX,
+        StatusCode.PRS_PARSING_ERROR,
+        StatusCode.PRS_PARSING_UNMATCHED,
+        StatusCode.PRS_PARSING_VERIFY_PASSWORD_ERROR,
+        StatusCode.PRS_EXPORT_ADDRESS_UNSUPPORTED_CHAIN,
+        StatusCode.PRS_EXPORT_ADDRESS_INVALID_PARAMS,
+        StatusCode.PRS_EXPORT_ADDRESS_ERROR,
+        StatusCode.PRS_EXPORT_ADDRESS_REJECTED,
+        StatusCode.PRS_EXPORT_ADDRESS_BUSY,
+        StatusCode.ERR_DEVICE_NOT_OPENED,
+        StatusCode.ERR_DEVICE_NOT_FOUND,
+        StatusCode.ERR_RESPONSE_STATUS_NOT_OK,
+        StatusCode.ERR_TIMEOUT,
+        StatusCode.ERR_DATA_TOO_LARGE,
+        StatusCode.ERR_NOT_SUPPORTED,
+        StatusCode.ERR_BUFFER_MISMATCH,
+        StatusCode.RSP_MAX_VALUE,
+            -> error("Expected RSP_SUCCESS_CODE, but got $this: $payload")
+    }
 }

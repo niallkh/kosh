@@ -38,6 +38,9 @@ interface KeystoneManager {
 
         interface Listener
     }
+
+    class ActionRejectedException : Exception()
+    class WrongStateException : Exception()
 }
 
 suspend inline fun <T> KeystoneManager.Connection.resolveUr(

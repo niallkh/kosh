@@ -14,18 +14,19 @@ import kotlinx.io.write
 
 suspend fun KeystoneManager.Connection.signTransaction(
     derivationPath: List<UInt>,
+    masterFingerprint: ULong,
     rawTransaction: ByteString,
 ) = resolveUr(
     EthSignRequest(
         signData = rawTransaction,
-        derivationPath = CryptoKeypath(derivationPath, 413577848uL),
+        derivationPath = CryptoKeypath(derivationPath, masterFingerprint),
         dataType = DataType.TypedTransaction,
     ).toUr(),
 ) { sc, ur ->
     sc.expectSuccess(ur)
     val signature = EthSignature(ur).signature
     Buffer().run {
-        write(signature, endIndex = signature.size - 1)
+        write(signature, endIndex = 64)
         writeByte((signature[64] + 27).toByte())
         readByteString()
     }

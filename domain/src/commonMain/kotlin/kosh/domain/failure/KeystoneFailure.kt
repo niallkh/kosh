@@ -37,6 +37,11 @@ sealed interface KeystoneFailure : AppFailure {
             get() = "Action canceled."
     }
 
+    class WrongState : KeystoneFailure {
+        override val message: String
+            get() = "Keystone is in wrong state. Please, go to home screen and try again."
+    }
+
     class Other(
         override val message: String = "Something went wrong.",
     ) : KeystoneFailure
