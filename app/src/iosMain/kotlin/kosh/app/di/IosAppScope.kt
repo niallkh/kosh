@@ -66,6 +66,8 @@ public class IosAppScope(
             filesComponent = filesComponent,
             ledgerComponent = ledgerComponent,
             reownComponent = reownComponent,
+            appComponent = appComponent,
+            keystoneComponent = keystoneComponent,
         )
     }
 

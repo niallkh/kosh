@@ -5,7 +5,7 @@ import kosh.domain.failure.LedgerFailure
 import kosh.domain.models.Address
 import kosh.domain.models.hw.Ledger
 import kosh.domain.models.web3.EthMessage
-import kosh.domain.models.web3.JsonTypeData
+import kosh.domain.models.web3.JsonTypedData
 import kosh.domain.models.web3.Signature
 import kosh.domain.models.web3.Signer
 import kosh.domain.models.web3.TransactionData
@@ -25,7 +25,7 @@ interface LedgerAccountService {
         listener: LedgerListener,
         ledger: Ledger,
         address: Address,
-        jsonTypeData: JsonTypeData,
+        jsonTypeData: JsonTypedData,
     ): Either<LedgerFailure, Signature>
 
     suspend fun sign(

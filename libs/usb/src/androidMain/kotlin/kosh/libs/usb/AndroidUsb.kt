@@ -280,7 +280,7 @@ private fun usbEndpoint(
             if (write) it.direction == UsbConstants.USB_DIR_OUT
             else it.direction == UsbConstants.USB_DIR_IN
         }
-        .filter { it.type == UsbConstants.USB_ENDPOINT_XFER_INT }
+//        .filter { it.type == UsbConstants.USB_ENDPOINT_XFER_INT }
         .filter { it.maxPacketSize == config.packetSize }
         .firstOrNull()
         ?: throw ConnectionFailedException("Usb endpoint not found, write=$write")

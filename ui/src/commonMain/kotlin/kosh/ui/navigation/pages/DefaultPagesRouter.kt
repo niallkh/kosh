@@ -83,10 +83,10 @@ class DefaultPagesRouter<R : Route>(
     }
 
     override fun reset(link: R?) {
-        pages.value.items.asSequence()
-            .flatMap { it.instance?.container?.values ?: listOf() }
-            .filterIsInstance<Router<*>>()
-            .forEach { it.reset() }
+        pages.value.items[pages.value.selectedIndex]
+            .instance?.container?.values
+            ?.filterIsInstance<Router<*>>()
+            ?.forEach { it.reset() }
 
         navigate { initial().copy(selectedIndex = it.selectedIndex) }
     }

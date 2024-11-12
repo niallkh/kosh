@@ -7,7 +7,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import kosh.domain.entities.TransactionEntity
-import kosh.domain.models.web3.JsonTypeData
+import kosh.domain.models.web3.JsonTypedData
 import kosh.eth.abi.json.JsonEip712
 import kosh.ui.component.dapp.DappIcon
 import kosh.ui.component.path.resolve
@@ -23,7 +23,7 @@ fun TypedMessageItem(
     onClick: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
-    val jsonTypeData = typedMessage.jsonTypeData.resolve(JsonTypeData.serializer())
+    val jsonTypeData = typedMessage.jsonTypeData.resolve(JsonTypedData.serializer())
 
     val jsonEip712 = remember(jsonTypeData) {
         jsonTypeData?.json?.let(JsonEip712.Companion::from)

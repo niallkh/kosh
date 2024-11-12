@@ -8,7 +8,7 @@ import kosh.domain.models.Hash
 import kosh.domain.models.Uri
 import kosh.domain.models.web3.EthMessage
 import kosh.domain.models.web3.GasPrice
-import kosh.domain.models.web3.JsonTypeData
+import kosh.domain.models.web3.JsonTypedData
 import kosh.domain.models.web3.Log
 import kosh.domain.models.web3.Receipt
 import kosh.domain.serializers.BigInteger
@@ -126,7 +126,7 @@ sealed interface TransactionEntity {
         val networkId: NetworkEntity.Id?,
         val sender: AccountEntity.Id,
         override val dapp: Dapp,
-        val jsonTypeData: Reference<JsonTypeData>,
+        val jsonTypeData: Reference<JsonTypedData>,
         override val createdAt: Instant,
         val modifiedAt: Instant,
     ) : TransactionEntity {
@@ -136,7 +136,7 @@ sealed interface TransactionEntity {
                 sender: AccountEntity.Id,
                 dapp: Dapp,
                 networkId: NetworkEntity.Id?,
-                jsonTypeData: Reference<JsonTypeData>,
+                jsonTypeData: Reference<JsonTypedData>,
             ) = Eip712(
                 id = Id(),
                 sender = sender,

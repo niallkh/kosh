@@ -7,4 +7,4 @@ import kotlin.jvm.JvmInline
 @JvmInline
 @Serializable
 @Immutable
-value class JsonTypeData(val json: String)
+value class JsonTypedData(val json: String)

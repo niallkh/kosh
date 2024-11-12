@@ -3,6 +3,8 @@ package kosh.domain
 import kosh.domain.state.AppStateProvider
 import kosh.domain.usecases.account.AccountService
 import kosh.domain.usecases.account.AccountTokensDiscoveryService
+import kosh.domain.usecases.keystone.KeystoneAccountService
+import kosh.domain.usecases.keystone.KeystoneService
 import kosh.domain.usecases.ledger.LedgerAccountService
 import kosh.domain.usecases.ledger.LedgerService
 import kosh.domain.usecases.network.NetworkService
@@ -48,6 +50,9 @@ interface DomainComponent {
 
     val ledgerService: LedgerService
     val ledgerAccountService: LedgerAccountService
+
+    val keystoneService: KeystoneService
+    val keystoneAccountService: KeystoneAccountService
 
     val wcSessionService: WcSessionService
     val wcProposalService: WcProposalService

@@ -11,6 +11,8 @@ import kosh.data.DefaultAppStateRepo
 import kosh.data.DefaultKeyStoreRepo
 import kosh.data.DefaultNotificationRepo
 import kosh.data.DefaultReferenceRepo
+import kosh.data.keystone.DefaultKeystoneRepo
+import kosh.data.keystone.KeystoneComponent
 import kosh.data.reown.DefaultWcRepo
 import kosh.data.reown.ReownComponent
 import kosh.data.trezor.DefaultLedgerRepo
@@ -35,6 +37,7 @@ import kosh.domain.repositories.DeeplinkRepo
 import kosh.domain.repositories.FunctionSignatureRepo
 import kosh.domain.repositories.GasRepo
 import kosh.domain.repositories.KeyStoreRepo
+import kosh.domain.repositories.KeystoneRepo
 import kosh.domain.repositories.LedgerRepo
 import kosh.domain.repositories.NetworkRepo
 import kosh.domain.repositories.NotificationRepo
@@ -63,6 +66,7 @@ internal abstract class DefaultAppRepositoriesComponent(
     ledgerComponent: LedgerComponent,
     reownComponent: ReownComponent,
     appComponent: AppComponent,
+    keystoneComponent: KeystoneComponent,
 ) : AppRepositoriesComponent,
     DataComponent by dataComponent,
     TrezorComponent by trezorComponent,
@@ -73,7 +77,8 @@ internal abstract class DefaultAppRepositoriesComponent(
     CoroutinesComponent by coroutinesComponent,
     LedgerComponent by ledgerComponent,
     ReownComponent by reownComponent,
-    AppComponent by appComponent {
+    AppComponent by appComponent,
+    KeystoneComponent by keystoneComponent {
 
     private val networkService by provider {
         DefaultNetworkService(
@@ -109,6 +114,12 @@ internal abstract class DefaultAppRepositoriesComponent(
         DefaultLedgerRepo(
             ledgerManager = ledgerManager,
             ledgerOffChain = LedgerOffChain(httpClient)
+        )
+    }
+
+    override val keystoneRepo: KeystoneRepo by provider {
+        DefaultKeystoneRepo(
+            keystoneManager = keystoneManager,
         )
     }
 

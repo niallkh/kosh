@@ -46,8 +46,6 @@ fun NetworksScreen(
     onOpen: (NetworkEntity.Id) -> Unit,
     onAdd: () -> Unit,
 ) {
-
-
     KoshScaffold(
         title = { Text(stringResource(Res.string.networks_title)) },
         floatingActionButton = {

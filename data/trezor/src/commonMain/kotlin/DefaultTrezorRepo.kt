@@ -74,7 +74,7 @@ class DefaultTrezorRepo(
                 val features = connection.init(newSession = refresh)
 
                 val mainAddress = connection.ethereumAddress(
-                    derivationPath = ethereumDerivationPath().path,
+                    derivationPath = ethereumDerivationPath().components,
                     networkDefinition = networkDefinition.await(),
                 )
 
@@ -92,7 +92,7 @@ class DefaultTrezorRepo(
                     derivationPath: DerivationPath,
                 ): Signer {
                     val address = connection.ethereumAddress(
-                        derivationPath = derivationPath.path,
+                        derivationPath = derivationPath.components,
                         networkDefinition = networkDefinition.await(),
                     )
                     return Signer(
@@ -131,7 +131,7 @@ class DefaultTrezorRepo(
                 connection.init(newSession = refresh)
 
                 val mainAddress = connection.ethereumAddress(
-                    derivationPath = ethereumDerivationPath().path,
+                    derivationPath = ethereumDerivationPath().components,
                     networkDefinition = networkDefinition.await(),
                 )
 
@@ -140,7 +140,7 @@ class DefaultTrezorRepo(
                 val bytes = message.encodeToByteString()
 
                 val (signature, address) = connection.signPersonalMessage(
-                    derivationPath = derivationPath.path,
+                    derivationPath = derivationPath.components,
                     message = bytes,
                     networkDefinition = networkDefinition.await(),
                 )
@@ -184,7 +184,7 @@ class DefaultTrezorRepo(
                 connection.init(newSession = refresh)
 
                 val mainAddress = connection.ethereumAddress(
-                    derivationPath = ethereumDerivationPath().path,
+                    derivationPath = ethereumDerivationPath().components,
                     networkDefinition = networkDefinition.await(),
                 )
 
@@ -194,7 +194,7 @@ class DefaultTrezorRepo(
                 val messageHash = SignerWallet.typeDataHash(eip712)
 
                 val (signature, address) = connection.signTypedMessage(
-                    derivationPath = derivationPath.path,
+                    derivationPath = derivationPath.components,
                     eip712 = eip712,
                     networkDefinition = networkDefinition.await(),
                     tokenDefinition = null,
@@ -242,7 +242,7 @@ class DefaultTrezorRepo(
                 connection.init(newSession = refresh)
 
                 val mainAddress = connection.ethereumAddress(
-                    derivationPath = ethereumDerivationPath().path,
+                    derivationPath = ethereumDerivationPath().components,
                     networkDefinition = networkDefinition.await(),
                 )
 
@@ -260,7 +260,7 @@ class DefaultTrezorRepo(
                 )
 
                 val signature = connection.signTransaction(
-                    derivationPath = derivationPath.path,
+                    derivationPath = derivationPath.components,
                     transaction = type1559,
                     networkDefinition = networkDefinition.await(),
                     tokenDefinition = tokenDefinition.await(),

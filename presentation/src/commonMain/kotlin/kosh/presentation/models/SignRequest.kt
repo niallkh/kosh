@@ -5,7 +5,7 @@ import kosh.domain.models.Address
 import kosh.domain.models.ChainId
 import kosh.domain.models.reown.DappMetadata
 import kosh.domain.models.web3.EthMessage
-import kosh.domain.models.web3.JsonTypeData
+import kosh.domain.models.web3.JsonTypedData
 import kosh.domain.models.web3.Signature
 import kosh.domain.models.web3.TransactionData
 import kotlinx.serialization.SerialName
@@ -32,7 +32,7 @@ sealed interface SignRequest {
     data class SignTyped(
         val chainId: ChainId?,
         override val account: Address,
-        val json: JsonTypeData,
+        val json: JsonTypedData,
         val dapp: DappMetadata,
     ) : SignRequest
 

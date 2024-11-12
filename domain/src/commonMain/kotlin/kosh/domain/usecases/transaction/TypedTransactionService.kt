@@ -11,7 +11,7 @@ import kosh.domain.entities.TransactionEntity
 import kosh.domain.failure.TransactionFailure
 import kosh.domain.models.ChainId
 import kosh.domain.models.reown.DappMetadata
-import kosh.domain.models.web3.JsonTypeData
+import kosh.domain.models.web3.JsonTypedData
 import kosh.domain.models.web3.Signature
 import kosh.domain.repositories.AppStateRepo
 import kosh.domain.repositories.ReferenceRepo
@@ -28,13 +28,13 @@ class TypedTransactionService(
 ) {
 
     suspend fun add(
-        jsonTypeData: JsonTypeData,
+        jsonTypeData: JsonTypedData,
         signature: Signature,
         chainId: ChainId?,
         dapp: DappMetadata,
     ): Ior<Nel<TransactionFailure>, Signature> = iorNel {
         saga {
-            val jsonTypeDataRef = save(referenceRepo, jsonTypeData, JsonTypeData.serializer())
+            val jsonTypeDataRef = save(referenceRepo, jsonTypeData, JsonTypedData.serializer())
 
             val eip712 = TransactionEntity.Eip712(
                 sender = AccountEntity.Id(signature.signer),

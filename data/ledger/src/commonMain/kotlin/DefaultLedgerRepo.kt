@@ -78,7 +78,7 @@ class DefaultLedgerRepo(
                 }
 
                 val mainAddress = connection.ethereumAddress(
-                    derivationPath = zeroDerivationPath.path,
+                    derivationPath = zeroDerivationPath.components,
                 )
 
                 val location = Location.Ledger(
@@ -90,7 +90,7 @@ class DefaultLedgerRepo(
                     derivationPath: DerivationPath,
                 ): Signer {
                     val address = connection.ethereumAddress(
-                        derivationPath = derivationPath.path,
+                        derivationPath = derivationPath.components,
                     )
                     return Signer(
                         derivationPath = derivationPath,
@@ -140,7 +140,7 @@ class DefaultLedgerRepo(
         val bytes = message.encodeToByteString()
 
         val signature = connection.signPersonalMessage(
-            derivationPath = derivationPath.path,
+            derivationPath = derivationPath.components,
             message = bytes,
         )
 
@@ -192,7 +192,7 @@ class DefaultLedgerRepo(
             }
 
             val signature = connection.signTypedMessage(
-                derivationPath = derivationPath.path,
+                derivationPath = derivationPath.components,
                 eip712 = eip712,
                 parameters = parameters.await(),
             )
@@ -264,7 +264,7 @@ class DefaultLedgerRepo(
             )
 
             val signature = connection.signTransaction(
-                derivationPath = derivationPath.path,
+                derivationPath = derivationPath.components,
                 transaction = type1559.encode(),
                 parameters = transactionParameters.await(),
             )

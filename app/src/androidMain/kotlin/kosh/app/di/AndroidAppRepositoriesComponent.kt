@@ -2,6 +2,7 @@ package kosh.app.di
 
 import kosh.app.di.impl.DefaultAppRepositoriesComponent
 import kosh.data.DataComponent
+import kosh.data.keystone.KeystoneComponent
 import kosh.data.reown.ReownComponent
 import kosh.data.trezor.LedgerComponent
 import kosh.data.trezor.TrezorComponent
@@ -20,6 +21,7 @@ internal class AndroidAppRepositoriesComponent(
     ledgerComponent: LedgerComponent,
     reownComponent: ReownComponent,
     appComponent: AppComponent,
+    keystoneComponent: KeystoneComponent,
 ) : AppRepositoriesComponent,
     DefaultAppRepositoriesComponent(
         dataComponent = dataComponent,
@@ -32,5 +34,6 @@ internal class AndroidAppRepositoriesComponent(
         ledgerComponent = ledgerComponent,
         reownComponent = reownComponent,
         appComponent = appComponent,
+        keystoneComponent = keystoneComponent,
     ),
     AndroidComponent by androidComponent

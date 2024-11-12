@@ -75,4 +75,16 @@ internal object Secp256k1 {
         }
         return publicKey
     }
+
+    fun publicKeyParse(
+        compressedPublicKey: ByteString,
+    ): ByteString {
+        lateinit var publicKey: ByteString
+        UnsafeByteStringOperations.withByteArrayUnsafe(compressedPublicKey) { pk ->
+            publicKey = UnsafeByteStringOperations.wrapUnsafe(
+                LibSecp256k1.pubkeyParse(pk)
+            )
+        }
+        return publicKey
+    }
 }

@@ -102,6 +102,7 @@ internal class AndroidAppScope(
             ledgerComponent = ledgerComponent,
             reownComponent = reownComponent,
             appComponent = appComponent,
+            keystoneComponent = keystoneComponent,
         )
     }
 
@@ -112,7 +113,7 @@ internal class AndroidAppScope(
 
         if (BuildConfig.DEBUG) {
 //            StrictMode.enableDefaults()
-            Logger.setMinSeverity(Severity.Verbose)
+            Logger.setMinSeverity(Severity.Debug)
             Logger.setLogWriters(
                 platformLogWriter(),
                 CrashlyticsLogWriter()

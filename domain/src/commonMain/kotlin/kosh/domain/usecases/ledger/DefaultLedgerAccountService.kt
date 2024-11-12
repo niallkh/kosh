@@ -8,7 +8,7 @@ import kosh.domain.models.Address
 import kosh.domain.models.account.ledgerDerivationPath
 import kosh.domain.models.hw.Ledger
 import kosh.domain.models.web3.EthMessage
-import kosh.domain.models.web3.JsonTypeData
+import kosh.domain.models.web3.JsonTypedData
 import kosh.domain.models.web3.Signature
 import kosh.domain.models.web3.TransactionData
 import kosh.domain.repositories.AppStateRepo
@@ -57,7 +57,7 @@ class DefaultLedgerAccountService(
         listener: LedgerListener,
         ledger: Ledger,
         address: Address,
-        jsonTypeData: JsonTypeData,
+        jsonTypeData: JsonTypedData,
     ): Either<LedgerFailure, Signature> = either {
         val appState = appStateRepo.state
         val account = AppState.account(address).get(appState) ?: raise(LedgerFailure.Other())

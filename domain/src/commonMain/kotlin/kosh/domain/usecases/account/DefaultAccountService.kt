@@ -47,6 +47,7 @@ class DefaultAccountService(
         val addressIndex = when (location) {
             is WalletEntity.Location.Ledger -> derivationPath.ledgerAddressIndex
             is WalletEntity.Location.Trezor -> derivationPath.ethereumAddressIndex
+            is WalletEntity.Location.Keystone -> derivationPath.ethereumAddressIndex
         }
 
         val account = AccountEntity(

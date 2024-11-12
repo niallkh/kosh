@@ -10,9 +10,11 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import kosh.domain.models.hw.HardwareWallet
 import kosh.domain.models.hw.HardwareWallet.Transport
+import kosh.domain.models.hw.Keystone
 import kosh.domain.models.hw.Ledger
 import kosh.domain.models.hw.Trezor
 import kosh.ui.component.text.TextLine
+import kosh.ui.resources.icons.Keystone
 import kosh.ui.resources.icons.LedgerIcon
 import kosh.ui.resources.icons.TrezorIcon
 
@@ -33,6 +35,13 @@ fun HardwareWalletItem(
             modifier = Modifier.clickable { onSelected(hardwareWallet) },
             leadingContent = { Icon(LedgerIcon, "Ledger") },
             headlineContent = { TextLine(hardwareWallet.product ?: "Ledger") },
+            trailingContent = { TransportIcon(hardwareWallet.transport) },
+        )
+
+        is Keystone -> ListItem(
+            modifier = Modifier.clickable { onSelected(hardwareWallet) },
+            leadingContent = { Icon(Keystone, "Keystone") },
+            headlineContent = { TextLine(hardwareWallet.product ?: "Keystone") },
             trailingContent = { TransportIcon(hardwareWallet.transport) },
         )
     }

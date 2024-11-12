@@ -4,6 +4,7 @@ import kosh.app.di.AppScope
 import kosh.app.di.CoroutinesComponent
 import kosh.app.di.FilesComponent
 import kosh.app.di.SerializationComponent
+import kosh.data.keystone.KeystoneComponent
 import kosh.data.trezor.LedgerComponent
 import kosh.data.trezor.TrezorComponent
 import kosh.data.web3.Web3Component
@@ -51,6 +52,12 @@ public abstract class DefaultAppScope : AppScope {
 
     override val ledgerComponent: LedgerComponent by provider {
         DefaultLedgerComponent(
+            transportComponent = transportComponent
+        )
+    }
+
+    override val keystoneComponent: KeystoneComponent by provider {
+        DefaultKeystoneComponent(
             transportComponent = transportComponent
         )
     }

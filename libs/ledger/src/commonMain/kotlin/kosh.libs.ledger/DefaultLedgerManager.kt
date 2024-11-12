@@ -35,7 +35,7 @@ class DefaultLedgerManager(
         id: String,
         listener: LedgerManager.Listener,
     ): Resource<LedgerManager.Connection> = resource {
-        logger.i { "open(id = ${id})" }
+        logger.v { "open(id = ${id})" }
 
         val parsedId = LedgerDevice.parseId(id)
 

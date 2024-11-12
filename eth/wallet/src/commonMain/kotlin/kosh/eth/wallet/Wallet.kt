@@ -34,6 +34,14 @@ public object Wallet {
         .substring(12, 32)
         .let(Value.Address::invoke)
 
+    public fun address(
+        compressedPublicKey: ByteString,
+    ): Value.Address = Secp256k1.publicKeyParse(compressedPublicKey)
+        .substring(1, 65)
+        .keccak256()
+        .substring(12, 32)
+        .let(Value.Address::invoke)
+
     public fun verify(
         privkey: PrivateKey,
         data: ByteString,

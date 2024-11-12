@@ -11,11 +11,11 @@ private const val hardenedIndex: UInt = 0x80000000u
 @JvmInline
 @Serializable
 @Immutable
-value class DerivationPath private constructor(val path: List<UInt>) {
+value class DerivationPath private constructor(val components: List<UInt>) {
 
     override fun toString(): String = buildString {
         append("m")
-        path.forEach {
+        components.forEach {
             append("/")
             if (it.isHardened) {
                 append(it.unhardened)
@@ -43,13 +43,13 @@ fun ledgerDerivationPath(index: UInt = 0u): DerivationPath {
 }
 
 val DerivationPath.ethereumAddressIndex: UInt
-    get() = path[4]
+    get() = components[4]
 
 val DerivationPath.ledgerAddressIndex: UInt
-    get() = path[2].unhardened
+    get() = components[2].unhardened
 
 val DerivationPath.slip44: UInt
-    get() = path[1]
+    get() = components[1]
 
 private val UInt.hardened: UInt
     inline get() = hardenedIndex + this

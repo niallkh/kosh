@@ -14,7 +14,7 @@ import kosh.domain.models.ChainId
 import kosh.domain.models.Uri
 import kosh.domain.models.reown.WcRequest
 import kosh.domain.models.web3.EthMessage
-import kosh.domain.models.web3.JsonTypeData
+import kosh.domain.models.web3.JsonTypedData
 import kosh.domain.serializers.BigInteger
 import kosh.eth.abi.json.JsonEip712
 import kosh.libs.reown.AddEthereumNetwork
@@ -62,7 +62,7 @@ internal fun requestCall(
 
             WcRequest.Call.SignTyped(
                 chainId = domain.chainId?.let { ChainId(it) },
-                json = JsonTypeData(json),
+                json = JsonTypedData(json),
                 account = address,
             )
         }

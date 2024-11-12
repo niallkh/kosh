@@ -9,7 +9,7 @@ import kosh.domain.models.Address
 import kosh.domain.models.account.ethereumDerivationPath
 import kosh.domain.models.hw.Trezor
 import kosh.domain.models.web3.EthMessage
-import kosh.domain.models.web3.JsonTypeData
+import kosh.domain.models.web3.JsonTypedData
 import kosh.domain.models.web3.Signature
 import kosh.domain.models.web3.Signer
 import kosh.domain.models.web3.TransactionData
@@ -18,13 +18,11 @@ import kosh.domain.repositories.TrezorListener
 import kosh.domain.repositories.TrezorRepo
 import kosh.domain.state.AppState
 import kosh.domain.state.account
-import kosh.domain.usecases.transaction.PersonalMessageService
 import kotlinx.coroutines.flow.Flow
 
 class DefaultTrezorAccountService(
     private val trezorRepo: TrezorRepo,
     private val appStateRepo: AppStateRepo,
-    private val personalTransactionService: PersonalMessageService,
 ) : TrezorAccountService {
 
     private val logger = Logger.withTag("[K]TrezorAccountService")
@@ -48,7 +46,7 @@ class DefaultTrezorAccountService(
         trezor: Trezor,
         refresh: Boolean,
         address: Address,
-        jsonTypeData: JsonTypeData,
+        jsonTypeData: JsonTypedData,
     ): Either<TrezorFailure, Signature> = either {
         val appState = appStateRepo.state
         val account = AppState.account(address).get(appState)

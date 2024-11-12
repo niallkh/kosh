@@ -10,6 +10,10 @@ import kosh.domain.usecases.account.AccountService
 import kosh.domain.usecases.account.AccountTokensDiscoveryService
 import kosh.domain.usecases.account.DefaultAccountService
 import kosh.domain.usecases.account.DefaultAccountTokensDiscoveryService
+import kosh.domain.usecases.keystone.DefaultKeystoneAccountService
+import kosh.domain.usecases.keystone.DefaultKeystoneService
+import kosh.domain.usecases.keystone.KeystoneAccountService
+import kosh.domain.usecases.keystone.KeystoneService
 import kosh.domain.usecases.ledger.DefaultLedgerAccountService
 import kosh.domain.usecases.ledger.DefaultLedgerService
 import kosh.domain.usecases.ledger.LedgerAccountService
@@ -172,7 +176,6 @@ internal class DefaultDomainComponent(
         DefaultTrezorAccountService(
             trezorRepo = trezorRepo,
             appStateRepo = appStateRepo,
-            personalTransactionService = personalMessageService,
         )
     }
 
@@ -238,6 +241,19 @@ internal class DefaultDomainComponent(
             tokensDiscoveryService = tokenDiscoveryService,
             tokenBalanceService = tokenBalanceService,
             tokenService = tokenService,
+            appStateProvider = appStateProvider,
+        )
+    }
+
+    override val keystoneService: KeystoneService by provider {
+        DefaultKeystoneService(
+            keystoneRepo = keystoneRepo,
+        )
+    }
+
+    override val keystoneAccountService: KeystoneAccountService by provider {
+        DefaultKeystoneAccountService(
+            keystoneRepo = keystoneRepo,
             appStateProvider = appStateProvider,
         )
     }

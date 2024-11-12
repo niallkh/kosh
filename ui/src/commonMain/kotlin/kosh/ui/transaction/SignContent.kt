@@ -8,6 +8,7 @@ import androidx.compose.runtime.setValue
 import com.arkivanov.decompose.router.slot.dismiss
 import kosh.domain.models.Address
 import kosh.presentation.account.rememberAccount
+import kosh.presentation.keystone.rememberKeystoneListener
 import kosh.presentation.keystore.rememberKeyStoreListener
 import kosh.presentation.ledger.rememberLedgerListener
 import kosh.presentation.models.SignRequest
@@ -44,6 +45,8 @@ fun SignContent(
 
     val ledgerListener = rememberLedgerListener()
 
+    val keystoneListener = rememberKeystoneListener()
+
     LedgerButtonRequest(
         request = ledgerListener.buttonRequest,
         onConfirm = ledgerListener.confirm,
@@ -53,6 +56,7 @@ fun SignContent(
     val sign = rememberSign(
         trezorListener = trezorListener.listener,
         ledgerListener = ledgerListener.listener,
+        keystoneListener = keystoneListener.listener,
     )
 
     AppFailureMessage(sign.ledgerFailure)

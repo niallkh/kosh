@@ -6,6 +6,7 @@ import kosh.domain.repositories.DeeplinkRepo
 import kosh.domain.repositories.FunctionSignatureRepo
 import kosh.domain.repositories.GasRepo
 import kosh.domain.repositories.KeyStoreRepo
+import kosh.domain.repositories.KeystoneRepo
 import kosh.domain.repositories.LedgerRepo
 import kosh.domain.repositories.NetworkRepo
 import kosh.domain.repositories.NotificationRepo
@@ -23,6 +24,7 @@ interface AppRepositoriesComponent {
     val trezorPasskeysRepo: TrezorPasskeysRepo
     val ledgerRepo: LedgerRepo
     val keyStoreRepo: KeyStoreRepo
+    val keystoneRepo: KeystoneRepo
     val networkRepo: NetworkRepo
     val tokenRepo: TokenRepo
     val analyticsRepo: AnalyticsRepo

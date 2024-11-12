@@ -2,7 +2,10 @@ package kosh.libs.transport
 
 import arrow.fx.coroutines.Resource
 import kotlinx.coroutines.flow.Flow
+import kotlinx.io.Buffer
+import kotlinx.io.Sink
 import kotlinx.io.bytestring.ByteString
+import kotlinx.io.readByteString
 
 interface Transport<Config> {
 
@@ -24,3 +27,9 @@ interface Transport<Config> {
         suspend fun read(): ByteString
     }
 }
+
+inline fun buildByteString(
+    block: Sink.() -> Unit,
+) = Buffer().apply {
+    block()
+}.readByteString()

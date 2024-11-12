@@ -19,8 +19,8 @@ import kosh.presentation.rememberEffect
 
 @Composable
 fun rememberSignLedger(
-    trezorListener: LedgerListener,
-    trezorAccountService: LedgerAccountService = di { domain.ledgerAccountService },
+    ledgerListener: LedgerListener,
+    ledgerAccountService: LedgerAccountService = di { domain.ledgerAccountService },
 ): SignLedgerState {
     var ledger by rememberRetained { mutableStateOf<Ledger?>(null) }
     var signRequest by rememberRetained { mutableStateOf<SignRequest?>(null) }
@@ -31,22 +31,22 @@ fun rememberSignLedger(
             val ledger1 = ledger ?: raise(null)
 
             val signature = when (request) {
-                is SignRequest.SignPersonal -> trezorAccountService.sign(
-                    listener = trezorListener,
+                is SignRequest.SignPersonal -> ledgerAccountService.sign(
+                    listener = ledgerListener,
                     ledger = ledger1,
                     address = request.account,
                     message = request.message,
                 )
 
-                is SignRequest.SignTyped -> trezorAccountService.sign(
-                    listener = trezorListener,
+                is SignRequest.SignTyped -> ledgerAccountService.sign(
+                    listener = ledgerListener,
                     ledger = ledger1,
                     address = request.account,
                     jsonTypeData = request.json,
                 )
 
-                is SignRequest.SignTransaction -> trezorAccountService.sign(
-                    listener = trezorListener,
+                is SignRequest.SignTransaction -> ledgerAccountService.sign(
+                    listener = ledgerListener,
                     ledger = ledger1,
                     transaction = request.data,
                 )

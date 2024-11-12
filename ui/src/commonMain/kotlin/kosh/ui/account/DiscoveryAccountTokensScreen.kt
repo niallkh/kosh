@@ -14,7 +14,7 @@ import kosh.domain.entities.AccountEntity
 import kosh.presentation.account.rememberDiscoveryAccountTokens
 import kosh.ui.component.LoadingIndicator
 import kosh.ui.component.scaffold.KoshScaffold
-import kosh.ui.failure.AppFailureMessage
+import kosh.ui.failure.AppFailureItem
 
 @Composable
 fun DiscoveryAccountTokensScreen(
@@ -39,7 +39,11 @@ fun DiscoveryAccountTokensScreen(
                 discovery.discover()
             }
 
-            AppFailureMessage(discovery.errors)
+            discovery.errors?.firstOrNull()?.let {
+                AppFailureItem(it) {
+                    discovery.retry()
+                }
+            }
 
             LaunchedEffect(discovery.finished) {
                 if (discovery.finished) {

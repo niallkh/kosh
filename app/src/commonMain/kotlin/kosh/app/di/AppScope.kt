@@ -1,6 +1,7 @@
 package kosh.app.di
 
 import kosh.data.DataComponent
+import kosh.data.keystone.KeystoneComponent
 import kosh.data.reown.ReownComponent
 import kosh.data.trezor.LedgerComponent
 import kosh.data.trezor.TrezorComponent
@@ -19,6 +20,7 @@ public interface AppScope {
     public val dataComponent: DataComponent
     public val trezorComponent: TrezorComponent
     public val ledgerComponent: LedgerComponent
+    public val keystoneComponent: KeystoneComponent
     public val web3Component: Web3Component
     public val imageComponent: ImageComponent
     public val domain: DomainComponent

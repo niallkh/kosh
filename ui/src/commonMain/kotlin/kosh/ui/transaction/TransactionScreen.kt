@@ -23,7 +23,7 @@ import arrow.core.raise.nullable
 import kosh.domain.entities.TransactionEntity
 import kosh.domain.models.web3.ContractCall
 import kosh.domain.models.web3.EthMessage
-import kosh.domain.models.web3.JsonTypeData
+import kosh.domain.models.web3.JsonTypedData
 import kosh.presentation.account.rememberAccount
 import kosh.presentation.network.rememberNetwork
 import kosh.presentation.network.rememberOpenExplorer
@@ -169,7 +169,7 @@ fun PersonalMessageContent(
 fun TypedMessageContent(
     typedMessage: TransactionEntity.Eip712,
 ) {
-    val jsonText = typedMessage.jsonTypeData.resolve(JsonTypeData.serializer())
+    val jsonText = typedMessage.jsonTypeData.resolve(JsonTypedData.serializer())
 
     Column(
         modifier = Modifier.verticalScroll(rememberScrollState()),

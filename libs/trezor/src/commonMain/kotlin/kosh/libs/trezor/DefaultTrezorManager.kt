@@ -27,7 +27,7 @@ class DefaultTrezorManager(
         id: String,
         listener: TrezorManager.Connection.Listener,
     ): Resource<TrezorManager.Connection> = resource {
-        logger.d { "open(id = ${id})" }
+        logger.v { "open(id = ${id})" }
         DefaultTrezorConnection(
             connection = TrezorUsbFormat(usb.open(id, trezorUsbConfig).bind()),
             listener = listener,

@@ -3,12 +3,14 @@ package kosh.ui.navigation.hosts
 import androidx.compose.runtime.Composable
 import com.arkivanov.decompose.router.stack.pushNew
 import com.arkivanov.decompose.router.stack.replaceCurrent
+import kosh.domain.models.hw.Keystone
 import kosh.domain.models.hw.Ledger
 import kosh.domain.models.hw.Trezor
 import kosh.ui.account.AccountScreen
 import kosh.ui.account.DeleteAccountScreen
 import kosh.ui.account.DiscoveryAccountTokensScreen
 import kosh.ui.analytics.LogScreen
+import kosh.ui.keystone.NewKeystoneAccountScreen
 import kosh.ui.ledger.NewLedgerAccountScreen
 import kosh.ui.navigation.RouteResult
 import kosh.ui.navigation.routes.WalletsRoute
@@ -54,6 +56,12 @@ fun WalletsHost(
 
                 is Ledger -> NewLedgerAccountScreen(
                     ledger = route.hw,
+                    onFinish = { replaceCurrent(WalletsRoute.TokensDiscovery(it)) },
+                    onNavigateUp = { navigateUp() },
+                )
+
+                is Keystone -> NewKeystoneAccountScreen(
+                    keystone = route.hw,
                     onFinish = { replaceCurrent(WalletsRoute.TokensDiscovery(it)) },
                     onNavigateUp = { navigateUp() },
                 )

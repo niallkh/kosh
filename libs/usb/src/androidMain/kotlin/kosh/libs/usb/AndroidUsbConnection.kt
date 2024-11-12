@@ -56,7 +56,6 @@ class AndroidUsbConnection(
             writeBuffer.put(it)
         }
         writeBuffer.flip()
-        writeBuffer.limit(packetSize)
         logger.v { "write(size = ${writeBuffer.limit()})" }
         writeRequest.transfer(writeBuffer)
         Unit
@@ -64,11 +63,9 @@ class AndroidUsbConnection(
 
     override suspend fun read(): ByteString = readMutex.withLock {
         readBuffer.clear()
-        readBuffer.limit(packetSize)
-        logger.v { "read(size = ${writeBuffer.limit()})" }
         readRequest.transfer(readBuffer)
-        readBuffer.rewind()
-        readBuffer.limit(packetSize)
+        readBuffer.flip()
+        logger.v { "read(size = ${writeBuffer.limit()})" }
         Buffer().apply { write(readBuffer) }.readByteString()
     }
 

@@ -18,7 +18,7 @@ fun rememberDeleteTransaction(
     return DeleteTransactionState(
         deleted = delete.done,
         loading = delete.inProgress,
-        delete = { delete.invoke() }
+        delete = { delete() }
     )
 }
 

@@ -82,6 +82,18 @@ data class WalletEntity(
             companion object
         }
 
+        @Serializable
+        @SerialName("keystone")
+        @Immutable
+        @optics
+        data class Keystone(
+            override val mainAddress: Address,
+            val product: String?,
+        ) : Location {
+
+            companion object
+        }
+
         companion object
     }
 

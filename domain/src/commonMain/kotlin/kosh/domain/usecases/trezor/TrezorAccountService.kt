@@ -5,7 +5,7 @@ import kosh.domain.failure.TrezorFailure
 import kosh.domain.models.Address
 import kosh.domain.models.hw.Trezor
 import kosh.domain.models.web3.EthMessage
-import kosh.domain.models.web3.JsonTypeData
+import kosh.domain.models.web3.JsonTypedData
 import kosh.domain.models.web3.Signature
 import kosh.domain.models.web3.Signer
 import kosh.domain.models.web3.TransactionData
@@ -36,7 +36,7 @@ interface TrezorAccountService {
         trezor: Trezor,
         refresh: Boolean,
         address: Address,
-        jsonTypeData: JsonTypeData,
+        jsonTypeData: JsonTypedData,
     ): Either<TrezorFailure, Signature>
 
     suspend fun sign(

@@ -31,6 +31,7 @@ import androidx.compose.ui.unit.dp
 import com.arkivanov.decompose.router.slot.dismiss
 import kosh.domain.entities.AccountEntity
 import kosh.domain.entities.WalletEntity
+import kosh.domain.entities.WalletEntity.Location
 import kosh.domain.models.hw.HardwareWallet
 import kosh.domain.serializers.ImmutableList
 import kosh.domain.serializers.ImmutableSet
@@ -47,6 +48,7 @@ import kosh.ui.navigation.slot.SlotHost
 import kosh.ui.navigation.slot.activate
 import kosh.ui.navigation.slot.rememberSlotRouter
 import kosh.ui.resources.Res
+import kosh.ui.resources.icons.Keystone
 import kosh.ui.resources.icons.LedgerIcon
 import kosh.ui.resources.icons.TrezorIcon
 import kosh.ui.resources.illustrations.WalletsEmpty
@@ -248,16 +250,18 @@ private fun WalletItem(
                 contentAlignment = Alignment.Center
             ) {
                 when (wallet?.location) {
-                    is WalletEntity.Location.Trezor -> Icon(TrezorIcon, "Trezor")
-                    is WalletEntity.Location.Ledger -> Icon(LedgerIcon, "Ledger")
+                    is Location.Trezor -> Icon(TrezorIcon, "Trezor")
+                    is Location.Ledger -> Icon(LedgerIcon, "Ledger")
+                    is Location.Keystone -> Icon(Keystone, "Keystone")
                     null -> Icon(TrezorIcon, "Trezor")
                 }
             }
         },
         supportingContent = {
             val text = when (val location = wallet?.location) {
-                is WalletEntity.Location.Trezor -> location.name ?: location.product ?: "Trezor"
-                is WalletEntity.Location.Ledger -> location.product ?: "Ledger"
+                is Location.Trezor -> location.name ?: location.product ?: "Trezor"
+                is Location.Ledger -> location.product ?: "Ledger"
+                is Location.Keystone -> location.product ?: "Keystone"
                 null -> null
             }
 

@@ -3,6 +3,7 @@ package kosh.app.di
 import kosh.app.di.impl.DefaultAppRepositoriesComponent
 import kosh.data.DataComponent
 import kosh.data.reown.ReownComponent
+import kosh.data.trezor.KeystoneComponent
 import kosh.data.trezor.LedgerComponent
 import kosh.data.trezor.TrezorComponent
 import kosh.data.web3.Web3Component
@@ -18,6 +19,8 @@ internal class IosAppRepositoriesComponent(
     filesComponent: FilesComponent,
     ledgerComponent: LedgerComponent,
     reownComponent: ReownComponent,
+    keystoneComponent: KeystoneComponent,
+    appComponent: AppComponent,
 ) : AppRepositoriesComponent,
     DefaultAppRepositoriesComponent(
         dataComponent = dataComponent,
@@ -28,5 +31,7 @@ internal class IosAppRepositoriesComponent(
         coroutinesComponent = coroutinesComponent,
         filesComponent = filesComponent,
         ledgerComponent = ledgerComponent,
-        reownComponent = reownComponent
+        reownComponent = reownComponent,
+        keystoneComponent = keystoneComponent,
+        appComponent = appComponent,
     )
