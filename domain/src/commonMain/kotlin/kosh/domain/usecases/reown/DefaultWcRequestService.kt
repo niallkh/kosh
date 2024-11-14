@@ -7,12 +7,12 @@ import arrow.core.raise.recover
 import co.touchlab.kermit.Logger
 import kosh.domain.failure.WcFailure
 import kosh.domain.failure.logFailure
-import kosh.domain.models.ByteString
 import kosh.domain.models.ChainId
 import kosh.domain.models.Hash
 import kosh.domain.models.reown.SessionTopic
 import kosh.domain.models.reown.WcRequest
 import kosh.domain.models.reown.WcSession
+import kosh.domain.models.web3.Signature
 import kosh.domain.repositories.WcRepo
 import kosh.domain.serializers.ImmutableList
 import kosh.domain.state.AppState
@@ -52,32 +52,24 @@ class DefaultWcRequestService(
         validate(request).bind()
     }
 
-    override fun onTypedSigned(
+    override suspend fun onPersonalSigned2(
         id: WcRequest.Id,
-        data: ByteString,
-    ) = applicationScope.launch {
-        recover({
-            reownRepo.approveSessionRequest(
-                id = id,
-                response = data.toString()
-            ).bind()
-        }) {
-            logger.logFailure(it)
-        }
+        signature: Signature,
+    ): Either<WcFailure, Unit> = either {
+        reownRepo.approveSessionRequest(
+            id = id,
+            response = signature.data.toString()
+        ).bind()
     }
 
-    override fun onPersonalSigned(
+    override suspend fun onTypedSigned2(
         id: WcRequest.Id,
-        data: ByteString,
-    ) = applicationScope.launch {
-        recover({
-            reownRepo.approveSessionRequest(
-                id = id,
-                response = data.toString()
-            ).bind()
-        }) {
-            logger.logFailure(it)
-        }
+        signature: Signature,
+    ): Either<WcFailure, Unit> = either {
+        reownRepo.approveSessionRequest(
+            id = id,
+            response = signature.data.toString()
+        ).bind()
     }
 
     override fun onTransactionSend(
@@ -126,6 +118,12 @@ class DefaultWcRequestService(
         }, {
             logger.logFailure(it)
         })
+    }
+
+    override suspend fun reject2(
+        id: WcRequest.Id,
+    ): Either<WcFailure, Unit> = either {
+        reownRepo.rejectSessionRequest(id).bind()
     }
 
     private fun validate(

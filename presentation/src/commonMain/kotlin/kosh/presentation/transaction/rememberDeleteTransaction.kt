@@ -11,14 +11,14 @@ fun rememberDeleteTransaction(
     id: TransactionEntity.Id,
     transactionService: TransactionService = di { domain.transactionService },
 ): DeleteTransactionState {
-    val delete = rememberEffect(id) {
+    val delete = rememberEffect(id) { _: Unit ->
         transactionService.delete(id)
     }
 
     return DeleteTransactionState(
         deleted = delete.done,
         loading = delete.inProgress,
-        delete = { delete() }
+        delete = { delete(Unit) }
     )
 }
 

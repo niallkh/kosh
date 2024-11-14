@@ -1,10 +1,10 @@
 package kosh.presentation.network
 
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.Immutable
-import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.Stable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import kosh.domain.entities.NetworkEntity
 import kosh.domain.serializers.ImmutableList
@@ -19,19 +19,24 @@ import kosh.presentation.di.rememberSerializable
 fun rememberNetworkSelector(
     appStateProvider: AppStateProvider = di { domain.appStateProvider },
 ): NetworkSelectorState {
-    val accounts by appStateProvider.collectAsState().optic(AppState.activeNetworks())
+    val accounts by optic(AppState.activeNetworks()) { appStateProvider.state }
     var selected by rememberSerializable { mutableStateOf(accounts.firstOrNull()) }
 
-    return NetworkSelectorState(
-        selected = selected,
-        available = accounts,
-        select = { selected = it }
-    )
+    return remember {
+        object : NetworkSelectorState {
+            override val selected: NetworkEntity? get() = selected
+            override val available: ImmutableList<NetworkEntity> get() = accounts
+            override fun select(network: NetworkEntity) {
+                selected = network
+            }
+        }
+    }
 }
 
-@Immutable
-data class NetworkSelectorState(
-    val selected: NetworkEntity?,
-    val available: ImmutableList<NetworkEntity>,
-    val select: (NetworkEntity) -> Unit,
-)
+@Stable
+interface NetworkSelectorState {
+    val selected: NetworkEntity?
+    val available: ImmutableList<NetworkEntity>
+    fun select(network: NetworkEntity)
+}
+

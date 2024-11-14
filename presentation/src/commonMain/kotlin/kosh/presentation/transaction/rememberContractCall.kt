@@ -20,16 +20,15 @@ fun rememberContractCall(
     data: ByteString,
     callDataParserService: ContractCallService = di { domain.callDataParserService },
 ): ContractCallState {
-
     val parsed = rememberLoad(chainId, from, to, data) {
-        callDataParserService.parse(chainId, from, to, value, data)
+        callDataParserService.parse(chainId, from, to, value, data).bind()
     }
 
     return ContractCallState(
-        contractCall = parsed.result?.getOrNull(),
+        contractCall = parsed.result,
         loading = parsed.loading,
-        failure = parsed.result?.leftOrNull(),
-        retry = { parsed() },
+        failure = parsed.failure,
+        retry = { parsed.retry() },
     )
 }
 

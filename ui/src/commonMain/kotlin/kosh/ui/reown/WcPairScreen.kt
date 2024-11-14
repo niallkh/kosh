@@ -2,8 +2,10 @@ package kosh.ui.reown
 
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
@@ -29,8 +31,8 @@ import kosh.domain.models.reown.WcAuthentication
 import kosh.domain.models.reown.WcSessionProposal
 import kosh.presentation.component.textfield.TextFieldState
 import kosh.presentation.component.textfield.rememberTextField
-import kosh.presentation.reown.PairState
-import kosh.presentation.reown.rememberPair
+import kosh.presentation.wc.PairState
+import kosh.presentation.wc.rememberPair
 import kosh.ui.component.button.LoadingButton
 import kosh.ui.component.button.PrimaryButtons
 import kosh.ui.component.nullUnless
@@ -134,6 +136,8 @@ fun WcPairContent(
                 }
             }
         )
+
+        Spacer(Modifier.size(128.dp))
     }
 }
 

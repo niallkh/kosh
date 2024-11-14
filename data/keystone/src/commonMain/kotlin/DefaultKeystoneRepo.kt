@@ -2,6 +2,7 @@ package kosh.data.keystone
 
 import arrow.core.Either
 import arrow.core.raise.Raise
+import arrow.core.raise.catch
 import arrow.core.raise.either
 import arrow.core.right
 import co.touchlab.kermit.Logger
@@ -100,7 +101,7 @@ class DefaultKeystoneRepo(
         derivationPath: DerivationPath,
     ): Either<KeystoneFailure, Signature> = withContext(Dispatchers.Default) {
         either {
-            arrow.core.raise.catch({
+            catch({
                 doSignPersonalMessage(
                     keystone = keystone,
                     masterFingerprint = masterFingerprint,
@@ -156,7 +157,7 @@ class DefaultKeystoneRepo(
         derivationPath: DerivationPath,
     ): Either<KeystoneFailure, Signature> = withContext(Dispatchers.Default) {
         either {
-            arrow.core.raise.catch({
+            catch({
                 doSignTypedMessage(
                     listener = listener,
                     keystone = keystone,
@@ -210,7 +211,7 @@ class DefaultKeystoneRepo(
         derivationPath: DerivationPath,
     ): Either<KeystoneFailure, Signature> = withContext(Dispatchers.Default) {
         either {
-            arrow.core.raise.catch({
+            catch({
                 doSignTransaction(
                     listener = listener,
                     keystone = keystone,

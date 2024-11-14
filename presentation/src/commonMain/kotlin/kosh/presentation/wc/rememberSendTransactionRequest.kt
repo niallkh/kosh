@@ -1,4 +1,4 @@
-package kosh.presentation.reown
+package kosh.presentation.wc
 
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.Immutable
@@ -15,28 +15,26 @@ import kosh.domain.models.reown.WcRequest
 import kosh.domain.models.web3.Signature
 import kosh.domain.usecases.reown.WcRequestService
 import kosh.presentation.core.di
-import kosh.presentation.di.rememberRetained
+import kosh.presentation.di.rememberSerializable
 import kosh.presentation.models.SignRequest
-import kosh.presentation.transaction.rememberSignTyped
-
 
 @Composable
-fun rememberSignTypedRequest(
+fun rememberSendTransactionRequest(
     id: WcRequest.Id,
     requestService: WcRequestService = di { domain.wcRequestService },
-): SignTypedRequestState {
-    var request by rememberRetained { mutableStateOf<WcRequest?>(null) }
-    var call by rememberRetained { mutableStateOf<WcRequest.Call.SignTyped?>(null) }
+): SendTransactionRequestState {
+    var request by rememberSerializable { mutableStateOf<WcRequest?>(null) }
+    var call by rememberSerializable { mutableStateOf<WcRequest.Call.SendTransaction?>(null) }
     var loading by remember { mutableStateOf(false) }
     var failure by remember { mutableStateOf<WcFailure?>(null) }
     var retry by remember { mutableIntStateOf(0) }
     var sent by remember { mutableStateOf(false) }
 
-    val signTyped = rememberSignTyped()
+    val sendTransaction = kosh.presentation.transaction.rememberSendTransaction()
 
-    LaunchedEffect(signTyped.signature) {
-        signTyped.signature?.let {
-            requestService.onTypedSigned(id, it.data)
+    LaunchedEffect(sendTransaction.hash) {
+        sendTransaction.hash?.let {
+            requestService.onTransactionSend(id, it)
             sent = true
         }
     }
@@ -46,8 +44,8 @@ fun rememberSignTypedRequest(
 
         recover({
             request = requestService.get(id).bind().also {
-                call = it.call as? WcRequest.Call.SignTyped
-                    ?: error("Request is not a SignTyped")
+                call = it.call as? WcRequest.Call.SendTransaction
+                    ?: error("Request is not a SendTransaction")
             }
 
             loading = false
@@ -60,37 +58,37 @@ fun rememberSignTypedRequest(
         }
     }
 
-    return SignTypedRequestState(
+    return SendTransactionRequestState(
         request = request,
         call = call,
         sent = sent,
-        loading = loading || signTyped.loading,
+        loading = loading || sendTransaction.loading,
         failure = failure,
-        txFailure = signTyped.failure,
-        send = { req, signature ->
-            sent = false
-            signTyped.add(req, signature)
-        },
+        txFailure = sendTransaction.failure,
         reject = { requestService.reject(id) },
         retry = {
-            if (signTyped.failure != null) {
-                signTyped.retry()
+            if (sendTransaction.failure != null) {
+                sendTransaction.retry()
             } else {
                 retry++
             }
+        },
+        send = { req, signature ->
+            sent = false
+            sendTransaction.send(req, signature)
         }
     )
 }
 
 @Immutable
-data class SignTypedRequestState(
+data class SendTransactionRequestState(
     val request: WcRequest?,
-    val call: WcRequest.Call.SignTyped?,
+    val call: WcRequest.Call.SendTransaction?,
     val sent: Boolean,
     val loading: Boolean,
     val failure: WcFailure?,
     val txFailure: TransactionFailure?,
-    val send: (SignRequest.SignTyped, Signature) -> Unit,
-    val retry: () -> Unit,
     val reject: () -> Unit,
+    val retry: () -> Unit,
+    val send: (SignRequest.SignTransaction, Signature) -> Unit,
 )

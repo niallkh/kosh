@@ -24,6 +24,7 @@ import kosh.presentation.core.di
 import kosh.presentation.di.rememberLifecycleState
 import kosh.presentation.ticker.rememberTimer
 import kosh.presentation.ticker.runAtLeast
+import kotlinx.serialization.builtins.serializer
 import kotlin.time.Duration.Companion.minutes
 
 @Composable
@@ -74,7 +75,7 @@ fun rememberFinalizeTransactions(
         }
     }
 
-    appStateProvider.collectAsState().optic(AppState.transactionsKey()).selector {
+    optic(AppState.transactionsKey()) { appStateProvider.state }.selector(String.serializer()) {
         timer.reset()
     }
 

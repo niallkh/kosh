@@ -2,11 +2,10 @@ package kosh.domain.usecases.reown
 
 import arrow.core.Either
 import arrow.core.raise.either
-import arrow.core.raise.recover
 import co.touchlab.kermit.Logger
+import kosh.domain.entities.AccountEntity
+import kosh.domain.entities.NetworkEntity
 import kosh.domain.failure.WcFailure
-import kosh.domain.failure.logFailure
-import kosh.domain.models.Address
 import kosh.domain.models.ChainAddress
 import kosh.domain.models.ChainId
 import kosh.domain.models.reown.WcSession
@@ -23,7 +22,6 @@ import kotlinx.collections.immutable.toPersistentHashSet
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.map
-import kotlinx.coroutines.launch
 
 class WcSessionService(
     private val applicationScope: CoroutineScope,
@@ -38,6 +36,7 @@ class WcSessionService(
     suspend fun get(
         id: WcSession.Id,
     ): Either<WcFailure, WcSessionAggregated> = either {
+        logger.d { "get()" }
 
         val session = reownRepo.getSession(id).bind()
 
@@ -46,21 +45,25 @@ class WcSessionService(
 
     suspend fun update(
         id: WcSession.Id,
-        approvedAccounts: List<Address>,
-        approvedChains: List<ChainId>,
-    ): Either<WcFailure, Unit> {
-        return reownRepo.updateSession(
+        approvedAccounts: List<AccountEntity>,
+        approvedNetworks: List<NetworkEntity>,
+    ): Either<WcFailure, Unit> = either {
+        logger.d { "update()" }
+        reownRepo.updateSession(
             id = id,
-            approvedAccounts = approvedChains.flatMap { chainId ->
-                approvedAccounts.map { account -> ChainAddress(chainId, account) }
+            approvedAccounts = approvedNetworks.flatMap { network ->
+                approvedAccounts.map { account ->
+                    ChainAddress(network.chainId, account.address)
+                }
             }
-        )
+        ).bind()
     }
 
     suspend fun addNetwork(
         id: WcSession.Id,
         chainId: ChainId,
     ): Either<WcFailure, Unit> = either {
+        logger.d { "addNetwork()" }
 
         val session = reownRepo.getSession(id).bind()
 
@@ -77,14 +80,11 @@ class WcSessionService(
         }
     }
 
-    fun disconnect(
+    suspend fun disconnect(
         id: WcSession.Id,
-    ) = applicationScope.launch {
-        recover({
-            reownRepo.disconnectSession(id).bind()
-        }) {
-            logger.logFailure(it)
-        }
+    ) = either {
+        logger.d { "disconnect()" }
+        reownRepo.disconnectSession(id).bind()
     }
 
     private fun wcSessionAggregated(

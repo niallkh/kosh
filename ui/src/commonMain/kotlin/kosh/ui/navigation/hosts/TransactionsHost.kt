@@ -1,6 +1,7 @@
 package kosh.ui.navigation.hosts
 
 import androidx.compose.runtime.Composable
+import arrow.core.compose
 import arrow.core.partially1
 import com.arkivanov.decompose.router.stack.pushNew
 import com.arkivanov.decompose.router.stack.replaceCurrent
@@ -10,6 +11,8 @@ import kosh.ui.navigation.routes.RootRoute
 import kosh.ui.navigation.routes.TransactionsRoute
 import kosh.ui.navigation.routes.wcRequestRoute
 import kosh.ui.navigation.stack.StackHost
+import kosh.ui.navigation.stack.popOr
+import kosh.ui.navigation.stack.rememberStackRouter
 import kosh.ui.reown.WcAddNetworkScreen
 import kosh.ui.reown.WcAuthenticationScreen
 import kosh.ui.reown.WcProposalScreen
@@ -28,99 +31,114 @@ import kosh.ui.transaction.TransactionScreen
 fun TransactionsHost(
     link: TransactionsRoute?,
     onOpen: (RootRoute) -> Unit,
+    start: TransactionsRoute = TransactionsRoute.List,
     onResult: (RouteResult<TransactionsRoute>) -> Unit,
 ) {
-    StackHost(
-        start = TransactionsRoute.List,
-        link = link,
-        onResult = { onResult(it) },
-    ) { route ->
+    val router = rememberStackRouter<TransactionsRoute>({ start }, link)
+
+    fun pop() {
+        router.popOr { onResult(RouteResult.Finished()) }
+    }
+
+    fun finish(redirect: String? = null) {
+        router.popOr { onResult(RouteResult.Finished(redirect)) }
+    }
+
+    fun navigateUp() {
+        router.popOr { onResult(RouteResult.Up(start)) }
+    }
+
+    StackHost(router, ::pop) { route ->
         when (route) {
             TransactionsRoute.List -> ActivityScreen(
-                onOpenTransaction = { pushNew(TransactionsRoute.Details(it)) },
-                onOpenRequest = { pushNew(wcRequestRoute(it)) },
-                onOpenAuth = { pushNew(TransactionsRoute.Auth(it.id)) },
-                onOpenProposal = { pushNew(TransactionsRoute.Proposal(it.id, it.requestId)) },
+                onOpenTransaction = { router.pushNew(TransactionsRoute.Details(it)) },
+                onOpenRequest = { router.pushNew(wcRequestRoute(it)) },
+                onOpenAuth = { router.pushNew(TransactionsRoute.Auth(it.id)) },
+                onOpenProposal = {
+                    router.pushNew(TransactionsRoute.Proposal(it.id, it.requestId))
+                },
                 onOpenNetworks = onOpen.partially1(RootRoute.Networks()),
                 onOpenWallets = onOpen.partially1(RootRoute.Wallets()),
             )
 
             is TransactionsRoute.Details -> TransactionScreen(
                 id = route.id,
-                onNavigateUp = { navigateUp() },
-                onDelete = { replaceCurrent(TransactionsRoute.Delete(it)) },
+                onNavigateUp = ::navigateUp,
+                onDelete = { router.replaceCurrent(TransactionsRoute.Delete(it)) },
                 onOpen = onOpen
             )
 
             is TransactionsRoute.Delete -> DeleteTransactionScreen(
                 id = route.id,
-                onFinish = { result() }
+                onFinish = ::finish
             )
 
             is TransactionsRoute.Proposal -> WcProposalScreen(
                 id = route.id,
                 requestId = route.requestId,
-                onResult = { result(it?.value) },
-                onCancel = { pop() },
-                onNavigateUp = { navigateUp() }
+                onFinish = ::finish compose { it?.value },
+                onCancel = ::pop,
+                onNavigateUp = ::navigateUp
             )
 
             is TransactionsRoute.Auth -> WcAuthenticationScreen(
                 id = route.id,
-                onResult = { result() },
-                onCancel = { pop() },
-                onNavigateUp = { navigateUp() }
+                onFinish = ::finish,
+                onCancel = ::pop,
+                onNavigateUp = ::navigateUp
             )
 
             is TransactionsRoute.Request -> WcRequestScreen(
                 id = route.id,
-                onResult = { replaceCurrent(wcRequestRoute(it)) },
-                onNavigateUp = { navigateUp() }
+                onFinish = { router.replaceCurrent(wcRequestRoute(it)) },
+                onNavigateUp = ::navigateUp
             )
 
             is TransactionsRoute.PersonalSign -> WcSignPersonalScreen(
                 id = route.id,
-                onCancel = { pop() },
-                onResult = { result() },
-                onNavigateUp = { navigateUp() }
+                onCancel = ::pop,
+                onFinish = ::finish,
+                onNavigateUp = ::navigateUp
             )
 
             is TransactionsRoute.SignTypedData -> WcSignTypedScreen(
                 id = route.id,
-                onCancel = { pop() },
-                onResult = { result() },
-                onNavigateUp = { navigateUp() }
+                onCancel = ::pop,
+                onFinish = ::finish,
+                onNavigateUp = ::navigateUp
             )
 
             is TransactionsRoute.SendTransaction -> WcSendTransactionScreen(
                 id = route.id,
-                onCancel = { pop() },
-                onResult = { result() },
-                onNavigateUp = { navigateUp() },
+                onCancel = ::pop,
+                onFinish = ::finish,
+                onNavigateUp = ::navigateUp,
                 onOpen = onOpen,
             )
 
             is TransactionsRoute.AddEthereumNetwork -> WcAddNetworkScreen(
                 id = route.id,
-                onCancel = { pop() },
-                onResult = { result() },
-                onNavigateUp = { navigateUp() }
+                onCancel = ::pop,
+                onFinish = ::finish,
+                onNavigateUp = ::navigateUp
             )
 
             is TransactionsRoute.WatchToken -> WcWatchTokenScreen(
                 id = route.id,
                 chainAddress = route.chainAddress,
-                onResult = { result() },
-                onNft = { replaceCurrent(TransactionsRoute.WatchNft(route.id, it, null)) },
-                onNavigateUp = { navigateUp() }
+                onFinish = ::finish,
+                onNft = {
+                    router.replaceCurrent(TransactionsRoute.WatchNft(route.id, it, null))
+                },
+                onNavigateUp = ::navigateUp
             )
 
             is TransactionsRoute.WatchNft -> WcWatchNftScreen(
                 id = route.id,
                 chainAddress = route.chainAddress,
                 tokenId = route.tokenId,
-                onResult = { result() },
-                onNavigateUp = { navigateUp() }
+                onFinish = ::finish,
+                onNavigateUp = ::navigateUp
             )
         }
 

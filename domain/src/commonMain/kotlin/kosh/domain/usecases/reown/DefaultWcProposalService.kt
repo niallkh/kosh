@@ -5,14 +5,12 @@ import arrow.core.left
 import arrow.core.raise.Raise
 import arrow.core.raise.either
 import arrow.core.raise.ensure
-import arrow.core.raise.recover
 import arrow.core.right
 import co.touchlab.kermit.Logger
+import kosh.domain.entities.AccountEntity
+import kosh.domain.entities.NetworkEntity
 import kosh.domain.failure.WcFailure
-import kosh.domain.failure.logFailure
-import kosh.domain.models.Address
 import kosh.domain.models.ChainAddress
-import kosh.domain.models.ChainId
 import kosh.domain.models.Redirect
 import kosh.domain.models.reown.PairingUri
 import kosh.domain.models.reown.WcAuthentication
@@ -28,7 +26,6 @@ import kosh.domain.utils.optic
 import kotlinx.collections.immutable.toPersistentHashSet
 import kotlinx.collections.immutable.toPersistentList
 import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Job
 import kotlinx.coroutines.async
 import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.flow.Flow
@@ -36,7 +33,6 @@ import kotlinx.coroutines.flow.asFlow
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.flatMapConcat
 import kotlinx.coroutines.flow.map
-import kotlinx.coroutines.launch
 import kotlinx.coroutines.selects.onTimeout
 import kotlinx.coroutines.selects.select
 import kotlin.time.Duration.Companion.seconds
@@ -78,11 +74,13 @@ class DefaultWcProposalService(
 
         select {
             asyncProposal.onAwait {
+                logger.d { "Proposal arrived" }
                 asyncAuthentication.cancel()
                 notificationService.cancel(it.requestId)
                 it.left().right()
             }
             asyncAuthentication.onAwait {
+                logger.d { "Authentication arrived" }
                 asyncProposal.cancel()
                 notificationService.cancel(it.id.value)
                 it.right().right()
@@ -99,6 +97,7 @@ class DefaultWcProposalService(
         id: WcSessionProposal.Id,
         requestId: Long,
     ): Either<WcFailure, WcProposalAggregated> = either {
+        logger.i { "get()" }
         val proposal = reownRepo.getProposal(id).bind()
 
         requestId.let { notificationService.cancel(proposal.requestId) }
@@ -108,28 +107,25 @@ class DefaultWcProposalService(
 
     override suspend fun approve(
         id: WcSessionProposal.Id,
-        approvedAccounts: List<Address>,
-        approvedChains: List<ChainId>,
+        approvedAccounts: List<AccountEntity>,
+        approvedNetworks: List<NetworkEntity>,
     ): Either<WcFailure, Redirect?> {
         logger.i { "approve()" }
         return reownRepo.approveProposal(
             id = id,
-            approvedAccounts = approvedChains.flatMap { chainId ->
-                approvedAccounts.map { account -> ChainAddress(chainId, account) }
+            approvedAccounts = approvedNetworks.flatMap { network ->
+                approvedAccounts.map { account ->
+                    ChainAddress(network.chainId, account.address)
+                }
             },
         )
     }
 
-    override fun reject(
+    override suspend fun reject(
         id: WcSessionProposal.Id,
-    ): Job = applicationScope.launch {
+    ): Either<WcFailure, Unit> = either {
         logger.i { "reject()" }
-
-        recover({
-            reownRepo.rejectProposal(id).bind()
-        }) {
-            logger.logFailure(it)
-        }
+        reownRepo.rejectProposal(id).bind()
     }
 
     private fun Raise<WcFailure>.wcProposalAggregated(
@@ -143,11 +139,11 @@ class DefaultWcProposalService(
 
         return WcProposalAggregated(
             proposal = proposal,
-            networks = networks
+            availableNetworks = networks
                 .filter { it.chainId in proposal.required.chains || it.chainId in proposal.optional.chains }
                 .map { it.id }
                 .toPersistentHashSet(),
-            required = networks
+            requiredNetworks = networks
                 .filter { it.chainId in proposal.required.chains }
                 .map { it.id }
                 .toPersistentHashSet()

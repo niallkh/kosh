@@ -10,8 +10,8 @@ import kotlinx.serialization.Serializable
 @Immutable
 data class WcSessionAggregated(
     val session: WcSession,
+    val approvedAccounts: ImmutableSet<AccountEntity.Id>,
     val availableNetworks: ImmutableSet<NetworkEntity.Id>,
     val requiredNetworks: ImmutableSet<NetworkEntity.Id>,
-    val approvedAccounts: Set<AccountEntity.Id>,
-    val approvedNetworks: Set<NetworkEntity.Id>,
+    val approvedNetworks: ImmutableSet<NetworkEntity.Id>,
 )

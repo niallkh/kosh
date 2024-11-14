@@ -17,8 +17,8 @@ import androidx.compose.ui.unit.dp
 import kosh.domain.models.Uri
 import kosh.domain.models.orZero
 import kosh.domain.models.reown.WcRequest
-import kosh.presentation.reown.AddNetworkRequestState
-import kosh.presentation.reown.rememberAddNetworkRequest
+import kosh.presentation.wc.AddNetworkRequestState
+import kosh.presentation.wc.rememberAddNetworkRequest
 import kosh.ui.component.LoadingIndicator
 import kosh.ui.component.button.LoadingButton
 import kosh.ui.component.button.PrimaryButtons
@@ -35,7 +35,7 @@ import kosh.ui.failure.AppFailureMessage
 fun WcAddNetworkScreen(
     id: WcRequest.Id,
     onCancel: () -> Unit,
-    onResult: () -> Unit,
+    onFinish: () -> Unit,
     onNavigateUp: () -> Unit,
 ) {
     val addNetwork = rememberAddNetworkRequest(id)
@@ -48,7 +48,7 @@ fun WcAddNetworkScreen(
 
         LaunchedEffect(addNetwork.added) {
             if (addNetwork.added) {
-                onResult()
+                onFinish()
             }
         }
 

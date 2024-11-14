@@ -9,8 +9,8 @@ import kotlin.jvm.JvmInline
 @Immutable
 data class WcSessionProposal(
     val id: Id,
-    val dapp: DappMetadata,
     val requestId: Long,
+    val dapp: DappMetadata,
     val verifyContext: WcVerifyContext,
     val required: Namespace,
     val optional: Namespace,

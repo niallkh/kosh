@@ -1,82 +1,74 @@
 package kosh.presentation.keystone
 
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.Immutable
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.setValue
-import arrow.core.raise.either
+import androidx.compose.runtime.Stable
+import androidx.compose.runtime.remember
 import kosh.domain.failure.KeystoneFailure
 import kosh.domain.models.hw.Keystone
 import kosh.domain.repositories.KeystoneListener
 import kosh.domain.usecases.keystone.KeystoneAccountService
 import kosh.presentation.core.di
-import kosh.presentation.di.rememberRetained
 import kosh.presentation.models.SignRequest
 import kosh.presentation.models.SignedRequest
-import kosh.presentation.rememberEffect
+import kosh.presentation.rememberEitherEffect
 
 @Composable
 fun rememberSignKeystone(
     keystoneListener: KeystoneListener,
+    onSigned: (SignedRequest) -> Unit = {},
     keystoneAccountService: KeystoneAccountService = di { domain.keystoneAccountService },
 ): SignKeystoneState {
-    var keystone by rememberRetained { mutableStateOf<Keystone?>(null) }
-    var signRequest by rememberRetained { mutableStateOf<SignRequest?>(null) }
 
-    val sign = rememberEffect(keystone, signRequest) {
-        either {
-            val request = signRequest ?: raise(null)
-            val keystone1 = keystone ?: raise(null)
+    val signKeystone = rememberEitherEffect(
+        keystoneListener,
+        onFinish = onSigned
+    ) { (keystone, request): Pair<Keystone, SignRequest> ->
+        val signature = when (request) {
+            is SignRequest.SignPersonal -> keystoneAccountService.sign(
+                listener = keystoneListener,
+                keystone = keystone,
+                address = request.account,
+                message = request.message,
+            )
 
-            val signature = when (request) {
-                is SignRequest.SignPersonal -> keystoneAccountService.sign(
-                    listener = keystoneListener,
-                    keystone = keystone1,
-                    address = request.account,
-                    message = request.message,
-                )
+            is SignRequest.SignTyped -> keystoneAccountService.sign(
+                listener = keystoneListener,
+                keystone = keystone,
+                address = request.account,
+                jsonTypeData = request.json,
+            )
 
-                is SignRequest.SignTyped -> keystoneAccountService.sign(
-                    listener = keystoneListener,
-                    keystone = keystone1,
-                    address = request.account,
-                    jsonTypeData = request.json,
-                )
+            is SignRequest.SignTransaction -> keystoneAccountService.sign(
+                listener = keystoneListener,
+                keystone = keystone,
+                transaction = request.data,
+            )
+        }.bind()
 
-                is SignRequest.SignTransaction -> keystoneAccountService.sign(
-                    listener = keystoneListener,
-                    keystone = keystone1,
-                    transaction = request.data,
-                )
-            }.bind()
-
-            SignedRequest(request, signature)
-        }
+        SignedRequest(request, signature)
     }
 
-    return SignKeystoneState(
-        signedRequest = sign.result?.getOrNull(),
-        loading = sign.inProgress,
-        failure = sign.result?.leftOrNull(),
-        sign = { keystone1, request ->
-            signRequest = request
-            keystone = keystone1
-            sign()
-        },
-        retry = {
-            sign()
+    return remember {
+        object : SignKeystoneState {
+            override val signedRequest: SignedRequest?
+                get() = signKeystone.result
+            override val loading: Boolean
+                get() = signKeystone.inProgress
+            override val failure: KeystoneFailure?
+                get() = signKeystone.failure
+
+            override fun sign(keystone: Keystone, request: SignRequest) {
+                signKeystone(Pair(keystone, request))
+            }
         }
-    )
+    }
 }
 
+@Stable
+interface SignKeystoneState {
+    val signedRequest: SignedRequest?
+    val loading: Boolean
+    val failure: KeystoneFailure?
 
-@Immutable
-data class SignKeystoneState(
-    val signedRequest: SignedRequest?,
-    val loading: Boolean,
-    val failure: KeystoneFailure?,
-
-    val sign: (Keystone, SignRequest) -> Unit,
-    val retry: () -> Unit,
-)
+    fun sign(keystone: Keystone, request: SignRequest)
+}

@@ -10,7 +10,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.ui.Modifier
 import kosh.domain.models.reown.WcRequest
-import kosh.presentation.reown.rememberRequest
+import kosh.presentation.wc.rememberRequest
 import kosh.ui.component.LoadingIndicator
 import kosh.ui.component.scaffold.KoshScaffold
 import kosh.ui.failure.AppFailureItem
@@ -21,7 +21,7 @@ import org.jetbrains.compose.resources.stringResource
 @Composable
 fun WcRequestScreen(
     id: WcRequest.Id?,
-    onResult: (WcRequest) -> Unit,
+    onFinish: (WcRequest) -> Unit,
     onNavigateUp: () -> Unit,
 ) {
     val request = rememberRequest(id)
@@ -31,7 +31,7 @@ fun WcRequestScreen(
         onNavigateUp = { onNavigateUp() }
     ) { paddingValues ->
         LaunchedEffect(request.request) {
-            request.request?.let(onResult)
+            request.request?.let(onFinish)
         }
 
         Column(

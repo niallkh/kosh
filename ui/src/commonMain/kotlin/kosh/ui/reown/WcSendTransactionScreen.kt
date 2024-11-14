@@ -29,14 +29,14 @@ import kosh.domain.models.web3.TransactionData
 import kosh.presentation.account.rememberAccount
 import kosh.presentation.models.SignRequest
 import kosh.presentation.network.rememberNetwork
-import kosh.presentation.reown.SendTransactionRequestState
-import kosh.presentation.reown.rememberSendTransactionRequest
 import kosh.presentation.transaction.get
 import kosh.presentation.transaction.rememberContractCall
 import kosh.presentation.transaction.rememberEstimateGas
 import kosh.presentation.transaction.rememberGasPrices
 import kosh.presentation.transaction.rememberGasSpeed
 import kosh.presentation.transaction.rememberNextNonce
+import kosh.presentation.wc.SendTransactionRequestState
+import kosh.presentation.wc.rememberSendTransactionRequest
 import kosh.ui.component.LoadingIndicator
 import kosh.ui.component.button.LoadingButton
 import kosh.ui.component.button.PrimaryButtons
@@ -68,7 +68,7 @@ import org.jetbrains.compose.resources.stringResource
 fun WcSendTransactionScreen(
     id: WcRequest.Id,
     onCancel: () -> Unit,
-    onResult: () -> Unit,
+    onFinish: () -> Unit,
     onOpen: (RootRoute) -> Unit,
     onNavigateUp: () -> Unit,
 ) {
@@ -90,7 +90,7 @@ fun WcSendTransactionScreen(
         }
     ) { paddingValues ->
 
-        val sign = SignContent(sendTransaction.call?.from)
+        val sign = SignContent(TODO())
 
         LaunchedEffect(sign.signedRequest) {
             sign.signedRequest?.let {
@@ -100,7 +100,7 @@ fun WcSendTransactionScreen(
 
         LaunchedEffect(sendTransaction.sent) {
             if (sendTransaction.sent) {
-                onResult()
+                onFinish()
             }
         }
 
@@ -115,7 +115,7 @@ fun WcSendTransactionScreen(
                 sendTransaction.reject()
                 onCancel()
             },
-            onSign = { sign.sign(it) },
+            onSign = { sign(it) },
             contentPadding = paddingValues,
             onOpen = onOpen,
         )
@@ -238,7 +238,7 @@ fun WcSendTransactionContent(
                 }
             }
 
-            Spacer(Modifier.height(64.dp))
+            Spacer(Modifier.height(128.dp))
         }
     }
 }

@@ -2,13 +2,7 @@ package kosh.presentation.trezor
 
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.Immutable
-import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableIntStateOf
-import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
-import arrow.core.raise.recover
 import kosh.domain.failure.TrezorFailure
 import kosh.domain.models.hw.Trezor
 import kosh.domain.repositories.TrezorListener
@@ -16,83 +10,63 @@ import kosh.domain.usecases.trezor.TrezorAccountService
 import kosh.presentation.core.di
 import kosh.presentation.models.SignRequest
 import kosh.presentation.models.SignedRequest
+import kosh.presentation.rememberEitherEffect
 
 @Composable
 fun rememberSignTrezor(
     trezorListener: TrezorListener,
+    onSigned: (SignedRequest) -> Unit = {},
     trezorAccountService: TrezorAccountService = di { domain.trezorAccountService },
 ): SignTrezorState {
-    var signRequest by remember { mutableStateOf<SignRequest?>(null) }
-    var signedRequest by remember { mutableStateOf<SignedRequest?>(null) }
-    var loading by remember { mutableStateOf(false) }
-    var failure by remember { mutableStateOf<TrezorFailure?>(null) }
-    var retry by remember { mutableIntStateOf(0) }
-    var refresh by remember { mutableStateOf(false) }
-    var trezor by remember { mutableStateOf<Trezor?>(null) }
+    val signTrezor = rememberEitherEffect(
+        trezorListener,
+        onFinish = onSigned
+    ) { (trezor, request, refresh): Triple<Trezor, SignRequest, Boolean> ->
+        val signature = when (request) {
+            is SignRequest.SignPersonal -> trezorAccountService.sign(
+                trezor = trezor,
+                listener = trezorListener,
+                address = request.account,
+                message = request.message,
+                refresh = refresh,
+            )
 
-    LaunchedEffect(retry, trezor, signRequest) {
-        loading = true
+            is SignRequest.SignTyped -> trezorAccountService.sign(
+                listener = trezorListener,
+                trezor = trezor,
+                address = request.account,
+                jsonTypeData = request.json,
+                refresh = refresh
+            )
 
-        recover({
-            val request = signRequest ?: raise(null)
+            is SignRequest.SignTransaction -> trezorAccountService.sign(
+                listener = trezorListener,
+                trezor = trezor,
+                transaction = request.data,
+                refresh = refresh,
+            )
+        }.bind()
 
-            val signature = when (request) {
-                is SignRequest.SignPersonal -> trezorAccountService.sign(
-                    trezor = trezor ?: raise(null),
-                    listener = trezorListener,
-                    address = request.account,
-                    message = request.message,
-                    refresh = refresh,
-                )
-
-                is SignRequest.SignTyped -> trezorAccountService.sign(
-                    listener = trezorListener,
-                    trezor = trezor ?: raise(null),
-                    address = request.account,
-                    jsonTypeData = request.json,
-                    refresh = refresh
-                )
-
-                is SignRequest.SignTransaction -> trezorAccountService.sign(
-                    listener = trezorListener,
-                    trezor = trezor ?: raise(null),
-                    transaction = request.data,
-                    refresh = refresh,
-                )
-            }.bind()
-
-            signedRequest = SignedRequest(request, signature)
-
-            loading = false
-            failure = null
-        }) {
-            loading = false
-            failure = it
-        }
+        SignedRequest(request, signature)
     }
 
-    return SignTrezorState(
-        signedRequest = signedRequest,
-        loading = loading,
-        failure = failure,
-        sign = { trezor1, request ->
-            retry++
-            signRequest = request
-            trezor = trezor1
-        },
-        retry = {
-            retry++
-            refresh = true
+    return remember {
+        object : SignTrezorState {
+            override val signedRequest: SignedRequest? get() = signTrezor.result
+            override val loading: Boolean get() = signTrezor.inProgress
+            override val failure: TrezorFailure? = signTrezor.failure
+            override operator fun invoke(trezor: Trezor, request: SignRequest) {
+                signTrezor(Triple(trezor, request, false))
+            }
         }
-    )
+    }
 }
 
 @Immutable
-data class SignTrezorState(
-    val signedRequest: SignedRequest?,
-    val loading: Boolean,
-    val failure: TrezorFailure?,
+interface SignTrezorState {
+    val signedRequest: SignedRequest?
+    val loading: Boolean
+    val failure: TrezorFailure?
 
-    val sign: (Trezor, SignRequest) -> Unit,
-    val retry: () -> Unit,
-)
+    operator fun invoke(trezor: Trezor, request: SignRequest)
+}

@@ -21,7 +21,6 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.unit.dp
-import kosh.domain.entities.TokenEntity
 import kosh.domain.models.ChainAddress
 import kosh.domain.models.token.NftMetadata
 import kosh.domain.models.token.TokenMetadata
@@ -46,7 +45,7 @@ fun SearchNftScreen(
     query: Pair<TextFieldValue, (TextFieldValue) -> Unit> = rememberTextField(tokenId?.toString()),
     searchNft: SearchNftState = rememberSearchNft(chainAddress, query.first.text),
     onNavigateUp: () -> Unit,
-    onResult: (TokenEntity.Id) -> Unit,
+    onFinish: () -> Unit,
 ) {
     val snackbarHostState = remember { SnackbarHostState() }
 
@@ -86,7 +85,7 @@ fun SearchNftScreen(
                 AppFailureMessage(createNft.failure)
 
                 LaunchedEffect(createNft.created != null) {
-                    createNft.created?.let { onResult(it) }
+                    createNft.created?.let { onFinish() }
                 }
 
                 searchNft.failure?.let {

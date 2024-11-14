@@ -21,18 +21,18 @@ fun rememberAccount(
 fun rememberAccount(
     id: AccountEntity.Id,
     appStateProvider: AppStateProvider = di { domain.appStateProvider },
-): Account {
+): AccountState {
     val account by optic(AppState.account(id)) { appStateProvider.state }
     val active by optic(AppState.isActive(id)) { appStateProvider.state }
 
-    return Account(
+    return AccountState(
         entity = account,
-        enabled = active,
+        active = active,
     )
 }
 
 @Immutable
-data class Account(
+data class AccountState(
     val entity: AccountEntity?,
-    val enabled: Boolean,
+    val active: Boolean,
 )

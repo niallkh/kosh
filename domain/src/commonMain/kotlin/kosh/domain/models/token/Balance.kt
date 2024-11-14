@@ -8,6 +8,7 @@ import kotlinx.serialization.Serializable
 @Immutable
 data class Balance(
     val value: BigInteger,
+    val failed: Boolean = false,
 ) {
 
     companion object {
@@ -16,3 +17,5 @@ data class Balance(
         operator fun invoke(): Balance = Empty
     }
 }
+
+operator fun Balance.plus(other: Balance) = Balance(value + other.value)

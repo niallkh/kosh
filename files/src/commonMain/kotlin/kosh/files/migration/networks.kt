@@ -28,7 +28,7 @@ internal fun Copy<AppState>.ethereum() {
     network(
         chainId = ethereum,
         name = "Ethereum Mainnet",
-        readRpcProvider = Uri("https://eth-mainnet.rpc.grove.city/v1/e2c5489a"),
+        readRpcProvider = Uri("https://eth.rpc.grove.city/v1/e2c5489a"),
         explorers = listOf("https://etherscan.io"),
         enabled = true,
         icon = "eth",
@@ -46,7 +46,7 @@ internal fun Copy<AppState>.optimism() {
     network(
         chainId = optimism,
         name = "OP Mainnet",
-        readRpcProvider = Uri("https://optimism-mainnet.rpc.grove.city/v1/e2c5489a"),
+        readRpcProvider = Uri("https://optimism.rpc.grove.city/v1/e2c5489a"),
         explorers = listOf("https://optimistic.etherscan.io"),
         enabled = true,
         icon = "op"
@@ -82,7 +82,7 @@ internal fun Copy<AppState>.base() {
     network(
         chainId = base,
         name = "Base",
-        readRpcProvider = Uri("https://base-mainnet.rpc.grove.city/v1/e2c5489a"),
+        readRpcProvider = Uri("https://base.rpc.grove.city/v1/e2c5489a"),
         explorers = listOf("https://basescan.org"),
         enabled = true,
         icon = "base"
@@ -100,7 +100,7 @@ internal fun Copy<AppState>.polygonPos() {
     network(
         chainId = polygonPos,
         name = "Polygon Mainnet",
-        readRpcProvider = Uri("https://poly-mainnet.rpc.grove.city/v1/e2c5489a"),
+        readRpcProvider = Uri("https://polygon.rpc.grove.city/v1/e2c5489a"),
         explorers = listOf("https://celoscan.io"),
         enabled = true,
         icon = "matic"
@@ -118,7 +118,7 @@ internal fun Copy<AppState>.bnbChain() {
     network(
         chainId = bnbChain,
         name = "BNB Chain",
-        readRpcProvider = Uri("https://bsc-mainnet.rpc.grove.city/v1/e2c5489a"),
+        readRpcProvider = Uri("https://bsc.rpc.grove.city/v1/e2c5489a"),
         explorers = listOf("https://bscscan.com"),
         enabled = true,
         icon = "bnb"
@@ -136,7 +136,7 @@ internal fun Copy<AppState>.avalanche() {
     network(
         chainId = avalanche,
         name = "Avalanche C-Chain",
-        readRpcProvider = Uri("https://avax-mainnet.rpc.grove.city/v1/e2c5489a"),
+        readRpcProvider = Uri("https://avax.rpc.grove.city/v1/e2c5489a"),
         explorers = listOf("https://snowtrace.io"),
         enabled = true,
         icon = "avax"
@@ -154,7 +154,7 @@ internal fun Copy<AppState>.gnosis() {
     network(
         chainId = gnosis,
         name = "Gnosis",
-        readRpcProvider = Uri("https://gnosischain-mainnet.rpc.grove.city/v1/e2c5489a"),
+        readRpcProvider = Uri("https://gnosis.rpc.grove.city/v1/e2c5489a"),
         explorers = listOf("https://gnosisscan.io"),
         enabled = true,
         icon = "gnosis"

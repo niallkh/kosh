@@ -26,15 +26,15 @@ import kosh.domain.models.reown.WcRequest
 import kosh.domain.models.reown.WcSessionProposal
 import kosh.domain.serializers.ImmutableList
 import kosh.domain.uuid.leastSignificantBits
-import kosh.presentation.reown.AuthenticationsState
-import kosh.presentation.reown.ProposalsState
-import kosh.presentation.reown.RequestsState
-import kosh.presentation.reown.rememberAuthentications
-import kosh.presentation.reown.rememberProposals
-import kosh.presentation.reown.rememberRequests
 import kosh.presentation.transaction.TransactionsState
 import kosh.presentation.transaction.rememberFinalizeTransactions
 import kosh.presentation.transaction.rememberTransactions
+import kosh.presentation.wc.AuthenticationsState
+import kosh.presentation.wc.ProposalsState
+import kosh.presentation.wc.RequestsState
+import kosh.presentation.wc.rememberAuthentications
+import kosh.presentation.wc.rememberProposals
+import kosh.presentation.wc.rememberRequests
 import kosh.ui.component.LoadingIndicator
 import kosh.ui.component.illustration.Illustration
 import kosh.ui.component.refresh.PullRefreshBox
@@ -148,7 +148,7 @@ fun ActivityContent(
         }
 
         item {
-            Spacer(Modifier.height(64.dp))
+            Spacer(Modifier.height(128.dp))
         }
     }
 }

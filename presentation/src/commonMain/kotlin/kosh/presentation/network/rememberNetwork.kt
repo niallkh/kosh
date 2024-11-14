@@ -1,16 +1,14 @@
 package kosh.presentation.network
 
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.Immutable
-import androidx.compose.runtime.collectAsState
-import androidx.compose.runtime.derivedStateOf
+import androidx.compose.runtime.Stable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
 import kosh.domain.entities.NetworkEntity
 import kosh.domain.models.ChainId
 import kosh.domain.state.AppState
 import kosh.domain.state.AppStateProvider
-import kosh.domain.state.activeNetworks
+import kosh.domain.state.isActive
 import kosh.domain.state.network
 import kosh.domain.utils.optic
 import kosh.presentation.core.di
@@ -24,19 +22,20 @@ fun rememberNetwork(
 fun rememberNetwork(
     id: NetworkEntity.Id,
     appStateProvider: AppStateProvider = di { domain.appStateProvider },
-): Network {
-    val network by appStateProvider.collectAsState().optic(AppState.network(id))
-    val activeNetworks by appStateProvider.collectAsState().optic(AppState.activeNetworks())
-    val enabled by remember { derivedStateOf { network?.id in activeNetworks.map { it.id } } }
+): NetworkState {
+    val network by optic(AppState.network(id)) { appStateProvider.state }
+    val active by optic(AppState.isActive(id)) { appStateProvider.state }
 
-    return Network(
-        entity = network,
-        enabled = enabled,
-    )
+    return remember {
+        object : NetworkState {
+            override val entity: NetworkEntity? get() = network
+            override val active: Boolean get() = active
+        }
+    }
 }
 
-@Immutable
-data class Network(
-    val entity: NetworkEntity?,
-    val enabled: Boolean,
-)
+@Stable
+interface NetworkState {
+    val entity: NetworkEntity?
+    val active: Boolean
+}

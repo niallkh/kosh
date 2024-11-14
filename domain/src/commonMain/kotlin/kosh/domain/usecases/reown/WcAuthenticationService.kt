@@ -7,7 +7,6 @@ import kosh.domain.models.ChainId
 import kosh.domain.models.reown.WcAuthentication
 import kosh.domain.models.web3.Signature
 import kosh.domain.serializers.ImmutableList
-import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.Flow
 
 interface WcAuthenticationService {
@@ -22,13 +21,13 @@ interface WcAuthenticationService {
         chainId: ChainId,
     ): Either<WcFailure, WcAuthentication.Message>
 
-    fun approve(
+    suspend fun approve(
         id: WcAuthentication.Id,
         account: Address,
         chainId: ChainId,
         signature: Signature,
-    ): Job
+    ): Either<WcFailure, Unit>
 
-    fun reject(id: WcAuthentication.Id): Job
+    suspend fun reject(id: WcAuthentication.Id): Either<WcFailure, Unit>
 }
 

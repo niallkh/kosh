@@ -1,16 +1,15 @@
 package kosh.domain.usecases.reown
 
 import arrow.core.Either
+import kosh.domain.entities.AccountEntity
+import kosh.domain.entities.NetworkEntity
 import kosh.domain.failure.WcFailure
-import kosh.domain.models.Address
-import kosh.domain.models.ChainId
 import kosh.domain.models.Redirect
 import kosh.domain.models.reown.PairingUri
 import kosh.domain.models.reown.WcAuthentication
 import kosh.domain.models.reown.WcProposalAggregated
 import kosh.domain.models.reown.WcSessionProposal
 import kosh.domain.serializers.ImmutableList
-import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.Flow
 
 interface WcProposalService {
@@ -26,10 +25,10 @@ interface WcProposalService {
 
     suspend fun approve(
         id: WcSessionProposal.Id,
-        approvedAccounts: List<Address>,
-        approvedChains: List<ChainId>,
+        approvedAccounts: List<AccountEntity>,
+        approvedNetworks: List<NetworkEntity>,
     ): Either<WcFailure, Redirect?>
 
-    fun reject(id: WcSessionProposal.Id): Job
+    suspend fun reject(id: WcSessionProposal.Id): Either<WcFailure, Unit>
 }
 

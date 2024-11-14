@@ -23,7 +23,6 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.unit.dp
-import kosh.domain.entities.TokenEntity
 import kosh.domain.models.Address
 import kosh.domain.models.ChainAddress
 import kosh.domain.models.caip10
@@ -50,7 +49,7 @@ fun SearchTokenScreen(
     address: Address?,
     query: Pair<TextFieldValue, (TextFieldValue) -> Unit> = rememberTextField(address?.eip55()),
     searchToken: SearchTokenState = rememberSearchToken(query.first.text),
-    onResult: (TokenEntity.Id) -> Unit,
+    onFinish: () -> Unit,
     onNft: (ChainAddress) -> Unit,
     onNavigateUp: () -> Unit,
 ) {
@@ -89,7 +88,7 @@ fun SearchTokenScreen(
                 AppFailureMessage(createToken.failure)
 
                 LaunchedEffect(createToken.created != null) {
-                    createToken.created?.let { onResult(it) }
+                    createToken.created?.let { onFinish() }
                 }
 
                 searchToken.failure?.let {

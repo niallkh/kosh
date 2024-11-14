@@ -28,6 +28,7 @@ import kosh.domain.models.account.ledgerAddressIndex
 import kosh.domain.models.token.AccountBalance
 import kosh.domain.models.token.Balance
 import kosh.domain.models.token.TokenBalance
+import kosh.domain.models.token.plus
 import kosh.domain.serializers.BigInteger
 import kosh.domain.serializers.PersistentHashSet
 import kosh.domain.serializers.PersistentHashSetSerializer
@@ -90,11 +91,23 @@ fun AppState.Companion.networks() = Getter<AppState, PersistentList<NetworkEntit
         .toPersistentList()
 }
 
+fun AppState.Companion.networks(
+    ids: Set<NetworkEntity.Id>,
+) = AppState.networks() compose Getter { networks ->
+    networks.removeAll { it.id !in ids }
+}
+
 fun AppState.Companion.activeAccounts() = Getter<AppState, PersistentList<AccountEntity>> { state ->
     state.accounts.values
         .filter { acc -> acc.id in state.enabledAccountIds }
         .sortedBy { it.createdAt }
         .toPersistentList()
+}
+
+fun AppState.Companion.activeAccounts(
+    ids: Set<AccountEntity.Id>,
+) = AppState.accounts() compose Getter {
+    it.removeAll { acc -> acc.id !in ids }
 }
 
 fun AppState.Companion.activeAccountIds() =
@@ -156,6 +169,17 @@ fun AppState.Companion.accounts(id: WalletEntity.Id) = AppState.accounts compose
         .toPersistentList()
 }
 
+fun AppState.Companion.accounts() = AppState.accounts compose Getter { map ->
+    map.values
+        .sortedWith(
+            compareBy(
+                { it.derivationPath.ledgerAddressIndex },
+                { it.derivationPath.ethereumAddressIndex }
+            )
+        )
+        .toPersistentList()
+}
+
 fun AppState.Companion.optionalAccount(id: AccountEntity.Id) =
     AppState.accounts.index(Index.pmap(), id)
 
@@ -197,7 +221,7 @@ fun AppState.Companion.balances() = Getter<AppState, PersistentList<TokenBalance
         val tokenBalance = state.tokenBalances
             .filter { (accountId) -> accountId in activeAccounts }
             .map { (_, balances) -> balances[token.id] ?: Balance() }
-            .fold(Balance()) { total, balance -> total.copy(value = total.value + balance.value) }
+            .fold(Balance()) { total, balance -> total + balance }
 
         TokenBalance(
             token = token,

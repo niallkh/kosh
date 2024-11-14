@@ -13,14 +13,14 @@ fun rememberDeleteNetwork(
     networkService: NetworkService = di { domain.networkService },
 ): DeleteNetworkState {
 
-    val delete = rememberEffect(id) {
+    val delete = rememberEffect(id) { _: Unit ->
         networkService.delete(id)
     }
 
     return DeleteNetworkState(
         deleted = delete.done,
         deleting = delete.inProgress,
-        delete = { delete() }
+        delete = { delete(Unit) }
     )
 }
 

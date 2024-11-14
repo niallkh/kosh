@@ -5,24 +5,33 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.Text
-import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.derivedStateOf
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import arrow.core.raise.nullable
 import kosh.domain.models.reown.WcRequest
+import kosh.presentation.account.AccountState
 import kosh.presentation.account.rememberAccount
 import kosh.presentation.models.SignRequest
+import kosh.presentation.network.NetworkState
 import kosh.presentation.network.rememberNetwork
-import kosh.presentation.reown.SignTypedRequestState
-import kosh.presentation.reown.rememberSignTypedRequest
+import kosh.presentation.wc.RejectRequestState
+import kosh.presentation.wc.SendTypedDataState
+import kosh.presentation.wc.SignTypedRequestState
+import kosh.presentation.wc.rememberRejectRequest
+import kosh.presentation.wc.rememberSendTypedData
+import kosh.presentation.wc.rememberSignTypedRequest
 import kosh.ui.component.LoadingIndicator
 import kosh.ui.component.button.LoadingButton
+import kosh.ui.component.button.LoadingTextButton
 import kosh.ui.component.button.PrimaryButtons
 import kosh.ui.component.dapp.DappIcon
 import kosh.ui.component.dapp.DappTitle
@@ -30,7 +39,6 @@ import kosh.ui.component.items.AccountItem
 import kosh.ui.component.items.NetworkItem
 import kosh.ui.component.items.VerifyContextItem
 import kosh.ui.component.scaffold.KoshScaffold
-import kosh.ui.component.single.single
 import kosh.ui.failure.AppFailureItem
 import kosh.ui.failure.AppFailureMessage
 import kosh.ui.resources.Res
@@ -45,11 +53,14 @@ import org.jetbrains.compose.resources.stringResource
 fun WcSignTypedScreen(
     id: WcRequest.Id,
     onCancel: () -> Unit,
-    onResult: () -> Unit,
+    onFinish: () -> Unit,
     onNavigateUp: () -> Unit,
+    signTyped: SignTypedRequestState = rememberSignTypedRequest(id),
+    network: NetworkState? = signTyped.call?.chainId?.let { rememberNetwork(it) },
+    account: AccountState? = signTyped.call?.let { rememberAccount(it.account) },
+    sendTypedData: SendTypedDataState = rememberSendTypedData(id, onFinish),
+    rejectRequest: RejectRequestState = rememberRejectRequest(id, onCancel),
 ) {
-    val signTyped = rememberSignTypedRequest(id)
-
     KoshScaffold(
         title = {
             if (signTyped.failure == null) {
@@ -65,33 +76,37 @@ fun WcSignTypedScreen(
         }
     ) { innerPadding ->
 
-        val sign = SignContent(signTyped.call?.account)
-
-        LaunchedEffect(sign.signedRequest) {
-            sign.signedRequest?.let {
-                signTyped.send(it.request as SignRequest.SignTyped, it.signature)
-            }
+        val sign = SignContent(account?.entity?.walletId) {
+            sendTypedData.send(it.request as SignRequest.SignTyped, it.signature)
         }
 
-        LaunchedEffect(signTyped.sent) {
-            if (signTyped.sent) {
-                onResult()
-            }
-        }
+        AppFailureMessage(sign.failure)
 
-        AppFailureMessage(signTyped.txFailure) {
-            signTyped.retry()
+        AppFailureMessage(sendTypedData.failure)
+
+        val signing by remember {
+            derivedStateOf { sign.signing || sendTypedData.sending }
         }
 
         WcSignTypedContent(
             signTyped = signTyped,
-            signing = sign.signing,
-            onSign = { sign.sign(it) },
-            onReject = {
-                signTyped.reject()
-                onCancel()
+            signing = signing,
+            onSign = {
+                nullable {
+                    val request = SignRequest.SignTyped(
+                        chainId = ensureNotNull(signTyped.call).chainId,
+                        dapp = ensureNotNull(signTyped.request).dapp,
+                        account = ensureNotNull(signTyped.call).account,
+                        json = ensureNotNull(signTyped.call).json,
+                    )
+                    sign(request)
+                }
             },
+            onReject = rejectRequest::reject,
             contentPadding = innerPadding,
+            account = account,
+            network = network,
+            rejecting = rejectRequest.rejecting
         )
 
         LoadingIndicator(
@@ -104,8 +119,11 @@ fun WcSignTypedScreen(
 @Composable
 fun WcSignTypedContent(
     signTyped: SignTypedRequestState,
+    account: AccountState?,
+    network: NetworkState?,
     signing: Boolean,
-    onSign: (SignRequest.SignTyped) -> Unit,
+    rejecting: Boolean,
+    onSign: () -> Unit,
     onReject: () -> Unit,
     contentPadding: PaddingValues = PaddingValues(),
 ) {
@@ -118,56 +136,47 @@ fun WcSignTypedContent(
                 .padding(contentPadding),
             verticalArrangement = Arrangement.spacedBy(16.dp)
         ) {
-
-            signTyped.request?.let {
-                VerifyContextItem(it.verifyContext)
-            }
-
-            Column {
-                val network = signTyped.call?.chainId?.let { rememberNetwork(it) }
-
-                if (signTyped.call == null || signTyped.call?.chainId != null) {
-                    NetworkItem(network?.entity)
+            signTyped.failure?.let {
+                AppFailureItem(it) { signTyped.retry() }
+            } ?: run {
+                signTyped.request?.let {
+                    VerifyContextItem(it.verifyContext)
                 }
 
-                val account = signTyped.call?.let { rememberAccount(it.account) }
-
-                AccountItem(account?.entity)
-            }
-
-            TypedMessageDomainCard(
-                jsonText = signTyped.call?.json?.json,
-                modifier = Modifier.padding(horizontal = 16.dp)
-            )
-
-            TypedMessageCard(
-                jsonText = signTyped.call?.json?.json,
-                modifier = Modifier.padding(horizontal = 16.dp),
-            )
-
-            PrimaryButtons(
-                modifier = Modifier.padding(horizontal = 16.dp),
-                cancel = {
-                    TextButton(onClick = onReject.single()) {
-                        Text(stringResource(Res.string.wc_request_reject_btn))
+                Column {
+                    if (network != null) {
+                        NetworkItem(network.entity)
                     }
-                },
-                confirm = {
-                    LoadingButton(signing, onClick = {
-                        nullable {
-                            val request = SignRequest.SignTyped(
-                                chainId = ensureNotNull(signTyped.call).chainId,
-                                dapp = ensureNotNull(signTyped.request).dapp,
-                                account = ensureNotNull(signTyped.call).account,
-                                json = ensureNotNull(signTyped.call).json,
-                            )
-                            onSign(request)
+
+                    AccountItem(account?.entity)
+                }
+
+                TypedMessageDomainCard(
+                    jsonText = signTyped.call?.json?.json,
+                    modifier = Modifier.padding(horizontal = 16.dp)
+                )
+
+                TypedMessageCard(
+                    jsonText = signTyped.call?.json?.json,
+                    modifier = Modifier.padding(horizontal = 16.dp),
+                )
+
+                PrimaryButtons(
+                    modifier = Modifier.padding(horizontal = 16.dp),
+                    cancel = {
+                        LoadingTextButton(rejecting, onReject) {
+                            Text(stringResource(Res.string.wc_request_reject_btn))
                         }
-                    }) {
-                        Text(stringResource(Res.string.wc_request_sign_btn))
+                    },
+                    confirm = {
+                        LoadingButton(signing, onSign) {
+                            Text(stringResource(Res.string.wc_request_sign_btn))
+                        }
                     }
-                }
-            )
+                )
+            }
         }
+
+        Spacer(Modifier.size(128.dp))
     }
 }

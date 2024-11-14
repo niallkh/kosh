@@ -32,7 +32,7 @@ fun StatusCode.expectSuccess(payload: String = "") {
         StatusCode.RSP_SUCCESS_CODE -> Unit
         StatusCode.PRS_PARSING_REJECTED -> throw KeystoneManager.ActionRejectedException()
         StatusCode.PRS_PARSING_DISALLOWED -> throw KeystoneManager.WrongStateException()
-        StatusCode.PRS_EXPORT_ADDRESS_DISALLOWED -> throw KeystoneManager.WrongStateException()
+        StatusCode.PRS_EXPORT_ADDRESS_DISALLOWED,
         StatusCode.PRS_PARSING_MISMATCHED_WALLET,
         StatusCode.RSP_FAILURE_CODE,
         StatusCode.PRS_INVALID_TOTAL_PACKETS,

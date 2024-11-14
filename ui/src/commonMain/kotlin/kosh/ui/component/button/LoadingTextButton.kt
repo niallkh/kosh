@@ -20,11 +20,11 @@ import kosh.ui.component.single.single
 
 @Composable
 fun LoadingTextButton(
-    text: () -> Unit,
     loading: Boolean,
-    enabled: Boolean,
     onClick: () -> Unit,
     modifier: Modifier = Modifier,
+    enabled: Boolean = true,
+    text: @Composable () -> Unit,
 ) {
     val colors = ButtonDefaults.buttonColors()
 

@@ -5,30 +5,37 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.Text
-import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.derivedStateOf
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import arrow.core.raise.nullable
 import kosh.domain.models.reown.WcRequest
+import kosh.presentation.account.AccountState
 import kosh.presentation.account.rememberAccount
 import kosh.presentation.models.SignRequest
-import kosh.presentation.reown.SignPersonalRequestState
-import kosh.presentation.reown.rememberSignPersonalRequest
+import kosh.presentation.wc.RejectRequestState
+import kosh.presentation.wc.SendPersonalMessageState
+import kosh.presentation.wc.SignPersonalRequestState
+import kosh.presentation.wc.rememberRejectRequest
+import kosh.presentation.wc.rememberSendPersonalMessage
+import kosh.presentation.wc.rememberSignPersonalRequest
 import kosh.ui.component.LoadingIndicator
 import kosh.ui.component.button.LoadingButton
+import kosh.ui.component.button.LoadingTextButton
 import kosh.ui.component.button.PrimaryButtons
 import kosh.ui.component.dapp.DappIcon
 import kosh.ui.component.dapp.DappTitle
 import kosh.ui.component.items.AccountItem
 import kosh.ui.component.items.VerifyContextItem
 import kosh.ui.component.scaffold.KoshScaffold
-import kosh.ui.component.single.single
 import kosh.ui.failure.AppFailureItem
 import kosh.ui.failure.AppFailureMessage
 import kosh.ui.resources.Res
@@ -43,10 +50,12 @@ fun WcSignPersonalScreen(
     id: WcRequest.Id,
     onCancel: () -> Unit,
     onNavigateUp: () -> Unit,
-    onResult: () -> Unit,
+    onFinish: () -> Unit,
+    signPersonal: SignPersonalRequestState = rememberSignPersonalRequest(id),
+    account: AccountState? = signPersonal.call?.let { rememberAccount(it.account) },
+    sendPersonalMessage: SendPersonalMessageState = rememberSendPersonalMessage(id, onFinish),
+    rejectRequest: RejectRequestState = rememberRejectRequest(id, onCancel),
 ) {
-    val signPersonal = rememberSignPersonalRequest(id)
-
     KoshScaffold(
         title = {
             if (signPersonal.failure == null) {
@@ -54,7 +63,6 @@ fun WcSignPersonalScreen(
             }
         },
         onNavigateUp = onNavigateUp,
-
         actions = {
             if (signPersonal.failure == null) {
                 DappIcon(signPersonal.request?.dapp)
@@ -62,32 +70,36 @@ fun WcSignPersonalScreen(
             Spacer(Modifier.width(8.dp))
         }
     ) { paddingValues ->
-        val sign = SignContent(signPersonal.call?.account)
-
-        LaunchedEffect(sign.signedRequest) {
-            sign.signedRequest?.let {
-                signPersonal.send(it.request as SignRequest.SignPersonal, it.signature)
-            }
+        val sign = SignContent(account?.entity?.walletId) {
+            sendPersonalMessage.send(it.request as SignRequest.SignPersonal, it.signature)
         }
 
-        LaunchedEffect(signPersonal.sent) {
-            if (signPersonal.sent) {
-                onResult()
-            }
-        }
+        AppFailureMessage(rejectRequest.failure)
 
-        AppFailureMessage(signPersonal.txFailure) {
-            signPersonal.retry()
+        AppFailureMessage(sign.failure)
+
+        val signing by remember {
+            derivedStateOf { sign.signing || sendPersonalMessage.sending }
         }
 
         WcSignPersonalContent(
             signPersonal = signPersonal,
-            signing = sign.signing,
-            onSign = { sign.sign(it) },
-            onReject = {
-                signPersonal.reject()
-                onCancel()
+            signing = signing,
+            account = account,
+            rejecting = rejectRequest.rejecting,
+            onSign = {
+                nullable {
+                    val signRequest = SignRequest.SignPersonal(
+                        account = ensureNotNull(signPersonal.call?.account),
+                        message = ensureNotNull(signPersonal.call?.message),
+                        dapp = ensureNotNull(signPersonal.request?.dapp),
+                        chainId = null,
+                    )
+
+                    sign(signRequest)
+                }
             },
+            onReject = rejectRequest::reject,
             contentPadding = paddingValues
         )
 
@@ -101,8 +113,10 @@ fun WcSignPersonalScreen(
 @Composable
 fun WcSignPersonalContent(
     signPersonal: SignPersonalRequestState,
+    account: AccountState?,
     signing: Boolean,
-    onSign: (SignRequest.SignPersonal) -> Unit,
+    rejecting: Boolean,
+    onSign: () -> Unit,
     onReject: () -> Unit,
     contentPadding: PaddingValues = PaddingValues(),
 ) {
@@ -119,8 +133,6 @@ fun WcSignPersonalContent(
                 VerifyContextItem(it.verifyContext)
             }
 
-            val account = signPersonal.call?.let { rememberAccount(it.account) }
-
             AccountItem(account?.entity)
 
             PersonalMessageCard(signPersonal.call?.message?.value)
@@ -128,27 +140,18 @@ fun WcSignPersonalContent(
             PrimaryButtons(
                 modifier = Modifier.padding(horizontal = 16.dp),
                 cancel = {
-                    TextButton(onReject.single()) {
+                    LoadingTextButton(rejecting, onReject) {
                         Text(stringResource(Res.string.wc_request_reject_btn))
                     }
                 },
                 confirm = {
-                    LoadingButton(signing, onClick = {
-                        nullable {
-                            onSign(
-                                SignRequest.SignPersonal(
-                                    account = ensureNotNull(signPersonal.call?.account),
-                                    message = ensureNotNull(signPersonal.call?.message),
-                                    dapp = ensureNotNull(signPersonal.request?.dapp),
-                                    chainId = null,
-                                )
-                            )
-                        }
-                    }) {
+                    LoadingButton(signing, onSign) {
                         Text(stringResource(Res.string.wc_request_sign_btn))
                     }
                 }
             )
         }
+
+        Spacer(Modifier.size(128.dp))
     }
 }

@@ -1,4 +1,4 @@
-package kosh.presentation.reown
+package kosh.presentation.wc
 
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.Immutable

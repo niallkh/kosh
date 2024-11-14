@@ -35,9 +35,7 @@ fun HomeHost(
 ) {
     val pagesRouter = rememberPagesRouter(
         { Pages(listOf(Assets(), Activity(), WalletConnect()), 0).update(initialLink) },
-    ) {
-        onResult(RouteResult.Finished())
-    }
+    )
 
     HandleDeeplink {
         val link = it?.let { parseDeeplink(it) }

@@ -12,14 +12,14 @@ fun rememberDeleteToken(
     id: TokenEntity.Id,
     tokenService: TokenService = di { domain.tokenService },
 ): DeleteTokenState {
-    val delete = rememberEffect(id) {
+    val delete = rememberEffect(id) { _: Unit ->
         tokenService.delete(id)
     }
 
     return DeleteTokenState(
         deleted = delete.done,
         deleting = delete.inProgress,
-        delete = { delete() },
+        delete = { delete(Unit) },
     )
 }
 

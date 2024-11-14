@@ -6,12 +6,10 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.rememberUpdatedState
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import kosh.domain.entities.AccountEntity
-import kosh.presentation.account.rememberDiscoveryAccountTokens
+import kosh.presentation.account.rememberDiscoverAccountTokens
 import kosh.ui.component.LoadingIndicator
 import kosh.ui.component.scaffold.KoshScaffold
 import kosh.ui.failure.AppFailureItem
@@ -26,14 +24,10 @@ fun DiscoveryAccountTokensScreen(
         title = { Text("Discovering Account Tokens...") },
     ) { innerPadding ->
         Box(
-            Modifier.fillMaxWidth()
-                .padding(innerPadding),
-            contentAlignment = Alignment.Center
+            Modifier.fillMaxWidth().padding(innerPadding),
+            contentAlignment = Alignment.TopCenter
         ) {
-
-            val discovery = rememberDiscoveryAccountTokens(id)
-
-            val onFinishUpdated by rememberUpdatedState(onFinish)
+            val discovery = rememberDiscoverAccountTokens(id, onFinish)
 
             LaunchedEffect(Unit) {
                 discovery.discover()
@@ -41,17 +35,11 @@ fun DiscoveryAccountTokensScreen(
 
             discovery.errors?.firstOrNull()?.let {
                 AppFailureItem(it) {
-                    discovery.retry()
+                    discovery.discover()
                 }
             }
 
-            LaunchedEffect(discovery.finished) {
-                if (discovery.finished) {
-                    onFinishUpdated()
-                }
-            }
-
-            LoadingIndicator(true)
+            LoadingIndicator(discovery.discovering)
         }
     }
 }

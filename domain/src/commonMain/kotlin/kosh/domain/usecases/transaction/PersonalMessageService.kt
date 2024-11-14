@@ -1,7 +1,6 @@
 package kosh.domain.usecases.transaction
 
 import arrow.core.Ior
-import arrow.core.raise.IorRaise
 import arrow.core.raise.iorNel
 import arrow.optics.dsl.at
 import arrow.optics.typeclasses.At
@@ -19,6 +18,7 @@ import kosh.domain.repositories.save
 import kosh.domain.serializers.Nel
 import kosh.domain.state.AppState
 import kosh.domain.state.transactions
+import kosh.domain.utils.ensureAccumulating
 import kosh.domain.utils.pmap
 
 class PersonalMessageService(
@@ -57,12 +57,4 @@ class PersonalMessageService(
             signature
         }.transact()
     }
-}
-
-inline fun <Error> IorRaise<Nel<Error>>.ensureAccumulating(condition: Boolean, raise: () -> Error) {
-    return if (condition) Unit else accumulate(raise)
-}
-
-inline fun <Error> IorRaise<Nel<Error>>.accumulate(raise: () -> Error) {
-    return Ior.bothNel(raise(), Unit).bind()
 }

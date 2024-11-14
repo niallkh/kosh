@@ -18,7 +18,7 @@ import kotlin.math.absoluteValue
 import kotlin.random.Random
 import kotlin.time.Duration.Companion.seconds
 
-private val retrySchedule = Schedule.linear<Throwable>(1.seconds) and Schedule.recurs(3)
+private val retrySchedule = Schedule.linear<Throwable>(1.seconds) and Schedule.recurs(1)
 
 internal class DefaultJsonRpcClient(
     private val httpClient: HttpClient,

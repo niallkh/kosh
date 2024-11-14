@@ -18,6 +18,7 @@ internal class DefaultSerializationComponent : SerializationComponent {
             isLenient = true
         }
     }
+
     override val cbor: Cbor by provider {
         Cbor {
             serializersModule = serializationModule

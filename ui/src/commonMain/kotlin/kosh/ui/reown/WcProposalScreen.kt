@@ -10,30 +10,26 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material3.Checkbox
 import androidx.compose.material3.Text
-import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import arrow.core.raise.nullable
-import arrow.optics.Getter
 import kosh.domain.models.Redirect
 import kosh.domain.models.reown.WcSessionProposal
-import kosh.domain.state.AppState
-import kosh.domain.state.accounts
-import kosh.domain.state.networks
 import kosh.domain.uuid.leastSignificantBits
 import kosh.presentation.account.AccountMultiSelectorState
 import kosh.presentation.account.rememberAccountMultiSelector
 import kosh.presentation.network.NetworkMultiSelectorState
 import kosh.presentation.network.rememberNetworkMultiSelector
-import kosh.presentation.reown.ApproveProposalState
-import kosh.presentation.reown.ProposalState
-import kosh.presentation.reown.rememberApproveProposal
-import kosh.presentation.reown.rememberProposal
-import kosh.presentation.reown.rememberRejectProposal
+import kosh.presentation.wc.ApproveProposalState
+import kosh.presentation.wc.ProposalState
+import kosh.presentation.wc.RejectProposalState
+import kosh.presentation.wc.rememberApproveProposal
+import kosh.presentation.wc.rememberProposal
+import kosh.presentation.wc.rememberRejectProposal
 import kosh.ui.component.LoadingIndicator
 import kosh.ui.component.button.LoadingButton
+import kosh.ui.component.button.LoadingTextButton
 import kosh.ui.component.button.PrimaryButtons
 import kosh.ui.component.dapp.DappIcon
 import kosh.ui.component.dapp.DappTitle
@@ -47,34 +43,25 @@ import kosh.ui.failure.AppFailureMessage
 import kosh.ui.resources.Res
 import kosh.ui.resources.wc_proposal_approve_btn
 import kosh.ui.resources.wc_proposal_reject_btn
-import kotlinx.collections.immutable.toPersistentList
+import kotlinx.collections.immutable.persistentSetOf
 import org.jetbrains.compose.resources.stringResource
 
 @Composable
 fun WcProposalScreen(
     id: WcSessionProposal.Id,
     requestId: Long,
-    onResult: (Redirect?) -> Unit,
+    onFinish: (Redirect?) -> Unit,
     onCancel: () -> Unit,
     onNavigateUp: () -> Unit,
+    proposal: ProposalState = rememberProposal(id, requestId),
+    reject: RejectProposalState = rememberRejectProposal(id, onCancel),
+    approve: ApproveProposalState = rememberApproveProposal(id, onFinish),
+    accountSelector: AccountMultiSelectorState = rememberAccountMultiSelector(),
+    networkSelector: NetworkMultiSelectorState = rememberNetworkMultiSelector(
+        networkIds = proposal.proposal?.availableNetworks ?: persistentSetOf(),
+        requiredIds = proposal.proposal?.requiredNetworks ?: persistentSetOf()
+    ),
 ) {
-    val proposal = rememberProposal(id, requestId)
-    val reject = rememberRejectProposal(id)
-    val approve = rememberApproveProposal(id)
-    val accountSelector = proposal.proposal?.let {
-        rememberAccountMultiSelector(
-            optic = AppState.accounts compose Getter { it.values.toPersistentList() },
-        )
-    }
-    val networkSelector = proposal.proposal?.let { proposalAggregated ->
-        rememberNetworkMultiSelector(
-            initial = AppState.networks compose Getter { map ->
-                map.values.filter { it.id in proposalAggregated.networks }.toPersistentList()
-            },
-            initialRequired = proposalAggregated.required,
-        )
-    }
-
     KoshScaffold(
         title = {
             if (proposal.failure == null) {
@@ -88,32 +75,30 @@ fun WcProposalScreen(
                 Spacer(Modifier.width(8.dp))
             }
         },
-        onNavigateUp = { onNavigateUp() }
+        onNavigateUp = onNavigateUp
     ) { paddingValues ->
 
-        AppFailureMessage(approve.failure) {
-            approve.retry()
-        }
+        AppFailureMessage(approve.failure)
 
-        LaunchedEffect(approve.approved) {
-            if (approve.approved) {
-                onResult(approve.redirect)
-            }
-        }
-
-        LaunchedEffect(reject.rejected) {
-            if (reject.rejected) {
-                onCancel()
-            }
-        }
+        AppFailureMessage(reject.failure)
 
         WcSessionProposalContent(
             proposal = proposal,
             networkSelector = networkSelector,
             accountSelector = accountSelector,
-            approve = approve,
-            onNavigateUp = onNavigateUp,
-            onReject = { reject.reject() },
+            onReject = { reject() },
+            rejecting = reject.rejecting,
+            approving = approve.approving,
+            onApprove = {
+                nullable {
+                    approve(
+                        ensureNotNull(accountSelector).accounts
+                            .filter { it.id in accountSelector.selected },
+                        ensureNotNull(networkSelector).networks
+                            .filter { it.id in networkSelector.selected },
+                    )
+                }
+            },
             contentPadding = paddingValues
         )
 
@@ -127,9 +112,11 @@ fun WcProposalScreen(
 @Composable
 fun WcSessionProposalContent(
     proposal: ProposalState,
-    networkSelector: NetworkMultiSelectorState?,
-    accountSelector: AccountMultiSelectorState?,
-    approve: ApproveProposalState, onNavigateUp: () -> Unit,
+    networkSelector: NetworkMultiSelectorState,
+    accountSelector: AccountMultiSelectorState,
+    approving: Boolean,
+    rejecting: Boolean,
+    onApprove: () -> Unit,
     onReject: () -> Unit,
     contentPadding: PaddingValues = PaddingValues(),
 ) {
@@ -150,17 +137,17 @@ fun WcSessionProposalContent(
         }
 
         items(
-            items = networkSelector?.available.orEmpty(),
+            items = networkSelector.networks,
             key = { it.id.value.leastSignificantBits }
         ) { network ->
             NetworkItem(
                 network = network,
-                onClick = { networkSelector?.select?.invoke(network.id) },
+                onClick = { networkSelector.invoke(network.id) },
             ) {
                 Checkbox(
-                    checked = network.id in networkSelector?.selected.orEmpty(),
-                    onCheckedChange = { networkSelector?.select?.invoke(network.id) },
-                    enabled = network.id !in networkSelector?.required.orEmpty()
+                    checked = network.id in networkSelector.selected,
+                    onCheckedChange = { networkSelector.invoke(network.id) },
+                    enabled = network.id !in networkSelector.required
                 )
             }
         }
@@ -170,16 +157,16 @@ fun WcSessionProposalContent(
         }
 
         items(
-            items = accountSelector?.available.orEmpty(),
+            items = accountSelector.accounts,
             key = { it.id.value.leastSignificantBits }
         ) { account ->
             AccountItem(
                 account = account,
-                onClick = { accountSelector?.select?.invoke(account.id) },
+                onClick = { accountSelector.select(account.id) },
             ) {
                 Checkbox(
-                    checked = account.id in accountSelector?.selected.orEmpty(),
-                    onCheckedChange = { accountSelector?.select?.invoke(account.id) }
+                    checked = account.id in accountSelector.selected,
+                    onCheckedChange = { accountSelector.select(account.id) }
                 )
             }
         }
@@ -189,25 +176,14 @@ fun WcSessionProposalContent(
                 modifier = Modifier
                     .fillMaxWidth()
                     .padding(horizontal = 16.dp, vertical = 8.dp),
+
                 cancel = {
-                    TextButton(onReject) {
+                    LoadingTextButton(rejecting, onReject) {
                         Text(stringResource(Res.string.wc_proposal_reject_btn))
                     }
                 },
                 confirm = {
-                    LoadingButton(approve.loading, onClick = {
-                        nullable {
-                            approve.approve(
-                                ensureNotNull(accountSelector).available
-                                    .filter { it.id in accountSelector.selected }
-                                    .map { it.address },
-                                ensureNotNull(networkSelector).available
-                                    .filter { it.id in networkSelector.selected }
-                                    .map { it.chainId },
-                            )
-
-                        }
-                    }) {
+                    LoadingButton(approving, onApprove) {
                         Text(stringResource(Res.string.wc_proposal_approve_btn))
                     }
                 }
@@ -215,7 +191,7 @@ fun WcSessionProposalContent(
         }
 
         item {
-            Spacer(Modifier.height(64.dp))
+            Spacer(Modifier.height(128.dp))
         }
     }
 }

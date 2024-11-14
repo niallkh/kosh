@@ -40,7 +40,7 @@ import kosh.domain.usecases.transaction.ContractCallService
 import kosh.domain.usecases.transaction.Eip1559TransactionService
 import kosh.domain.usecases.transaction.PersonalMessageService
 import kosh.domain.usecases.transaction.TransactionService
-import kosh.domain.usecases.transaction.TypedTransactionService
+import kosh.domain.usecases.transaction.TypedDataService
 import kosh.domain.usecases.transaction.parser.ApproveParser
 import kosh.domain.usecases.transaction.parser.FallbackParser
 import kosh.domain.usecases.transaction.parser.TransferParser
@@ -121,8 +121,8 @@ internal class DefaultDomainComponent(
         )
     }
 
-    override val typedTransactionService: TypedTransactionService by provider {
-        TypedTransactionService(
+    override val typedDataService: TypedDataService by provider {
+        TypedDataService(
             appStateRepo = appStateRepo,
             referenceRepo = referenceRepo
         )
@@ -222,7 +222,6 @@ internal class DefaultDomainComponent(
     override val wcAuthenticationService: WcAuthenticationService by provider {
         DefaultWcAuthenticationService(
             reownRepo = wcRepo,
-            applicationScope = applicationScope,
             notificationService = notificationService,
             appStateProvider = appStateProvider,
         )

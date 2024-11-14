@@ -6,6 +6,7 @@ import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
@@ -16,12 +17,12 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedCard
 import androidx.compose.material3.RadioButton
 import androidx.compose.material3.Text
-import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.key
 import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
@@ -35,11 +36,16 @@ import kosh.presentation.account.rememberAccountSelector
 import kosh.presentation.models.SignRequest
 import kosh.presentation.network.NetworkSelectorState
 import kosh.presentation.network.rememberNetworkSelector
-import kosh.presentation.reown.AuthenticationRequestState
-import kosh.presentation.reown.rememberAuthenticationRequest
+import kosh.presentation.wc.ApproveAuthenticationState
+import kosh.presentation.wc.AuthenticationRequestState
+import kosh.presentation.wc.RejectAuthenticationState
+import kosh.presentation.wc.rememberApproveAuthentication
+import kosh.presentation.wc.rememberAuthenticationRequest
+import kosh.presentation.wc.rememberRejectAuthentication
 import kosh.ui.component.LoadingIndicator
 import kosh.ui.component.bottomsheet.KoshModalBottomSheet
 import kosh.ui.component.button.LoadingButton
+import kosh.ui.component.button.LoadingTextButton
 import kosh.ui.component.button.PrimaryButtons
 import kosh.ui.component.dapp.DappIcon
 import kosh.ui.component.dapp.DappTitle
@@ -48,7 +54,6 @@ import kosh.ui.component.items.NetworkItem
 import kosh.ui.component.items.VerifyContextItem
 import kosh.ui.component.placeholder.placeholder
 import kosh.ui.component.scaffold.KoshScaffold
-import kosh.ui.component.single.single
 import kosh.ui.component.text.Header
 import kosh.ui.failure.AppFailureItem
 import kosh.ui.failure.AppFailureMessage
@@ -61,18 +66,24 @@ import org.jetbrains.compose.resources.stringResource
 @Composable
 fun WcAuthenticationScreen(
     id: WcAuthentication.Id,
-    onResult: () -> Unit,
+    onFinish: () -> Unit,
     onCancel: () -> Unit,
     onNavigateUp: () -> Unit,
+    accountSelector: AccountSelectorState = rememberAccountSelector(),
+    networkSelector: NetworkSelectorState = rememberNetworkSelector(),
+    authentication: AuthenticationRequestState = rememberAuthenticationRequest(
+        id,
+        accountSelector.selected,
+        networkSelector.selected
+    ),
+    approveAuthentication: ApproveAuthenticationState = rememberApproveAuthentication(
+        id,
+        accountSelector.selected,
+        networkSelector.selected,
+        onFinish
+    ),
+    rejectAuthentication: RejectAuthenticationState = rememberRejectAuthentication(id, onCancel),
 ) {
-    val accountSelector = rememberAccountSelector()
-
-    val networkSelector = rememberNetworkSelector()
-
-    val authentication = rememberAuthenticationRequest(
-        id, accountSelector.selected, networkSelector.selected
-    )
-
     KoshScaffold(
         title = {
             if (authentication.failure == null) {
@@ -89,32 +100,34 @@ fun WcAuthenticationScreen(
         }
     ) { paddingValues ->
 
-        val sign = SignContent(accountSelector.selected?.address)
-
-        LaunchedEffect(sign.signedRequest) {
-            sign.signedRequest?.let {
-                authentication.send(it.request as SignRequest.SignPersonal, it.signature)
-            }
+        val sign = SignContent(accountSelector.selected?.walletId) {
+            approveAuthentication.send(it.request as SignRequest.SignPersonal, it.signature)
         }
 
-        LaunchedEffect(authentication.sent) {
-            if (authentication.sent) {
-                onResult()
-            }
-        }
+        AppFailureMessage(approveAuthentication.failure)
 
-        AppFailureMessage(authentication.txFailure) {
-            authentication.retry()
+        AppFailureMessage(rejectAuthentication.failure)
+
+        val signing by remember {
+            derivedStateOf { sign.signing || approveAuthentication.approving }
         }
 
         WcAuthenticationContent(
             authentication = authentication,
-            signing = sign.signing,
-            onSign = { sign.sign(it) },
-            onReject = {
-                authentication.reject()
-                onCancel()
+            signing = signing,
+            onSign = {
+                nullable {
+                    val signRequest = SignRequest.SignPersonal(
+                        account = ensureNotNull(authentication.message).account,
+                        message = ensureNotNull(authentication.message).msg,
+                        chainId = ensureNotNull(authentication.message).chainId,
+                        dapp = ensureNotNull(authentication.auth).dapp,
+                    )
+                    sign(signRequest)
+                }
             },
+            onReject = rejectAuthentication::reject,
+            rejecting = rejectAuthentication.rejecting,
             networkSelector = networkSelector,
             accountSelector = accountSelector,
             contentPadding = paddingValues,
@@ -133,7 +146,8 @@ fun WcAuthenticationContent(
     accountSelector: AccountSelectorState,
     networkSelector: NetworkSelectorState,
     signing: Boolean,
-    onSign: (SignRequest.SignPersonal) -> Unit,
+    rejecting: Boolean,
+    onSign: () -> Unit,
     onReject: () -> Unit,
     contentPadding: PaddingValues = PaddingValues(),
 ) {
@@ -150,37 +164,28 @@ fun WcAuthenticationContent(
                 VerifyContextItem(it.verifyContext)
             }
 
-            NetworkSelector(networkSelector)
+            NetworkSelector(networkSelector, !signing)
 
-            AccountSelector(accountSelector)
+            AccountSelector(accountSelector, !signing)
 
             AuthenticationMessage(authentication.message)
 
             PrimaryButtons(
                 modifier = Modifier.padding(horizontal = 16.dp),
                 cancel = {
-                    TextButton(onClick = onReject.single()) {
+                    LoadingTextButton(rejecting, onReject) {
                         Text(stringResource(Res.string.wc_authentication_reject_btn))
                     }
                 },
                 confirm = {
-                    LoadingButton(signing, onClick = {
-                        nullable {
-                            onSign(
-                                SignRequest.SignPersonal(
-                                    account = ensureNotNull(authentication.message).account,
-                                    message = ensureNotNull(authentication.message).msg,
-                                    chainId = ensureNotNull(authentication.message).chainId,
-                                    dapp = ensureNotNull(authentication.auth).dapp,
-                                )
-                            )
-                        }
-                    }) {
+                    LoadingButton(signing, onSign) {
                         Text(stringResource(Res.string.wc_authentication_authenticate_btn))
                     }
                 },
             )
         }
+
+        Spacer(Modifier.size(128.dp))
     }
 }
 
@@ -188,6 +193,7 @@ fun WcAuthenticationContent(
 @Composable
 fun AccountSelector(
     accountSelector: AccountSelectorState,
+    active: Boolean,
     modifier: Modifier = Modifier,
 ) {
     var openAccountSelector by rememberSaveable { mutableStateOf(false) }
@@ -196,7 +202,7 @@ fun AccountSelector(
         AccountItem(
             modifier = modifier,
             account = it,
-            onClick = { openAccountSelector = true },
+            onClick = { openAccountSelector = true }.takeIf { active },
         ) {
             Icon(Icons.Default.ArrowDropDown, contentDescription = "Dropdown")
         }
@@ -232,6 +238,7 @@ fun AccountSelector(
 @Composable
 fun NetworkSelector(
     networkSelector: NetworkSelectorState,
+    active: Boolean,
     modifier: Modifier = Modifier,
 ) {
     var openNetworkSelector by rememberSaveable { mutableStateOf(false) }
@@ -240,7 +247,7 @@ fun NetworkSelector(
         NetworkItem(
             modifier = modifier,
             network = it,
-            onClick = { openNetworkSelector = true },
+            onClick = { openNetworkSelector = true }.takeIf { active },
         ) {
             Icon(Icons.Default.ArrowDropDown, contentDescription = "Dropdown")
         }

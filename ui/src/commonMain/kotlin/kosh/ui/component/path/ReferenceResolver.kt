@@ -1,6 +1,7 @@
 package kosh.ui.component.path
 
 import androidx.compose.runtime.Composable
+import arrow.core.right
 import kosh.domain.entities.Reference
 import kosh.domain.models.ByteString
 import kosh.domain.repositories.ReferenceRepo
@@ -15,10 +16,9 @@ inline fun <reified T : Any> Reference<T>.resolve(
     serializer: KSerializer<T>,
     referenceRepo: ReferenceRepo = di { appRepositoriesComponent.referenceRepo },
 ): T? {
-
-    return rememberLoad<T?>(this) {
+    return rememberLoad(this) {
         withContext(Dispatchers.Default) {
-            referenceRepo.get(this@resolve, serializer)
+            referenceRepo.get(this@resolve, serializer).right().bind()
         }
     }.result
 }
@@ -30,7 +30,7 @@ inline fun Reference<ByteString>.resolve(
 
     return rememberLoad(this) {
         withContext(Dispatchers.Default) {
-            referenceRepo.get(this@resolve)
+            referenceRepo.get(this@resolve).right().bind()
         }
     }.result
 }

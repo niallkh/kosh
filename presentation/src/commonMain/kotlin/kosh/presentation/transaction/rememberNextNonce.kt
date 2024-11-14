@@ -15,14 +15,14 @@ fun rememberNextNonce(
     transactionRepo: TransactionRepo = di { appRepositoriesComponent.transactionRepo },
 ): NextNonceState {
     val nonce = rememberLoad(chainId, account) {
-        transactionRepo.nextNonce(chainId, account)
+        transactionRepo.nextNonce(chainId, account).bind()
     }
 
     return NextNonceState(
-        nonce = nonce.result?.getOrNull(),
+        nonce = nonce.result,
         loading = nonce.loading,
-        failure = nonce.result?.leftOrNull(),
-        retry = { nonce() }
+        failure = nonce.failure,
+        retry = { nonce.retry() }
     )
 }
 

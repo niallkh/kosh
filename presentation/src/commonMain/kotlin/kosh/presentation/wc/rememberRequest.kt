@@ -1,9 +1,10 @@
-package kosh.presentation.reown
+package kosh.presentation.wc
 
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.Immutable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
@@ -12,53 +13,46 @@ import kosh.domain.failure.WcFailure
 import kosh.domain.models.reown.WcRequest
 import kosh.domain.usecases.reown.WcRequestService
 import kosh.presentation.core.di
-import kosh.presentation.di.rememberRetained
+import kosh.presentation.di.rememberSerializable
 
 @Composable
-fun rememberWatchAssetRequest(
-    id: WcRequest.Id,
+fun rememberRequest(
+    id: WcRequest.Id?,
     requestService: WcRequestService = di { domain.wcRequestService },
-): WatchAssetRequestState {
-    var request by rememberRetained { mutableStateOf<WcRequest?>(null) }
-    var call by rememberRetained { mutableStateOf<WcRequest.Call.WatchAsset?>(null) }
+): RequestState {
+    var request by rememberSerializable { mutableStateOf<WcRequest?>(null) }
     var loading by remember { mutableStateOf(false) }
     var failure by remember { mutableStateOf<WcFailure?>(null) }
+    var retry by remember { mutableIntStateOf(0) }
 
-    LaunchedEffect(id) {
+    LaunchedEffect(id, retry) {
         loading = true
 
         recover({
-            request = requestService.get(id).bind().also {
-                call = it.call as? WcRequest.Call.WatchAsset
-                    ?: error("Request is not a WatchAsset")
-            }
+            request = requestService.get(id).bind()
 
             loading = false
             failure = null
         }) {
-            failure = it
-            request = null
-            call = null
             loading = false
+            failure = it
         }
     }
 
-    return WatchAssetRequestState(
+    return RequestState(
         request = request,
-        call = call,
         loading = loading,
         failure = failure,
-        onWatch = { requestService.onAssetWatched(id) },
-        reject = { requestService.reject(id) },
+        retry = { retry++ },
+        reject = { (id ?: request?.id)?.let { requestService.reject(it) } }
     )
 }
 
 @Immutable
-data class WatchAssetRequestState(
+data class RequestState(
     val request: WcRequest?,
-    val call: WcRequest.Call.WatchAsset?,
     val loading: Boolean,
     val failure: WcFailure?,
-    val onWatch: () -> Unit,
+    val retry: () -> Unit,
     val reject: () -> Unit,
 )

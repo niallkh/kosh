@@ -1,10 +1,10 @@
 package kosh.presentation.account
 
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.Immutable
-import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.Stable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import kosh.domain.entities.AccountEntity
 import kosh.domain.serializers.ImmutableList
@@ -20,19 +20,23 @@ import kosh.presentation.di.rememberSerializable
 fun rememberAccountSelector(
     appStateProvider: AppStateProvider = di { domain.appStateProvider },
 ): AccountSelectorState {
-    val accounts by appStateProvider.collectAsState().optic(AppState.activeAccounts())
+    val accounts by optic(AppState.activeAccounts()) { appStateProvider.state }
     var selected by rememberSerializable { mutableStateOf(accounts.firstOrNull()) }
 
-    return AccountSelectorState(
-        selected = selected,
-        available = accounts,
-        select = { selected = it }
-    )
+    return remember {
+        object : AccountSelectorState {
+            override val selected: AccountEntity? get() = selected
+            override val available: ImmutableList<AccountEntity> get() = accounts
+            override fun select(account: AccountEntity) {
+                selected = account
+            }
+        }
+    }
 }
 
-@Immutable
-data class AccountSelectorState(
-    val selected: AccountEntity?,
-    val available: ImmutableList<AccountEntity>,
-    val select: (AccountEntity) -> Unit,
-)
+@Stable
+interface AccountSelectorState {
+    val selected: AccountEntity?
+    val available: ImmutableList<AccountEntity>
+    fun select(account: AccountEntity)
+}

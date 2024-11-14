@@ -113,7 +113,7 @@ internal class AndroidAppScope(
 
         if (BuildConfig.DEBUG) {
 //            StrictMode.enableDefaults()
-            Logger.setMinSeverity(Severity.Debug)
+            Logger.setMinSeverity(Severity.Verbose)
             Logger.setLogWriters(
                 platformLogWriter(),
                 CrashlyticsLogWriter()

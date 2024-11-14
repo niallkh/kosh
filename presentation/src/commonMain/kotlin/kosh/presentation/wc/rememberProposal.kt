@@ -1,12 +1,12 @@
-package kosh.presentation.reown
+package kosh.presentation.wc
 
 import androidx.compose.runtime.Composable
 import kosh.domain.failure.WcFailure
-import kosh.domain.models.reown.WcSessionProposal
 import kosh.domain.models.reown.WcProposalAggregated
+import kosh.domain.models.reown.WcSessionProposal
 import kosh.domain.usecases.reown.WcProposalService
-import kosh.presentation.Load
 import kosh.presentation.core.di
+import kosh.presentation.rememberLoad
 
 @Composable
 fun rememberProposal(
@@ -14,14 +14,13 @@ fun rememberProposal(
     requestId: Long,
     proposalService: WcProposalService = di { domain.wcProposalService },
 ): ProposalState {
-
-    val content = Load(id, requestId) {
+    val content = rememberLoad(id, requestId) {
         proposalService.get(id, requestId).bind()
     }
 
     return ProposalState(
         loading = content.loading,
-        proposal = content.content,
+        proposal = content.result,
         failure = content.failure,
         retry = { content.retry() },
     )

@@ -11,29 +11,25 @@ import androidx.compose.foundation.lazy.items
 import androidx.compose.material3.Checkbox
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
-import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import arrow.core.raise.nullable
-import arrow.optics.Getter
 import kosh.domain.models.reown.WcSession
-import kosh.domain.state.AppState
-import kosh.domain.state.accounts
-import kosh.domain.state.networks
 import kosh.domain.uuid.leastSignificantBits
 import kosh.presentation.account.AccountMultiSelectorState
 import kosh.presentation.account.rememberAccountMultiSelector
 import kosh.presentation.network.NetworkMultiSelectorState
 import kosh.presentation.network.rememberNetworkMultiSelector
-import kosh.presentation.reown.SessionState
-import kosh.presentation.reown.UpdateSessionState
-import kosh.presentation.reown.rememberDisconnectSession
-import kosh.presentation.reown.rememberSession
-import kosh.presentation.reown.rememberUpdateSession
+import kosh.presentation.wc.DisconnectSessionState
+import kosh.presentation.wc.SessionState
+import kosh.presentation.wc.UpdateSessionState
+import kosh.presentation.wc.rememberDisconnectSession
+import kosh.presentation.wc.rememberSession
+import kosh.presentation.wc.rememberUpdateSession
 import kosh.ui.component.LoadingIndicator
 import kosh.ui.component.button.LoadingButton
+import kosh.ui.component.button.LoadingTextButton
 import kosh.ui.component.button.PrimaryButtons
 import kosh.ui.component.dapp.DappIcon
 import kosh.ui.component.dapp.DappTitle
@@ -41,11 +37,12 @@ import kosh.ui.component.items.AccountItem
 import kosh.ui.component.items.NetworkItem
 import kosh.ui.component.scaffold.KoshScaffold
 import kosh.ui.component.text.Header
+import kosh.ui.failure.AppFailureItem
 import kosh.ui.failure.AppFailureMessage
 import kosh.ui.resources.Res
 import kosh.ui.resources.wc_session_disconnect_btn
 import kosh.ui.resources.wc_session_update_btn
-import kotlinx.collections.immutable.toPersistentList
+import kotlinx.collections.immutable.persistentSetOf
 import org.jetbrains.compose.resources.stringResource
 
 @Composable
@@ -54,28 +51,18 @@ fun WcSessionScreen(
     onCancel: () -> Unit,
     onFinish: () -> Unit,
     onNavigateUp: () -> Unit,
+    session: SessionState = rememberSession(id),
+    disconnectSession: DisconnectSessionState = rememberDisconnectSession(id, onCancel),
+    updateSession: UpdateSessionState = rememberUpdateSession(id, onFinish),
+    accountSelector: AccountMultiSelectorState = rememberAccountMultiSelector(
+        selectedIds = session.session?.approvedAccounts ?: persistentSetOf(),
+    ),
+    networkSelector: NetworkMultiSelectorState = rememberNetworkMultiSelector(
+        networkIds = session.session?.availableNetworks ?: persistentSetOf(),
+        requiredIds = session.session?.requiredNetworks ?: persistentSetOf(),
+        selectedIds = session.session?.approvedNetworks ?: persistentSetOf(),
+    ),
 ) {
-    val session = rememberSession(id)
-    val disconnect = rememberDisconnectSession(id)
-    val update = rememberUpdateSession(id)
-
-    val accountSelector = session.session?.let { sessionAggregated ->
-        rememberAccountMultiSelector(
-            optic = AppState.accounts compose Getter { it.values.toPersistentList() },
-            initialSelected = sessionAggregated.approvedAccounts
-        )
-    }
-
-    val networkSelector = session.session?.let { sessionAggregated ->
-        rememberNetworkMultiSelector(
-            initial = AppState.networks compose Getter { map ->
-                map.values.filter { it.id in sessionAggregated.availableNetworks }
-                    .toPersistentList()
-            },
-            initialRequired = sessionAggregated.requiredNetworks,
-            initialSelected = sessionAggregated.approvedNetworks,
-        )
-    }
 
     KoshScaffold(
         title = {
@@ -92,24 +79,28 @@ fun WcSessionScreen(
             }
         }
     ) { paddingValues ->
-        LaunchedEffect(update.updated) {
-            if (update.updated) {
-                onFinish()
-            }
-        }
 
-        LaunchedEffect(disconnect.disconnected) {
-            if (disconnect.disconnected) {
-                onCancel()
-            }
-        }
+        AppFailureMessage(updateSession.failure)
+
+        AppFailureMessage(disconnectSession.failure)
 
         WcSessionContent(
             session = session,
             networkSelector = networkSelector,
             accountSelector = accountSelector,
-            update = update,
-            onDisconnect = { disconnect.disconnect() },
+            disconnecting = disconnectSession.disconnecting,
+            updating = updateSession.updating,
+            onDisconnect = { disconnectSession() },
+            onUpdate = {
+                nullable {
+                    updateSession(
+                        ensureNotNull(accountSelector).accounts
+                            .filter { it.id in accountSelector.selected },
+                        ensureNotNull(networkSelector).networks
+                            .filter { it.id in networkSelector.selected },
+                    )
+                }
+            },
             contentPadding = paddingValues,
         )
 
@@ -123,17 +114,17 @@ fun WcSessionScreen(
 @Composable
 fun WcSessionContent(
     session: SessionState,
-    networkSelector: NetworkMultiSelectorState?,
-    accountSelector: AccountMultiSelectorState?,
-    update: UpdateSessionState,
+    networkSelector: NetworkMultiSelectorState,
+    accountSelector: AccountMultiSelectorState,
+    updating: Boolean,
+    disconnecting: Boolean,
     onDisconnect: () -> Unit,
+    onUpdate: () -> Unit,
     contentPadding: PaddingValues = PaddingValues(),
 ) {
-    AppFailureMessage(update.failure) {
-        update.retry()
-    }
-
-    LazyColumn(
+    session.failure?.let {
+        AppFailureItem(it) { session.retry() }
+    } ?: LazyColumn(
         contentPadding = contentPadding,
     ) {
 
@@ -158,17 +149,17 @@ fun WcSessionContent(
         }
 
         items(
-            items = networkSelector?.available.orEmpty(),
+            items = networkSelector.networks,
             key = { it.id.value.leastSignificantBits }
         ) { network ->
             NetworkItem(
                 network = network,
-                onClick = { networkSelector?.select?.invoke(network.id) },
+                onClick = { networkSelector(network.id) },
             ) {
                 Checkbox(
-                    checked = network.id in networkSelector?.selected.orEmpty(),
-                    onCheckedChange = { networkSelector?.select?.invoke(network.id) },
-                    enabled = network.id !in networkSelector?.required.orEmpty()
+                    checked = network.id in networkSelector.selected,
+                    onCheckedChange = { networkSelector(network.id) },
+                    enabled = network.id !in networkSelector.required
                 )
             }
         }
@@ -178,16 +169,16 @@ fun WcSessionContent(
         }
 
         items(
-            items = accountSelector?.available.orEmpty(),
+            items = accountSelector.accounts,
             key = { it.id.value.leastSignificantBits }
         ) { account ->
             AccountItem(
                 account = account,
-                onClick = { accountSelector?.select?.invoke(account.id) },
+                onClick = { accountSelector.select(account.id) },
             ) {
                 Checkbox(
-                    checked = account.id in accountSelector?.selected.orEmpty(),
-                    onCheckedChange = { accountSelector?.select?.invoke(account.id) }
+                    checked = account.id in accountSelector.selected,
+                    onCheckedChange = { accountSelector.select(account.id) }
                 )
             }
         }
@@ -198,23 +189,12 @@ fun WcSessionContent(
                     .fillMaxWidth()
                     .padding(horizontal = 16.dp, vertical = 8.dp),
                 cancel = {
-                    TextButton(onDisconnect) {
+                    LoadingTextButton(disconnecting, onDisconnect) {
                         Text(stringResource(Res.string.wc_session_disconnect_btn))
                     }
                 },
                 confirm = {
-                    LoadingButton(update.loading, onClick = {
-                        nullable {
-                            update.update(
-                                ensureNotNull(accountSelector).available
-                                    .filter { it.id in accountSelector.selected }
-                                    .map { it.address },
-                                ensureNotNull(networkSelector).available
-                                    .filter { it.id in networkSelector.selected }
-                                    .map { it.chainId },
-                            )
-                        }
-                    }) {
+                    LoadingButton(updating, onUpdate) {
                         Text(stringResource(Res.string.wc_session_update_btn))
                     }
                 }
@@ -222,7 +202,7 @@ fun WcSessionContent(
         }
 
         item {
-            Spacer(Modifier.height(64.dp))
+            Spacer(Modifier.height(128.dp))
         }
     }
 }

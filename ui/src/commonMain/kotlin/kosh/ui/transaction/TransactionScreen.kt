@@ -115,7 +115,7 @@ fun TransactionContent(
     onOpen: (RootRoute) -> Unit,
     contentPadding: PaddingValues = PaddingValues(),
 ) {
-    Box(Modifier.padding(contentPadding)) {
+    Column(Modifier.padding(contentPadding)) {
         when (transaction) {
             is TransactionEntity.PersonalMessage -> PersonalMessageContent(
                 personalMessage = transaction,
@@ -132,6 +132,8 @@ fun TransactionContent(
 
             null -> Unit
         }
+
+        Spacer(Modifier.height(128.dp))
     }
 }
 
@@ -297,6 +299,6 @@ fun TransactionContent(
             }
         }
 
-        Spacer(Modifier.height(64.dp))
+        Spacer(Modifier.height(128.dp))
     }
 }

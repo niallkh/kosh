@@ -1,35 +1,35 @@
 package kosh.presentation.account
 
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.remember
 import arrow.core.Nel
 import kosh.domain.entities.AccountEntity
 import kosh.domain.failure.Web3Failure
 import kosh.domain.usecases.account.AccountTokensDiscoveryService
 import kosh.presentation.core.di
-import kosh.presentation.rememberEffect
+import kosh.presentation.rememberIorEffect
 
 @Composable
-fun rememberDiscoveryAccountTokens(
+fun rememberDiscoverAccountTokens(
     id: AccountEntity.Id,
+    onFinish: () -> Unit,
     accountTokensDiscoveryService: AccountTokensDiscoveryService = di { domain.accountTokensDiscoveryService },
-): DiscoveryAccountTokensState {
-    val discovery = rememberEffect(id) {
-        accountTokensDiscoveryService.discoverTokens(id).toEither()
+): DiscoverAccountTokensState {
+    val discovery = rememberIorEffect(id, onFinish = { onFinish() }) { _: Unit ->
+        accountTokensDiscoveryService.discoverTokens(id)
     }
 
-    return DiscoveryAccountTokensState(
-        finished = discovery.done,
-        loading = discovery.inProgress,
-        errors = discovery.result?.leftOrNull(),
-        discover = { discovery() },
-        retry = { discovery() }
-    )
+    return remember {
+        object : DiscoverAccountTokensState {
+            override val discovering: Boolean get() = discovery.inProgress
+            override val errors: Nel<Web3Failure>? get() = discovery.failure
+            override fun discover() = discovery(Unit)
+        }
+    }
 }
 
-data class DiscoveryAccountTokensState(
-    val finished: Boolean,
-    val loading: Boolean,
-    val errors: Nel<Web3Failure>?,
-    val discover: () -> Unit,
-    val retry: () -> Unit,
-)
+interface DiscoverAccountTokensState {
+    val discovering: Boolean
+    val errors: Nel<Web3Failure>?
+    fun discover()
+}

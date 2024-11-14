@@ -10,7 +10,6 @@ import com.arkivanov.essenty.backhandler.BackCallback
 import kosh.presentation.core.LocalPresentationContext
 import kosh.presentation.core.PresentationContext
 import kosh.presentation.di.rememberRetained
-import kosh.ui.navigation.RouteResult
 import kosh.ui.navigation.routes.Route
 import kotlinx.serialization.KSerializer
 import kotlinx.serialization.Serializable
@@ -20,13 +19,11 @@ class DefaultListDetailRouter<R : Route>(
     presentationContext: PresentationContext,
     serializer: KSerializer<R>,
     initial: () -> ListDetailState<R>,
-    private val onResult: ListDetailRouter<R>.(RouteResult<R>) -> Unit,
 ) : ListDetailRouter<R>, PresentationContext by presentationContext {
 
     private val navigation = SimpleNavigation<ListDetailEvent<R>>()
 
     private val backCallback = BackCallback {
-        pop()
     }
 
     init {
@@ -58,22 +55,6 @@ class DefaultListDetailRouter<R : Route>(
         navigation.push(route)
     }
 
-    override fun pop(result: RouteResult<R>) {
-        navigation.popOr { onResult(result) }
-    }
-
-    override fun pop() {
-        navigation.popOr { onResult(RouteResult.Finished()) }
-    }
-
-    override fun result(redirect: String?) {
-        onResult(RouteResult.Finished())
-    }
-
-    override fun navigateUp() {
-        onResult(RouteResult.Up(null))
-    }
-
     override fun reset(link: R?) {
         TODO("Not yet implemented")
     }
@@ -82,7 +63,6 @@ class DefaultListDetailRouter<R : Route>(
 @Composable
 inline fun <reified R : @Serializable Route> rememberListDetailRouter(
     link: R? = null,
-    noinline onResult: ListDetailRouter<R>.(RouteResult<R>) -> Unit,
     serializer: KSerializer<R> = serializer(),
     noinline list: @DisallowComposableCalls () -> R,
 ): ListDetailRouter<R> {
@@ -98,7 +78,6 @@ inline fun <reified R : @Serializable Route> rememberListDetailRouter(
                     detail = link.takeIf { it != list() }
                 )
             },
-            onResult = { onResult(it) },
         )
     }
 

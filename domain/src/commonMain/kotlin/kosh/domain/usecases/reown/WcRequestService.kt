@@ -2,11 +2,11 @@ package kosh.domain.usecases.reown
 
 import arrow.core.Either
 import kosh.domain.failure.WcFailure
-import kosh.domain.models.ByteString
 import kosh.domain.models.ChainId
 import kosh.domain.models.Hash
 import kosh.domain.models.reown.SessionTopic
 import kosh.domain.models.reown.WcRequest
+import kosh.domain.models.web3.Signature
 import kosh.domain.serializers.ImmutableList
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.Flow
@@ -17,9 +17,11 @@ interface WcRequestService {
 
     suspend fun get(id: WcRequest.Id?): Either<WcFailure, WcRequest>
 
-    fun onTypedSigned(id: WcRequest.Id, data: ByteString): Job
+    suspend fun onTypedSigned2(id: WcRequest.Id, signature: Signature): Either<WcFailure, Unit>
 
-    fun onPersonalSigned(id: WcRequest.Id, data: ByteString): Job
+    suspend fun onPersonalSigned2(id: WcRequest.Id, signature: Signature): Either<WcFailure, Unit>
+
+    suspend fun reject2(id: WcRequest.Id): Either<WcFailure, Unit>
 
     fun onTransactionSend(id: WcRequest.Id, hash: Hash): Job
 

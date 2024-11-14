@@ -1,10 +1,7 @@
 package kosh.data.reown
 
-import arrow.core.Either
-import arrow.core.left
 import arrow.core.raise.either
 import arrow.core.raise.ensureNotNull
-import arrow.core.right
 import kosh.domain.failure.WcFailure
 import kosh.domain.models.ChainAddress
 import kosh.domain.models.ChainId
@@ -18,8 +15,6 @@ import kosh.domain.models.reown.WcSession
 import kosh.domain.models.reown.WcSessionProposal
 import kosh.domain.models.reown.WcVerifyContext
 import kosh.libs.reown.AuthenticationRequest
-import kosh.libs.reown.ReownFailure
-import kosh.libs.reown.ReownResult
 import kosh.libs.reown.Session
 import kosh.libs.reown.SessionProposal
 import kosh.libs.reown.SessionRequest

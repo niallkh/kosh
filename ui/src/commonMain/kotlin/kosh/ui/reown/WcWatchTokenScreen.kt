@@ -1,13 +1,12 @@
 package kosh.ui.reown
 
 import androidx.compose.runtime.Composable
-import kosh.domain.entities.TokenEntity
 import kosh.domain.models.ChainAddress
 import kosh.domain.models.eip55
 import kosh.domain.models.reown.WcRequest
 import kosh.presentation.component.textfield.rememberTextField
 import kosh.presentation.token.rememberSearchToken
-import kosh.presentation.reown.rememberWatchAssetRequest
+import kosh.presentation.wc.rememberWatchAssetRequest
 import kosh.ui.token.SearchTokenScreen
 
 @Composable
@@ -15,7 +14,7 @@ fun WcWatchTokenScreen(
     id: WcRequest.Id,
     chainAddress: ChainAddress,
     onNavigateUp: () -> Unit,
-    onResult: (TokenEntity.Id) -> Unit,
+    onFinish: () -> Unit,
     onNft: (ChainAddress) -> Unit,
 ) {
     val watchAsset = rememberWatchAssetRequest(id)
@@ -32,9 +31,9 @@ fun WcWatchTokenScreen(
         address = chainAddress.address,
         query = query,
         searchToken = rememberSearchToken(query.first.text, icon),
-        onResult = {
+        onFinish = {
             watchAsset.onWatch()
-            onResult(it)
+            onFinish()
         },
         onNavigateUp = onNavigateUp,
         onNft = onNft,

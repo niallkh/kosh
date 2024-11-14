@@ -12,15 +12,14 @@ fun rememberDeleteAccount(
     id: AccountEntity.Id,
     accountService: AccountService = di { domain.accountService },
 ): DeleteAccountState {
-
-    val delete = rememberEffect(id) {
+    val delete = rememberEffect(id) { _: Unit ->
         accountService.delete(id)
     }
 
     return DeleteAccountState(
-        deleted = delete.done,
+        deleted = delete.result != null,
         loading = delete.inProgress,
-        delete = { delete() },
+        delete = { delete(Unit) },
     )
 }
 

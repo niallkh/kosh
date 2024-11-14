@@ -1,83 +1,75 @@
 package kosh.presentation.ledger
 
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.Immutable
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.setValue
-import arrow.core.raise.either
+import androidx.compose.runtime.Stable
+import androidx.compose.runtime.remember
 import kosh.domain.failure.LedgerFailure
 import kosh.domain.models.hw.Ledger
 import kosh.domain.repositories.LedgerListener
 import kosh.domain.usecases.ledger.LedgerAccountService
 import kosh.presentation.core.di
-import kosh.presentation.di.rememberRetained
 import kosh.presentation.models.SignRequest
 import kosh.presentation.models.SignedRequest
-import kosh.presentation.rememberEffect
+import kosh.presentation.rememberEitherEffect
 
 
 @Composable
 fun rememberSignLedger(
     ledgerListener: LedgerListener,
+    onSigned: (SignedRequest) -> Unit = {},
     ledgerAccountService: LedgerAccountService = di { domain.ledgerAccountService },
 ): SignLedgerState {
-    var ledger by rememberRetained { mutableStateOf<Ledger?>(null) }
-    var signRequest by rememberRetained { mutableStateOf<SignRequest?>(null) }
-
-    val sign = rememberEffect(ledger, signRequest) {
-        either {
-            val request = signRequest ?: raise(null)
-            val ledger1 = ledger ?: raise(null)
-
+    val signLedger = rememberEitherEffect(
+        ledgerListener,
+        onFinish = onSigned
+    ) { (ledger, request): Pair<Ledger, SignRequest> ->
             val signature = when (request) {
                 is SignRequest.SignPersonal -> ledgerAccountService.sign(
                     listener = ledgerListener,
-                    ledger = ledger1,
+                    ledger = ledger,
                     address = request.account,
                     message = request.message,
                 )
 
                 is SignRequest.SignTyped -> ledgerAccountService.sign(
                     listener = ledgerListener,
-                    ledger = ledger1,
+                    ledger = ledger,
                     address = request.account,
                     jsonTypeData = request.json,
                 )
 
                 is SignRequest.SignTransaction -> ledgerAccountService.sign(
                     listener = ledgerListener,
-                    ledger = ledger1,
+                    ledger = ledger,
                     transaction = request.data,
                 )
             }.bind()
 
             SignedRequest(request, signature)
-        }
     }
 
 
-    return SignLedgerState(
-        signedRequest = sign.result?.getOrNull(),
-        loading = sign.inProgress,
-        failure = sign.result?.leftOrNull(),
-        sign = { ledger1, request ->
-            signRequest = request
-            ledger = ledger1
-            sign()
-        },
-        retry = {
-            sign()
+    return remember(ledgerListener) {
+        object : SignLedgerState {
+            override val signedRequest: SignedRequest?
+                get() = signLedger.result
+            override val loading: Boolean
+                get() = signLedger.inProgress
+            override val failure: LedgerFailure?
+                get() = signLedger.failure
+
+            override fun sign(ledger: Ledger, request: SignRequest) {
+                signLedger(Pair(ledger, request))
+            }
         }
-    )
+    }
 }
 
-@Immutable
-data class SignLedgerState(
-    val signedRequest: SignedRequest?,
-    val loading: Boolean,
-    val failure: LedgerFailure?,
+@Stable
+interface SignLedgerState {
+    val signedRequest: SignedRequest?
+    val loading: Boolean
+    val failure: LedgerFailure?
 
-    val sign: (Ledger, SignRequest) -> Unit,
-    val retry: () -> Unit,
-)
+    fun sign(ledger: Ledger, request: SignRequest)
+}

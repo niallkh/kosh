@@ -21,7 +21,7 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import kosh.domain.models.reown.WcSession
 import kosh.domain.serializers.ImmutableList
-import kosh.presentation.reown.rememberSessions
+import kosh.presentation.wc.rememberSessions
 import kosh.ui.component.illustration.Illustration
 import kosh.ui.component.items.DappItem
 import kosh.ui.component.scaffold.KoshScaffold
@@ -97,7 +97,7 @@ fun WcSessionsContent(
         }
 
         item {
-            Spacer(Modifier.height(64.dp))
+            Spacer(Modifier.height(128.dp))
         }
     }
 }

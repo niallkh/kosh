@@ -20,9 +20,10 @@ import kosh.domain.serializers.Nel
 import kosh.domain.state.AppState
 import kosh.domain.state.network
 import kosh.domain.state.transactions
+import kosh.domain.utils.ensureAccumulating
 import kosh.domain.utils.pmap
 
-class TypedTransactionService(
+class TypedDataService(
     private val appStateRepo: AppStateRepo,
     private val referenceRepo: ReferenceRepo,
 ) {

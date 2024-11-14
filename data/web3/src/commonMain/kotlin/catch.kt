@@ -17,59 +17,41 @@ inline fun <T> Web3Provider.catch(
     logger: Logger,
     block: Web3Provider.() -> T,
 ): Either<Web3Failure, T> = Either.catch { block() }.mapLeft { error ->
-    logger.w(error) { "Error happened during web3 call" }
-    when (error) {
-        is JsonRpcResponseException ->
-            Web3Failure.RpcException(error.error.message ?: error.error.data.toString())
-
-        is ResponseException ->
-            Web3Failure.HttpException(error.message ?: "Http response exception")
-
-        is HttpRequestTimeoutException,
-        is ConnectTimeoutException,
-        is SocketTimeoutException,
-        -> Web3Failure.ServerNotRespond(error.message)
-
-        else -> Web3Failure.Other(error.message ?: "Error happened during web3 call")
-    }
+    error.mapToWeb3Failure(logger)
 }
 
 inline fun <T> HttpClient.catch(
     logger: Logger,
     block: HttpClient.() -> T,
 ): Either<Web3Failure, T> = Either.catch { block() }.mapLeft { error ->
-    logger.w(error) { "Error happened during http call" }
-    when (error) {
-        is ResponseException ->
-            Web3Failure.HttpException(error.message ?: "Http response exception")
-
-        is HttpRequestTimeoutException,
-        is ConnectTimeoutException,
-        is SocketTimeoutException,
-        -> Web3Failure.ServerNotRespond(error.message)
-
-        else -> Web3Failure.Other(error.message ?: "Error happened during web3 call")
-    }
+    error.mapToWeb3Failure(logger)
 }
 
 inline fun <T> Raise<Web3Failure>.catchWeb3Failure(
     logger: Logger,
     block: Raise<Web3Failure>.() -> T,
-): T = recover(
-    block,
-    { raise(it) }
-) { error ->
-    logger.w(error) { "Error happened during web3 call" }
-    when (error) {
-        is ResponseException ->
-            Web3Failure.HttpException(error.message ?: "Http response exception")
+): T = recover(block, { raise(it) }) { error ->
+    raise(error.mapToWeb3Failure(logger))
+}
+
+fun Throwable.mapToWeb3Failure(logger: Logger): Web3Failure {
+    logger.w(this) { "Error happened during web3 call" }
+    return when (this) {
+        is JsonRpcResponseException -> Web3Failure.RpcException(
+            message ?: "Server Json Rpc call failed"
+        )
+
+        is ResponseException -> Web3Failure.HttpException(
+            message ?: "Server Request failed"
+        )
 
         is HttpRequestTimeoutException,
         is ConnectTimeoutException,
         is SocketTimeoutException,
-        -> Web3Failure.ServerNotRespond(error.message)
+            -> Web3Failure.ServerNotRespond(message)
 
-        else -> Web3Failure.Other(error.message ?: "Error happened during web3 call")
+        else -> Web3Failure.Other(message ?: "Error happened during web3 call")
     }
-        .let { raise(it) }
 }
+
+

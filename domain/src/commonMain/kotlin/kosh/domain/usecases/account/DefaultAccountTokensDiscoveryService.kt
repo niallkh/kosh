@@ -5,6 +5,7 @@ import arrow.core.nel
 import arrow.core.raise.forEachAccumulating
 import arrow.core.raise.iorNel
 import arrow.core.raise.withError
+import co.touchlab.kermit.Logger
 import kosh.domain.entities.AccountEntity
 import kosh.domain.failure.AccountFailure
 import kosh.domain.failure.Web3Failure
@@ -27,7 +28,11 @@ class DefaultAccountTokensDiscoveryService(
     private val appStateProvider: AppStateProvider,
 ) : AccountTokensDiscoveryService {
 
+    private val logger = Logger.withTag("[K]AccountTokensDiscoveryService")
+
     override suspend fun discoverTokens(id: AccountEntity.Id): IorNel<Web3Failure, Unit> = iorNel {
+        logger.i { "discoverTokens()" }
+
         val account = appStateProvider.optic(AppState.account(id)).value
             ?: raise(Web3Failure.Other(AccountFailure.NotFound()).nel())
 
@@ -41,8 +46,7 @@ class DefaultAccountTokensDiscoveryService(
         val balances = tokenBalanceService.getBalances(account.address, verifiedTokens).bind()
 
         val newTokens = verifiedTokens.zip(balances)
-            .filter { (_, balance) -> !balance.value.isZero() }
-            .map { it.first }
+            .mapNotNull { (token, balance) -> token.takeIf { !balance.value.isZero() } }
 
         forEachAccumulating(newTokens) { token ->
             withError({ Web3Failure.Other(it.message) }) {

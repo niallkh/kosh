@@ -24,7 +24,7 @@ import kotlinx.collections.immutable.ImmutableSet
 
 @Composable
 fun TrezorPasskeysScreen(
-    onUp: () -> Unit,
+    onNavigateUp: () -> Unit,
 ) {
 //    val uiState by trezorPasskeysVM.state.collectState()
 //

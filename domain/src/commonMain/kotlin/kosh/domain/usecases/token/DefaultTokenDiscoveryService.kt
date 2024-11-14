@@ -66,7 +66,8 @@ class DefaultTokenDiscoveryService(
     }
 
     override suspend fun getVerifiedTokens(): Flow<TokenMetadata> {
-        return appStateProvider.optic(AppState.activeNetworks()).value.asFlow()
+        logger.i { "getVerifiedTokens()" }
+        return AppState.activeNetworks().get(appStateProvider.state).asFlow()
             .flatMapConcat { network -> tokenListsRepo.tokens(network.chainId) }
     }
 

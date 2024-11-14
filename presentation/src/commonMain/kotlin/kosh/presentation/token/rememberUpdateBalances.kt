@@ -3,13 +3,10 @@ package kosh.presentation.token
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.Immutable
 import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
-import arrow.core.getOrElse
-import arrow.core.raise.recover
 import kosh.domain.failure.Web3Failure
 import kosh.domain.serializers.Nel
 import kosh.domain.state.AppState
@@ -22,6 +19,7 @@ import kosh.presentation.core.di
 import kosh.presentation.di.rememberLifecycleState
 import kosh.presentation.ticker.rememberTimer
 import kosh.presentation.ticker.runAtLeast
+import kotlinx.serialization.builtins.serializer
 import kotlin.time.Duration.Companion.minutes
 
 @Composable
@@ -41,25 +39,15 @@ fun rememberUpdateBalances(
 
                 loading = true
 
-                recover({
-                    runAtLeast {
-                        tokenBalanceService.update()
-                            .getOrElse { raise(it) }
-                    }
+                failures = runAtLeast { tokenBalanceService.update() }.leftOrNull()
 
-                    loading = false
-                    refreshing = false
-                    failures = null
-                }) {
-                    failures = it
-                    loading = false
-                    refreshing = false
-                }
+                loading = false
+                refreshing = false
             }
         }
     }
 
-    appStateProvider.collectAsState().optic(AppState.balancesKey()).selector {
+    optic(AppState.balancesKey()) { appStateProvider.state }.selector(String.serializer()) {
         timer.reset()
     }
 

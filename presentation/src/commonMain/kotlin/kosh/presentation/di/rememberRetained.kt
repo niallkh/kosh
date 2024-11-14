@@ -6,6 +6,7 @@ import androidx.compose.runtime.RememberObserver
 import androidx.compose.runtime.SideEffect
 import androidx.compose.runtime.currentCompositeKeyHash
 import androidx.compose.runtime.remember
+import com.arkivanov.essenty.lifecycle.Lifecycle
 import kosh.presentation.core.LocalPresentationContext
 import kosh.presentation.core.PresentationContext
 import kosh.presentation.core.getOrCreate
@@ -38,24 +39,7 @@ private class Holder<T>(
     private var value: T,
     private var presentationContext: PresentationContext,
     private var key: String,
-) : RememberObserver {
-
-    fun update(
-        inputs: Array<out Any?>,
-        value: T,
-        presentationContext: PresentationContext,
-        key: String,
-    ) {
-        if (presentationContext != this.presentationContext || key == this.key) {
-            remove()
-            this.presentationContext = presentationContext
-            this.key = key
-            put()
-        }
-
-        this.inputs = inputs
-        this.value = value
-    }
+) : RememberObserver, Lifecycle.Callbacks {
 
     fun getValueIfInputsDidntChange(
         inputs: Array<out Any?>,
@@ -67,16 +51,32 @@ private class Holder<T>(
         }
     }
 
-    private fun put() {
+    fun update(
+        inputs: Array<out Any?>,
+        value: T,
+        presentationContext: PresentationContext,
+        key: String,
+    ) {
+        if (presentationContext != this.presentationContext || key != this.key) {
+            remove(this.key)
+            this.presentationContext = presentationContext
+            this.key = key
+            put(key)
+        }
+
+        this.inputs = inputs
+        this.value = value
+    }
+
+    private fun put(key: String) {
         presentationContext.container[key] = this
     }
 
-    private fun remove() {
+    private fun remove(key: String) {
         presentationContext.container.remove(key)
     }
 
     override fun onRemembered() {
-        put()
     }
 
     override fun onForgotten() {

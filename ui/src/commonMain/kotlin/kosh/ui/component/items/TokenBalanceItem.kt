@@ -79,6 +79,7 @@ private fun TokenBalanceItemPreview() {
 }
 
 @Composable
+@Preview
 private fun PreviewToken(
     token: TokenEntity,
     network: NetworkEntity,

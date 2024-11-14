@@ -51,9 +51,8 @@ internal class AndroidNetworkComponent(
             }
 
             install(HttpRequestRetry) {
-                maxRetries = 3
-                retryOnServerErrors()
-                exponentialDelay()
+                retryOnServerErrors(1)
+                constantDelay()
             }
 
             install(IpfsPlugin)

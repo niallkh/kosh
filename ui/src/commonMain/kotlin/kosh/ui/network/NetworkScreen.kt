@@ -34,8 +34,8 @@ import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
 import kosh.domain.entities.NetworkEntity
 import kosh.presentation.component.textfield.TextFieldState
-import kosh.presentation.network.Network
 import kosh.presentation.network.NetworkFormState
+import kosh.presentation.network.NetworkState
 import kosh.presentation.network.rememberNetwork
 import kosh.presentation.network.rememberNetworkForm
 import kosh.ui.component.button.LoadingButton
@@ -127,7 +127,7 @@ fun NetworkScreen(
 
 @Composable
 fun NetworkContent(
-    network: Network?,
+    network: NetworkState?,
     networkForm: NetworkFormState,
     onCancel: () -> Unit,
     contentPadding: PaddingValues = PaddingValues(),
