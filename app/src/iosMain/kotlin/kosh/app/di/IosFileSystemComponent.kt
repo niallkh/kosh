@@ -1,6 +1,5 @@
 package kosh.app.di
 
-import arrow.core.memoize
 import kotlinx.io.files.FileSystem
 import kotlinx.io.files.Path
 import kotlinx.io.files.SystemFileSystem
@@ -18,7 +17,7 @@ internal class IosFileSystemComponent : FileSystemComponent {
                 true
             ).first() as String
         )
-    }.memoize()
+    }
 
     override val cacheDir: () -> Path = {
         Path(
@@ -28,7 +27,7 @@ internal class IosFileSystemComponent : FileSystemComponent {
                 true
             ).first() as String
         )
-    }.memoize()
+    }
 
     override val noBackupFilesDir: () -> Path = {
         val dir = NSSearchPathForDirectoriesInDomains(
@@ -39,7 +38,7 @@ internal class IosFileSystemComponent : FileSystemComponent {
 
 //        NSURL(dir).setResourceValue(true, forKey = NSURLIsExcludedFromBackupKey, error = null)
         Path(dir)
-    }.memoize()
+    }
 
     override val fileSystem: FileSystem
         get() = SystemFileSystem

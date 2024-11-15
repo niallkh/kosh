@@ -72,32 +72,24 @@ class DefaultWcRequestService(
         ).bind()
     }
 
-    override fun onTransactionSend(
+    override suspend fun onTransactionSend(
         id: WcRequest.Id,
         hash: Hash,
-    ) = applicationScope.launch {
-        recover({
-            reownRepo.approveSessionRequest(
-                id = id,
-                response = hash.toString()
-            ).bind()
-        }) {
-            logger.logFailure(it)
-        }
+    ): Either<WcFailure, Unit> = either {
+        reownRepo.approveSessionRequest(
+            id = id,
+            response = hash.toString()
+        ).bind()
     }
 
-    override fun onNetworkAdded(
+    override suspend fun onNetworkAdded(
         id: WcRequest.Id,
         sessionTopic: SessionTopic,
         chainId: ChainId,
-    ): Job = applicationScope.launch {
-        recover({
-            sessionService.addNetwork(WcSession.Id(sessionTopic), chainId).bind()
+    ): Either<WcFailure, Unit> = either {
+        sessionService.addNetwork(WcSession.Id(sessionTopic), chainId).bind()
 
-            reownRepo.approveSessionRequest(id, "null").bind()
-        }, {
-            logger.logFailure(it)
-        })
+        reownRepo.approveSessionRequest(id, "null").bind()
     }
 
     override fun onAssetWatched(

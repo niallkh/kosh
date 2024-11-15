@@ -28,8 +28,8 @@ fun AccountIcon(
         modifier = modifier
             .size(40.dp)
             .placeholder(address == null),
-        color = colorScheme.secondaryContainer,
-        contentColor = colorScheme.primary,
+        color = colorScheme().secondaryContainer,
+        contentColor = colorScheme().primary,
         shape = CircleShape,
     ) {
         Icon(

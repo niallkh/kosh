@@ -10,9 +10,9 @@ import kosh.domain.utils.md5
 internal fun addressColor(
     address: Address,
     isDark: Boolean,
-): ColorScheme = remember(address, isDark) {
-    dynamicColor(
-        bytes = address.bytes().md5(),
+): () -> ColorScheme {
+    return dynamicColor(
+        bytes = remember(address) { address.bytes().md5() },
         isDark = isDark,
     )
 }

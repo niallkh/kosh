@@ -1,83 +1,59 @@
 package kosh.presentation.token
 
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableIntStateOf
-import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.Stable
 import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
-import arrow.core.raise.recover
-import kosh.domain.entities.TokenEntity
 import kosh.domain.failure.TokenFailure
+import kosh.domain.models.Address
+import kosh.domain.models.Uri
 import kosh.domain.models.token.NftMetadata
 import kosh.domain.models.token.TokenMetadata
-import kosh.domain.models.token.TokenMetadata.Type
 import kosh.domain.models.token.map
 import kosh.domain.usecases.token.TokenService
 import kosh.presentation.core.di
+import kosh.presentation.rememberEitherEffect
 
 @Composable
 fun rememberCreateNft(
+    icon: Pair<Address, Uri>? = null,
+    onCreated: () -> Unit,
     tokenService: TokenService = di { domain.tokenService },
 ): CreateNftState {
-    var token by remember { mutableStateOf<TokenMetadata?>(null) }
-    var nft by remember { mutableStateOf<NftMetadata?>(null) }
-    var created by remember { mutableStateOf<TokenEntity.Id?>(null) }
-    var loading by remember { mutableStateOf(false) }
-    var failure by remember { mutableStateOf<TokenFailure?>(null) }
-    var retry by remember { mutableIntStateOf(0) }
-
-    LaunchedEffect(retry, token, nft) {
-        loading = true
-
-        recover({
-            val localToken = token ?: raise(null)
-            val localNft = nft ?: raise(null)
-
-            created = tokenService.add(
-                chainId = localNft.chainId,
-                address = localNft.address,
-                name = localToken.name,
-                symbol = localNft.symbol ?: localToken.symbol,
-                decimals = localNft.decimals ?: localToken.decimals,
-                icon = localToken.icon,
-                type = localToken.type.map(),
-                tokenName = localNft.name,
-                tokenId = localNft.tokenId,
-                uri = localNft.uri,
-                image = localNft.image,
-                external = localNft.external,
-            ).bind()
-
-            failure = null
-            loading = false
-        }) {
-            created = null
-
-            failure = it
-            loading = false
-        }
+    val create = rememberEitherEffect(
+        icon,
+        onFinish = { onCreated() }
+    ) { (token, nft): Pair<TokenMetadata, NftMetadata> ->
+        tokenService.add(
+            chainId = nft.chainId,
+            address = nft.address,
+            name = token.name,
+            symbol = nft.symbol ?: token.symbol,
+            decimals = nft.decimals ?: token.decimals,
+            icon = token.icon
+                ?: icon?.second?.takeIf { icon.first == token.address },
+            type = token.type.map(),
+            tokenName = nft.name,
+            tokenId = nft.tokenId,
+            uri = nft.uri,
+            image = nft.image,
+            external = nft.external,
+        ).bind()
     }
 
-    return CreateNftState(
-        created = created,
-        loading = loading,
-        failure = failure,
-        create = { tokenMetadata, nftMetadata ->
-            require(tokenMetadata.type in arrayOf(Type.ERC721, Type.ERC1155))
-            retry++
-            token = tokenMetadata
-            nft = nftMetadata
-        },
-        retry = { retry++ }
-    )
+    return remember {
+        object : CreateNftState {
+            override val loading: Boolean get() = create.inProgress
+            override val failure: TokenFailure? get() = create.failure
+            override fun create(token: TokenMetadata, nft: NftMetadata) {
+                create(token to nft)
+            }
+        }
+    }
 }
 
-data class CreateNftState(
-    val created: TokenEntity.Id?,
-    val loading: Boolean,
-    val failure: TokenFailure?,
-    val create: (TokenMetadata, NftMetadata) -> Unit,
-    val retry: () -> Unit,
-)
+@Stable
+interface CreateNftState {
+    val loading: Boolean
+    val failure: TokenFailure?
+    fun create(token: TokenMetadata, nft: NftMetadata)
+}

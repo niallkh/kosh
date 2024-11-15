@@ -1,7 +1,6 @@
 package kosh.domain.entities
 
 import androidx.compose.runtime.Immutable
-import arrow.core.memoize
 import arrow.optics.optics
 import kosh.domain.models.Address
 import kosh.domain.models.account.DerivationPath
@@ -38,7 +37,7 @@ data class AccountEntity(
     value class Id private constructor(val value: Uuid) {
 
         companion object {
-            private val memo = ::Id.memoize()
+            private val memo: (value: Uuid) -> Id = ::Id
 
             object Serializer :
                 KSerializer<Id> by serializer(UuidSerializer, { it.value }, { memo(it) })

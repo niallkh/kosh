@@ -2,7 +2,6 @@ package kosh.domain.models
 
 import androidx.compose.runtime.Immutable
 import arrow.core.Either
-import arrow.core.memoize
 import arrow.core.raise.either
 import arrow.core.raise.ensure
 import kosh.domain.failure.AppFailure
@@ -31,7 +30,7 @@ value class Address private constructor(
     override fun toString(): String = eip55()
 
     companion object {
-        private val memo = ::Address.memoize()
+        private val memo = ::Address
 
         private val EMPTY = memo(ByteString(20))
 

@@ -10,9 +10,9 @@ import kotlinx.io.bytestring.encodeToByteString
 internal fun symbolColor(
     symbol: String,
     isDark: Boolean,
-): ColorScheme = remember(symbol, isDark) {
-    dynamicColor(
-        bytes = symbol.encodeToByteString().md5(),
+): () -> ColorScheme {
+    return dynamicColor(
+        bytes = remember(symbol) { symbol.encodeToByteString().md5() },
         isDark = isDark,
     )
 }

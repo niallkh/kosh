@@ -1,73 +1,43 @@
 package kosh.presentation.token
 
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.Immutable
-import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableIntStateOf
-import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.Stable
 import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
-import arrow.core.raise.recover
 import kosh.domain.failure.Web3Failure
-import kosh.domain.models.Address
-import kosh.domain.models.Uri
 import kosh.domain.models.token.TokenMetadata
 import kosh.domain.serializers.ImmutableList
 import kosh.domain.usecases.token.TokenDiscoveryService
 import kosh.presentation.core.di
-import kosh.presentation.di.rememberRetained
-import kotlinx.collections.immutable.mutate
+import kosh.presentation.rememberLoad
 import kotlinx.collections.immutable.persistentListOf
 import kotlinx.collections.immutable.toPersistentList
 
 @Composable
 fun rememberSearchToken(
     query: String,
-    icon: Pair<Address, Uri>? = null,
     tokenDiscoveryService: TokenDiscoveryService = di { domain.tokenDiscoveryService },
 ): SearchTokenState {
-    var tokens by rememberRetained { mutableStateOf(persistentListOf<TokenMetadata>()) }
-    var loading by remember { mutableStateOf(false) }
-    var failure by remember { mutableStateOf<Web3Failure?>(null) }
-    var retry by remember { mutableIntStateOf(0) }
-
-    LaunchedEffect(retry, query) {
-        loading = true
-
-        recover({
-            tokens = tokenDiscoveryService.searchToken(query).bind().toPersistentList()
-
-            loading = false
-        }) {
-            failure = it
-            loading = false
-        }
+    val tokens = rememberLoad(query) {
+        tokenDiscoveryService.searchToken(query).bind().toPersistentList()
     }
 
-    LaunchedEffect(icon, tokens) {
-        if (tokens.size == 1
-            && tokens.first().address == icon?.first
-            && tokens.first().icon != icon.second
-        ) {
-            tokens = tokens.toPersistentList().mutate {
-                it[0] = it[0].copy(icon = icon.second)
+    return remember {
+        object : SearchTokenState {
+            override val tokens: ImmutableList<TokenMetadata>
+                get() = tokens.result ?: persistentListOf()
+            override val loading: Boolean get() = tokens.loading
+            override val failure: Web3Failure? get() = tokens.failure
+            override fun retry() {
+                tokens.retry()
             }
         }
     }
-
-    return SearchTokenState(
-        tokens = tokens,
-        loading = loading,
-        failure = failure,
-        retry = { retry++ }
-    )
 }
 
-@Immutable
-data class SearchTokenState(
-    val tokens: ImmutableList<TokenMetadata>,
-    val loading: Boolean,
-    val failure: Web3Failure?,
-    val retry: () -> Unit,
-)
+@Stable
+interface SearchTokenState {
+    val tokens: ImmutableList<TokenMetadata>
+    val loading: Boolean
+    val failure: Web3Failure?
+    fun retry()
+}

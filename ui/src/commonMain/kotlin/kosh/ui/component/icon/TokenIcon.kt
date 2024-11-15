@@ -61,8 +61,8 @@ private fun TokenIcon(
 
         rememberSymbolIconPainter(
             symbol = symbol,
-            color = colorScheme.primary,
-            containerColor = colorScheme.secondaryContainer,
+            color = colorScheme().primary,
+            containerColor = colorScheme().secondaryContainer,
         )
     }
 

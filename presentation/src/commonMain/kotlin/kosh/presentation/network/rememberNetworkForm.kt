@@ -21,8 +21,8 @@ import kosh.domain.usecases.network.rpcProviderValidator
 import kosh.domain.usecases.network.writeProviderValidator
 import kosh.domain.usecases.token.tokenNameValidator
 import kosh.domain.usecases.token.tokenSymbolValidator
-import kosh.presentation.component.textfield.TextFieldState
-import kosh.presentation.component.textfield.rememberTextField
+import kosh.presentation.component.textfield.TextFieldValidatedState
+import kosh.presentation.component.textfield.rememberTextFieldValidated
 import kosh.presentation.core.di
 import kosh.presentation.token.rememberNativeToken
 
@@ -34,32 +34,34 @@ fun rememberNetworkForm(
     val network = id?.let { rememberNetwork(it) }
     val token = network?.entity?.chainId?.let { rememberNativeToken(it) }
 
-    val networkNameTextField = rememberTextField(network?.entity?.name) {
+    val networkNameTextField = rememberTextFieldValidated(network?.entity?.name) {
         networkNameValidator(it)
     }
-    val tokenIconTextField = rememberTextField(token?.entity?.icon?.toString()) {
+    val tokenIconTextField = rememberTextFieldValidated(token?.entity?.icon?.toString()) {
         iconValidator(it)
     }
-    val networkIconTextField = rememberTextField(network?.entity?.icon?.toString()) {
+    val networkIconTextField = rememberTextFieldValidated(network?.entity?.icon?.toString()) {
         iconValidator(it)
     }
     val explorer = network?.entity?.explorers?.firstOrNull()
-    val explorerTextField = rememberTextField(explorer?.toString()) {
+    val explorerTextField = rememberTextFieldValidated(explorer?.toString()) {
         explorerValidator(it)
     }
-    val tokenSymbolTextField = rememberTextField(token?.entity?.symbol) {
+    val tokenSymbolTextField = rememberTextFieldValidated(token?.entity?.symbol) {
         tokenSymbolValidator(it)
     }
-    val tokenNameTextField = rememberTextField(token?.entity?.name) {
+    val tokenNameTextField = rememberTextFieldValidated(token?.entity?.name) {
         tokenNameValidator(it)
     }
-    val chainIdTextField = rememberTextField(network?.entity?.chainId?.value?.toString()) {
+    val chainIdTextField = rememberTextFieldValidated(network?.entity?.chainId?.value?.toString()) {
         chainIdValidator(it)
     }
-    val writeRpcTextField = rememberTextField(network?.entity?.writeRpcProvider?.toString()) {
+    val writeRpcTextField =
+        rememberTextFieldValidated(network?.entity?.writeRpcProvider?.toString()) {
         writeProviderValidator(it)
     }
-    val readRpcTextField = rememberTextField(network?.entity?.readRpcProvider?.toString()) {
+    val readRpcTextField =
+        rememberTextFieldValidated(network?.entity?.readRpcProvider?.toString()) {
         rpcProviderValidator(it)
     }
 
@@ -138,15 +140,15 @@ fun rememberNetworkForm(
 
 @Immutable
 data class NetworkFormState(
-    val networkNameTextField: TextFieldState<*, *>,
-    val readRpcTextField: TextFieldState<*, *>,
-    val writeRpcTextField: TextFieldState<*, *>,
-    val chainIdTextField: TextFieldState<*, *>,
-    val explorerTextField: TextFieldState<*, *>,
-    val networkIconTextField: TextFieldState<*, *>,
-    val tokenNameTextField: TextFieldState<*, *>,
-    val tokenSymbolTextField: TextFieldState<*, *>,
-    val tokenIconTextField: TextFieldState<*, *>,
+    val networkNameTextField: TextFieldValidatedState<*, *>,
+    val readRpcTextField: TextFieldValidatedState<*, *>,
+    val writeRpcTextField: TextFieldValidatedState<*, *>,
+    val chainIdTextField: TextFieldValidatedState<*, *>,
+    val explorerTextField: TextFieldValidatedState<*, *>,
+    val networkIconTextField: TextFieldValidatedState<*, *>,
+    val tokenNameTextField: TextFieldValidatedState<*, *>,
+    val tokenSymbolTextField: TextFieldValidatedState<*, *>,
+    val tokenIconTextField: TextFieldValidatedState<*, *>,
     val saved: Boolean,
     val loading: Boolean,
     val failure: NetworkFailure?,

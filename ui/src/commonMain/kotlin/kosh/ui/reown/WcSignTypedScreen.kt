@@ -84,6 +84,8 @@ fun WcSignTypedScreen(
 
         AppFailureMessage(sendTypedData.failure)
 
+        AppFailureMessage(rejectRequest.failure)
+
         val signing by remember {
             derivedStateOf { sign.signing || sendTypedData.sending }
         }
@@ -102,7 +104,7 @@ fun WcSignTypedScreen(
                     sign(request)
                 }
             },
-            onReject = rejectRequest::reject,
+            onReject = rejectRequest::invoke,
             contentPadding = innerPadding,
             account = account,
             network = network,

@@ -17,11 +17,11 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
-import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.derivedStateOf
+import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.unit.dp
 import kosh.domain.models.Address
 import kosh.domain.models.ChainAddress
@@ -30,7 +30,9 @@ import kosh.domain.models.eip55
 import kosh.domain.models.token.TokenMetadata
 import kosh.domain.models.token.isNft
 import kosh.domain.serializers.ImmutableList
+import kosh.presentation.component.textfield.TextFieldState
 import kosh.presentation.component.textfield.rememberTextField
+import kosh.presentation.token.CreateTokenState
 import kosh.presentation.token.SearchTokenState
 import kosh.presentation.token.rememberCreateToken
 import kosh.presentation.token.rememberSearchToken
@@ -47,11 +49,12 @@ import kosh.ui.failure.AppFailureMessage
 @Composable
 fun SearchTokenScreen(
     address: Address?,
-    query: Pair<TextFieldValue, (TextFieldValue) -> Unit> = rememberTextField(address?.eip55()),
-    searchToken: SearchTokenState = rememberSearchToken(query.first.text),
     onFinish: () -> Unit,
-    onNft: (ChainAddress) -> Unit,
     onNavigateUp: () -> Unit,
+    onNft: (ChainAddress) -> Unit,
+    query: TextFieldState = rememberTextField(address?.eip55()),
+    searchToken: SearchTokenState = rememberSearchToken(query.value.text),
+    createToken: CreateTokenState = rememberCreateToken(onCreated = { onFinish() }),
 ) {
     val snackbarHostState = remember { SnackbarHostState() }
 
@@ -63,14 +66,14 @@ fun SearchTokenScreen(
                 SearchView(
                     modifier = Modifier
                         .windowInsetsPadding(TopAppBarDefaults.windowInsets),
-                    value = query.first,
-                    onValueChange = query.second,
+                    value = query.value,
+                    onValueChange = query::onChange,
                     onUp = onNavigateUp,
                     placeholder = "Enter Token Name or Address",
                     trailingIcon = {
                         PasteClearIcon(
-                            textField = query.first,
-                            onChange = query.second
+                            textField = query.value,
+                            onChange = query::onChange
                         )
                     }
                 )
@@ -83,13 +86,7 @@ fun SearchTokenScreen(
                     .imePadding()
             ) {
 
-                val createToken = rememberCreateToken()
-
                 AppFailureMessage(createToken.failure)
-
-                LaunchedEffect(createToken.created != null) {
-                    createToken.created?.let { onFinish() }
-                }
 
                 searchToken.failure?.let {
                     AppFailureItem(it) {
@@ -108,9 +105,11 @@ fun SearchTokenScreen(
                     )
                 }
 
-                LoadingIndicator(
-                    searchToken.loading || createToken.loading,
-                )
+                val loading by remember {
+                    derivedStateOf { searchToken.loading || createToken.loading }
+                }
+
+                LoadingIndicator(loading)
             }
         }
     }

@@ -9,18 +9,22 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.Text
-import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
+import arrow.core.raise.nullable
 import kosh.domain.models.Uri
 import kosh.domain.models.orZero
 import kosh.domain.models.reown.WcRequest
 import kosh.presentation.wc.AddNetworkRequestState
+import kosh.presentation.wc.AddNetworkState
+import kosh.presentation.wc.RejectRequestState
+import kosh.presentation.wc.rememberAddNetwork
 import kosh.presentation.wc.rememberAddNetworkRequest
+import kosh.presentation.wc.rememberRejectRequest
 import kosh.ui.component.LoadingIndicator
 import kosh.ui.component.button.LoadingButton
+import kosh.ui.component.button.LoadingTextButton
 import kosh.ui.component.button.PrimaryButtons
 import kosh.ui.component.placeholder.placeholder
 import kosh.ui.component.scaffold.KoshScaffold
@@ -37,32 +41,37 @@ fun WcAddNetworkScreen(
     onCancel: () -> Unit,
     onFinish: () -> Unit,
     onNavigateUp: () -> Unit,
+    request: AddNetworkRequestState = rememberAddNetworkRequest(id),
+    addNetwork: AddNetworkState = rememberAddNetwork(id, onFinish),
+    reject: RejectRequestState = rememberRejectRequest(id, onCancel),
 ) {
-    val addNetwork = rememberAddNetworkRequest(id)
-
     KoshScaffold(
         title = { TextLine("Add Network") },
         onNavigateUp = { onNavigateUp() },
     ) { paddingValues ->
-        AppFailureMessage(addNetwork.networkFailure)
 
-        LaunchedEffect(addNetwork.added) {
-            if (addNetwork.added) {
-                onFinish()
-            }
-        }
+        AppFailureMessage(request.failure)
+
+        AppFailureMessage(addNetwork.failure)
 
         WcAddNetworkContent(
-            addNetwork = addNetwork,
-            onReject = {
-                addNetwork.reject()
-                onCancel()
+            addNetwork = request,
+            rejecting = reject.rejecting,
+            adding = addNetwork.adding,
+            onReject = reject::invoke,
+            onAdd = {
+                nullable {
+                    addNetwork(
+                        ensureNotNull(request.request).sessionTopic,
+                        ensureNotNull(request.call)
+                    )
+                }
             },
             contentPadding = paddingValues
         )
 
         LoadingIndicator(
-            addNetwork.loading,
+            request.loading,
             Modifier.padding(paddingValues),
         )
     }
@@ -71,6 +80,9 @@ fun WcAddNetworkScreen(
 @Composable
 fun WcAddNetworkContent(
     addNetwork: AddNetworkRequestState,
+    adding: Boolean,
+    rejecting: Boolean,
+    onAdd: () -> Unit,
     onReject: () -> Unit,
     contentPadding: PaddingValues = PaddingValues(),
 ) {
@@ -158,14 +170,12 @@ fun WcAddNetworkContent(
         PrimaryButtons(
             modifier = Modifier.fillMaxWidth(),
             cancel = {
-                TextButton(onClick = onReject) {
+                LoadingTextButton(rejecting, onReject) {
                     Text("Reject")
                 }
             },
             confirm = {
-                LoadingButton(addNetwork.adding, onClick = {
-                    addNetwork.add()
-                }) {
+                LoadingButton(adding, onAdd) {
                     Text("Add")
                 }
             }

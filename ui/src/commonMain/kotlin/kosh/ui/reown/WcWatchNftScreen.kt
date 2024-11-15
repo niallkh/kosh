@@ -5,6 +5,7 @@ import kosh.domain.models.ChainAddress
 import kosh.domain.models.reown.WcRequest
 import kosh.domain.serializers.BigInteger
 import kosh.presentation.component.textfield.rememberTextField
+import kosh.presentation.token.rememberCreateNft
 import kosh.presentation.token.rememberSearchNft
 import kosh.presentation.wc.rememberWatchAssetRequest
 import kosh.ui.token.SearchNftScreen
@@ -25,17 +26,23 @@ fun WcWatchNftScreen(
         }
     }
 
+    val createNft = rememberCreateNft(icon, onCreated = {
+        watchAsset.onWatch()
+        onFinish()
+    })
+
     val query = rememberTextField(tokenId?.toString())
 
     SearchNftScreen(
         chainAddress = chainAddress,
         tokenId = tokenId,
         query = query,
-        searchNft = rememberSearchNft(chainAddress, query.first.text, icon),
+        searchNft = rememberSearchNft(chainAddress, query.value.text),
         onFinish = {
             watchAsset.onWatch()
             onFinish()
         },
+        createNft = createNft,
         onNavigateUp = onNavigateUp,
     )
 }

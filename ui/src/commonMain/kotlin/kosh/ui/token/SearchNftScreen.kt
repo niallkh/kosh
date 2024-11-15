@@ -14,19 +14,21 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
-import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.derivedStateOf
+import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.input.KeyboardType
-import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.unit.dp
 import kosh.domain.models.ChainAddress
 import kosh.domain.models.token.NftMetadata
 import kosh.domain.models.token.TokenMetadata
 import kosh.domain.serializers.BigInteger
+import kosh.presentation.component.textfield.TextFieldState
 import kosh.presentation.component.textfield.rememberTextField
 import kosh.presentation.network.rememberNetwork
+import kosh.presentation.token.CreateNftState
 import kosh.presentation.token.SearchNftState
 import kosh.presentation.token.rememberCreateNft
 import kosh.presentation.token.rememberSearchNft
@@ -42,10 +44,11 @@ import kosh.ui.failure.AppFailureMessage
 fun SearchNftScreen(
     chainAddress: ChainAddress,
     tokenId: BigInteger?,
-    query: Pair<TextFieldValue, (TextFieldValue) -> Unit> = rememberTextField(tokenId?.toString()),
-    searchNft: SearchNftState = rememberSearchNft(chainAddress, query.first.text),
     onNavigateUp: () -> Unit,
     onFinish: () -> Unit,
+    query: TextFieldState = rememberTextField(tokenId?.toString()),
+    searchNft: SearchNftState = rememberSearchNft(chainAddress, query.value.text),
+    createNft: CreateNftState = rememberCreateNft(onCreated = { onFinish() }),
 ) {
     val snackbarHostState = remember { SnackbarHostState() }
 
@@ -57,8 +60,8 @@ fun SearchNftScreen(
                 SearchView(
                     modifier = Modifier
                         .windowInsetsPadding(TopAppBarDefaults.windowInsets),
-                    value = query.first,
-                    onValueChange = query.second,
+                    value = query.value,
+                    onValueChange = query::onChange,
                     onUp = onNavigateUp,
                     keyboardOptions = KeyboardOptions(
                         keyboardType = KeyboardType.Number,
@@ -66,8 +69,8 @@ fun SearchNftScreen(
                     placeholder = "Enter Token Id",
                     trailingIcon = {
                         PasteClearIcon(
-                            textField = query.first,
-                            onChange = query.second
+                            textField = query.value,
+                            onChange = query::onChange
                         )
                     }
                 )
@@ -80,13 +83,7 @@ fun SearchNftScreen(
                     .imePadding()
             ) {
 
-                val createNft = rememberCreateNft()
-
                 AppFailureMessage(createNft.failure)
-
-                LaunchedEffect(createNft.created != null) {
-                    createNft.created?.let { onFinish() }
-                }
 
                 searchNft.failure?.let {
                     AppFailureItem(it) {
@@ -104,7 +101,11 @@ fun SearchNftScreen(
                     }
                 }
 
-                LoadingIndicator(searchNft.loading || createNft.loading)
+                val loading by remember {
+                    derivedStateOf { searchNft.loading || createNft.loading }
+                }
+
+                LoadingIndicator(loading)
             }
         }
     }

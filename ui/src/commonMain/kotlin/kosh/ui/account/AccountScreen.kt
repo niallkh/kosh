@@ -28,8 +28,8 @@ import kosh.domain.entities.AccountEntity
 import kosh.domain.usecases.account.accountNameValidator
 import kosh.presentation.account.rememberAccount
 import kosh.presentation.account.rememberUpdateAccount
-import kosh.presentation.component.textfield.TextFieldState
-import kosh.presentation.component.textfield.rememberTextField
+import kosh.presentation.component.textfield.TextFieldValidatedState
+import kosh.presentation.component.textfield.rememberTextFieldValidated
 import kosh.presentation.network.rememberNetworks
 import kosh.presentation.network.rememberOpenExplorer
 import kosh.ui.component.button.LoadingButton
@@ -149,7 +149,7 @@ fun AccountContent(
             )
         }
 
-        val textField = rememberTextField(account?.name) {
+        val textField = rememberTextFieldValidated(account?.name) {
             accountNameValidator(it)
         }
 
@@ -188,7 +188,7 @@ fun AccountContent(
 
 @Composable
 private fun AccountNameTextField(
-    textField: TextFieldState<*, *>,
+    textField: TextFieldValidatedState<*, *>,
     modifier: Modifier = Modifier,
     onDone: () -> Unit,
 ) {

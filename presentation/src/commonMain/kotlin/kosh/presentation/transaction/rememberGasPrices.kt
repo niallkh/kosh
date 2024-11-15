@@ -1,8 +1,8 @@
 package kosh.presentation.transaction
 
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.Immutable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.Stable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
@@ -22,13 +22,13 @@ import kotlin.time.Duration.Companion.seconds
 
 @Composable
 fun rememberGasPrices(
-    chainId: ChainId,
+    chainId: ChainId?,
     active: Boolean = true,
-) = rememberGasPrices(NetworkEntity.Id(chainId), active)
+) = rememberGasPrices(chainId?.let(NetworkEntity.Id::invoke), active)
 
 @Composable
 fun rememberGasPrices(
-    networkId: NetworkEntity.Id,
+    networkId: NetworkEntity.Id?,
     active: Boolean = true,
     gasRepo: GasRepo = di { appRepositoriesComponent.gasRepo },
 ): GasPricesState {
@@ -40,6 +40,7 @@ fun rememberGasPrices(
     if (rememberLifecycleState()) {
         LaunchedEffect(retry, networkId, active) {
             if (!active) return@LaunchedEffect
+            networkId ?: return@LaunchedEffect
 
             while (true) {
                 loading = true
@@ -60,19 +61,23 @@ fun rememberGasPrices(
         }
     }
 
-    return GasPricesState(
-        prices = gasPrices,
-        failure = failure,
-        loading = loading,
-        retry = { retry++ }
-    )
+    return remember {
+        object : GasPricesState {
+            override val prices: GasPrices? get() = gasPrices
+            override val loading: Boolean get() = loading
+            override val failure: Web3Failure? get() = failure
+            override fun retry() {
+                retry++
+            }
+        }
+    }
 }
 
-@Immutable
-data class GasPricesState(
-    val prices: GasPrices?,
-    val loading: Boolean,
-    val failure: Web3Failure?,
-    val retry: () -> Unit,
-)
+@Stable
+interface GasPricesState {
+    val prices: GasPrices?
+    val loading: Boolean
+    val failure: Web3Failure?
+    fun retry()
+}
 

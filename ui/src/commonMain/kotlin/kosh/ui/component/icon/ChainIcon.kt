@@ -51,8 +51,8 @@ internal fun ChainIcon(
 
         rememberSymbolIconPainter(
             symbol = symbol.substringBefore(" ").uppercase(),
-            color = colorScheme.primary,
-            containerColor = colorScheme.secondaryContainer,
+            color = colorScheme().primary,
+            containerColor = colorScheme().secondaryContainer,
         )
     }
 

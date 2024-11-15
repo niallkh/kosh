@@ -12,9 +12,9 @@ import kotlinx.io.bytestring.encodeToByteString
 internal fun uriColor(
     uri: Uri,
     isDark: Boolean,
-): ColorScheme = remember(uri, isDark) {
-    dynamicColor(
-        bytes = uri.toLibUri().host.orEmpty().encodeToByteString().md5(),
+): () -> ColorScheme {
+    return dynamicColor(
+        bytes = remember(uri) { uri.toLibUri().host.orEmpty().encodeToByteString().md5() },
         isDark = isDark,
     )
 }

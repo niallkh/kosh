@@ -104,6 +104,8 @@ fun WcAuthenticationScreen(
             approveAuthentication.send(it.request as SignRequest.SignPersonal, it.signature)
         }
 
+        AppFailureMessage(sign.failure)
+
         AppFailureMessage(approveAuthentication.failure)
 
         AppFailureMessage(rejectAuthentication.failure)

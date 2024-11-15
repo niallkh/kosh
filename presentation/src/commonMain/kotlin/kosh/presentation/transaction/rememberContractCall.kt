@@ -1,6 +1,8 @@
 package kosh.presentation.transaction
 
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.Stable
+import androidx.compose.runtime.remember
 import kosh.domain.failure.Web3Failure
 import kosh.domain.models.Address
 import kosh.domain.models.ByteString
@@ -24,17 +26,23 @@ fun rememberContractCall(
         callDataParserService.parse(chainId, from, to, value, data).bind()
     }
 
-    return ContractCallState(
-        contractCall = parsed.result,
-        loading = parsed.loading,
-        failure = parsed.failure,
-        retry = { parsed.retry() },
-    )
+    return remember {
+        object : ContractCallState {
+            override val contractCall: ContractCall? get() = parsed.result
+            override val loading: Boolean get() = parsed.loading
+            override val failure: Web3Failure? get() = parsed.failure
+
+            override fun retry() {
+                parsed.retry()
+            }
+        }
+    }
 }
 
-data class ContractCallState(
-    val contractCall: ContractCall?,
-    val loading: Boolean,
-    val failure: Web3Failure?,
-    val retry: () -> Unit,
-)
+@Stable
+interface ContractCallState {
+    val contractCall: ContractCall?
+    val loading: Boolean
+    val failure: Web3Failure?
+    fun retry()
+}

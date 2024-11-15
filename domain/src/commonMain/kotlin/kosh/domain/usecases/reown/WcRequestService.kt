@@ -23,9 +23,13 @@ interface WcRequestService {
 
     suspend fun reject2(id: WcRequest.Id): Either<WcFailure, Unit>
 
-    fun onTransactionSend(id: WcRequest.Id, hash: Hash): Job
+    suspend fun onTransactionSend(id: WcRequest.Id, hash: Hash): Either<WcFailure, Unit>
 
-    fun onNetworkAdded(id: WcRequest.Id, sessionTopic: SessionTopic, chainId: ChainId): Job
+    suspend fun onNetworkAdded(
+        id: WcRequest.Id,
+        sessionTopic: SessionTopic,
+        chainId: ChainId,
+    ): Either<WcFailure, Unit>
 
     fun onAssetWatched(id: WcRequest.Id): Job
 

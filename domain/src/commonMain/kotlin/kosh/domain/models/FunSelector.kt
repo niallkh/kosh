@@ -1,7 +1,6 @@
 package kosh.domain.models
 
 import androidx.compose.runtime.Immutable
-import arrow.core.memoize
 import kosh.eth.abi.functionSelector
 import kotlinx.serialization.Serializable
 import kotlin.jvm.JvmInline
@@ -21,7 +20,7 @@ value class FunSelector private constructor(val value: ByteString) {
     }
 
     companion object {
-        private val memo = ::FunSelector.memoize()
+        private val memo = ::FunSelector
 
         private val EMPTY = memo(ByteString(kotlinx.io.bytestring.ByteString(ByteArray(4))))
 

@@ -15,30 +15,41 @@ import androidx.compose.material.icons.filled.Warning
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
-import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.derivedStateOf
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import arrow.core.raise.nullable
 import kosh.domain.models.reown.WcRequest
-import kosh.domain.models.reown.toTransactionData
 import kosh.domain.models.web3.ContractCall
-import kosh.domain.models.web3.Transaction
 import kosh.domain.models.web3.TransactionData
+import kosh.presentation.account.AccountState
 import kosh.presentation.account.rememberAccount
 import kosh.presentation.models.SignRequest
+import kosh.presentation.network.NetworkState
 import kosh.presentation.network.rememberNetwork
+import kosh.presentation.transaction.ContractCallState
+import kosh.presentation.transaction.EstimateGasState
+import kosh.presentation.transaction.GasPricesState
+import kosh.presentation.transaction.GasSpeedState
+import kosh.presentation.transaction.NextNonceState
 import kosh.presentation.transaction.get
 import kosh.presentation.transaction.rememberContractCall
 import kosh.presentation.transaction.rememberEstimateGas
 import kosh.presentation.transaction.rememberGasPrices
 import kosh.presentation.transaction.rememberGasSpeed
 import kosh.presentation.transaction.rememberNextNonce
+import kosh.presentation.wc.RejectRequestState
 import kosh.presentation.wc.SendTransactionRequestState
+import kosh.presentation.wc.WcSendTransactionState
+import kosh.presentation.wc.rememberRejectRequest
 import kosh.presentation.wc.rememberSendTransactionRequest
+import kosh.presentation.wc.rememberWcSendTransaction
 import kosh.ui.component.LoadingIndicator
 import kosh.ui.component.button.LoadingButton
+import kosh.ui.component.button.LoadingTextButton
 import kosh.ui.component.button.PrimaryButtons
 import kosh.ui.component.dapp.DappIcon
 import kosh.ui.component.dapp.DappTitle
@@ -47,7 +58,6 @@ import kosh.ui.component.items.NetworkItem
 import kosh.ui.component.items.VerifyContextItem
 import kosh.ui.component.placeholder.placeholder
 import kosh.ui.component.scaffold.KoshScaffold
-import kosh.ui.component.single.single
 import kosh.ui.component.text.TextNumber
 import kosh.ui.failure.AppFailureItem
 import kosh.ui.failure.AppFailureMessage
@@ -71,57 +81,86 @@ fun WcSendTransactionScreen(
     onFinish: () -> Unit,
     onOpen: (RootRoute) -> Unit,
     onNavigateUp: () -> Unit,
+    request: SendTransactionRequestState = rememberSendTransactionRequest(id),
+    sendTransaction: WcSendTransactionState = rememberWcSendTransaction(id, onFinish),
+    account: AccountState? = request.transaction?.let { rememberAccount(it.from) },
+    network: NetworkState? = request.transaction?.let { rememberNetwork(it.chainId) },
+    rejectRequest: RejectRequestState = rememberRejectRequest(id, onCancel),
+    gasSpeed: GasSpeedState = rememberGasSpeed(),
+    gasPrices: GasPricesState = rememberGasPrices(request.transaction?.chainId),
+    estimateGas: EstimateGasState = rememberEstimateGas(request.transaction),
+    nextNonce: NextNonceState = rememberNextNonce(
+        request.transaction?.chainId,
+        request.transaction?.from
+    ),
+    contractCall: ContractCallState? = request.transaction?.let {
+        rememberContractCall(it.chainId, it.from, it.to, it.value, it.input)
+    },
 ) {
-    val sendTransaction = rememberSendTransactionRequest(id)
-
     KoshScaffold(
         title = {
-            if (sendTransaction.failure == null) {
-                DappTitle(sendTransaction.request?.dapp)
+            if (request.failure == null) {
+                DappTitle(request.request?.dapp)
             }
         },
         onNavigateUp = onNavigateUp,
-
         actions = {
-            if (sendTransaction.failure == null) {
-                DappIcon(sendTransaction.request?.dapp)
+            if (request.failure == null) {
+                DappIcon(request.request?.dapp)
             }
             Spacer(Modifier.width(8.dp))
         }
     ) { paddingValues ->
 
-        val sign = SignContent(TODO())
-
-        LaunchedEffect(sign.signedRequest) {
-            sign.signedRequest?.let {
-                sendTransaction.send(it.request as SignRequest.SignTransaction, it.signature)
-            }
+        val sign = SignContent(account?.entity?.walletId) {
+            sendTransaction(it.request as SignRequest.SignTransaction, it.signature)
         }
 
-        LaunchedEffect(sendTransaction.sent) {
-            if (sendTransaction.sent) {
-                onFinish()
-            }
-        }
+        AppFailureMessage(sign.failure)
+        AppFailureMessage(rejectRequest.failure)
+        AppFailureMessage(sendTransaction.failure)
 
-        AppFailureMessage(sendTransaction.txFailure) {
-            sendTransaction.retry()
+        val signing by remember {
+            derivedStateOf { sign.signing || sendTransaction.sending }
         }
 
         WcSendTransactionContent(
-            sendTransaction = sendTransaction,
-            signing = sign.signing,
-            onReject = {
-                sendTransaction.reject()
-                onCancel()
+            request = request,
+            gasPrices = gasPrices,
+            nextNonce = nextNonce,
+            estimateGas = estimateGas,
+            gasSpeed = gasSpeed,
+            signing = signing,
+            account = account,
+            network = network,
+            contractCall = contractCall,
+            rejecting = rejectRequest.rejecting,
+            onReject = rejectRequest::invoke,
+            onSign = {
+                nullable {
+                    val gasPrice = gasPrices.prices?.get(gasSpeed.speed)
+
+                    val data = TransactionData(
+                        tx = ensureNotNull(request.transaction),
+                        gasPrice = ensureNotNull(gasPrice),
+                        gasLimit = ensureNotNull(estimateGas.estimation?.gas),
+                        nonce = ensureNotNull(nextNonce.nonce),
+                    )
+
+                    val signTransaction = SignRequest.SignTransaction(
+                        data = data,
+                        dapp = ensureNotNull(request.request?.dapp),
+                    )
+
+                    sign(signTransaction)
+                }
             },
-            onSign = { sign(it) },
-            contentPadding = paddingValues,
             onOpen = onOpen,
+            contentPadding = paddingValues,
         )
 
         LoadingIndicator(
-            sendTransaction.loading,
+            request.loading,
             Modifier.padding(paddingValues),
         )
     }
@@ -129,9 +168,17 @@ fun WcSendTransactionScreen(
 
 @Composable
 fun WcSendTransactionContent(
-    sendTransaction: SendTransactionRequestState,
+    request: SendTransactionRequestState,
+    gasSpeed: GasSpeedState,
+    gasPrices: GasPricesState,
+    estimateGas: EstimateGasState,
+    nextNonce: NextNonceState,
+    account: AccountState?,
+    network: NetworkState?,
+    contractCall: ContractCallState?,
     signing: Boolean,
-    onSign: (SignRequest.SignTransaction) -> Unit,
+    rejecting: Boolean,
+    onSign: () -> Unit,
     onReject: () -> Unit,
     onOpen: (RootRoute) -> Unit,
     contentPadding: PaddingValues = PaddingValues(),
@@ -141,41 +188,21 @@ fun WcSendTransactionContent(
             .verticalScroll(rememberScrollState())
             .padding(contentPadding),
     ) {
-        sendTransaction.failure?.let {
-            AppFailureItem(it) { sendTransaction.retry() }
+        request.failure?.let {
+            AppFailureItem(it) { request.retry() }
         } ?: run {
             Column(
                 verticalArrangement = Arrangement.spacedBy(16.dp)
             ) {
-                val transaction = sendTransaction.call?.toTransactionData()
-                val nonce = transaction?.let { rememberNextNonce(it.chainId, it.from) }
-
-                sendTransaction.request?.let {
+                request.request?.let {
                     VerifyContextItem(it.verifyContext)
                 }
 
                 Column {
-                    val network = sendTransaction.call?.chainId?.let { rememberNetwork(it) }
-
                     NetworkItem(network?.entity)
 
-                    val account = sendTransaction.call?.from?.let { rememberAccount(it) }
-
                     AccountItem(account?.entity) {
-                        Row {
-                            Text("nonce: ")
-                            nonce?.failure?.let {
-                                Icon(
-                                    imageVector = Icons.Default.Warning,
-                                    contentDescription = null,
-                                    tint = MaterialTheme.colorScheme.error
-                                )
-                            } ?: TextNumber(
-                                nonce?.nonce ?: 0u,
-                                Modifier.placeholder(nonce?.nonce == null)
-                            )
-                            AppFailureMessage(nonce?.failure) { nonce?.retry?.invoke() }
-                        }
+                        TextNonce(nextNonce)
                     }
                 }
 
@@ -183,55 +210,29 @@ fun WcSendTransactionContent(
                     verticalArrangement = Arrangement.spacedBy(16.dp)
                 ) {
                     TransactionCall(
-                        data = transaction,
+                        contractCall = contractCall,
                         onOpen = onOpen,
                         modifier = Modifier.padding(horizontal = 16.dp),
                     )
 
-                    val gasSpeed = rememberGasSpeed()
-                    val gasPrices = transaction?.chainId?.let {
-                        rememberGasPrices(
-                            chainId = it,
-                            active = !signing,
-                        )
-                    }
-                    val gasEstimation = transaction?.let { rememberEstimateGas(transaction) }
-
                     NetworkFeesCard(
                         modifier = Modifier.padding(horizontal = 16.dp),
-                        transaction = transaction,
+                        transaction = request.transaction,
                         gasSpeed = gasSpeed,
                         gasPrices = gasPrices,
-                        gasEstimation = gasEstimation,
+                        gasEstimation = estimateGas,
                     )
 
                     PrimaryButtons(
                         modifier = Modifier.padding(horizontal = 16.dp),
-                        confirm = {
-                            LoadingButton(
-                                text = { Text(stringResource(Res.string.wc_sign_tx_send_btn)) },
-                                loading = signing,
-                                onClick = {
-                                    nullable {
-                                        val gasPrice = gasPrices?.prices?.get(gasSpeed.speed)
-                                        val data = TransactionData(
-                                            tx = ensureNotNull(transaction),
-                                            gasPrice = ensureNotNull(gasPrice),
-                                            gasLimit = ensureNotNull(gasEstimation?.estimation?.gas),
-                                            nonce = ensureNotNull(nonce?.nonce),
-                                        )
-                                        val signTransaction = SignRequest.SignTransaction(
-                                            data = data,
-                                            dapp = ensureNotNull(sendTransaction.request?.dapp),
-                                        )
-                                        onSign(signTransaction)
-                                    }
-                                }
-                            )
-                        },
                         cancel = {
-                            TextButton(onReject.single()) {
+                            LoadingTextButton(rejecting, onReject) {
                                 Text(stringResource(Res.string.wc_request_reject_btn))
+                            }
+                        },
+                        confirm = {
+                            LoadingButton(signing, onSign) {
+                                Text(stringResource(Res.string.wc_sign_tx_send_btn))
                             }
                         }
                     )
@@ -244,15 +245,33 @@ fun WcSendTransactionContent(
 }
 
 @Composable
+private fun TextNonce(
+    nextNonce: NextNonceState,
+) {
+    AppFailureMessage(nextNonce.failure) { nextNonce.retry() }
+
+    Row {
+        Text("nonce: ")
+
+        nextNonce.failure?.let {
+            Icon(
+                imageVector = Icons.Default.Warning,
+                contentDescription = null,
+                tint = MaterialTheme.colorScheme.error
+            )
+        } ?: TextNumber(
+            nextNonce.nonce ?: 0u,
+            Modifier.placeholder(nextNonce.nonce == null)
+        )
+    }
+}
+
+@Composable
 fun TransactionCall(
-    data: Transaction?,
+    contractCall: ContractCallState?,
     onOpen: (RootRoute) -> Unit,
     modifier: Modifier = Modifier,
 ) {
-    val contractCall = data?.let {
-        rememberContractCall(it.chainId, it.from, it.to, it.value, it.input)
-    }
-
     contractCall?.failure?.let {
         AppFailureItem(it) { contractCall.retry() }
     } ?: run {

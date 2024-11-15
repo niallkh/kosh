@@ -1,7 +1,6 @@
 package kosh.domain.entities
 
 import androidx.compose.runtime.Immutable
-import arrow.core.memoize
 import arrow.optics.optics
 import kosh.domain.models.Address
 import kosh.domain.models.eip55
@@ -36,7 +35,7 @@ data class WalletEntity(
     value class Id private constructor(val value: Uuid) {
 
         companion object {
-            private val memo = ::Id.memoize()
+            private val memo = ::Id
 
             object Serializer :
                 KSerializer<Id> by serializer(UuidSerializer, { it.value }, { memo(it) })

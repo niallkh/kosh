@@ -23,7 +23,7 @@ fun rememberRejectRequest(
         object : RejectRequestState {
             override val rejecting: Boolean get() = reject.inProgress
             override val failure: WcFailure? get() = reject.failure
-            override fun reject() = reject(Unit)
+            override operator fun invoke() = reject(Unit)
         }
     }
 }
@@ -32,5 +32,5 @@ fun rememberRejectRequest(
 interface RejectRequestState {
     val rejecting: Boolean
     val failure: WcFailure?
-    fun reject()
+    operator fun invoke()
 }

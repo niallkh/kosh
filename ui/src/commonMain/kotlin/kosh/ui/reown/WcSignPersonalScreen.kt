@@ -78,6 +78,8 @@ fun WcSignPersonalScreen(
 
         AppFailureMessage(sign.failure)
 
+        AppFailureMessage(sendPersonalMessage.failure)
+
         val signing by remember {
             derivedStateOf { sign.signing || sendPersonalMessage.sending }
         }
@@ -99,7 +101,7 @@ fun WcSignPersonalScreen(
                     sign(signRequest)
                 }
             },
-            onReject = rejectRequest::reject,
+            onReject = rejectRequest::invoke,
             contentPadding = paddingValues
         )
 

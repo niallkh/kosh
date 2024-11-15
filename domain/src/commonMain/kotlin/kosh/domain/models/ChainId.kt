@@ -1,7 +1,6 @@
 package kosh.domain.models
 
 import androidx.compose.runtime.Immutable
-import arrow.core.memoize
 import kotlinx.serialization.Serializable
 import kotlin.jvm.JvmInline
 
@@ -14,7 +13,7 @@ value class ChainId private constructor(val value: ULong) {
     override fun toString(): String = value.toString()
 
     companion object {
-        private val memo = ::ChainId.memoize()
+        private val memo = ::ChainId
 
         operator fun invoke(id: ULong) = memo(id)
 

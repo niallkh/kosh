@@ -29,8 +29,8 @@ import kosh.domain.failure.WcFailure
 import kosh.domain.models.reown.PairingUri
 import kosh.domain.models.reown.WcAuthentication
 import kosh.domain.models.reown.WcSessionProposal
-import kosh.presentation.component.textfield.TextFieldState
-import kosh.presentation.component.textfield.rememberTextField
+import kosh.presentation.component.textfield.TextFieldValidatedState
+import kosh.presentation.component.textfield.rememberTextFieldValidated
 import kosh.presentation.wc.PairState
 import kosh.presentation.wc.rememberPair
 import kosh.ui.component.button.LoadingButton
@@ -57,7 +57,7 @@ fun WcPairScreen(
 ) {
     val pair = rememberPair(initial)
 
-    val textField = rememberTextField(initial?.value ?: "", initial != null) {
+    val textField = rememberTextFieldValidated(initial?.value ?: "", initial != null) {
         PairingUri(it).toEitherNel()
     }
 
@@ -93,7 +93,7 @@ fun WcPairScreen(
 @Composable
 fun WcPairContent(
     pair: PairState,
-    textField: TextFieldState<PairingUri, WcFailure>,
+    textField: TextFieldValidatedState<PairingUri, WcFailure>,
     onCancel: () -> Unit,
     modifier: Modifier = Modifier,
     contentPadding: PaddingValues = PaddingValues(),

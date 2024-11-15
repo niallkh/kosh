@@ -14,8 +14,6 @@ import kosh.app.di.AppScope
 import kosh.app.di.IosAppScope
 import kosh.presentation.core.LocalPresentationContext
 import kosh.presentation.core.PresentationContext
-import kosh.ui.component.path.LocalReferenceResolver
-import kosh.ui.component.path.ReferenceResolver
 import platform.Foundation.NSURL.Companion.URLWithString
 import platform.UIKit.UIApplication
 import platform.UIKit.UIViewController
@@ -24,7 +22,7 @@ public fun rootViewController(
     appScope: AppScope,
     presentationContext: PresentationContext,
 ): UIViewController {
-    val pathResolver = ReferenceResolver { appScope.appRepositoriesComponent.fileRepo.read(it) }
+
     requestNotificationPermission()
     val pushNotifier = (appScope as IosAppScope).iosPushNotifier
 
@@ -32,7 +30,6 @@ public fun rootViewController(
         CompositionLocalProvider(
             LocalPresentationContext provides presentationContext,
             LocalImageLoader provides appScope.imageComponent.imageLoader,
-            LocalReferenceResolver provides pathResolver,
         ) {
 
             PredictiveBackGestureOverlay(

@@ -33,7 +33,7 @@ import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
 import kosh.domain.entities.NetworkEntity
-import kosh.presentation.component.textfield.TextFieldState
+import kosh.presentation.component.textfield.TextFieldValidatedState
 import kosh.presentation.network.NetworkFormState
 import kosh.presentation.network.NetworkState
 import kosh.presentation.network.rememberNetwork
@@ -245,7 +245,7 @@ fun NetworkContent(
 @Composable
 fun NetworkTextFiled(
     modifier: Modifier = Modifier,
-    textField: TextFieldState<*, *>,
+    textField: TextFieldValidatedState<*, *>,
     readOnly: Boolean = false,
     keyboardType: KeyboardType = KeyboardType.Text,
     label: @Composable () -> Unit,

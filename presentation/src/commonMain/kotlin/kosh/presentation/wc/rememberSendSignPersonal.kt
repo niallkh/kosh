@@ -19,10 +19,12 @@ fun rememberSendPersonalMessage(
     onSent: () -> Unit = {},
     requestService: WcRequestService = di { domain.wcRequestService },
 ): SendPersonalMessageState {
-    val sendSignPersonal =
-        rememberEitherEffect(id, onFinish = { onSent() }) { signature: Signature ->
-            requestService.onPersonalSigned2(id, signature).bind()
-        }
+    val sendSignPersonal = rememberEitherEffect(
+        id,
+        onFinish = { onSent() }
+    ) { signature: Signature ->
+        requestService.onPersonalSigned2(id, signature).bind()
+    }
 
     val addSignPersonal = rememberAddSignPersonal(
         onAdded = { sendSignPersonal(it) }

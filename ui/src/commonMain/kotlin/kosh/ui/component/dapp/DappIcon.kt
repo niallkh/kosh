@@ -105,11 +105,12 @@ private fun DappIcon(
 
         val painter = rememberVectorPainter(DappUnknown)
 
-        remember(colorScheme, painter) {
+        val scheme = colorScheme()
+        remember(scheme, painter) {
             IconPainter(
                 icon = painter,
-                containerColor = colorScheme.secondaryContainer,
-                color = colorScheme.primary,
+                containerColor = scheme.secondaryContainer,
+                color = scheme.primary,
             )
         }
     }

@@ -27,7 +27,6 @@ inline fun <reified T : Any> Reference<T>.resolve(
 inline fun Reference<ByteString>.resolve(
     referenceRepo: ReferenceRepo = di { appRepositoriesComponent.referenceRepo },
 ): ByteString? {
-
     return rememberLoad(this) {
         withContext(Dispatchers.Default) {
             referenceRepo.get(this@resolve).right().bind()

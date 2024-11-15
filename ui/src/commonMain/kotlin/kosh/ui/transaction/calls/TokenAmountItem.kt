@@ -33,6 +33,35 @@ import kosh.ui.navigation.routes.RootRoute
 
 @Composable
 fun TokenAmountItem(
+    tokenEntity: TokenEntity?,
+    amount: BigInteger?,
+    modifier: Modifier = Modifier,
+    overlineContent: @Composable (() -> Unit)? = null,
+) {
+    ListItem(
+        modifier = modifier,
+        leadingContent = {
+            TokenIcon(
+                token = tokenEntity,
+                modifier = modifier
+                    .size(40.dp),
+            )
+        },
+        headlineContent = {
+            TextLine(tokenEntity?.name)
+        },
+        trailingContent = {
+            TextAmount(
+                token = tokenEntity,
+                amount = amount,
+            )
+        },
+        overlineContent = overlineContent,
+    )
+}
+
+@Composable
+fun TokenAmountItem(
     chainId: ChainId,
     token: Address,
     amount: BigInteger,
@@ -45,7 +74,7 @@ fun TokenAmountItem(
     var menuVisible by rememberSaveable { mutableStateOf(false) }
 
     val supportingText: @Composable (() -> Unit)? = tokenId?.let {
-        { TextNumber(it, prefix = "#: ") }
+        { TextNumber(it, prefix = "id: ") }
     }
 
     ListItem(
@@ -104,33 +133,4 @@ fun TokenAmountItem(
             )
         }
     }
-}
-
-@Composable
-fun TokenAmountItem(
-    tokenEntity: TokenEntity?,
-    amount: BigInteger?,
-    modifier: Modifier = Modifier,
-    overlineContent: @Composable (() -> Unit)? = null,
-) {
-    ListItem(
-        modifier = modifier,
-        leadingContent = {
-            TokenIcon(
-                token = tokenEntity,
-                modifier = modifier
-                    .size(40.dp),
-            )
-        },
-        headlineContent = {
-            TextLine(tokenEntity?.name)
-        },
-        trailingContent = {
-            TextAmount(
-                token = tokenEntity,
-                amount = amount,
-            )
-        },
-        overlineContent = overlineContent,
-    )
 }

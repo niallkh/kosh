@@ -112,7 +112,7 @@ data class WcRequest(
 }
 
 
-fun WcRequest.Call.SendTransaction.toTransactionData() = Transaction(
+fun WcRequest.Call.SendTransaction.toTransaction() = Transaction(
     chainId = chainId,
     from = from,
     to = to,

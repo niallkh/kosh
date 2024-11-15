@@ -3,7 +3,6 @@
 package kosh.domain.models
 
 import androidx.compose.runtime.Immutable
-import arrow.core.memoize
 import kosh.domain.serializers.ByteStringSerializer
 import kosh.domain.serializers.HashSerializer
 import kotlinx.serialization.Serializable
@@ -25,7 +24,7 @@ value class Hash private constructor(val value: ByteString) {
     }
 
     companion object {
-        private val memo = ::Hash.memoize()
+        private val memo = ::Hash
 
         private val EMPTY = memo(ByteString(32))
 

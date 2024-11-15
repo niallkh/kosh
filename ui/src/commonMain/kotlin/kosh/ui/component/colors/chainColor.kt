@@ -11,9 +11,9 @@ import kotlinx.io.Buffer
 internal fun chainColor(
     chainId: ChainId,
     isDark: Boolean,
-): ColorScheme = remember(chainId, isDark) {
-    dynamicColor(
-        bytes = Buffer().apply { writeLong(chainId.value.toLong()) }.md5(),
+): () -> ColorScheme {
+    return dynamicColor(
+        bytes = remember(chainId) { Buffer().apply { writeLong(chainId.value.toLong()) }.md5() },
         isDark = isDark,
     )
 }

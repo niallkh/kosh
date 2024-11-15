@@ -39,7 +39,6 @@ kotlin {
             implementation(libs.kotlinx.io)
             implementation(libs.kotlinx.coroutines)
             implementation(libs.kotlinx.collections.immutable)
-            implementation(libs.uuid)
             implementation(libs.arrow)
             implementation(libs.arrow.fx)
             implementation(libs.arrow.resilience)
