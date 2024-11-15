@@ -1,6 +1,5 @@
 package kosh.data.web3
 
-import arrow.core.raise.either
 import co.touchlab.kermit.Logger
 import com.ionspin.kotlin.bignum.integer.toBigInteger
 import kosh.domain.entities.NetworkEntity
@@ -36,16 +35,14 @@ class DefaultGasRepo(
     override suspend fun gasPrices(
         id: NetworkEntity.Id,
     ): Either<Web3Failure, GasPrices> = withContext(Dispatchers.Default) {
-        either {
+        Either.catch {
             val web3 = web3ProviderFactory(networkService.getRpc(id).toLibUri())
 
-            val feeHistory = web3.catch(logger) {
-                web3.feeHistory(
-                    blockCount = 5u,
-                    newestBlock = Web3Provider.BlockTag.Latest,
-                    rewardPercentiles = listOf(5u, 30u, 80u)
-                )
-            }.bind()
+            val feeHistory = web3.feeHistory(
+                blockCount = 5u,
+                newestBlock = Web3Provider.BlockTag.Latest,
+                rewardPercentiles = listOf(5u, 30u, 80u)
+            )
 
             val full = feeHistory.gasUsedRatio.all { it > 0.5 }
 
@@ -81,7 +78,7 @@ class DefaultGasRepo(
                     priority = fast,
                 )
             )
-        }
+        }.mapToWeb3Failure(logger)
     }
 
     override suspend fun estimate(
@@ -92,23 +89,21 @@ class DefaultGasRepo(
         data: ByteString?,
         gas: ULong?,
     ): Either<Web3Failure, GasEstimation> = withContext(Dispatchers.Default) {
-        either {
+        Either.catch {
             val web3 = web3ProviderFactory(getRpcProvidersUC(chainId).toLibUri())
 
-            val estimated = web3.catch(logger) {
-                web3.estimateGas(
-                    sender = from.bytes().abi.address,
-                    target = to?.bytes()?.abi?.address,
-                    data = data?.bytes() ?: kotlinx.io.bytestring.ByteString(),
-                    value = value,
-                    gas = gas?.toBigInteger(),
-                )
-            }.bind()
+            val estimated = web3.estimateGas(
+                sender = from.bytes().abi.address,
+                target = to?.bytes()?.abi?.address,
+                data = data?.bytes() ?: kotlinx.io.bytestring.ByteString(),
+                value = value,
+                gas = gas?.toBigInteger(),
+            )
 
             GasEstimation(
                 estimated = estimated,
                 gas = gas ?: estimated,
             )
-        }
+        }.mapToWeb3Failure(logger)
     }
 }

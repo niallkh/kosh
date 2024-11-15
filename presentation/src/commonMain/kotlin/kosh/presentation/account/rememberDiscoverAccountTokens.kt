@@ -22,7 +22,7 @@ fun rememberDiscoverAccountTokens(
     return remember {
         object : DiscoverAccountTokensState {
             override val discovering: Boolean get() = discovery.inProgress
-            override val errors: Nel<Web3Failure>? get() = discovery.failure
+            override val errors: Nel<Web3Failure>? get() = discovery.failure?.takeIf { !discovery.both }
             override fun discover() = discovery(Unit)
         }
     }

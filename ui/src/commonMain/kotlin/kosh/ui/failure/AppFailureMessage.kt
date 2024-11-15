@@ -36,7 +36,7 @@ fun <T : AppFailure> AppFailureMessage(
                 message = failure.message,
                 actionLabel = "Retry".takeIf { retryAble },
                 duration = if (retryAble) SnackbarDuration.Indefinite else SnackbarDuration.Long,
-                withDismissAction = retryAble,
+                withDismissAction = true,
             )
 
             when (result) {

@@ -9,11 +9,11 @@ import arrow.core.raise.either
 
 @Composable
 fun <F, R, P> rememberEitherEffect(
-    vararg keys: Any?,
+    vararg inputs: Any?,
     onFinish: (R) -> Unit = {},
     effect: @DisallowComposableCalls suspend Raise<F>.(P) -> R,
 ): EitherEffectState<F, R, P> {
-    val either = rememberEffect(*keys, onFinish = { it.onRight(onFinish) }) { param: P ->
+    val either = rememberEffect(*inputs, onFinish = { it.onRight(onFinish) }) { param: P ->
         either { effect(param) }
     }
 

@@ -2,8 +2,6 @@ package kosh.libs.reown
 
 import android.app.Application
 import android.content.Context
-import arrow.core.continuations.AtomicRef
-import arrow.core.continuations.update
 import co.touchlab.kermit.Logger
 import com.reown.android.Core
 import com.reown.android.CoreClient
@@ -12,6 +10,8 @@ import com.reown.sign.client.Sign
 import com.reown.sign.client.SignClient
 import com.reown.walletkit.client.Wallet
 import com.reown.walletkit.client.WalletKit
+import kotlinx.atomicfu.atomic
+import kotlinx.atomicfu.update
 import kotlinx.collections.immutable.persistentHashMapOf
 import kotlinx.collections.immutable.persistentListOf
 import kotlinx.collections.immutable.plus
@@ -39,23 +39,21 @@ class AndroidReownAdapter(
     private val context: Context,
     private val applicationScope: CoroutineScope,
 ) : ReownAdapter, WalletKit.WalletDelegate {
-    private val proposalRequestIds = AtomicRef(persistentHashMapOf<String, Long>())
+    private val logger = Logger.withTag("[K]AndroidReownAdapter")
+
+    private val proposalRequestIds = atomic(persistentHashMapOf<String, Long>())
     private val newProposalFlow = MutableSharedFlow<SessionProposal>()
     private val proposalsState = MutableStateFlow<List<SessionProposal>>(listOf())
 
     private val newAuthenticationFlow = MutableSharedFlow<AuthenticationRequest>()
-    private val authenticationsState =
-        MutableStateFlow<List<AuthenticationRequest>>(listOf())
+    private val authenticationsState = MutableStateFlow<List<AuthenticationRequest>>(listOf())
 
     private val newRequestsFlow = MutableSharedFlow<SessionRequest>()
     private val requestsState = MutableStateFlow<List<SessionRequest>>(listOf())
 
     private val sessionsState = MutableStateFlow<List<Session>>(listOf())
 
-    private var pairCont =
-        AtomicRef<CancellableContinuation<ReownResult<Unit>>?>()
-
-    private val logger = Logger.withTag("[K]AndroidReownAdapter")
+    private val pairCont = atomic<CancellableContinuation<ReownResult<Unit>>?>(null)
 
     init {
         proposalsState.subscriptionCount
@@ -241,7 +239,7 @@ class AndroidReownAdapter(
     ): ReownResult<SessionProposal> = WalletKit.getSessionProposals()
         .find { it.pairingTopic == pairingTopic }
         ?.let { proposal ->
-            val requestIds = proposalRequestIds.get()
+            val requestIds = proposalRequestIds.value
             mapProposal(
                 proposal = proposal,
                 context = requestIds[pairingTopic]?.let(WalletKit::getVerifyContext)
@@ -691,7 +689,7 @@ class AndroidReownAdapter(
         val proposalNotFoundMessage =
             "No proposal or pending session authenticate request for pairing topic"
         if (proposalNotFoundMessage in error.throwable.message.orEmpty()) {
-            val continuation = pairCont.get()
+            val continuation = pairCont.value
             if (continuation?.isActive == true) {
                 continuation.resume(
                     ReownResult.Failure(ReownFailure.NotFound(proposalNotFoundMessage))
@@ -703,7 +701,7 @@ class AndroidReownAdapter(
 
     private fun updateProposals() {
         applicationScope.launch {
-            val requestIds = proposalRequestIds.get()
+            val requestIds = proposalRequestIds.value
 
             val proposals = WalletKit.getSessionProposals().map { proposal ->
                 mapProposal(

@@ -14,7 +14,7 @@ internal class DefaultFilesComponent(
     }
 
     override val keyStorePath: () -> Path = {
-        Path(noBackupFilesDir(), "keystore.preferences")
+        Path(noBackupFilesDir(), "keystore.preferences_pb")
     }
 
     override val keyValuePath: () -> Path = {

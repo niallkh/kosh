@@ -24,31 +24,6 @@ inline fun <reified T> rememberSerializable(
 )
 
 @Composable
-inline fun <reified T> rememberSerializable(
-    vararg inputs: Any?,
-    stateSerializer: KSerializer<T> = serializer(),
-    key: String? = null,
-    noinline init: () -> MutableState<T>,
-): MutableState<T> = rememberSaveable(
-    inputs = inputs,
-    stateSaver = remember(stateSerializer) { SerializableSaver(stateSerializer) },
-    key = key,
-    init = init
-)
-
-@Composable
-inline fun <reified T : Any> rememberSerializable(
-    serializer: KSerializer<T> = serializer(),
-    key: String? = null,
-    noinline init: () -> T,
-): T = rememberSaveable(
-    Unit,
-    saver = remember(serializer) { SerializableSaver(serializer) },
-    key = key,
-    init = init,
-)
-
-@Composable
 inline fun <reified T : Any> rememberSerializable(
     vararg inputs: Any?,
     serializer: KSerializer<T> = serializer(),

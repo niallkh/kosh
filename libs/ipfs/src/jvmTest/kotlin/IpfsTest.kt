@@ -7,11 +7,9 @@ import io.ktor.client.plugins.logging.Logger
 import io.ktor.client.plugins.logging.Logging
 import io.ktor.client.request.get
 import io.ktor.client.statement.bodyAsChannel
-import io.ktor.utils.io.ByteReadChannel
-import io.ktor.utils.io.readAvailable
+import io.ktor.utils.io.readBuffer
 import kotlinx.coroutines.runBlocking
-import okio.Buffer
-import okio.BufferedSource
+import kotlinx.io.readByteArray
 import okio.FileSystem
 import okio.Path.Companion.toPath
 import okio.buffer
@@ -52,19 +50,9 @@ class IpfsTest {
                     .bodyAsChannel().readBuffer()
 //            val bufferedSource = httpClient.get("ipfs://QmYwAPJzv5CZsnA625s3Xf2nemtYgPpHdWEz79ojWnPbdG/readme").bodyAsChannel().readBuffer()
             FileSystem.SYSTEM.sink("src/jvmTest/kotlin/ipfs.json".toPath()).buffer().use {
-                it.write(bufferedSource.readByteString())
+                it.write(bufferedSource.readByteArray())
             }
         }
     }
 }
 
-internal suspend fun ByteReadChannel.readBuffer(): BufferedSource {
-    val buffer = Buffer()
-    val buff = ByteArray(8192)
-    while (!isClosedForRead) {
-        val read = readAvailable(buff)
-        if (read == -1) continue
-        buffer.write(buff, 0, read)
-    }
-    return buffer
-}

@@ -10,7 +10,7 @@ public interface NetworkComponent {
     public val httpClient: HttpClient
 }
 
-internal fun grovePlugin(groveKey: String) = createClientPlugin("DRpcPlugin") {
+internal fun grovePlugin(groveKey: String) = createClientPlugin("GrovePlugin") {
     onRequest { request, _ ->
         if (request.url.host.endsWith("rpc.grove.city")) {
             request.headers {

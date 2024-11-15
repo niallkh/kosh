@@ -4,28 +4,12 @@ import arrow.core.Either
 import arrow.core.raise.Raise
 import arrow.core.raise.recover
 import co.touchlab.kermit.Logger
-import io.ktor.client.HttpClient
 import io.ktor.client.network.sockets.ConnectTimeoutException
 import io.ktor.client.network.sockets.SocketTimeoutException
 import io.ktor.client.plugins.HttpRequestTimeoutException
 import io.ktor.client.plugins.ResponseException
 import kosh.domain.failure.Web3Failure
 import kosh.eth.rpc.JsonRpcResponseException
-import kosh.eth.rpc.Web3Provider
-
-inline fun <T> Web3Provider.catch(
-    logger: Logger,
-    block: Web3Provider.() -> T,
-): Either<Web3Failure, T> = Either.catch { block() }.mapLeft { error ->
-    error.mapToWeb3Failure(logger)
-}
-
-inline fun <T> HttpClient.catch(
-    logger: Logger,
-    block: HttpClient.() -> T,
-): Either<Web3Failure, T> = Either.catch { block() }.mapLeft { error ->
-    error.mapToWeb3Failure(logger)
-}
 
 inline fun <T> Raise<Web3Failure>.catchWeb3Failure(
     logger: Logger,
@@ -33,6 +17,9 @@ inline fun <T> Raise<Web3Failure>.catchWeb3Failure(
 ): T = recover(block, { raise(it) }) { error ->
     raise(error.mapToWeb3Failure(logger))
 }
+
+inline fun <T> Either<Throwable, T>.mapToWeb3Failure(logger: Logger) =
+    mapLeft { it.mapToWeb3Failure(logger) }
 
 fun Throwable.mapToWeb3Failure(logger: Logger): Web3Failure {
     logger.w(this) { "Error happened during web3 call" }

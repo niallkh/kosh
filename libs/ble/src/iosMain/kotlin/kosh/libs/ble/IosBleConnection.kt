@@ -10,10 +10,6 @@ import kosh.libs.transport.TransportException.DeviceDisconnectedException
 import kosh.libs.transport.TransportException.ResponseTimeoutException
 import kotlinx.cinterop.ExperimentalForeignApi
 import kotlinx.cinterop.ObjCSignatureOverride
-import kotlinx.cinterop.addressOf
-import kotlinx.cinterop.allocArrayOf
-import kotlinx.cinterop.memScoped
-import kotlinx.cinterop.usePinned
 import kotlinx.coroutines.CompletableDeferred
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.delay
@@ -24,6 +20,8 @@ import kotlinx.coroutines.withContext
 import kotlinx.coroutines.withTimeoutOrNull
 import kotlinx.io.Buffer
 import kotlinx.io.bytestring.ByteString
+import kotlinx.io.bytestring.toByteString
+import kotlinx.io.bytestring.toNSData
 import kotlinx.io.bytestring.unsafe.UnsafeByteStringOperations
 import kotlinx.io.readByteString
 import platform.CoreBluetooth.CBCharacteristic
@@ -32,13 +30,8 @@ import platform.CoreBluetooth.CBPeripheral
 import platform.CoreBluetooth.CBPeripheralDelegateProtocol
 import platform.CoreBluetooth.CBPeripheralStateConnected
 import platform.CoreBluetooth.CBService
-import platform.Foundation.NSData
 import platform.Foundation.NSError
-import platform.Foundation.NSString
-import platform.Foundation.NSUTF8StringEncoding
-import platform.Foundation.create
 import platform.darwin.NSObject
-import platform.posix.memcpy
 import kotlin.coroutines.Continuation
 import kotlin.coroutines.resume
 import kotlin.coroutines.resumeWithException
@@ -108,8 +101,10 @@ class IosBleConnection(
         ) {
             logger.v { "didUpdateValueForCharacteristic: ${didUpdateValueForCharacteristic.UUID.UUIDString}" }
 
-            didUpdateValueForCharacteristic.value?.let {
-                readBuffer.write(it.toByteArray())
+            didUpdateValueForCharacteristic.value?.let { nsData ->
+                UnsafeByteStringOperations.withByteArrayUnsafe(nsData.toByteString()) {
+                    readBuffer.write(it)
+                }
             }
         }
 
@@ -146,13 +141,11 @@ class IosBleConnection(
 
             val characteristic = writeCharacteristic.await()
 
-            UnsafeByteStringOperations.withByteArrayUnsafe(data) {
-                peripheral.writeValue(
-                    data = it.toData(),
-                    forCharacteristic = characteristic,
-                    type = CBCharacteristicWriteWithResponse
-                )
-            }
+            peripheral.writeValue(
+                data = data.toNSData(),
+                forCharacteristic = characteristic,
+                type = CBCharacteristicWriteWithResponse
+            )
 
             withTimeoutOrNull(10.seconds) {
                 suspendCancellableCoroutine<Unit> { cont -> writeCont = cont }
@@ -177,25 +170,4 @@ class IosBleConnection(
     override fun close() {
         logger.v { "close" }
     }
-}
-
-internal fun NSData.string(): String? {
-    return NSString.create(this, NSUTF8StringEncoding) as String?
-}
-
-internal fun NSData.toByteArray(): ByteArray {
-    val data = this
-    val d = memScoped { data }
-    return ByteArray(d.length.toInt()).apply {
-        usePinned {
-            memcpy(it.addressOf(0), d.bytes, d.length)
-        }
-    }
-}
-
-internal fun ByteArray.toData(): NSData = memScoped {
-    NSData.create(
-        bytes = allocArrayOf(this@toData),
-        length = this@toData.size.toULong()
-    )
 }

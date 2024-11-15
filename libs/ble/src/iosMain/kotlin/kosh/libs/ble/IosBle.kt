@@ -1,7 +1,5 @@
 package kosh.libs.ble
 
-import arrow.core.continuations.AtomicRef
-import arrow.core.continuations.update
 import arrow.fx.coroutines.ExitCase
 import arrow.fx.coroutines.Resource
 import arrow.fx.coroutines.resource
@@ -10,6 +8,8 @@ import kosh.libs.transport.Device
 import kosh.libs.transport.Transport
 import kosh.libs.transport.TransportException.ConnectionFailedException
 import kosh.libs.transport.TransportException.TransportDisabledException
+import kotlinx.atomicfu.atomic
+import kotlinx.atomicfu.update
 import kotlinx.collections.immutable.minus
 import kotlinx.collections.immutable.persistentHashSetOf
 import kotlinx.collections.immutable.persistentListOf
@@ -62,7 +62,7 @@ class IosBle : Ble {
     private val enabled = MutableStateFlow(false)
     private val discoveredDevices = MutableStateFlow(persistentSetOf<BleDevice>())
     private val connected = MutableStateFlow(persistentHashSetOf<String>())
-    private val configs = AtomicRef(persistentListOf<BleConfig>())
+    private val configs = atomic(persistentListOf<BleConfig>())
 
     private val callback = object : NSObject(), CBCentralManagerDelegateProtocol {
         override fun centralManagerDidUpdateState(central: CBCentralManager) {
@@ -141,7 +141,7 @@ class IosBle : Ble {
     private fun startScan() {
         logger.v { "startScan()" }
         bleManager.scanForPeripheralsWithServices(
-            serviceUUIDs = configs.get().flatMap { it.serviceUuids }.map { cbUuid(it) },
+            serviceUUIDs = configs.value.flatMap { it.serviceUuids }.map { cbUuid(it) },
             options = mapOf(CBCentralManagerScanOptionAllowDuplicatesKey to false),
         )
     }

@@ -6,14 +6,11 @@ import io.ktor.client.request.get
 import io.ktor.client.statement.bodyAsChannel
 import io.ktor.http.appendPathSegments
 import io.ktor.http.isSuccess
-import io.ktor.utils.io.ByteReadChannel
-import io.ktor.utils.io.readAvailable
+import io.ktor.utils.io.readBuffer
 import kosh.domain.models.Address
 import kosh.domain.models.ChainId
 import kosh.domain.models.account.DerivationPath
 import kosh.domain.models.account.slip44
-import kotlinx.io.Buffer
-import kotlinx.io.Source
 import kotlinx.io.bytestring.ByteString
 import kotlinx.io.bytestring.toHexString
 import kotlinx.io.readByteString
@@ -64,15 +61,4 @@ class TrezorOffChain(
             .readByteString()
         else null
     }
-}
-
-suspend fun ByteReadChannel.readBuffer(): Source {
-    val buffer = Buffer()
-    val buff = ByteArray(4096)
-    while (!isClosedForRead) {
-        val read = readAvailable(buff)
-        if (read == -1) continue
-        buffer.write(buff, 0, read)
-    }
-    return buffer
 }

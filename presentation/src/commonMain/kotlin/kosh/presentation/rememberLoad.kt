@@ -23,7 +23,7 @@ import kotlin.coroutines.CoroutineContext
 
 @Composable
 fun <F, R> rememberLoad(
-    vararg keys: Any?,
+    vararg inputs: Any?,
     load: @DisallowComposableCalls suspend Raise<F>.() -> R,
 ): LoadState<F, R> {
     var inProgress by remember { mutableStateOf(false) }
@@ -32,7 +32,7 @@ fun <F, R> rememberLoad(
 
     val currentLoad by rememberUpdatedState(load)
 
-    val loadLauncher = LoadLauncher(*keys) {
+    val loadLauncher = LoadLauncher(*inputs) {
         inProgress = true
 
         recover({

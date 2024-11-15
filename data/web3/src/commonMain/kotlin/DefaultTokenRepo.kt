@@ -2,8 +2,6 @@
 
 package kosh.data.web3
 
-import arrow.core.raise.Raise
-import arrow.core.raise.either
 import arrow.core.raise.nullable
 import co.touchlab.kermit.Logger
 import io.ktor.client.HttpClient
@@ -12,8 +10,7 @@ import io.ktor.client.request.headers
 import io.ktor.client.statement.bodyAsChannel
 import io.ktor.http.CacheControl
 import io.ktor.http.HttpHeaders
-import io.ktor.utils.io.ByteReadChannel
-import io.ktor.utils.io.readAvailable
+import io.ktor.utils.io.readBuffer
 import kosh.domain.failure.Web3Failure
 import kosh.domain.models.Address
 import kosh.domain.models.ChainId
@@ -41,8 +38,6 @@ import kosh.eth.rpc.Web3ProviderFactory
 import kotlinx.collections.immutable.toImmutableList
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
-import kotlinx.io.Buffer
-import kotlinx.io.Source
 import kotlinx.io.bytestring.hexToByteString
 import kotlinx.io.bytestring.toHexString
 import kotlinx.serialization.ExperimentalSerializationApi
@@ -67,9 +62,9 @@ class DefaultTokenRepo(
         chainId: ChainId,
         address: Address,
     ): Either<Web3Failure, TokenMetadata?> = withContext(Dispatchers.Default) {
-        either {
+        Either.catch {
             nullable {
-                val web3Provider = web3ProviderFactory(getRpcProvidersUC(chainId).toLibUri())
+                val web3 = web3ProviderFactory(getRpcProvidersUC(chainId).toLibUri())
 
                 val abiAddress = address.bytes().abi.address
                 val isErc165 =
@@ -85,18 +80,16 @@ class DefaultTokenRepo(
                 val symbolCall = Erc20Abi.symbol().at(abiAddress)
                 val decimalsCall = Erc20Abi.decimals().at(abiAddress)
 
-                web3Provider.catch(logger) {
-                    web3Provider.multicall(
-                        isErc165,
-                        isInvalidErc165,
-                        isErc20,
-                        isErc721,
-                        isErc1155,
-                        nameCall,
-                        symbolCall,
-                        decimalsCall,
-                    )
-                }.bind()
+                web3.multicall(
+                    isErc165,
+                    isInvalidErc165,
+                    isErc20,
+                    isErc721,
+                    isErc1155,
+                    nameCall,
+                    symbolCall,
+                    decimalsCall,
+                )
 
                 val name = nameCall.result.getOrElse {
                     logger.i(it) { "Invalid token name" }
@@ -127,7 +120,7 @@ class DefaultTokenRepo(
                     icon = null,
                 )
             }
-        }
+        }.mapToWeb3Failure(logger)
     }
 
     override suspend fun getNftMetadata(
@@ -137,9 +130,9 @@ class DefaultTokenRepo(
         type: Type,
         refresh: Boolean,
     ): Either<Web3Failure, NftMetadata?> = withContext(Dispatchers.Default) {
-        either {
+        Either.catch {
             nullable {
-                val web3Provider = web3ProviderFactory(getRpcProvidersUC(chainId).toLibUri())
+                val web3 = web3ProviderFactory(getRpcProvidersUC(chainId).toLibUri())
 
                 val tokenUriCall = when (type) {
                     Type.ERC20 -> error("Erc20 doesn't have nft metadata")
@@ -147,9 +140,7 @@ class DefaultTokenRepo(
                     Type.ERC1155 -> Erc1155Abi.uri(tokenId)
                 }.at(address.bytes().abi.address)
 
-                web3Provider.catch(logger) {
-                    web3Provider.multicall(tokenUriCall)
-                }.bind()
+                web3.multicall(tokenUriCall)
 
                 val tokenUri = tokenUriCall.result.getOrElse {
                     logger.i(it) { "Invalid token uri" }
@@ -188,7 +179,7 @@ class DefaultTokenRepo(
                     description = metadata.description,
                 )
             }
-        }
+        }.mapToWeb3Failure(logger)
     }
 
     override suspend fun getNftMetadata(
@@ -196,7 +187,7 @@ class DefaultTokenRepo(
         tokenId: BigInteger,
         refresh: Boolean,
     ): Either<Web3Failure, NftExtendedMetadata?> = withContext(Dispatchers.Default) {
-        either {
+        Either.catch {
             val metadata = getMetadata(uri.toString(), tokenId, refresh)
 
             NftExtendedMetadata(
@@ -212,39 +203,27 @@ class DefaultTokenRepo(
                 }.toImmutableList()
             )
         }
+            .mapToWeb3Failure(logger)
     }
 
-    private suspend fun Raise<Web3Failure>.getMetadata(
+    private suspend fun getMetadata(
         tokenUri: String,
         tokenId: BigInteger,
         refresh: Boolean,
     ): Metadata {
-
-        val response = httpClient.catch(logger) {
-            get(
-                tokenUri
-                    .replace("0x{id}", "0x${tokenId.toString(16)}")
-                    .replace("{id}", tokenId.toString(10))
-            ) {
-                if (refresh) {
-                    headers {
-                        append(HttpHeaders.CacheControl, CacheControl.NoCache(null).toString())
-                    }
+        val response = httpClient.get(
+            tokenUri
+                .replace("0x{id}", "0x${tokenId.toString(16)}")
+                .replace("{id}", tokenId.toString(10))
+        ) {
+            if (refresh) {
+                headers {
+                    append(HttpHeaders.CacheControl, CacheControl.NoCache(null).toString())
                 }
             }
-        }.bind()
+        }
 
         return json.decodeFromSource<Metadata>(response.bodyAsChannel().readBuffer())
     }
 }
 
-internal suspend fun ByteReadChannel.readBuffer(): Source {
-    val buffer = Buffer()
-    val buff = ByteArray(4096)
-    while (!isClosedForRead) {
-        val read = readAvailable(buff)
-        if (read == -1) continue
-        buffer.write(buff, 0, read)
-    }
-    return buffer
-}

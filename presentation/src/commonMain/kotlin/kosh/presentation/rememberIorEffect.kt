@@ -8,11 +8,11 @@ import arrow.core.Ior
 
 @Composable
 fun <F, R, P> rememberIorEffect(
-    vararg keys: Any?,
+    vararg inputs: Any?,
     onFinish: (R) -> Unit = {},
     effect: @DisallowComposableCalls suspend (P) -> Ior<F, R>,
 ): IorEffectState<F, R, P> {
-    val either = rememberEffect(*keys, onFinish = { it.map(onFinish) }) { param: P ->
+    val either = rememberEffect(*inputs, onFinish = { it.map(onFinish) }) { param: P ->
         effect(param)
     }
 

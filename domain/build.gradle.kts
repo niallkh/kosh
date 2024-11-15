@@ -53,6 +53,7 @@ kotlin {
             api(libs.arrow.optics)
             api(libs.bignum)
             api(libs.crypto.md)
+            api(libs.crypto.sha1)
             api(libs.kotlinx.collections.immutable)
 
             api(libs.kotlinx.datetime)

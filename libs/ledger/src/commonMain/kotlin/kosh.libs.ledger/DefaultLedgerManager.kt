@@ -1,6 +1,5 @@
 package kosh.libs.ledger
 
-import arrow.core.partially2
 import arrow.fx.coroutines.Resource
 import arrow.fx.coroutines.resource
 import co.touchlab.kermit.Logger
@@ -21,9 +20,9 @@ class DefaultLedgerManager(
     override val devices: Flow<List<LedgerDevice>>
         get() = combine(
             usb.devices(ledgerUsbConfig)
-                .map { it.map(::mapLedgerDevice.partially2(false)) },
+                .map { it.map { mapLedgerDevice(it, false) } },
             ble.devices(ledgerBleConfig)
-                .map { it.map(::mapLedgerDevice.partially2(true)) },
+                .map { it.map { mapLedgerDevice(it, true) } },
         ) { d1, d2 -> d1 + d2 }
 
     init {

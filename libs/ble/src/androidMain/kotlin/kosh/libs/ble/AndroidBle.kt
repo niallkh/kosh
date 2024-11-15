@@ -24,8 +24,6 @@ import android.os.Build
 import android.os.Handler
 import android.os.HandlerThread
 import android.os.ParcelUuid
-import arrow.core.continuations.AtomicRef
-import arrow.core.continuations.update
 import arrow.fx.coroutines.Resource
 import arrow.fx.coroutines.resource
 import co.touchlab.kermit.Logger
@@ -33,6 +31,8 @@ import kosh.libs.transport.Device
 import kosh.libs.transport.Transport
 import kosh.libs.transport.TransportException.PermissionNotGrantedException
 import kosh.libs.transport.TransportException.TransportDisabledException
+import kotlinx.atomicfu.atomic
+import kotlinx.atomicfu.update
 import kotlinx.collections.immutable.persistentListOf
 import kotlinx.collections.immutable.persistentSetOf
 import kotlinx.collections.immutable.plus
@@ -69,7 +69,7 @@ class AndroidBle(
     private val enabled = MutableStateFlow(
         bluetoothManager.adapter.state == BluetoothAdapter.STATE_ON
     )
-    private val configs = AtomicRef(persistentListOf<BleConfig>())
+    private val configs = atomic(persistentListOf<BleConfig>())
 
     private val scanCallback = object : ScanCallback() {
         override fun onScanResult(callbackType: Int, result: ScanResult) {
@@ -151,7 +151,7 @@ class AndroidBle(
                 .setMatchMode(MATCH_MODE_STICKY)
                 .build()
 
-            val filters = configs.get().flatMap { it.serviceUuids }
+            val filters = configs.value.flatMap { it.serviceUuids }
                 .map { ScanFilter.Builder().setServiceUuid(ParcelUuid(it.toJavaUuid())).build() }
 
             bluetoothManager.adapter.bluetoothLeScanner?.startScan(

@@ -239,7 +239,7 @@ fun WcSendTransactionContent(
                 }
             }
 
-            Spacer(Modifier.height(128.dp))
+            Spacer(Modifier.height(64.dp))
         }
     }
 }

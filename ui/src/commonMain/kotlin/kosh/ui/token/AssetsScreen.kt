@@ -150,7 +150,7 @@ fun AssetsContent(
             )
         }
 
-        item { Spacer(Modifier.height(128.dp)) }
+        item { Spacer(Modifier.height(64.dp)) }
     }
 }
 

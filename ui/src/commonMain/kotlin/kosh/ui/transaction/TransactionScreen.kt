@@ -64,7 +64,6 @@ fun TransactionScreen(
     KoshScaffold(
         title = { DappTitle(transaction.entity?.dapp) },
         onNavigateUp = onNavigateUp,
-
         actions = {
             DappIcon(transaction.entity?.dapp)
 
@@ -99,50 +98,39 @@ fun TransactionScreen(
 
             Spacer(Modifier.width(8.dp))
         }
-    ) { paddingValues ->
+    ) { contentPadding ->
 
-        TransactionContent(
-            transaction = transaction.entity,
-            contentPadding = paddingValues,
-            onOpen = onOpen
-        )
-    }
-}
-
-@Composable
-fun TransactionContent(
-    transaction: TransactionEntity?,
-    onOpen: (RootRoute) -> Unit,
-    contentPadding: PaddingValues = PaddingValues(),
-) {
-    Column(Modifier.padding(contentPadding)) {
-        when (transaction) {
+        when (val tx = transaction.entity) {
             is TransactionEntity.PersonalMessage -> PersonalMessageContent(
-                personalMessage = transaction,
+                personalMessage = tx,
+                contentPadding = contentPadding
             )
 
             is TransactionEntity.Eip712 -> TypedMessageContent(
-                typedMessage = transaction,
+                typedMessage = tx,
+                contentPadding = contentPadding
             )
 
             is TransactionEntity.Eip1559 -> TransactionContent(
-                transaction = transaction,
+                transaction = tx,
                 onOpen = onOpen,
+                contentPadding = contentPadding
             )
 
             null -> Unit
         }
-
-        Spacer(Modifier.height(128.dp))
     }
 }
 
 @Composable
 fun PersonalMessageContent(
     personalMessage: TransactionEntity.PersonalMessage,
+    contentPadding: PaddingValues = PaddingValues(),
 ) {
     Column(
-        modifier = Modifier.verticalScroll(rememberScrollState()),
+        modifier = Modifier
+            .verticalScroll(rememberScrollState())
+            .padding(contentPadding),
         verticalArrangement = Arrangement.spacedBy(8.dp)
     ) {
         val account = rememberAccount(personalMessage.sender)
@@ -164,17 +152,21 @@ fun PersonalMessageContent(
                 value = { TextDate(personalMessage.createdAt) }
             )
         }
+
+        Spacer(Modifier.height(64.dp))
     }
 }
 
 @Composable
 fun TypedMessageContent(
     typedMessage: TransactionEntity.Eip712,
+    contentPadding: PaddingValues = PaddingValues(),
 ) {
     val jsonText = typedMessage.jsonTypeData.resolve(JsonTypedData.serializer())
 
     Column(
-        modifier = Modifier.verticalScroll(rememberScrollState()),
+        modifier = Modifier.verticalScroll(rememberScrollState())
+            .padding(contentPadding),
         verticalArrangement = Arrangement.spacedBy(8.dp)
     ) {
         val network = typedMessage.networkId?.let { rememberNetwork(it) }
@@ -208,6 +200,8 @@ fun TypedMessageContent(
                 value = { TextDate(typedMessage.createdAt) }
             )
         }
+
+        Spacer(Modifier.height(64.dp))
     }
 }
 
@@ -215,6 +209,7 @@ fun TypedMessageContent(
 fun TransactionContent(
     transaction: TransactionEntity.Eip1559,
     onOpen: (RootRoute) -> Unit,
+    contentPadding: PaddingValues = PaddingValues(),
 ) {
     val network = rememberNetwork(transaction.networkId)
     val account = rememberAccount(transaction.sender)
@@ -231,7 +226,8 @@ fun TransactionContent(
     }
 
     Column(
-        modifier = Modifier.verticalScroll(rememberScrollState()),
+        modifier = Modifier.verticalScroll(rememberScrollState())
+            .padding(contentPadding),
     ) {
         NetworkItem(network.entity)
 
@@ -287,7 +283,7 @@ fun TransactionContent(
 
                 if (transaction.receipt != null) {
                     KeyValueRow(
-                        key = { Text("Confirm At") },
+                        key = { Text("Confirmed At") },
                         value = { TextDate(transaction.receipt?.time ?: Instant.DISTANT_PAST) }
                     )
                 }
@@ -299,6 +295,6 @@ fun TransactionContent(
             }
         }
 
-        Spacer(Modifier.height(128.dp))
+        Spacer(Modifier.height(64.dp))
     }
 }

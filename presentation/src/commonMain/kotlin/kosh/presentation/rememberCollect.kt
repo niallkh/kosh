@@ -23,7 +23,7 @@ import kotlin.coroutines.CoroutineContext
 @Composable
 fun <R> rememberCollect(
     initial: R,
-    vararg keys: Any?,
+    vararg inputs: Any?,
     flow: @DisallowComposableCalls suspend () -> Flow<R>,
 ): CollectState<R> {
     var init by rememberRetained { mutableStateOf(false) }
@@ -31,7 +31,7 @@ fun <R> rememberCollect(
 
     val currentFlow by rememberUpdatedState(flow)
 
-    val collectLauncher = CollectLauncher(*keys) {
+    val collectLauncher = CollectLauncher(*inputs) {
         currentFlow().collect {
             init = true
             result = it
@@ -53,11 +53,11 @@ fun <R> rememberCollect(
 @Composable
 @NonRestartableComposable
 private fun CollectLauncher(
-    vararg keys: Any?,
+    vararg inputs: Any?,
     block: suspend () -> Unit,
 ): CollectLauncher {
     val applyContext = rememberCoroutineScope().coroutineContext
-    return remember(*keys) { CollectLauncher(applyContext, block) }
+    return remember(*inputs) { CollectLauncher(applyContext, block) }
 }
 
 private class CollectLauncher(

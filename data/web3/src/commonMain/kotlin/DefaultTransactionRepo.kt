@@ -1,6 +1,6 @@
 package kosh.data.web3
 
-import arrow.core.raise.either
+import arrow.core.Either
 import co.touchlab.kermit.Logger
 import kosh.domain.entities.NetworkEntity
 import kosh.domain.failure.Web3Failure
@@ -16,7 +16,6 @@ import kosh.domain.models.web3.ReceiptLogs
 import kosh.domain.models.web3.Signature
 import kosh.domain.repositories.TransactionRepo
 import kosh.domain.serializers.BigInteger
-import kosh.domain.serializers.Either
 import kosh.domain.usecases.network.GetRpcProvidersUC
 import kosh.domain.usecases.network.NetworkService
 import kosh.domain.usecases.network.invoke
@@ -40,41 +39,36 @@ class DefaultTransactionRepo(
         chainId: ChainId,
         address: Address,
     ): Either<Web3Failure, ULong> = withContext(Dispatchers.Default) {
-        either {
+        Either.catch {
             val web3 = web3ProviderFactory(getRpcProvidersUC(chainId).toLibUri())
 
             web3.getNonce(address = address.bytes().abi.address)
-        }
+        }.mapToWeb3Failure(logger)
     }
 
     override suspend fun send(
         chainId: ChainId,
         transaction: Signature,
     ): Either<Web3Failure, Hash> = withContext(Dispatchers.Default) {
-        either {
+        Either.catch {
             val web3 = web3ProviderFactory(getRpcProvidersUC(chainId, write = true).toLibUri())
             val hash = web3.sendRawTransaction(transaction.data.bytes())
             check(hash.bytes == transaction.data.bytes().keccak256())
             Hash(ByteString(transaction.data.bytes().keccak256()))
-        }
+        }.mapToWeb3Failure(logger)
     }
 
     override suspend fun receipt(
         networkId: NetworkEntity.Id,
         hash: Hash,
     ): Either<Web3Failure, ReceiptLogs?> = withContext(Dispatchers.Default) {
-        either {
+        Either.catch {
             val web3 = web3ProviderFactory(networkService.getRpc(networkId).toLibUri())
 
-            val receipt = web3.catch(logger) {
-                getTransactionReceipt(kosh.eth.rpc.Hash(hash.value.bytes()))
-            }.bind()
+            val receipt = web3.getTransactionReceipt(kosh.eth.rpc.Hash(hash.value.bytes()))
+                ?: return@catch null
 
-            if (receipt == null) return@either null
-
-            val block = web3.catch(logger) {
-                getBlockByHash(receipt.blockHash)
-            }.bind()
+            val block = web3.getBlockByHash(receipt.blockHash)
 
             val baseFee = block.baseFeePerGas ?: BigInteger.ZERO
             val priorityFee = receipt.effectiveGasPrice - baseFee
@@ -99,6 +93,6 @@ class DefaultTransactionRepo(
                     )
                 },
             )
-        }
+        }.mapToWeb3Failure(logger)
     }
 }

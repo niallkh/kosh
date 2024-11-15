@@ -13,8 +13,6 @@ import android.hardware.usb.UsbEndpoint
 import android.hardware.usb.UsbInterface
 import android.hardware.usb.UsbManager
 import android.os.Build
-import arrow.core.continuations.AtomicRef
-import arrow.core.continuations.update
 import arrow.fx.coroutines.Resource
 import arrow.fx.coroutines.resource
 import arrow.resilience.Schedule
@@ -26,6 +24,8 @@ import kosh.libs.transport.Transport
 import kosh.libs.transport.TransportException.ConnectionFailedException
 import kosh.libs.transport.TransportException.DeviceDisconnectedException
 import kosh.libs.transport.TransportException.PermissionNotGrantedException
+import kotlinx.atomicfu.atomic
+import kotlinx.atomicfu.update
 import kotlinx.collections.immutable.minus
 import kotlinx.collections.immutable.persistentHashSetOf
 import kotlinx.collections.immutable.persistentListOf
@@ -61,7 +61,7 @@ class AndroidUsb(
     private val coroutineScope = CoroutineScope(dispatcher + SupervisorJob())
 
     private val discoveredDevices = MutableStateFlow(persistentHashSetOf<WrappedDevice>())
-    private val configs = AtomicRef(persistentListOf<UsbConfig>())
+    private val configs = atomic(persistentListOf<UsbConfig>())
 
     private val receiver = object : BroadcastReceiver() {
         override fun onReceive(context: Context, intent: Intent) {

@@ -13,6 +13,7 @@ import io.ktor.http.contentType
 import io.ktor.http.takeFrom
 import io.ktor.utils.io.ByteReadChannel
 import io.ktor.utils.io.readAvailable
+import io.ktor.utils.io.writeFully
 import io.ktor.utils.io.writer
 import kosh.libs.ipfs.car.CarSource
 import kosh.libs.ipfs.cid.Cid

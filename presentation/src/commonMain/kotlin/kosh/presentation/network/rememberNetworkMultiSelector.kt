@@ -22,7 +22,6 @@ import kotlinx.collections.immutable.minus
 import kotlinx.collections.immutable.persistentSetOf
 import kotlinx.collections.immutable.plus
 import kotlinx.collections.immutable.toPersistentHashSet
-import kotlinx.collections.immutable.toPersistentSet
 
 
 @Composable
@@ -37,11 +36,15 @@ fun rememberNetworkMultiSelector(
     var selected by rememberSerializable(
         stateSerializer = ImmutableSetSerializer(NetworkEntity.Id.serializer())
     ) {
-        mutableStateOf(selectedIds)
+        mutableStateOf(required.toPersistentHashSet() + selectedIds)
     }
 
     selector(selectedIds, ImmutableSetSerializer(NetworkEntity.Id.serializer())) {
-        selected = selected.toPersistentSet() + it
+        selected = selected.toPersistentHashSet() + it
+    }
+
+    selector(requiredIds, ImmutableSetSerializer(NetworkEntity.Id.serializer())) {
+        selected = selected.toPersistentHashSet() + it
     }
 
     return remember {

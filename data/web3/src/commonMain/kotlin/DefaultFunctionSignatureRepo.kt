@@ -9,6 +9,7 @@ import io.ktor.client.request.headers
 import io.ktor.client.request.parameter
 import io.ktor.client.statement.bodyAsChannel
 import io.ktor.http.HttpHeaders
+import io.ktor.utils.io.readBuffer
 import kosh.domain.failure.Web3Failure
 import kosh.domain.models.FunSelector
 import kosh.domain.repositories.FunctionSignatureRepo

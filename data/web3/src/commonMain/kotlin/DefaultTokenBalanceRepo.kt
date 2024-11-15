@@ -1,7 +1,5 @@
 package kosh.data.web3
 
-import arrow.core.raise.Raise
-import arrow.core.raise.either
 import co.touchlab.kermit.Logger
 import com.ionspin.kotlin.bignum.integer.BigInteger
 import kosh.domain.entities.NetworkEntity
@@ -39,11 +37,11 @@ class DefaultTokenBalanceRepo(
         account: Address,
         tokens: List<TokenEntity>,
     ): Either<Web3Failure, List<Balance>> = withContext(Dispatchers.Default) {
-        either {
+        Either.catch {
             val calls = tokens.map { token -> mapToCall(account, token) }
 
             getBalances(networkId, calls)
-        }
+        }.mapToWeb3Failure(logger)
     }
 
     override suspend fun getBalancesForMetadata(
@@ -51,14 +49,14 @@ class DefaultTokenBalanceRepo(
         account: Address,
         tokens: List<TokenMetadata>,
     ): Either<Web3Failure, List<Balance>> = withContext(Dispatchers.Default) {
-        either {
+        Either.catch {
             val calls = tokens.map { token -> mapToCall(account, token) }
 
             getBalances(networkId, calls)
-        }
+        }.mapToWeb3Failure(logger)
     }
 
-    private suspend fun Raise<Web3Failure>.getBalances(
+    private suspend fun getBalances(
         networkId: NetworkEntity.Id,
         calls: List<ContractCall<BigInteger>?>,
     ): List<Balance> {
@@ -66,9 +64,7 @@ class DefaultTokenBalanceRepo(
             networkService.getRpc(networkId).toLibUri()
         )
 
-        web3.catch(logger) {
-            web3.multicall(*calls.filterNotNull().toTypedArray())
-        }.bind()
+        web3.multicall(*calls.filterNotNull().toTypedArray())
 
         return calls.map { call ->
             val balance = call?.result?.getOrNull() ?: BigInteger.ZERO

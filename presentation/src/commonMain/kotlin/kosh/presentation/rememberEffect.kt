@@ -24,7 +24,7 @@ import kotlin.experimental.ExperimentalTypeInference
 
 @Composable
 fun <R, P> rememberEffect(
-    vararg keys: Any?,
+    vararg inputs: Any?,
     onFinish: (R) -> Unit = {},
     effect: @DisallowComposableCalls suspend (P) -> R,
 ): EffectState<R, P> {
@@ -35,7 +35,7 @@ fun <R, P> rememberEffect(
     val currentEffect by rememberUpdatedState(effect)
     val currentOnFinish by rememberUpdatedState(onFinish)
 
-    val effectLauncher = EffectLauncher<P>(*keys) { param ->
+    val effectLauncher = EffectLauncher<P>(*inputs) { param ->
         inProgress = true
 
         val res = currentEffect(param)
@@ -61,11 +61,11 @@ fun <R, P> rememberEffect(
 @Composable
 @NonRestartableComposable
 private fun <P> EffectLauncher(
-    vararg keys: Any?,
+    vararg inputs: Any?,
     block: suspend (P) -> Unit,
 ): EffectLauncher<P> {
     val applyContext = rememberCoroutineScope().coroutineContext
-    return remember(*keys) { EffectLauncher(applyContext, block) }
+    return remember(*inputs) { EffectLauncher(applyContext, block) }
 }
 
 private class EffectLauncher<P>(

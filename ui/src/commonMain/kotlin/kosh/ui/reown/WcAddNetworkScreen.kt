@@ -108,7 +108,7 @@ fun WcAddNetworkContent(
         )
 
         KeyValueColumn(
-            key = { Text("Network Name") },
+            key = { TextLine("Network Name") },
             value = {
                 TextLine(
                     addNetwork.call?.chainName ?: "Unknown Network Name",

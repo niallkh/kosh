@@ -8,8 +8,7 @@ import io.ktor.client.request.parameter
 import io.ktor.client.statement.bodyAsChannel
 import io.ktor.http.appendPathSegments
 import io.ktor.http.isSuccess
-import io.ktor.utils.io.ByteReadChannel
-import io.ktor.utils.io.readAvailable
+import io.ktor.utils.io.readBuffer
 import kosh.eth.abi.Abi
 import kosh.eth.abi.Value
 import kosh.eth.abi.abiAddress
@@ -36,7 +35,6 @@ import kosh.libs.ledger.cmds.TokenInfo
 import kotlinx.coroutines.async
 import kotlinx.coroutines.coroutineScope
 import kotlinx.io.Buffer
-import kotlinx.io.Source
 import kotlinx.io.bytestring.ByteString
 import kotlinx.io.bytestring.encodeToByteString
 import kotlinx.io.bytestring.hexToByteString
@@ -361,16 +359,4 @@ class LedgerOffChain(
         }
         return result
     }
-}
-
-
-internal suspend fun ByteReadChannel.readBuffer(): Source {
-    val buffer = Buffer()
-    val buff = ByteArray(4096)
-    while (!isClosedForRead) {
-        val read = readAvailable(buff)
-        if (read == -1) continue
-        buffer.write(buff, 0, read)
-    }
-    return buffer
 }

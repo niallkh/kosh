@@ -4,12 +4,13 @@ import com.seiko.imageloader.ImageLoader
 import com.seiko.imageloader.component.fetcher.FetchResult
 import com.seiko.imageloader.component.fetcher.Fetcher
 import com.seiko.imageloader.component.mapper.Mapper
+import com.seiko.imageloader.model.ImageSource
+import com.seiko.imageloader.model.ImageSourceFrom
 import com.seiko.imageloader.option.Options
 import io.ktor.http.Url
 import kosh.domain.models.Uri
 import kosh.domain.models.toLibUri
 import kosh.ui.resources.Res
-import okio.Buffer
 
 public interface ImageComponent {
 
@@ -46,7 +47,8 @@ internal class ComposeResourceFetcher private constructor(
     override suspend fun fetch(): FetchResult {
         val uri1 = uri.toLibUri()
         return FetchResult.OfSource(
-            source = Buffer().apply { write(Res.readBytes(uri1.host + uri1.encodedPath)) },
+            imageSource = ImageSource(Res.readBytes(uri1.host + uri1.encodedPath)),
+            imageSourceFrom = ImageSourceFrom.Disk
         )
     }
 

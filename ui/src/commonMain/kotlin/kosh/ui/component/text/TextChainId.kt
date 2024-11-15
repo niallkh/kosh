@@ -16,7 +16,7 @@ fun TextChainId(
     modifier: Modifier = Modifier,
     style: TextStyle = LocalTextStyle.current,
 ) {
-    val text = remember(chainId) { "#" + chainId.value.toString() }
+    val text = remember(chainId) { chainId.value.toString() }
 
     Text(
         modifier = modifier,
