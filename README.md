@@ -33,11 +33,10 @@ from your mobile device.
 - [x] IPFS Trustless client
 - [x] EIP-191, EIP-712, EIP-1559
 - [x] iOS
+- [x] Keystone (USB)
 - [ ] Export/Import passkeys
 - [ ] ENS
-- [ ] Keystone (USB)
 - [ ] EIP-7702
-- [ ] WalletConnect Inbox
 - [ ] publish iOS
 
 ## Built With
