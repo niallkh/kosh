@@ -27,7 +27,7 @@ interface LedgerRepo : Repository {
         derivationPath: DerivationPath,
     ): Either<LedgerFailure, Signature>
 
-    suspend fun signTypedMessage(
+    suspend fun signTypedData(
         listener: LedgerListener,
         ledger: Ledger,
         typedMessage: String,

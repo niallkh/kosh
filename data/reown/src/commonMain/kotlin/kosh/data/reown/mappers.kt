@@ -2,6 +2,7 @@ package kosh.data.reown
 
 import arrow.core.raise.either
 import arrow.core.raise.ensureNotNull
+import co.touchlab.kermit.Logger
 import kosh.domain.failure.WcFailure
 import kosh.domain.models.ChainAddress
 import kosh.domain.models.ChainId
@@ -62,7 +63,7 @@ internal fun AuthenticationRequest.map() = either {
     )
 }
 
-internal fun SessionRequest.map() = either {
+internal fun SessionRequest.map(logger: Logger) = either {
     WcRequest(
         id = WcRequest.Id(id),
         dapp = DappMetadata(
@@ -78,7 +79,8 @@ internal fun SessionRequest.map() = either {
         call = requestCall(
             requestChainId = chainId,
             method = method,
-            params = params
+            params = params,
+            logger = logger
         ).bind()
     )
 }

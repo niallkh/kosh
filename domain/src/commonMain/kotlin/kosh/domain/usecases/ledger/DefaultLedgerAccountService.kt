@@ -62,7 +62,7 @@ class DefaultLedgerAccountService(
         val appState = appStateRepo.state
         val account = AppState.account(address).get(appState) ?: raise(LedgerFailure.Other())
 
-        val signature = ledgerRepo.signTypedMessage(
+        val signature = ledgerRepo.signTypedData(
             listener, ledger, jsonTypeData.json, account.derivationPath
         ).bind()
 

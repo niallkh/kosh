@@ -83,21 +83,6 @@ inline fun <reified P : Any, reified R, reified E> Perform(
 
 @Deprecated("")
 @Composable
-inline fun <reified R : Any, reified E> Perform(
-    vararg keys: Any?,
-    crossinline block: suspend Raise<E>.() -> R,
-): PerformState<Unit, R, E> {
-    val actionState = rememberPerform<Unit, R, E>()
-
-    actionState.Perform(*keys) {
-        block(this)
-    }
-
-    return actionState
-}
-
-@Deprecated("")
-@Composable
 inline fun Perform(
     vararg keys: Any?,
     crossinline block: suspend () -> Unit,

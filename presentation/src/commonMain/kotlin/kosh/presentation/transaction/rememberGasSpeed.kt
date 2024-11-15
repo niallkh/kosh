@@ -8,10 +8,13 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import kosh.domain.models.web3.GasPrices
 import kosh.presentation.di.rememberSerializable
+import kotlinx.serialization.Serializable
 
 @Composable
 fun rememberGasSpeed(): GasSpeedState {
-    var gasSpeed by rememberSerializable { mutableStateOf(GasSpeed.Medium) }
+    var gasSpeed by rememberSerializable(GasSpeed.serializer()) {
+        mutableStateOf(GasSpeed.Medium)
+    }
 
     return remember {
         object : GasSpeedState {
@@ -29,6 +32,7 @@ interface GasSpeedState {
     fun change(speed: GasSpeed)
 }
 
+@Serializable
 enum class GasSpeed {
     Slow,
     Medium,

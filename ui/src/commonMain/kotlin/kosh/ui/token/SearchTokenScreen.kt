@@ -11,12 +11,10 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.SnackbarHost
-import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
@@ -56,63 +54,60 @@ fun SearchTokenScreen(
     searchToken: SearchTokenState = rememberSearchToken(query.value.text),
     createToken: CreateTokenState = rememberCreateToken(onCreated = { onFinish() }),
 ) {
-    val snackbarHostState = remember { SnackbarHostState() }
+    val snackbarHostState = LocalSnackbarHostState.current
 
-    CompositionLocalProvider(
-        LocalSnackbarHostState provides snackbarHostState,
-    ) {
-        Scaffold(
-            topBar = {
-                SearchView(
-                    modifier = Modifier
-                        .windowInsetsPadding(TopAppBarDefaults.windowInsets),
-                    value = query.value,
-                    onValueChange = query::onChange,
-                    onUp = onNavigateUp,
-                    placeholder = "Enter Token Name or Address",
-                    trailingIcon = {
-                        PasteClearIcon(
-                            textField = query.value,
-                            onChange = query::onChange
-                        )
-                    }
-                )
-            },
-            snackbarHost = { SnackbarHost(snackbarHostState) }
-        ) { innerPadding ->
-
-            Box(
-                modifier = Modifier.padding(innerPadding)
-                    .imePadding()
-            ) {
-
-                AppFailureMessage(createToken.failure)
-
-                searchToken.failure?.let {
-                    AppFailureItem(it) {
-                        searchToken.retry()
-                    }
-                } ?: run {
-                    SearchTokenContent(
-                        tokens = searchToken.tokens,
-                        onSelect = {
-                            if (it.isNft) {
-                                onNft(ChainAddress(it.chainId, it.address))
-                            } else {
-                                createToken.create(it)
-                            }
-                        }
+    Scaffold(
+        topBar = {
+            SearchView(
+                modifier = Modifier
+                    .windowInsetsPadding(TopAppBarDefaults.windowInsets),
+                value = query.value,
+                onValueChange = query::onChange,
+                onUp = onNavigateUp,
+                placeholder = "Enter Token Name or Address",
+                trailingIcon = {
+                    PasteClearIcon(
+                        textField = query.value,
+                        onChange = query::onChange
                     )
                 }
+            )
+        },
+        snackbarHost = { SnackbarHost(snackbarHostState) }
+    ) { innerPadding ->
 
-                val loading by remember {
-                    derivedStateOf { searchToken.loading || createToken.loading }
+        Box(
+            modifier = Modifier.padding(innerPadding)
+                .imePadding()
+        ) {
+
+            AppFailureMessage(createToken.failure)
+
+            searchToken.failure?.let {
+                AppFailureItem(it) {
+                    searchToken.retry()
                 }
-
-                LoadingIndicator(loading)
+            } ?: run {
+                SearchTokenContent(
+                    tokens = searchToken.tokens,
+                    onSelect = {
+                        if (it.isNft) {
+                            onNft(ChainAddress(it.chainId, it.address))
+                        } else {
+                            createToken.create(it)
+                        }
+                    }
+                )
             }
+
+            val loading by remember {
+                derivedStateOf { searchToken.loading || createToken.loading }
+            }
+
+            LoadingIndicator(loading)
         }
     }
+
 }
 
 @Composable

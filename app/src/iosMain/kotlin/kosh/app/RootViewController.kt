@@ -4,6 +4,7 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.ComposeUIViewController
@@ -14,6 +15,9 @@ import kosh.app.di.AppScope
 import kosh.app.di.IosAppScope
 import kosh.presentation.core.LocalPresentationContext
 import kosh.presentation.core.PresentationContext
+import kosh.ui.component.scaffold.LocalSnackbarHostState
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.launch
 import platform.Foundation.NSURL.Companion.URLWithString
 import platform.UIKit.UIApplication
 import platform.UIKit.UIViewController
@@ -40,6 +44,9 @@ public fun rootViewController(
                 activationOffsetThreshold = 8.dp
             ) {
                 Box {
+                    val snackbar = LocalSnackbarHostState.current
+                    val scope = rememberCoroutineScope()
+
                     App(
                         initialLink = null,
                         onResult = {
@@ -48,13 +55,18 @@ public fun rootViewController(
                                     url = URLWithString(it.redirect!!)!!,
                                     options = emptyMap<Any?, Any>(),
                                     completionHandler = {
-                                        presentationContext.presentationScope.deeplinkHandler.handle(
-                                            null
-                                        )
+                                        presentationContext.presentationScope
+                                            .deeplinkHandler.handle(null)
                                     }
                                 )
                             } else {
                                 presentationContext.presentationScope.deeplinkHandler.handle(null)
+                                scope.launch {
+                                    delay(300)
+                                    snackbar.showSnackbar(
+                                        "Done! You may return to previous app."
+                                    )
+                                }
                             }
                         }
                     )

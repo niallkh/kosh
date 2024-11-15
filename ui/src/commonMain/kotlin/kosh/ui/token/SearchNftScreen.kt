@@ -9,11 +9,9 @@ import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.SnackbarHost
-import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
@@ -50,63 +48,59 @@ fun SearchNftScreen(
     searchNft: SearchNftState = rememberSearchNft(chainAddress, query.value.text),
     createNft: CreateNftState = rememberCreateNft(onCreated = { onFinish() }),
 ) {
-    val snackbarHostState = remember { SnackbarHostState() }
+    val snackbarHostState = LocalSnackbarHostState.current
 
-    CompositionLocalProvider(
-        LocalSnackbarHostState provides snackbarHostState,
-    ) {
-        Scaffold(
-            topBar = {
-                SearchView(
-                    modifier = Modifier
-                        .windowInsetsPadding(TopAppBarDefaults.windowInsets),
-                    value = query.value,
-                    onValueChange = query::onChange,
-                    onUp = onNavigateUp,
-                    keyboardOptions = KeyboardOptions(
-                        keyboardType = KeyboardType.Number,
-                    ),
-                    placeholder = "Enter Token Id",
-                    trailingIcon = {
-                        PasteClearIcon(
-                            textField = query.value,
-                            onChange = query::onChange
-                        )
-                    }
-                )
-            },
-            containerColor = MaterialTheme.colorScheme.surfaceContainerHigh,
-            snackbarHost = { SnackbarHost(snackbarHostState) },
-        ) { innerPadding ->
-            Box(
-                modifier = Modifier.padding(innerPadding)
-                    .imePadding()
-            ) {
+    Scaffold(
+        topBar = {
+            SearchView(
+                modifier = Modifier
+                    .windowInsetsPadding(TopAppBarDefaults.windowInsets),
+                value = query.value,
+                onValueChange = query::onChange,
+                onUp = onNavigateUp,
+                keyboardOptions = KeyboardOptions(
+                    keyboardType = KeyboardType.Number,
+                ),
+                placeholder = "Enter Token Id",
+                trailingIcon = {
+                    PasteClearIcon(
+                        textField = query.value,
+                        onChange = query::onChange
+                    )
+                }
+            )
+        },
+        containerColor = MaterialTheme.colorScheme.surfaceContainerHigh,
+        snackbarHost = { SnackbarHost(snackbarHostState) },
+    ) { innerPadding ->
+        Box(
+            modifier = Modifier.padding(innerPadding)
+                .imePadding()
+        ) {
 
-                AppFailureMessage(createNft.failure)
+            AppFailureMessage(createNft.failure)
 
-                searchNft.failure?.let {
-                    AppFailureItem(it) {
-                        searchNft.retry()
-                    }
-                } ?: run {
-                    SearchNftContent(
-                        modifier = Modifier.padding(16.dp),
-                        nft = searchNft.nft,
-                        token = searchNft.token,
-                    ) { nft ->
-                        searchNft.token?.let { token ->
-                            createNft.create(token, nft)
-                        }
+            searchNft.failure?.let {
+                AppFailureItem(it) {
+                    searchNft.retry()
+                }
+            } ?: run {
+                SearchNftContent(
+                    modifier = Modifier.padding(16.dp),
+                    nft = searchNft.nft,
+                    token = searchNft.token,
+                ) { nft ->
+                    searchNft.token?.let { token ->
+                        createNft.create(token, nft)
                     }
                 }
-
-                val loading by remember {
-                    derivedStateOf { searchNft.loading || createNft.loading }
-                }
-
-                LoadingIndicator(loading)
             }
+
+            val loading by remember {
+                derivedStateOf { searchNft.loading || createNft.loading }
+            }
+
+            LoadingIndicator(loading)
         }
     }
 }

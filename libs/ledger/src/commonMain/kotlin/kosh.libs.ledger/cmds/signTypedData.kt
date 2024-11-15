@@ -7,9 +7,9 @@ import kosh.eth.abi.eip712.Eip712
 import kosh.eth.abi.eip712.Eip712Type
 import kosh.eth.abi.eip712.toValue
 import kosh.libs.ledger.LedgerManager
-import kosh.libs.ledger.StatusWord
 import kosh.libs.ledger.cmds.Eip712Filters.Format
 import kosh.libs.ledger.exchange
+import kosh.libs.ledger.expectSuccess
 import kosh.libs.ledger.ledgerAPDU
 import kosh.libs.ledger.toInt
 import kotlinx.io.Buffer
@@ -22,27 +22,27 @@ import kotlinx.io.readByteString
 import kotlinx.io.write
 import kotlinx.io.writeString
 
-suspend fun LedgerManager.Connection.signTypedMessage(
+suspend fun LedgerManager.Connection.signTypedData(
     derivationPath: List<UInt>,
     eip712: Eip712,
-    parameters: SignTypedMessageParameters?,
+    parameters: SignTypedMessageParameters? = null,
 ): ByteString {
 
     eip712.types.entries.sortedBy { it.key.name }.forEach { (tuple, params) ->
         exchange(structName(tuple.name)) { sw ->
-            sw.expectToBe(StatusWord.OK)
+            sw.expectSuccess()
         }
 
         params.forEach { param ->
             exchange(structField(param.name, param.type)) { sw ->
-                sw.expectToBe(StatusWord.OK)
+                sw.expectSuccess()
             }
         }
     }
 
     if (parameters?.filters != null) {
         exchange(filterActivation()) { sw ->
-            sw.expectToBe(StatusWord.OK)
+            sw.expectSuccess()
         }
 
         parameters.tokens.forEach {
@@ -59,7 +59,7 @@ suspend fun LedgerManager.Connection.signTypedMessage(
 
     if (parameters?.filters != null) {
         exchange(filterMessageInfo(parameters.filters)) { sw ->
-            sw.expectToBe(StatusWord.OK)
+            sw.expectSuccess()
         }
     }
 
@@ -76,7 +76,7 @@ suspend fun LedgerManager.Connection.signTypedMessage(
             writeInt(it.toInt())
         }
     }) { sw ->
-        sw.expectToBe(StatusWord.OK)
+        sw.expectSuccess()
         readByteString()
     }
 
@@ -125,7 +125,7 @@ private suspend fun LedgerManager.Connection.sendRoot(name: String) {
     exchange(ledgerAPDU(0xe0, 0x1c, 0x00, 0x00) {
         writeString(name)
     }) { sw ->
-        sw.expectToBe(StatusWord.OK)
+        sw.expectSuccess()
     }
 }
 
@@ -133,7 +133,7 @@ private suspend fun LedgerManager.Connection.sendArray(size: Int) {
     exchange(ledgerAPDU(0xe0, 0x1c, 0x00, 0x0f) {
         writeByte(size.toByte())
     }) { sw ->
-        sw.expectToBe(StatusWord.OK)
+        sw.expectSuccess()
     }
 }
 
@@ -155,7 +155,7 @@ private suspend fun LedgerManager.Connection.sendField(
             }
 
             exchange(apdu) { sw ->
-                sw.expectToBe(StatusWord.OK)
+                sw.expectSuccess()
             }
         }
     }
@@ -168,7 +168,7 @@ private suspend fun LedgerManager.Connection.sendField(
         writeShort(bytes.size.toShort())
         write(chunk)
     }) { sw ->
-        sw.expectToBe(StatusWord.OK)
+        sw.expectSuccess()
     }
 
     while (!messageBuffer.exhausted()) {
@@ -177,7 +177,7 @@ private suspend fun LedgerManager.Connection.sendField(
         exchange(ledgerAPDU(0xe0, 0x1c, p11, 0xff) {
             write(chunk)
         }) { sw ->
-            sw.expectToBe(StatusWord.OK)
+            sw.expectSuccess()
         }
     }
 }
@@ -318,14 +318,19 @@ private suspend fun LedgerManager.Connection.send(
     path: List<String>,
 ): Unit = when (type) {
     is Eip712Type.UInt -> (value as Value.BigNumber).value
-        .toByteArray().let { sendField(UnsafeByteStringOperations.wrapUnsafe(it), filters, path) }
+        .toByteArray()
+        .let { sendField(UnsafeByteStringOperations.wrapUnsafe(it), filters, path) }
 
     is Eip712Type.Int -> (value as Value.BigNumber).value
         .toTwosComplementByteArray()
         .let { sendField(UnsafeByteStringOperations.wrapUnsafe(it), filters, path) }
 
-    is Eip712Type.Bool -> (value as Value.Bool).value.toInt().toBigInteger()
-        .toByteArray().let { sendField(UnsafeByteStringOperations.wrapUnsafe(it), filters, path) }
+    is Eip712Type.Bool -> (value as Value.Bool).value
+        .toInt()
+        .toString()
+        .toBigInteger()
+        .toByteArray()
+        .let { sendField(UnsafeByteStringOperations.wrapUnsafe(it), filters, path) }
 
     is Eip712Type.FixedBytes -> sendField((value as Value.Bytes).value, filters, path)
     is Eip712Type.Address -> sendField((value as Value.Address).value, filters, path)

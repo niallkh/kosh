@@ -1,6 +1,8 @@
 package kosh.presentation.wc
 
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.Stable
+import androidx.compose.runtime.remember
 import kosh.domain.models.reown.WcAuthentication
 import kosh.domain.serializers.ImmutableList
 import kosh.domain.usecases.reown.WcAuthenticationService
@@ -16,11 +18,18 @@ fun rememberAuthentications(
         authenticationService.authentications
     }
 
-    return AuthenticationsState(
-        authentications = authentications.result,
-    )
+    return remember {
+        object : AuthenticationsState {
+            override val authentications get() = authentications.result
+            override fun retry() {
+                authentications.retry()
+            }
+        }
+    }
 }
 
-data class AuthenticationsState(
-    val authentications: ImmutableList<WcAuthentication>,
-)
+@Stable
+interface AuthenticationsState {
+    val authentications: ImmutableList<WcAuthentication>
+    fun retry()
+}

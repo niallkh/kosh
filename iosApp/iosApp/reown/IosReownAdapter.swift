@@ -46,26 +46,48 @@ class IosReownAdapter: ReownAdapter {
             crypto: DefaultCryptoProvider()
         )
         
+    
         let _ = WalletKit.instance.authenticateRequestPublisher
-            .sink { _ in self.updateAuthentications() }
+            .sink { _ in
+                self.log { "new auth arrived" }
+                self.updateAuthentications()
+            }
         
         let _ = WalletKit.instance.sessionRequestPublisher
-            .sink { _ in self.updateRequests() }
+            .sink { _ in
+                self.log { "new request arrived" }
+                self.updateRequests()
+            }
         
         let _ = WalletKit.instance.requestExpirationPublisher
-            .sink { _ in self.updateRequests() }
+            .sink { _ in
+                self.log { "new request expired" }
+                self.updateRequests()
+            }
         
         let _ = WalletKit.instance.sessionsPublisher
-            .sink { _ in self.updateSessions() }
+            .sink { _ in
+                self.log { "new sessions updated" }
+                self.updateSessions()
+            }
         
         let _ = WalletKit.instance.sessionSettlePublisher
-            .sink { _ in self.updateSessions() }
+            .sink { _ in
+                self.log { "new session settled" }
+                self.updateSessions()
+            }
         
         let _ = WalletKit.instance.sessionDeletePublisher
-            .sink { _ in self.updateSessions() }
+            .sink { _ in
+                self.log { "new session deleted" }
+                self.updateSessions()
+            }
         
         let _ = WalletKit.instance.sessionResponsePublisher
-            .sink { _ in self.updateSessions() }
+            .sink { _ in
+                self.log { "new session response published" }
+                self.updateSessions()
+            }
     }
     
     func connect() async {

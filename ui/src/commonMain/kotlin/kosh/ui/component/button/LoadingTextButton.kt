@@ -26,7 +26,7 @@ fun LoadingTextButton(
     enabled: Boolean = true,
     text: @Composable () -> Unit,
 ) {
-    val colors = ButtonDefaults.buttonColors()
+    val colors = ButtonDefaults.textButtonColors()
 
     TextButton(
         modifier = modifier.defaultMinSize(minWidth = 96.dp),

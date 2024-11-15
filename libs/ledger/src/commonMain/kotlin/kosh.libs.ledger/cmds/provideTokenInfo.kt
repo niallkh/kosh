@@ -2,8 +2,8 @@ package kosh.libs.ledger.cmds
 
 import kosh.eth.abi.Value
 import kosh.libs.ledger.LedgerManager
-import kosh.libs.ledger.StatusWord
 import kosh.libs.ledger.exchange
+import kosh.libs.ledger.expectSuccess
 import kosh.libs.ledger.ledgerAPDU
 import kotlinx.io.bytestring.ByteString
 import kotlinx.io.write
@@ -20,7 +20,7 @@ suspend fun LedgerManager.Connection.provideToken(
 
     write(token.data)
 }) { sw ->
-    sw.expectToBe(StatusWord.OK)
+    sw.expectSuccess()
     readByte().toUByte().toInt()
 }
 

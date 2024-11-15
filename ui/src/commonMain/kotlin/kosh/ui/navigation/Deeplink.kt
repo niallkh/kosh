@@ -27,6 +27,7 @@ fun parseDeeplink(uriStr: String): RootRoute? {
         uriStr.substringAfter(":", "")
             .removePrefix("//")
             .substringBefore("?")
+            .removeSuffix("/")
     }
 
     val pairingUri by lazy(NONE) {

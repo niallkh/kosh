@@ -5,4 +5,4 @@ import androidx.compose.runtime.ProvidableCompositionLocal
 import androidx.compose.runtime.compositionLocalOf
 
 val LocalSnackbarHostState: ProvidableCompositionLocal<SnackbarHostState> =
-    compositionLocalOf { error("LocalSnackbarHostState not provided") }
+    compositionLocalOf { SnackbarHostState() }

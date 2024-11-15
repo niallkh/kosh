@@ -95,14 +95,14 @@ public object Wallet {
     public fun signTypeData(
         privateKey: PrivateKey,
         eip712: Eip712,
-    ): Signature = typeDataHash(eip712).let { hash ->
+    ): Signature = typedDataHash(eip712).let { hash ->
         Signature(
             data = sign(privateKey, hash).concat(),
             messageHash = hash,
         )
     }
 
-    public fun typeDataHash(eip712: Eip712): ByteString = Buffer().run {
+    public fun typedDataHash(eip712: Eip712): ByteString = Buffer().run {
         write("1901".hexToByteString())
         write(eip712.types.structHash(Eip712Type.Tuple.Domain, eip712.domain.toValue()))
         write(eip712.types.structHash(eip712.primaryType, eip712.message))

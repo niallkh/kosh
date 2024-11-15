@@ -27,5 +27,5 @@ fun ledgerAPDU(
     Buffer().apply { data() }.readByteString()
 )
 
-fun Boolean.toInt(): Int = if (this) 0x01 else 0x00
+fun Boolean.toInt(): Int = if (this) 1 else 0
 

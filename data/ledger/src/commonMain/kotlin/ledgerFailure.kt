@@ -5,6 +5,7 @@ import arrow.core.left
 import co.touchlab.kermit.Logger
 import kosh.domain.failure.LedgerFailure
 import kosh.domain.failure.RequestCanceledException
+import kosh.libs.ledger.LedgerManager
 import kosh.libs.transport.TransportException
 import kosh.libs.transport.TransportException.CommunicationFailedException
 import kosh.libs.transport.TransportException.ConnectionFailedException
@@ -26,7 +27,7 @@ internal fun <T> Either<Throwable, T>.mapLedgerFailure(logger: Logger) = mapLeft
 internal fun Throwable.mapLedgerFailure(
     logger: Logger,
 ): LedgerFailure {
-    logger.w(this) { "Ledger: Error happened" }
+    logger.w(this) { "Ledger: Error happened: $message" }
     return when (this) {
         is TransportException -> when (this) {
             is CommunicationFailedException -> LedgerFailure.CommunicationFailed()
@@ -38,6 +39,7 @@ internal fun Throwable.mapLedgerFailure(
         }
 
         is RequestCanceledException -> LedgerFailure.ActionCanceled()
+        is LedgerManager.ActionRejectedException -> LedgerFailure.ActionCanceled()
         else -> LedgerFailure.Other()
     }
 }

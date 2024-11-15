@@ -1,6 +1,8 @@
 package kosh.presentation.wc
 
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.Stable
+import androidx.compose.runtime.remember
 import kosh.domain.models.reown.WcSessionProposal
 import kosh.domain.serializers.ImmutableList
 import kosh.domain.usecases.reown.WcProposalService
@@ -16,11 +18,18 @@ fun rememberProposals(
         proposalService.proposals
     }
 
-    return ProposalsState(
-        proposals = proposals.result
-    )
+    return remember {
+        object : ProposalsState {
+            override val proposals get() = proposals.result
+            override fun retry() {
+                proposals.retry()
+            }
+        }
+    }
 }
 
-data class ProposalsState(
-    val proposals: ImmutableList<WcSessionProposal>,
-)
+@Stable
+interface ProposalsState {
+    val proposals: ImmutableList<WcSessionProposal>
+    fun retry()
+}

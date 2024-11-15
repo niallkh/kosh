@@ -1,6 +1,8 @@
 package kosh.presentation.wc
 
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.Stable
+import androidx.compose.runtime.remember
 import kosh.domain.models.reown.WcRequest
 import kosh.domain.serializers.ImmutableList
 import kosh.domain.usecases.reown.WcRequestService
@@ -16,11 +18,18 @@ fun rememberRequests(
         requestService.requests
     }
 
-    return RequestsState(
-        requests = requests.result,
-    )
+    return remember {
+        object : RequestsState {
+            override val requests get() = requests.result
+            override fun retry() {
+                requests.retry()
+            }
+        }
+    }
 }
 
-data class RequestsState(
-    val requests: ImmutableList<WcRequest>,
-)
+@Stable
+interface RequestsState {
+    val requests: ImmutableList<WcRequest>
+    fun retry()
+}

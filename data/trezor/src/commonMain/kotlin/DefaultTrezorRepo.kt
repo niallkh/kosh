@@ -191,7 +191,7 @@ class DefaultTrezorRepo(
                 listener.onConnected(WalletEntity.Id(Address(mainAddress).getOrNull()!!))
 
                 val eip712 = Eip712.fromJson(json)
-                val messageHash = SignerWallet.typeDataHash(eip712)
+                val messageHash = SignerWallet.typedDataHash(eip712)
 
                 val (signature, address) = connection.signTypedMessage(
                     derivationPath = derivationPath.components,

@@ -57,15 +57,23 @@ fun ActivityScreen(
     onOpenRequest: (WcRequest) -> Unit,
     onOpenNetworks: () -> Unit,
     onOpenWallets: () -> Unit,
+    transactions: TransactionsState = rememberTransactions(),
+    proposals: ProposalsState = rememberProposals(),
+    authentications: AuthenticationsState = rememberAuthentications(),
+    requests: RequestsState = rememberRequests(),
 ) {
     val finalizeTransactions = rememberFinalizeTransactions()
-    val transactions = rememberTransactions()
     val refreshState = rememberPullToRefreshState()
 
     KoshScaffold(
         modifier = Modifier.pullToRefresh(
             isRefreshing = finalizeTransactions.refreshing,
-            onRefresh = finalizeTransactions.refresh,
+            onRefresh = {
+                finalizeTransactions.refresh()
+                proposals.retry()
+                authentications.retry()
+                requests.retry()
+            },
             state = refreshState
         ),
         title = { Text("Activity") },
@@ -90,6 +98,9 @@ fun ActivityScreen(
             ActivityContent(
                 isRefreshing = finalizeTransactions.refreshing,
                 transactions = transactions,
+                proposals = proposals,
+                authentications = authentications,
+                requests = requests,
                 onSelectTransaction = { onOpenTransaction(it.id) },
                 onSelectRequest = { onOpenRequest(it) },
                 onSelectProposal = { onOpenProposal(it) },
@@ -108,10 +119,10 @@ fun ActivityScreen(
 @Composable
 fun ActivityContent(
     isRefreshing: Boolean = false,
-    transactions: TransactionsState = rememberTransactions(),
-    proposals: ProposalsState = rememberProposals(),
-    authentications: AuthenticationsState = rememberAuthentications(),
-    requests: RequestsState = rememberRequests(),
+    transactions: TransactionsState,
+    proposals: ProposalsState,
+    authentications: AuthenticationsState,
+    requests: RequestsState,
     onSelectTransaction: (TransactionEntity) -> Unit,
     onSelectProposal: (WcSessionProposal) -> Unit,
     onSelectAuthentication: (WcAuthentication) -> Unit,

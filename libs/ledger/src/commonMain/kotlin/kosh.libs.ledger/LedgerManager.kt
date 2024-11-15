@@ -76,6 +76,8 @@ interface LedgerManager {
             UnlockDevice,
         }
     }
+
+    class ActionRejectedException : Exception()
 }
 
 data class LedgerDevice(

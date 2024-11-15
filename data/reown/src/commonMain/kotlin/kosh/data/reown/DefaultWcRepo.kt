@@ -131,7 +131,7 @@ class DefaultWcRepo(
         get() = callbackFlow {
             init()
             val cancelable = adapter.getNewRequest { request ->
-                request.map().fold(
+                request.map(logger).fold(
                     { logger.w { "Session request error: ${it.message}" } },
                     { launch { send(it) } }
                 )
@@ -145,8 +145,8 @@ class DefaultWcRepo(
         get() = callbackFlow {
             init()
             val cancelable = adapter.getRequests { requests ->
-                requests.mapNotNull { authentication ->
-                    authentication.map().fold(
+                requests.mapNotNull { request ->
+                    request.map(logger).fold(
                         { logger.w { "Session request error: ${it.message}" }; null },
                         { it }
                     )
@@ -355,7 +355,7 @@ class DefaultWcRepo(
             retrySchedule.retryRaise {
                 adapter.getRequest(id.value)
                     .mapFailure().bind()
-                    .map().bind()
+                    .map(logger).bind()
             }
         } else {
             withTimeoutOrNull(10.seconds) {

@@ -35,7 +35,7 @@ import kosh.libs.ledger.cmds.ethereumAddress
 import kosh.libs.ledger.cmds.getAppAndVersion
 import kosh.libs.ledger.cmds.signPersonalMessage
 import kosh.libs.ledger.cmds.signTransaction
-import kosh.libs.ledger.cmds.signTypedMessage
+import kosh.libs.ledger.cmds.signTypedData
 import kotlinx.collections.immutable.ImmutableList
 import kotlinx.collections.immutable.toImmutableList
 import kotlinx.coroutines.Dispatchers
@@ -158,7 +158,7 @@ class DefaultLedgerRepo(
         )
     }
 
-    override suspend fun signTypedMessage(
+    override suspend fun signTypedData(
         listener: LedgerListener,
         ledger: Ledger,
         typedMessage: String,
@@ -166,20 +166,21 @@ class DefaultLedgerRepo(
     ): Either<LedgerFailure, Signature> = withContext(Dispatchers.Default) {
         either {
             catch({
-                doSignTypedMessage(listener, ledger, typedMessage, derivationPath)
+                doSignTypedData(listener, ledger, typedMessage, derivationPath)
             }) {
                 raise(it.mapLedgerFailure(logger))
             }
         }
     }
 
-    private suspend fun Raise<LedgerFailure>.doSignTypedMessage(
+    private suspend fun Raise<LedgerFailure>.doSignTypedData(
         listener: LedgerListener,
         ledger: Ledger,
         typedMessage: String,
         derivationPath: DerivationPath,
     ): Signature = coroutineScope {
         val eip712 = Eip712.fromJson(typedMessage)
+
         val parameters = async { ledgerOffChain.getEip712Parameters(typedMessage, eip712) }
 
         ledgerManager.open(
@@ -191,13 +192,13 @@ class DefaultLedgerRepo(
                 LedgerFailure.NoEthereumApp()
             }
 
-            val signature = connection.signTypedMessage(
+            val signature = connection.signTypedData(
                 derivationPath = derivationPath.components,
                 eip712 = eip712,
                 parameters = parameters.await(),
             )
 
-            val messageHash = Wallet.typeDataHash(Eip712.fromJson(typedMessage))
+            val messageHash = Wallet.typedDataHash(eip712)
 
             val recovered = Wallet.recover(
                 signature = signature,

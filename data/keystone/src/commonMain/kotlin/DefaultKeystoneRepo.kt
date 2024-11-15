@@ -188,7 +188,7 @@ class DefaultKeystoneRepo(
             masterFingerprint = masterFingerprint
         )
 
-        val messageHash = Wallet.typeDataHash(Eip712.fromJson(jsonTypedData.json))
+        val messageHash = Wallet.typedDataHash(Eip712.fromJson(jsonTypedData.json))
 
         val recovered = Wallet.recover(
             signature = signature,

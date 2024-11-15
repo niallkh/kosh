@@ -37,7 +37,7 @@ private fun JsonElement.decodeBigNumber(): Value {
     }
 
     return if (jsonPrimitive.content.startsWith("0x")) {
-        Value.BigNumber(jsonPrimitive.content.toBigInteger(16))
+        Value.BigNumber(jsonPrimitive.content.removePrefix("0x").toBigInteger(16))
     } else {
         Value.BigNumber(jsonPrimitive.content.toBigInteger())
     }
