@@ -9,8 +9,6 @@ from your mobile device.
 
 **Note:** Kosh is currently in development and may be unstable.
 
-[<img src="images/get_on_github.webp" alt="Download app from GitHub" height="80">](https://github.com/niallkh/kosh/releases)
-
 ## Screenshots
 
 <div>
